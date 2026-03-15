@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="경배와 친구들">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5243/5243000.png">
+    
+    <title>경배와 친구들 당구</title>
+    
+    <style>
+        :root { --main: #007bff; --bg: #f4f7f6; --accent: #ff4757; --success: #2ed573; --edit: #f39c12; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: env(safe-area-inset-top) 15px 100px 15px; }
+        
+        /* 공통 카드 스타일 */
+        .card { background: white; border-radius: 20px; padding: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); margin-bottom: 20px; }
+        
+        /* 달력 스타일 보완 */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-top: 10px; }
+        .day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; font-size: 14px; position: relative; background: #fff; border: 1px solid #f0f0f0; transition: 0.2s; }
+        .day.selected { background: var(--main) !important; color: white !important; font-weight: bold; border: 2px solid #0056b3; z-index: 1; transform: scale(1.05); }
+        .has-record { background: #e8f9ee !important; border: 2.5px solid var(--success) !important; font-weight: bold; color: #155724; }
+        .has-record::after { content: ''; position: absolute; bottom: 4px; width: 6px; height: 6px; background: var(--success); border-radius: 50%; }
+        
+        /* 입력 폼 스타일 */
+        .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+        .input-row { display: flex; align-items: center; margin-bottom: 10px; }
+        .input-row label { width: 55px; font-size: 13px; font-weight: bold; color: var(--main); }
+        select { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 15px; background: #fff; appearance: none; }
+        
+        /* 버튼 스타일 */
+        button.save-btn { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 15px; font-weight: bold; margin-top: 10px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 12px rgba(0,123,255,0.3); }
+        button.edit-btn { background: var(--edit) !important; box-shadow: 0 4px 12px rgba(243,156,18,0.3); }
+        button:active { transform: scale(0.97); opacity: 0.9; }
+
+        /* 통계 테이블 */
+        .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+        .stats-table th { padding: 10px 5px; border-bottom: 2px solid #eee; background: #fdfdfd; color: #666; }
+        .stats-table td { padding: 12px 5px; text-align: center; border-bottom: 1px solid #f1f1f1; }
+        
+        /* 강력 강조 초기화 구역 */
+        .danger-zone { margin-top: 50px; padding: 25px; border: 2px dashed #ff4757; border-radius: 25px; background: #fff5f5; text-align: center; }
+        .reset-btn { width: 100%; background: #ff4757; color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,71,87,0.4); }
+        
+        /* 로딩 애니메이션 */
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; font-weight: bold; color: var(--main); }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--main); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .game-item { padding: 14px; border: 1px solid #eee; margin-top: 10px; border-radius: 15px; background: #fafafa; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        .rich-msg { background: #fff3cd; padding: 15px; border-radius: 18px; text-align: center; font-size: 14px; color: #856404; font-weight: bold; margin-top: 15px; border: 2px solid #ffeeba; }
+    </style>
+</head>
+<body>
+
+<div id="loading"><div class="spinner"></div><div id="loadingText">데이터 로딩 중. 기둘려!</div></div>
+
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-weight:bold;">
+        <button onclick="changeMonth(-1)" style="border:none; background:#eee; width:35px; height:35px; border-radius:50%; font-size:14px;">◀</button>
+        <span id="monthDisplay" style="font-size:18px;"></span>
+        <button onclick="changeMonth(1)" style="border:none; background:#eee; width:35px; height:35px; border-radius:50%; font-size:14px;">▶</button>
+    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
+</div>
+
+<div class="card">
+    <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 15px 0; color:#333;">📅 날짜 로딩 중!</h2>
+    <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:12px; background: var(--edit); padding: 10px; border-radius: 10px; text-align: center;">✏️ 기존 기록 수정 중</div>
+    
+    <div class="setup-row">
+        <span style="font-size:14px; font-weight:bold;">게임 인원</span>
+        <select id="playerCount" style="flex:none; width:90px;" onchange="updateInputFields()">
+            <option value="2">2명</option>
+            <option value="3" selected>3명</option>
+            <option value="4">4명</option>
+            <option value="5">5명</option>
+        </select>
+    </div>
+    
+    <div id="inputArea"></div>
+    <button id="mainBtn" class="save-btn" onclick="saveGame()">기록 저장</button>
+    
+    <div id="dayGameList"></div>
+</div>
+
+<div class="card">
+    <h2 style="font-size:17px; margin:0 0 10px 0; color:#333;">📊 멤버별 누적 전적</h2>
+    <table class="stats-table">
+        <thead>
+            <tr><th>이름</th><th>참여</th><th>1위🥇</th><th>2위</th><th>3위</th><th>4위</th><th style="color:red;">꼴찌💀</th></tr>
+        </thead>
+        <tbody id="statsBody"></tbody>
+    </table>
+    <div id="richFriendArea" class="rich-msg" style="display:none;"></div>
+</div>
+
+<div class="danger-zone">
+    <div style="color:#ff4757; font-weight:900; margin-bottom:12px; font-size:16px;">[위험 구역]</div>
+    <button class="reset-btn" onclick="startResetProcess()">⚠️ 모든 데이터 초기화 (복구 불가)</button>
+    <div style="font-size:12px; color:#999; margin-top:12px; line-height:1.4;">이 버튼은 모든 전적 데이터를 삭제합니다.<br>신중하게 결정해 주세요.</div>
+</div>
+
+<script>
+    // [필독] 본인의 GAS URL을 여기에 입력하세요.
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzUSHAIV1iSLTFYxVATVFSqA7V9qKDY1jhXkEp1_jX54tnQONkiIui2yVjCezkIJV_7eQ/exec"; 
+    const players = ["경배", "원석", "진웅", "창한", "정석"];
+    
+    let gameLogs = [];
+    let currentViewDate = new Date();
+    let selectedDateStr = new Date().toLocaleDateString('sv-SE');
+    let editMode = false;
+    let editRound = null;
+
+    function formatDate(dateInput) {
+        const d = new Date(dateInput);
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    // 핵심: 달력은 데이터 로드와 상관없이 즉시 렌더링함
+    async function fetchData() {
+        renderAll(); 
+        
+        if(!GAS_URL || GAS_URL.includes("URL_입력")) {
+            document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
+            return;
+        }
+
+        showLoading(true, "클라우드 데이터 동기화 중");
+        try {
+            const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
+            if(!response.ok) throw new Error();
+            const rawData = await response.json();
+            gameLogs = rawData.map(g => ({ ...g, dateStr: formatDate(g.date) }));
+            renderAll();
+        } catch (e) {
+            console.error("Data fetch error");
+        } finally {
+            showLoading(false);
+            document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
+        }
+    }
+
+    function renderAll() {
+        renderCalendar();
+        renderStats();
+        renderGameList();
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        if(!grid) return;
+        grid.innerHTML = "";
+        
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
+        document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
+        
+        ["일","월","화","수","목","금","토"].forEach(d => {
+            grid.innerHTML += `<div style="font-size:12px;color:#aaa;padding-bottom:5px;">${d}</div>`;
+        });
+        
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
+        
+        for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
+        
+        for (let d = 1; d <= lastDate; d++) {
+            const dStr = formatDate(new Date(year, month, d));
+            const isSelected = dStr === selectedDateStr ? 'selected' : '';
+            const hasRecord = gameLogs.some(g => g.dateStr === dStr) ? 'has-record' : '';
+            grid.innerHTML += `<div class="day ${isSelected} ${hasRecord}" onclick="selectDate('${dStr}')">${d}</div>`;
+        }
+    }
+
+    function selectDate(dateStr) {
+        if(editMode) cancelEdit();
+        selectedDateStr = dateStr;
+        document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`;
+        renderAll();
+    }
+
+    function renderGameList() {
+        const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
+        const listArea = document.getElementById('dayGameList');
+        if(games.length > 0) {
+            let html = `<p style="font-size:12px; color:var(--edit); font-weight:bold; margin:20px 0 8px 0;">⌵ 이 날의 경기 (수정하려면 터치)</p>`;
+            games.forEach((g, idx) => {
+                const names = g.ranks.filter(n => n && n.trim() !== "");
+                html += `<div class="game-item" onclick="enterEditMode(${g.round}, '${names.join(',')}')">
+                    <div><small style="color:#888;">${idx+1}경기:</small> <span style="font-weight:600;">${names.join(' → ')}</span></div>
+                    <div style="display:flex; gap:12px;">
+                        <div style="color:var(--edit); font-size:12px; font-weight:bold;">수정</div>
+                        <div style="color:#ff4757; font-size:12px; font-weight:bold;" onclick="deleteGame(event, ${g.round})">삭제</div>
+                    </div>
+                </div>`;
+            });
+            listArea.innerHTML = html;
+        } else {
+            listArea.innerHTML = "";
+        }
+    }
+
+    async function saveGame() {
+        const count = parseInt(document.getElementById('playerCount').value);
+        const ranks = [];
+        for(let i=1; i<=count; i++) {
+            const v = document.getElementById('rank'+i).value;
+            if(!v) return alert("선수를 모두 지정해 주세요!");
+            ranks.push(v);
+        }
+        if(new Set(ranks).size !== ranks.length) return alert("❌ 중복된 선수가 있습니다!");
+
+        showLoading(true, "기록 저장 중.");
+        try {
+            await fetch(GAS_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: ranks, round: editRound })
+            });
+            setTimeout(async () => { 
+                await fetchData(); 
+                alert("성공적으로 저장되었습니다! ✅"); 
+                cancelEdit(); 
+            }, 1500);
+        } catch (e) {
+            alert("연결 오류가 발생했습니다.");
+            showLoading(false);
+        }
+    }
+
+    function updateInputFields(preFillData = null) {
+        const count = preFillData ? preFillData.length : parseInt(document.getElementById('playerCount').value);
+        if(!preFillData) document.getElementById('playerCount').value = count;
+        const area = document.getElementById('inputArea');
+        let html = '';
+        for(let i=1; i<=count; i++) {
+            const label = i === count ? "꼴찌💀" : `${i}등`;
+            html += `<div class="input-row"><label>${label}</label><select id="rank${i}"><option value="">선수 선택</option>${players.map(p => `<option value="${p}" ${preFillData && preFillData[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
+        }
+        area.innerHTML = html;
+    }
+
+    function enterEditMode(round, rankStr) {
+        editMode = true; 
+        editRound = round;
+        updateInputFields(rankStr.split(','));
+        document.getElementById('editBadge').style.display = 'block';
+        const mainBtn = document.getElementById('mainBtn');
+        mainBtn.innerText = "경기 기록 수정 완료";
+        mainBtn.classList.add('edit-btn');
+        window.scrollTo({ top: 200, behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+        editMode = false; 
+        editRound = null;
+        document.getElementById('editBadge').style.display = 'none';
+        const mainBtn = document.getElementById('mainBtn');
+        mainBtn.innerText = "기록 저장";
+        mainBtn.classList.remove('edit-btn');
+        updateInputFields();
+    }
+
+    async function deleteGame(event, round) {
+        event.stopPropagation();
+        if (!confirm("이 경기를 정말 삭제하시겠습니까?")) return;
+        
+        showLoading(true, "기록 삭제 중.");
+        try {
+            await fetch(GAS_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "DELETE", round: round })
+            });
+            setTimeout(async () => { 
+                await fetchData(); 
+                alert("삭제되었습니다! 🗑️"); 
+                cancelEdit(); 
+            }, 1500);
+        } catch (e) {
+            alert("연결 오류가 발생했습니다.");
+            showLoading(false);
+        }
+    }
+
+    function renderStats() {
+        let stats = {};
+        players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
+        gameLogs.forEach(g => {
+            const actual = g.ranks.filter(n => n && n.trim() !== "");
+            actual.forEach((name, idx) => {
+                if(stats[name]) {
+                    stats[name].played++;
+                    if (idx === actual.length - 1 && actual.length > 1) stats[name].ranks[4]++; 
+                    else if (idx < 4) stats[name].ranks[idx]++;
+                }
+            });
+        });
+        document.getElementById('statsBody').innerHTML = players.sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]).map(p => `<tr><td><strong>${p}</strong></td><td>${stats[p].played}</td><td>${stats[p].ranks[0]}</td><td>${stats[p].ranks[1]}</td><td>${stats[p].ranks[2]}</td><td>${stats[p].ranks[3]}</td><td style="color:red; font-weight:bold;">${stats[p].ranks[4]}</td></tr>`).join('');
+        
+        let maxL = 0; 
+        players.forEach(p => { if(stats[p].ranks[4] > maxL) maxL = stats[p].ranks[4]; });
+        const richArea = document.getElementById('richFriendArea');
+        if (maxL > 0) {
+            const losers = players.filter(p => stats[p].ranks[4] === maxL);
+            richArea.style.display = 'block';
+            richArea.innerHTML = `💸 이판도 나? 다들 카드까봐! (최고 꼴찌 ${maxL}회)<br><span style="font-size:20px; color:var(--accent);">${losers.join(', ')}</span>`;
+        } else { 
+            richArea.style.display = 'none'; 
+        }
+    }
+
+    async function startResetProcess() {
+        const pass = confirm("🚨 경고: 모든 데이터가 영구적으로 삭제됩니다.\n정말 초기화하시겠습니까?");
+        if (!pass) return;
+        
+        showLoading(true, "서버 데이터를 비우는 중...");
+        try {
+            await fetch(GAS_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "RESET" }) 
+            });
+            alert("초기화가 완료되었습니다."); 
+            location.reload(); 
+        } catch (e) { 
+            alert("초기화 중 오류가 발생했습니다."); 
+            showLoading(false); 
+        }
+    }
+
+    function changeMonth(v) { 
+        currentViewDate.setMonth(currentViewDate.getMonth() + v); 
+        renderCalendar(); 
+    }
+
+    function showLoading(v, text = "처리 중...") { 
+        document.getElementById('loadingText').innerText = text;
+        document.getElementById('loading').style.display = v ? 'flex' : 'none'; 
+    }
+
+    window.onload = () => {
+        updateInputFields();
+        fetchData();
+    };
+</script>
+</body>
+</html>

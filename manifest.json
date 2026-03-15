@@ -1,0 +1,15 @@
+{
+  "name": "경배와 친구들",
+  "short_name": "경배와 친구들",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f4f7f6",
+  "theme_color": "#007bff",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/5243/5243000.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
