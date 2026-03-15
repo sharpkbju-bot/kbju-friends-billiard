@@ -16,42 +16,61 @@
         :root { --main: #007bff; --bg: #f4f7f6; --accent: #ff4757; --success: #2ed573; --edit: #f39c12; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: env(safe-area-inset-top) 15px 100px 15px; }
         
-        /* 공통 카드 스타일 */
         .card { background: white; border-radius: 20px; padding: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); margin-bottom: 20px; }
         
-        /* 달력 스타일 보완 */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-top: 10px; }
         .day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; font-size: 14px; position: relative; background: #fff; border: 1px solid #f0f0f0; transition: 0.2s; }
         .day.selected { background: var(--main) !important; color: white !important; font-weight: bold; border: 2px solid #0056b3; z-index: 1; transform: scale(1.05); }
         .has-record { background: #e8f9ee !important; border: 2.5px solid var(--success) !important; font-weight: bold; color: #155724; }
         .has-record::after { content: ''; position: absolute; bottom: 4px; width: 6px; height: 6px; background: var(--success); border-radius: 50%; }
         
-        /* 입력 폼 스타일 */
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
         .input-row { display: flex; align-items: center; margin-bottom: 10px; }
         .input-row label { width: 55px; font-size: 13px; font-weight: bold; color: var(--main); }
         select { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 15px; background: #fff; appearance: none; }
         
-        /* 버튼 스타일 */
         button.save-btn { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 15px; font-weight: bold; margin-top: 10px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 12px rgba(0,123,255,0.3); }
         button.edit-btn { background: var(--edit) !important; box-shadow: 0 4px 12px rgba(243,156,18,0.3); }
         button:active { transform: scale(0.97); opacity: 0.9; }
 
-        /* 통계 테이블 */
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
         .stats-table th { padding: 10px 5px; border-bottom: 2px solid #eee; background: #fdfdfd; color: #666; }
         .stats-table td { padding: 12px 5px; text-align: center; border-bottom: 1px solid #f1f1f1; }
         
-        /* 강력 강조 초기화 구역 */
         .danger-zone { margin-top: 50px; padding: 25px; border: 2px dashed #ff4757; border-radius: 25px; background: #fff5f5; text-align: center; }
         .reset-btn { width: 100%; background: #ff4757; color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,71,87,0.4); }
         
-        /* 로딩 애니메이션 */
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; font-weight: bold; color: var(--main); }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--main); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .game-item { padding: 14px; border: 1px solid #eee; margin-top: 10px; border-radius: 15px; background: #fafafa; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        /* 경기 항목 스타일 최적화 */
+        .game-item { 
+            padding: 14px; 
+            border: 1px solid #eee; 
+            margin-top: 10px; 
+            border-radius: 15px; 
+            background: #fafafa; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); 
+        }
+        .game-info { 
+            flex: 1; 
+            min-width: 0; 
+            padding-right: 10px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            font-size: 13.5px; /* 폰트 약간 축소 */
+        }
+        .game-btns { 
+            display: flex; 
+            gap: 12px; 
+            flex-shrink: 0; /* 버튼이 줄어들거나 줄바꿈되지 않게 고정 */
+        }
+        
         .rich-msg { background: #fff3cd; padding: 15px; border-radius: 18px; text-align: center; font-size: 14px; color: #856404; font-weight: bold; margin-top: 15px; border: 2px solid #ffeeba; }
     </style>
 </head>
@@ -106,7 +125,6 @@
 </div>
 
 <script>
-    // [필독] 본인의 GAS URL을 여기에 입력하세요.
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzUSHAIV1iSLTFYxVATVFSqA7V9qKDY1jhXkEp1_jX54tnQONkiIui2yVjCezkIJV_7eQ/exec"; 
     const players = ["경배", "원석", "진웅", "창한", "정석"];
     
@@ -121,15 +139,12 @@
         return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
 
-    // 핵심: 달력은 데이터 로드와 상관없이 즉시 렌더링함
     async function fetchData() {
         renderAll(); 
-        
         if(!GAS_URL || GAS_URL.includes("URL_입력")) {
             document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
             return;
         }
-
         showLoading(true, "클라우드 데이터 동기화 중");
         try {
             const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
@@ -155,20 +170,15 @@
         const grid = document.getElementById('calendarGrid');
         if(!grid) return;
         grid.innerHTML = "";
-        
         const year = currentViewDate.getFullYear();
         const month = currentViewDate.getMonth();
         document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
-        
         ["일","월","화","수","목","금","토"].forEach(d => {
             grid.innerHTML += `<div style="font-size:12px;color:#aaa;padding-bottom:5px;">${d}</div>`;
         });
-        
         const firstDay = new Date(year, month, 1).getDay();
         const lastDate = new Date(year, month + 1, 0).getDate();
-        
         for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
-        
         for (let d = 1; d <= lastDate; d++) {
             const dStr = formatDate(new Date(year, month, d));
             const isSelected = dStr === selectedDateStr ? 'selected' : '';
@@ -191,9 +201,13 @@
             let html = `<p style="font-size:12px; color:var(--edit); font-weight:bold; margin:20px 0 8px 0;">⌵ 이 날의 경기 (수정하려면 터치)</p>`;
             games.forEach((g, idx) => {
                 const names = g.ranks.filter(n => n && n.trim() !== "");
-                html += `<div class="game-item" onclick="enterEditMode(${g.round}, '${names.join(',')}')">
-                    <div><small style="color:#888;">${idx+1}경기:</small> <span style="font-weight:600;">${names.join(' → ')}</span></div>
-                    <div style="display:flex; gap:12px;">
+                html += `
+                <div class="game-item" onclick="enterEditMode(${g.round}, '${names.join(',')}')">
+                    <div class="game-info">
+                        <small style="color:#888;">${idx+1}경기:</small> 
+                        <span style="font-weight:600;">${names.join(' → ')}</span>
+                    </div>
+                    <div class="game-btns">
                         <div style="color:var(--edit); font-size:12px; font-weight:bold;">수정</div>
                         <div style="color:#ff4757; font-size:12px; font-weight:bold;" onclick="deleteGame(event, ${g.round})">삭제</div>
                     </div>
@@ -269,7 +283,6 @@
     async function deleteGame(event, round) {
         event.stopPropagation();
         if (!confirm("이 경기를 정말 삭제하시겠습니까?")) return;
-        
         showLoading(true, "기록 삭제 중.");
         try {
             await fetch(GAS_URL, {
@@ -318,7 +331,6 @@
     async function startResetProcess() {
         const pass = confirm("🚨 경고: 모든 데이터가 영구적으로 삭제됩니다.\n정말 초기화하시겠습니까?");
         if (!pass) return;
-        
         showLoading(true, "서버 데이터를 비우는 중...");
         try {
             await fetch(GAS_URL, { 
