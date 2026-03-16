@@ -209,7 +209,7 @@
                     </div>
                     <div class="game-btns">
                         <div style="color:var(--edit); font-size:12px; font-weight:bold;">수정</div>
-                        <div style="color:#00FF00; font-size:12px; font-weight:bold;" onclick="deleteGame(event, ${g.round})">삭제</div>
+                        <div style="color:#3CB371; font-size:12px; font-weight:bold;" onclick="deleteGame(event, ${g.round})">삭제</div>
                     </div>
                 </div>`;
             });
@@ -253,7 +253,7 @@
         const area = document.getElementById('inputArea');
         let html = '';
         for(let i=1; i<=count; i++) {
-            const label = i === count ? "꼴찌💀" : `${i}등`;
+            const label = i === count ? "꼴찌💀" : `${i}위`;
             html += `<div class="input-row"><label>${label}</label><select id="rank${i}"><option value="">선수 선택</option>${players.map(p => `<option value="${p}" ${preFillData && preFillData[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
         }
         area.innerHTML = html;
@@ -331,7 +331,7 @@
     async function startResetProcess() {
         const pass = confirm("🚨 경고: 모든 데이터가 영구적으로 삭제됩니다.\n정말 초기화하시겠습니까?");
         if (!pass) return;
-        showLoading(true, "서버 데이터를 비우는 중...");
+        showLoading(true, "서버 데이터를 비우는 중");
         try {
             await fetch(GAS_URL, { 
                 method: 'POST', 
@@ -351,7 +351,7 @@
         renderCalendar(); 
     }
 
-    function showLoading(v, text = "처리 중...") { 
+    function showLoading(v, text = "처리 중") { 
         document.getElementById('loadingText').innerText = text;
         document.getElementById('loading').style.display = v ? 'flex' : 'none'; 
     }
