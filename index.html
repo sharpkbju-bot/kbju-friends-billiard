@@ -227,7 +227,7 @@
             if(!v) return alert("선수를 모두 지정해 주세요!");
             ranks.push(v);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("❌ 쌍둥이여? 잘 선택혀!");
+        if(new Set(ranks).size !== ranks.length) return alert("❌ 쌍둥이여? 잘 선택혀!(중복!)");
 
         showLoading(true, "기록 저장 중.");
         try {
