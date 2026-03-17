@@ -5,21 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>경배와 친구들</title>
     <style>
-        :root { --main: #007bff; --bg: #f4f7f6; --success: #2ed573; --edit: #f39c12; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; padding-bottom: 50px; }
+        :root { --main: #007bff; --bg: #f4f7f6; --success: #2ed573; --edit: #f39c12; --danger: #ff4757; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; padding-bottom: 50px; color: #333; }
         .card { background: white; border-radius: 20px; padding: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        /* 달력 강조 표시 */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; border: 1px solid #eee; font-size: 14px; background: white; }
+        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; border: 1px solid #eee; font-size: 14px; background: white; transition: 0.2s; }
         .day.selected { background: var(--main) !important; color: white !important; font-weight: bold; }
-        .has-record { border: 2px solid var(--success) !important; background: #e8f9ee !important; }
+        .has-record { border: 2.5px solid var(--success) !important; background: #e8f9ee !important; font-weight: bold; color: #27ae60; }
+        
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
         .input-row { display: flex; align-items: center; margin-bottom: 8px; }
         .input-row label { width: 50px; font-weight: bold; font-size: 13px; color: var(--main); }
-        select { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ddd; font-size: 14px; background: #fff; }
+        
+        /* 인원 선택 필드 크기 최적화 */
+        .count-select { width: 70px; padding: 8px; border-radius: 10px; border: 1px solid #ddd; font-size: 14px; background: #fff; text-align: center; }
+        .player-select { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ddd; font-size: 14px; background: #fff; }
+        
         .btn { width: 100%; padding: 15px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
         .save-btn { background: var(--main); color: white; }
-        .edit-mode-btn { background: var(--edit); color: white; }
-        .game-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #eee; border-radius: 12px; margin-top: 10px; background: #fafafa; font-size: 14px; }
+        .edit-complete-btn { background: var(--edit); color: white; }
+        
+        /* 목록 내 버튼들 */
+        .game-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #eee; border-radius: 12px; margin-top: 10px; background: #fafafa; }
+        .btn-group { display: flex; gap: 8px; }
+        .action-link { font-size: 12px; font-weight: bold; cursor: pointer; padding: 5px 8px; border-radius: 6px; }
+        .edit-link { color: var(--edit); border: 1px solid var(--edit); }
+        .del-link { color: var(--danger); border: 1px solid var(--danger); }
+        
         .stats-table { width: 100%; border-collapse: collapse; font-size: 11px; }
         .stats-table th, .stats-table td { padding: 8px 2px; border-bottom: 1px solid #eee; text-align: center; }
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; font-weight: bold; }
@@ -27,24 +41,30 @@
 </head>
 <body>
 
-<div id="loading">동기화 중...</div>
+<div id="loading">데이터 처리 중...</div>
 
 <div class="card">
     <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
-        <button onclick="changeMonth(-1)">◀</button>
+        <button onclick="changeMonth(-1)" style="border:none; background:#eee; border-radius:50%; width:30px; height:30px;">◀</button>
         <b id="monthDisplay"></b>
-        <button onclick="changeMonth(1)">▶</button>
+        <button onclick="changeMonth(1)" style="border:none; background:#eee; border-radius:50%; width:30px; height:30px;">▶</button>
     </div>
     <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
 <div class="card">
     <h3 id="selectedDateTitle" style="margin:0 0 15px 0;">날짜 선택</h3>
-    <div id="editModeIndicator" style="display:none; background:var(--edit); color:white; padding:10px; border-radius:10px; margin-bottom:10px; text-align:center; font-size:13px;">✏️ 수정 중 (취소하려면 날짜 다시 클릭)</div>
+    <div id="editModeIndicator" style="display:none; background:var(--edit); color:white; padding:10px; border-radius:10px; margin-bottom:10px; text-align:center; font-size:13px; font-weight:bold;">
+        ✏️ 경기 기록 수정 모드
+        <div style="font-size:11px; font-weight:normal; margin-top:3px; text-decoration:underline;" onclick="cancelEdit()">수정 취소하기</div>
+    </div>
     <div class="setup-row">
-        <b>인원</b>
-        <select id="playerCount" onchange="updateInputFields()" style="width:80px;">
-            <option value="2">2명</option><option value="3" selected>3명</option><option value="4">4명</option><option value="5">5명</option>
+        <span style="font-size:14px; font-weight:bold;">게임 참여 인원</span>
+        <select id="playerCount" class="count-select" onchange="updateInputFields()">
+            <option value="2">2명</option>
+            <option value="3" selected>3명</option>
+            <option value="4">4명</option>
+            <option value="5">5명</option>
         </select>
     </div>
     <div id="inputArea"></div>
@@ -60,12 +80,13 @@
     </table>
 </div>
 
-<button onclick="startResetProcess()" style="width:100%; color:#ccc; border:none; background:none; font-size:11px; margin-top:20px;">전체 초기화</button>
+<button onclick="startResetProcess()" style="width:100%; color:#bbb; border:none; background:none; font-size:11px; margin-top:20px; text-decoration:underline;">전체 초기화</button>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzb2IGqIZy7_PdVdNeftnlzVOkzi5fghGAWV5zVdQ3ZqopgxxgjLXgIUgqoGVbUrtk9/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwfieg-MhToo8SMg45RD4cVIMUSbwzbZVCkhQCnUD_QKsQekZKJFHuF8oCfRtqjkrWO/exec"; 
     const players = ["경배", "원석", "진웅", "창한", "정석"];
-    let gameLogs = [], curDate = new Date(), selDate = new Date().toISOString().split('T')[0], editId = null;
+    let gameLogs = [], curDate = new Date(), editId = null;
+    let selDate = new Date().toISOString().split('T')[0];
 
     async function fetchData() {
         document.getElementById('loading').style.display = 'flex';
@@ -78,30 +99,40 @@
     }
 
     function render() {
-        // 달력
+        // 달력 렌더링
         const grid = document.getElementById('calendarGrid');
         grid.innerHTML = "";
         const y = curDate.getFullYear(), m = curDate.getMonth();
         document.getElementById('monthDisplay').innerText = `${y}년 ${m+1}월`;
         const first = new Date(y, m, 1).getDay(), last = new Date(y, m+1, 0).getDate();
+        
         for(let i=0; i<first; i++) grid.innerHTML += "<div></div>";
         for(let d=1; d<=last; d++) {
             const dstr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-            const cls = `day ${dstr===selDate?'selected':''} ${gameLogs.some(g=>g.date===dstr)?'has-record':''}`;
+            // 날짜 비교 로직 강화 (has-record)
+            const hasRecord = gameLogs.some(g => g.date === dstr);
+            const cls = `day ${dstr===selDate?'selected':''} ${hasRecord?'has-record':''}`;
             grid.innerHTML += `<div class="${cls}" onclick="selectDate('${dstr}')">${d}</div>`;
         }
         
-        // 당일 목록
+        // 당일 기록 목록
         const list = document.getElementById('dayGameList');
         list.innerHTML = "";
-        gameLogs.filter(g => g.date === selDate).forEach((g, i) => {
-            list.innerHTML += `<div class="game-item">
-                <span style="flex:1" onclick="enterEdit('${g.round}', '${g.ranks}')">${i+1}. ${g.ranks.join(' → ')}</span>
-                <b onclick="deleteGame('${g.round}')" style="color:red; cursor:pointer;">삭제</b>
-            </div>`;
+        const todayGames = gameLogs.filter(g => g.date === selDate);
+        if(todayGames.length > 0) list.innerHTML = "<p style='font-size:12px; color:#666; margin:15px 0 5px 0;'>선택한 날짜의 경기 기록</p>";
+        
+        todayGames.forEach((g, i) => {
+            list.innerHTML += `
+                <div class="game-item">
+                    <span style="flex:1; font-size:13px;"><b>${i+1}.</b> ${g.ranks.join(' → ')}</span>
+                    <div class="btn-group">
+                        <span class="action-link edit-link" onclick="enterEdit('${g.round}', '${g.ranks}')">수정</span>
+                        <span class="action-link del-link" onclick="deleteGame('${g.round}')">삭제</span>
+                    </div>
+                </div>`;
         });
 
-        // 전적 (모든 순위 표시)
+        // 전적 렌더링
         const stats = {};
         players.forEach(p => stats[p] = {p:0, r:[0,0,0,0,0]});
         gameLogs.forEach(g => {
@@ -115,7 +146,12 @@
         `).join('');
     }
 
-    function selectDate(d) { selDate = d; document.getElementById('selectedDateTitle').innerText = `📅 ${d}`; cancelEdit(); render(); }
+    function selectDate(d) { 
+        selDate = d; 
+        document.getElementById('selectedDateTitle').innerText = `📅 ${d}`; 
+        cancelEdit(); 
+        render(); 
+    }
     
     function updateInputFields(pre = []) {
         const area = document.getElementById('inputArea');
@@ -123,7 +159,14 @@
         if(pre.length > 0) document.getElementById('playerCount').value = count;
         area.innerHTML = "";
         for(let i=0; i<count; i++) {
-            area.innerHTML += `<div class="input-row"><label>${i+1}위</label><select id="r${i}"><option value="">선택</option>${players.map(p=>`<option value="${p}" ${pre[i]===p?'selected':''}>${p}</option>`).join('')}</select></div>`;
+            area.innerHTML += `
+                <div class="input-row">
+                    <label>${i+1}위</label>
+                    <select id="r${i}" class="player-select">
+                        <option value="">선택</option>
+                        ${players.map(p=>`<option value="${p}" ${pre[i]===p?'selected':''}>${p}</option>`).join('')}
+                    </select>
+                </div>`;
         }
     }
 
@@ -135,34 +178,45 @@
             if(!v) return alert("순위를 모두 선택하세요.");
             ranks.push(v);
         }
+        if(new Set(ranks).size !== ranks.length) return alert("중복된 선수가 있습니다.");
+
         document.getElementById('loading').style.display = 'flex';
-        await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: editId?"UPDATE":"SAVE", date: selDate, ranks, round: editId }) });
-        setTimeout(() => { fetchData(); cancelEdit(); }, 2000);
+        await fetch(GAS_URL, { 
+            method: 'POST', mode: 'no-cors', 
+            body: JSON.stringify({ action: editId?"UPDATE":"SAVE", date: selDate, ranks, round: editId }) 
+        });
+        setTimeout(() => { fetchData(); cancelEdit(); }, 1500);
     }
 
     async function deleteGame(id) {
-        if(!confirm("삭제할까요?")) return;
+        if(!confirm("기록을 삭제하시겠습니까?")) return;
         document.getElementById('loading').style.display = 'flex';
         await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "DELETE", round: id }) });
-        setTimeout(fetchData, 2000);
+        setTimeout(fetchData, 1500);
     }
 
     function enterEdit(id, rstr) {
-        editId = id; updateInputFields(rstr.split(','));
+        editId = id;
+        const ranks = rstr.split(',');
+        updateInputFields(ranks);
         document.getElementById('editModeIndicator').style.display = 'block';
         const btn = document.getElementById('mainBtn');
-        btn.innerText = "수정 완료"; btn.className = "btn edit-mode-btn";
+        btn.innerText = "수정 완료하기"; 
+        btn.className = "btn edit-complete-btn";
+        window.scrollTo({top: 200, behavior: 'smooth'});
     }
 
     function cancelEdit() {
-        editId = null; document.getElementById('editModeIndicator').style.display = 'none';
+        editId = null;
+        document.getElementById('editModeIndicator').style.display = 'none';
         const btn = document.getElementById('mainBtn');
-        btn.innerText = "기록 저장"; btn.className = "btn save-btn";
+        btn.innerText = "기록 저장"; 
+        btn.className = "btn save-btn";
         updateInputFields();
     }
 
     async function startResetProcess() {
-        if(confirm("정말 초기화할까요?") && confirm("진짜 다 지웁니다?") && confirm("마지막 확인입니다.")) {
+        if(confirm("모든 데이터를 초기화할까요?") && confirm("복구할 수 없습니다. 계속하시겠습니까?") && confirm("마지막 확인입니다.")) {
             await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "RESET" }) });
             location.reload();
         }
