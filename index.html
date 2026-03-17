@@ -9,286 +9,154 @@
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3256/3256247.png">
   
   <style>
-    :root {
-      --primary-color: #007bff;
-      --bg-color: #f4f7f6;
+    /* --- 기존 스타일 유지 --- */
+    :root { --primary-color: #007bff; --bg-color: #f4f7f6; --text-color: #333; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: var(--primary-color); margin-bottom: 20px; font-size: 1.5rem; }
+    .form-group { margin-bottom: 15px; }
+    .form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+    .ranks-input { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .ranks-input input { flex: 1; min-width: 45%; }
+    .btn-box { display: flex; gap: 10px; justify-content: flex-end; }
+    .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: background-color 0.2s; }
+    .btn-primary { background-color: var(--primary-color); color: white; }
+    .btn-warning { background-color: #ffc107; color: #333; }
+    .btn-danger { background-color: #dc3545; color: white; }
+
+    /* --- [수정] 5명이 모두 표시되도록 조정한 목록 스타일 --- */
+    #record-list { list-style: none; padding: 0; margin-top: 30px; }
+    .record-item { background: #f9f9f9; padding: 12px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid #007bff; display: flex; flex-direction: column; }
+    .record-header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .record-date { font-weight: bold; color: #555; font-size: 14px; }
+    
+    .record-content { 
+      width: 100%; 
+      /* 글자 크기를 줄이고 줄 바꿈을 허용하여 5명이 다 보이게 함 */
+      font-size: 12px; 
+      white-space: normal; 
+      word-break: keep-all; 
+      line-height: 1.6;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg-color);
-      margin: 0;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+    .record-ranks-list { display: flex; flex-wrap: wrap; list-style: none; padding: 0; margin: 0; gap: 8px; }
+    .record-ranks-item { color: #333; font-weight: 500; background: #eee; padding: 2px 6px; border-radius: 4px; }
+    .rank-label { color: var(--primary-color); font-weight: bold; margin-right: 3px; font-size: 10px; }
 
-    .container {
-      width: 100%;
-      max-width: 500px;
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    }
-
-    h1 {
-      text-align: center;
-      color: var(--primary-color);
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-    }
-
-    /* 입력 영역 */
-    .input-section {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 25px;
-    }
-
-    input.form-control {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 16px;
-      outline: none;
-    }
-
-    .rank-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    /* 버튼 스타일 */
-    .btn-group {
-      display: flex;
-      gap: 8px;
-      margin-top: 5px;
-    }
-
-    .btn {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 15px;
-    }
-
-    .btn-save { background: var(--primary-color); color: white; }
-    .btn-update { background: #ffc107; color: #333; }
-    .btn-cancel { background: #6c757d; color: white; }
-
-    /* 리스트 영역 - 핵심 수정 부분 */
-    #record-list {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .record-card {
-      background: #fff;
-      border: 1px solid #eee;
-      border-radius: 10px;
-      padding: 12px;
-      position: relative;
-    }
-
-    .record-date {
-      font-size: 12px;
-      color: #888;
-      margin-bottom: 8px;
-    }
-
-    /* 5명이 모두 보이도록 글자 크기 축소 및 줄바꿈 허용 */
-    .player-row {
-      display: flex;
-      flex-wrap: wrap; /* 공간 부족 시 다음 줄로 */
-      gap: 6px;
-      font-size: 13px; /* 글자 크기 작게 조절 */
-      font-weight: 500;
-      color: #333;
-      line-height: 1.4;
-    }
-
-    .player-tag {
-      background: #f0f4f8;
-      padding: 2px 6px;
-      border-radius: 4px;
-      white-space: nowrap;
-    }
-
-    .rank-num {
-      color: var(--primary-color);
-      font-weight: bold;
-      margin-right: 2px;
-      font-size: 11px;
-    }
-
-    .card-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 15px;
-      margin-top: 10px;
-      border-top: 1px dotted #eee;
-      padding-top: 8px;
-    }
-
-    .action-link {
-      font-size: 13px;
-      color: #666;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
+    .record-actions { display: flex; gap: 10px; margin-top: 12px; border-top: 1px solid #eee; padding-top: 8px; }
+    .action-btn { font-size: 12px; cursor: pointer; color: #666; text-decoration: underline; border: none; background: none; padding: 0; }
     .action-delete { color: #dc3545; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>경배와 친구들 🎱</h1>
+  <h1>경배와 친구들</h1>
 
-  <div class="input-section">
+  <div class="form-group">
+    <label for="game-date">날짜</label>
     <input type="date" id="game-date" class="form-control">
-    <div class="rank-grid">
-      <input type="text" id="r1" class="form-control" placeholder="1등">
-      <input type="text" id="r2" class="form-control" placeholder="2등">
-      <input type="text" id="r3" class="form-control" placeholder="3등">
-      <input type="text" id="r4" class="form-control" placeholder="4등">
-      <input type="text" id="r5" class="form-control" placeholder="5등">
-    </div>
-    
-    <input type="hidden" id="edit-round-id">
-    
-    <div class="btn-group">
-      <button id="btn-main" class="btn btn-save" onclick="handleSave()">기록 저장</button>
-      <button id="btn-cancel" class="btn btn-cancel" onclick="resetForm()" style="display:none;">취소</button>
+  </div>
+  <div class="form-group">
+    <label>순위 기록</label>
+    <div class="ranks-input">
+      <input type="text" id="rank-1" class="form-control" placeholder="1등">
+      <input type="text" id="rank-2" class="form-control" placeholder="2등">
+      <input type="text" id="rank-3" class="form-control" placeholder="3등">
+      <input type="text" id="rank-4" class="form-control" placeholder="4등">
+      <input type="text" id="rank-5" class="form-control" placeholder="5등">
     </div>
   </div>
+  <div class="btn-box">
+    <input type="hidden" id="edit-round">
+    <button id="btn-save" class="btn btn-primary" onclick="saveData()">기록 저장</button>
+    <button id="btn-update" class="btn btn-warning" style="display:none;" onclick="updateData()">수정 완료</button>
+    <button id="btn-cancel" class="btn btn-danger" style="display:none;" onclick="clearForm()">취소</button>
+  </div>
 
-  <div id="record-list">
-    </div>
+  <ul id="record-list"></ul>
 </div>
 
 <script>
-  // 🚨 본인의 Google Apps Script 배포 URL을 입력하세요
-  const API_URL = "https://script.google.com/macros/s/AKfycbz3DvmZ32bGaVq4CSffpXCK6oCJ8V3Sg3Ao6A8qi2POZK0UUGEOMjLIanqhflMybo4k/exec";
+  // 🚨 배포 URL을 입력하세요
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbz3DvmZ32bGaVq4CSffpXCK6oCJ8V3Sg3Ao6A8qi2POZK0UUGEOMjLIanqhflMybo4k/exec"; 
 
-  // 데이터 불러오기
-  async function fetchRecords() {
-    const listDiv = document.getElementById('record-list');
-    listDiv.innerHTML = "<p style='text-align:center;'>데이터 로딩 중...</p>";
-    
+  async function loadData() {
     try {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      renderRecords(data.reverse()); // 최신순으로 정렬
-    } catch (e) {
-      listDiv.innerHTML = "<p>데이터를 불러오지 못했습니다.</p>";
+      const response = await fetch(GAS_URL);
+      const data = await response.json();
+      renderRecords(data.reverse());
+    } catch (error) {
+      console.error("오류:", error);
     }
   }
 
-  // 목록 그리기
   function renderRecords(records) {
-    const listDiv = document.getElementById('record-list');
-    listDiv.innerHTML = "";
-
-    records.forEach(item => {
-      const card = document.createElement('div');
-      card.className = "record-card";
+    const list = document.getElementById('record-list');
+    list.innerHTML = "";
+    records.forEach(record => {
+      const li = document.createElement('li');
+      li.className = "record-item";
       
-      // 순위 텍스트 생성
-      const playersHtml = item.ranks
-        .map((name, idx) => name ? `<span class="player-tag"><span class="rank-num">${idx+1}위</span>${name}</span>` : "")
-        .join("");
+      let ranksHtml = record.ranks.map((name, i) => 
+        name ? `<li class="record-ranks-item"><span class="rank-label">${i+1}위</span>${name}</li>` : ""
+      ).join("");
 
-      card.innerHTML = `
-        <div class="record-date">${item.date}</div>
-        <div class="player-row">${playersHtml}</div>
-        <div class="card-actions">
-          <span class="action-link" onclick="startEdit(${JSON.stringify(item).replace(/"/g, '&quot;')})">수정</span>
-          <span class="action-link action-delete" onclick="handleDelete(${item.round})">삭제</span>
+      li.innerHTML = `
+        <div class="record-header"><span class="record-date">${record.date}</span></div>
+        <div class="record-content"><ul class="record-ranks-list">${ranksHtml}</ul></div>
+        <div class="record-actions">
+          <button class="action-btn" onclick='startEdit(${JSON.stringify(record)})'>수정</button>
+          <button class="action-btn action-delete" onclick="deleteGame(${record.round})">삭제</button>
         </div>
       `;
-      listDiv.appendChild(card);
+      list.appendChild(li);
     });
   }
 
-  // 저장 및 수정 통합 핸들러
-  async function handleSave() {
-    const date = document.getElementById('game-date').value;
-    const round = document.getElementById('edit-round-id').value;
-    const ranks = [
-      document.getElementById('r1').value,
-      document.getElementById('r2').value,
-      document.getElementById('r3').value,
-      document.getElementById('r4').value,
-      document.getElementById('r5').value
-    ];
-
-    if(!date || !ranks[0]) return alert("날짜와 1등은 필수입니다!");
-
-    const action = round ? "UPDATE" : "SAVE";
-    const payload = { action, date, ranks, round: parseInt(round) };
-
-    await sendData(payload);
+  async function saveData() {
+    const payload = { action: "SAVE", date: document.getElementById('game-date').value, 
+      ranks: [1,2,3,4,5].map(i => document.getElementById(`rank-${i}`).value) };
+    await sendPost(payload);
   }
 
-  // 삭제 핸들러
-  async function handleDelete(round) {
-    if(!confirm("정말 삭제하시겠습니까?")) return;
-    await sendData({ action: "DELETE", round });
+  async function updateData() {
+    const payload = { action: "UPDATE", round: document.getElementById('edit-round').value, 
+      date: document.getElementById('game-date').value, 
+      ranks: [1,2,3,4,5].map(i => document.getElementById(`rank-${i}`).value) };
+    await sendPost(payload);
   }
 
-  // 수정 시작
-  function startEdit(item) {
-    document.getElementById('game-date').value = item.date;
-    document.getElementById('r1').value = item.ranks[0] || "";
-    document.getElementById('r2').value = item.ranks[1] || "";
-    document.getElementById('r3').value = item.ranks[2] || "";
-    document.getElementById('r4').value = item.ranks[3] || "";
-    document.getElementById('r5').value = item.ranks[4] || "";
-    document.getElementById('edit-round-id').value = item.round;
-
-    document.getElementById('btn-main').textContent = "수정 완료";
-    document.getElementById('btn-main').className = "btn btn-update";
-    document.getElementById('btn-cancel').style.display = "block";
-    window.scrollTo(0,0);
+  async function deleteGame(round) {
+    if (confirm("삭제하시겠습니까?")) await sendPost({ action: "DELETE", round });
   }
 
-  // 폼 초기화
-  function resetForm() {
+  function startEdit(record) {
+    document.getElementById('edit-round').value = record.round;
+    document.getElementById('game-date').value = record.date;
+    record.ranks.forEach((name, i) => document.getElementById(`rank-${i+1}`).value = name || "");
+    document.getElementById('btn-save').style.display = 'none';
+    document.getElementById('btn-update').style.display = 'inline-block';
+    document.getElementById('btn-cancel').style.display = 'inline-block';
+  }
+
+  async function sendPost(payload) {
+    await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
+    clearForm();
+    loadData();
+  }
+
+  function clearForm() {
     document.getElementById('game-date').value = "";
-    for(let i=1; i<=5; i++) document.getElementById('r'+i).value = "";
-    document.getElementById('edit-round-id').value = "";
-    document.getElementById('btn-main').textContent = "기록 저장";
-    document.getElementById('btn-main').className = "btn btn-save";
-    document.getElementById('btn-cancel').style.display = "none";
+    [1,2,3,4,5].forEach(i => document.getElementById(`rank-${i}`).value = "");
+    document.getElementById('edit-round').value = "";
+    document.getElementById('btn-save').style.display = 'inline-block';
+    document.getElementById('btn-update').style.display = 'none';
+    document.getElementById('btn-cancel').style.display = 'none';
   }
 
-  // 서버 통신
-  async function sendData(payload) {
-    try {
-      await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
-      resetForm();
-      fetchRecords();
-    } catch (e) {
-      alert("오류가 발생했습니다.");
-    }
-  }
-
-  fetchRecords();
+  loadData();
 </script>
-
 </body>
 </html>
