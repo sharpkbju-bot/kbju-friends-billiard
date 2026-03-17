@@ -9,33 +9,35 @@
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; padding-bottom: 100px; }
         .card { background: white; border-radius: 20px; padding: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
-        /* 달력 스타일 */
+        /* 달력 */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; border: 1px solid #eee; font-size: 14px; background: white; position: relative; }
-        .day.selected { background: var(--main) !important; color: white !important; font-weight: bold; transform: scale(1.05); z-index: 1; }
-        .has-record { border: 2.5px solid var(--success) !important; background: #e8f9ee !important; font-weight: bold; }
+        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; border: 1px solid #eee; font-size: 14px; background: white; }
+        .day.selected { background: var(--main) !important; color: white !important; font-weight: bold; transform: scale(1.05); }
+        .has-record { border: 2.5px solid var(--success) !important; background: #e8f9ee !important; }
         
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
         .input-row { display: flex; align-items: center; margin-bottom: 10px; }
         .input-row label { width: 55px; font-weight: bold; font-size: 13px; color: var(--main); }
-        select { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 15px; background: #fff; }
+        select { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 15px; background: #fff; -webkit-appearance: none; }
         
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.2s; }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
         .save-btn { background: var(--main); color: white; }
-        .edit-mode-btn { background: var(--edit); color: white; }
+        .edit-mode-btn { background: var(--edit); color: white; border: 2px solid #fff; box-shadow: 0 0 10px rgba(243, 156, 18, 0.4); }
+        .cancel-btn { background: #eee; color: #666; font-size: 13px; padding: 8px; margin-top: 5px; border-radius: 10px; width: 100%; border: none; }
         
         .game-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #eee; border-radius: 12px; margin-top: 10px; background: #fafafa; }
+        .game-info { flex: 1; font-size: 14px; cursor: pointer; padding-right: 10px; }
+        .edit-label { font-size: 11px; background: var(--edit); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
+        
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; }
         .stats-table th, .stats-table td { padding: 10px 2px; border-bottom: 1px solid #eee; text-align: center; }
         
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; font-weight: bold; flex-direction: column; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--main); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-bottom: 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; flex-direction: column; }
     </style>
 </head>
 <body>
 
-<div id="loading"><div class="spinner"></div><div id="loadingText">데이터 동기화 중...</div></div>
+<div id="loading"><div id="loadingText">처리 중...</div></div>
 
 <div class="card">
     <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
@@ -48,7 +50,13 @@
 
 <div class="card">
     <h3 id="selectedDateTitle" style="margin:0 0 15px 0;">날짜를 선택하세요</h3>
-    <div id="editBadge" style="display:none; color:white; background:var(--edit); padding:8px; border-radius:10px; text-align:center; margin-bottom:12px; font-size:13px; font-weight:bold;">✏️ 기존 기록 수정 중</div>
+    
+    <div id="editModeIndicator" style="display:none; margin-bottom:15px;">
+        <div style="background:var(--edit); color:white; padding:10px; border-radius:12px; font-weight:bold; text-align:center; font-size:14px;">
+            ✏️ 선택한 기록을 수정하고 있습니다
+        </div>
+        <button class="cancel-btn" onclick="cancelEdit()">수정 취소</button>
+    </div>
     
     <div class="setup-row">
         <span style="font-weight:bold; font-size:14px;">참여 인원</span>
@@ -74,21 +82,30 @@
     </table>
 </div>
 
-<button onclick="startResetProcess()" style="width:100%; color:#999; border:none; background:none; font-size:12px; text-decoration:underline; margin-top:30px; margin-bottom:50px;">모든 데이터 초기화</button>
+<button onclick="startResetProcess()" style="width:100%; color:#999; border:none; background:none; font-size:12px; text-decoration:underline; margin-top:30px; margin-bottom:50px;">데이터 전체 초기화</button>
 
 <script>
     // ⚠️ 여기에 새로 배포한 웹 앱 URL을 넣으세요
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxDAz9PxoUVhF2KAfqVOs2jXR7yS3bz_7HwjOVnIj2z8isr3BL3BKuplE6mBZdJywXV/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwLQ2V4EfP2-JB6aXSxNlen-72cmrWv52SXBeSHzhQ/dev"; 
     const players = ["경배", "원석", "진웅", "창한", "정석"];
-    let gameLogs = [], curDate = new Date(), selDate = new Date().toLocaleDateString('sv-SE'), editId = null;
+    let gameLogs = [], curDate = new Date();
+    
+    // 오늘 날짜를 YYYY-MM-DD 형식으로 안전하게 가져오기
+    function getTodayStr() {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    }
+    
+    let selDate = getTodayStr();
+    let editId = null;
 
     async function fetchData() {
-        toggleLoading(true, "데이터를 불러오는 중...");
+        toggleLoading(true, "데이터 불러오는 중...");
         try {
             const res = await fetch(`${GAS_URL}?t=${Date.now()}`);
             gameLogs = await res.json();
             render();
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("Fetch Error:", e); }
         finally { toggleLoading(false); }
     }
 
@@ -98,36 +115,35 @@
         grid.innerHTML = "";
         const y = curDate.getFullYear(), m = curDate.getMonth();
         document.getElementById('monthDisplay').innerText = `${y}년 ${m+1}월`;
-        const first = new Date(y, m, 1).getDay(), last = new Date(y, m+1, 0).getDate();
+        
+        const first = new Date(y, m, 1).getDay();
+        const last = new Date(y, m+1, 0).getDate();
         
         for(let i=0; i<first; i++) grid.innerHTML += "<div></div>";
         for(let d=1; d<=last; d++) {
             const dstr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
             const isSelected = dstr === selDate ? 'selected' : '';
-            const hasRecord = gameLogs.some(g => {
-                const gDate = typeof g.date === 'string' ? g.date.split('T')[0] : new Date(g.date).toLocaleDateString('sv-SE');
-                return gDate === dstr;
-            }) ? 'has-record' : '';
+            const hasRecord = gameLogs.some(g => g.date === dstr) ? 'has-record' : '';
             grid.innerHTML += `<div class="day ${isSelected} ${hasRecord}" onclick="selectDate('${dstr}')">${d}</div>`;
         }
         
-        // 당일 경기 목록 렌더링
+        // 목록 렌더링
         const list = document.getElementById('dayGameList');
         list.innerHTML = "";
-        const dayGames = gameLogs.filter(g => {
-            const gDate = typeof g.date === 'string' ? g.date.split('T')[0] : new Date(g.date).toLocaleDateString('sv-SE');
-            return gDate === selDate;
-        });
+        const dayGames = gameLogs.filter(g => g.date === selDate);
         
-        if(dayGames.length > 0) list.innerHTML = "<p style='font-size:12px; color:#f39c12; font-weight:bold; margin-top:20px;'>⌵ 오늘의 경기 목록</p>";
+        if(dayGames.length > 0) list.innerHTML = "<p style='font-size:12px; color:#666; margin-top:20px; text-align:center;'>내용을 클릭하면 수정할 수 있습니다.</p>";
         dayGames.forEach((g, i) => {
-            list.innerHTML += `<div class="game-item">
-                <span style="flex:1; font-size:14px;" onclick="enterEdit('${g.round}', '${g.ranks}')"><b>${i+1}.</b> ${g.ranks.join(' → ')}</span>
-                <b onclick="deleteGame('${g.round}')" style="color:red; cursor:pointer; font-size:12px; padding:5px;">삭제</b>
-            </div>`;
+            list.innerHTML += `
+                <div class="game-item">
+                    <div class="game-info" onclick="enterEdit('${g.round}', '${g.ranks.join(',')}')">
+                        <b>${i+1}.</b> ${g.ranks.join(' → ')}
+                    </div>
+                    <b onclick="deleteGame('${g.round}')" style="color:red; cursor:pointer; font-size:13px;">삭제</b>
+                </div>`;
         });
 
-        // 전적 계산 및 렌더링
+        // 전적 렌더링
         const stats = {};
         players.forEach(p => stats[p] = {p:0, f:0, l:0});
         gameLogs.forEach(g => {
@@ -158,7 +174,7 @@
         
         area.innerHTML = "";
         for(let i=0; i<count; i++) {
-            const label = (i === count - 1) ? "꼴찌💀" : `${i+1}위`;
+            const label = (i == count - 1) ? "꼴찌💀" : `${i+1}위`;
             area.innerHTML += `
                 <div class="input-row">
                     <label>${label}</label>
@@ -180,12 +196,18 @@
         }
         if(new Set(ranks).size !== ranks.length) return alert("중복된 선수가 있습니다.");
 
-        toggleLoading(true, "기록 저장 중...");
+        toggleLoading(true, "서버에 기록 저장 중...");
+        // 날짜가 변하지 않도록 selDate 문자열 그대로 전송
         await fetch(GAS_URL, { 
             method: 'POST', mode: 'no-cors', 
             body: JSON.stringify({ action: editId ? "UPDATE" : "SAVE", date: selDate, ranks, round: editId }) 
         });
-        setTimeout(() => { fetchData(); cancelEdit(); }, 2000);
+        
+        setTimeout(() => { 
+            fetchData(); 
+            if(editId) alert("수정이 완료되었습니다.");
+            cancelEdit(); 
+        }, 2000);
     }
 
     async function deleteGame(id) {
@@ -202,29 +224,31 @@
         editId = id;
         const rArr = rstr.split(',');
         updateInputFields(rArr);
-        document.getElementById('editBadge').style.display = 'block';
+        
+        document.getElementById('editModeIndicator').style.display = 'block';
         const btn = document.getElementById('mainBtn');
         btn.innerText = "경기 기록 수정 완료";
         btn.className = "btn edit-mode-btn";
-        window.scrollTo(0, 300);
+        
+        // 입력창으로 스크롤 이동
+        document.getElementById('selectedDateTitle').scrollIntoView({ behavior: 'smooth' });
     }
 
     function cancelEdit() {
         editId = null;
-        document.getElementById('editBadge').style.display = 'none';
+        document.getElementById('editModeIndicator').style.display = 'none';
         const btn = document.getElementById('mainBtn');
         btn.innerText = "기록 저장";
         btn.className = "btn save-btn";
         updateInputFields();
     }
 
-    // 3단계 초기화 확인 절차
     async function startResetProcess() {
         if(!confirm("⚠️ [1단계] 정말 모든 데이터를 삭제하시겠습니까?")) return;
-        if(!confirm("⚠️ [2단계] 전적과 달력 기록이 모두 사라지며 복구할 수 없습니다. 계속할까요?")) return;
-        if(!confirm("⚠️ [마지막 확인] 정말로 초기화하시겠습니까?")) return;
+        if(!confirm("⚠️ [2단계] 계속하시겠습니까?")) return;
+        if(!confirm("⚠️ [마지막] 초기화합니다.")) return;
         
-        toggleLoading(true, "모든 데이터 초기화 중...");
+        toggleLoading(true, "초기화 중...");
         await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "RESET" }) });
         setTimeout(() => location.reload(), 2000);
     }
@@ -235,7 +259,11 @@
         document.getElementById('loading').style.display = v ? 'flex' : 'none'; 
     }
     
-    window.onload = () => { selectDate(selDate); fetchData(); };
+    window.onload = () => { 
+        document.getElementById('selectedDateTitle').innerText = `📅 ${selDate}`;
+        updateInputFields(); 
+        fetchData(); 
+    };
 </script>
 </body>
 </html>
