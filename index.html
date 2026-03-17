@@ -283,7 +283,7 @@
     async function deleteGame(event, round) {
         event.stopPropagation();
         if (!confirm("이 경기를 정말 삭제하시겠습니까?")) return;
-        showLoading(true, "기록 삭제 중.");
+        showLoading(true, "기록 삭제 중");
         try {
             await fetch(GAS_URL, {
                 method: 'POST',
