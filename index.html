@@ -124,7 +124,7 @@
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxREpARQJqeDpdIUxd5YuY5vSUW8woZAzjdUr-LgsH_k5334cZxTTm5Ae7E6lQs6qghiA/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbydLVWsYRqpc9EA-w3csoyAe9XFfMYPZZlBLjXzb_jI-p-demBzQd__vqvJyKo_f6T7/exec"; 
     const players = ["경배", "원석", "진웅", "창한", "정석"];
     
     let gameLogs = [];
@@ -202,13 +202,13 @@
                 const names = g.ranks.filter(n => n && n.trim() !== "");
                 html += `
                 <div class="game-item">
-                    <div class="game-info" onclick="enterEditMode(${g.round}, '${names.join(',')}')">
+                    <div class="game-info" onclick="enterEditMode('${g.round}', '${names.join(',')}')">
                         <small style="color:#FF00FF;">${idx+1}경기:</small> 
                         <span style="font-weight:600;">${names.join(' → ')}</span>
                     </div>
                     <div class="game-btns">
-                        <div style="color:var(--edit); font-size:12px; font-weight:bold; cursor:pointer;" onclick="enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
-                        <div style="color:#3CB371; font-size:12px; font-weight:bold; cursor:pointer;" onclick="deleteGame(event, ${g.round})">삭제</div>
+                        <div style="color:var(--edit); font-size:12px; font-weight:bold; cursor:pointer;" onclick="enterEditMode('${g.round}', '${names.join(',')}')">수정</div>
+                        <div style="color:#3CB371; font-size:12px; font-weight:bold; cursor:pointer;" onclick="deleteGame(event, '${g.round}')">삭제</div>
                     </div>
                 </div>`;
             });
@@ -220,18 +220,16 @@
 
     async function sendToGas(payload) {
         try {
-            // mode: 'no-cors'를 제거하고 표준 통신 시도 (오류가 날 경우 no-cors로 자동 전환됨)
-            // GAS 서버에서 round를 찾지 못하는 문제를 방지하기 위해 데이터를 명확히 전송
             await fetch(GAS_URL, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             });
             return true;
         } catch (e) {
-            // fetch 오류 시 최후의 수단으로 한 번 더 전송
-            fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            return true;
+            console.error(e);
+            return false;
         }
     }
 
@@ -245,7 +243,7 @@
         }
         if(new Set(ranks).size !== ranks.length) return alert("❌ 쌍둥이여? 잘 선택혀!(중복!)");
 
-        showLoading(true, "기록 저장 중. 기둘려!");
+        showLoading(true, "기록 저장 중!");
         await sendToGas({ action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: ranks, round: editRound });
         
         setTimeout(async () => { 
@@ -292,18 +290,18 @@
         if (event) event.stopPropagation();
         if (!confirm("이 경기를 정말 삭제하시겠습니까?")) return;
         
-        showLoading(true, "기록 삭제 중!");
+        showLoading(true, "기록 삭제 중");
         
-        // 중요: round를 명확하게 숫자형과 문자열형 모두 고려하여 전송
+        // round를 문자열로 명시적으로 변환하여 GAS 서버에 전달
         await sendToGas({ 
             action: "DELETE", 
-            round: round 
+            round: String(round) 
         });
 
-        // 삭제 반영 시간을 위해 대기 시간을 3초로 연장
+        // 삭제 후 스프레드시트 업데이트 시간을 고려해 3초 뒤에 다시 데이터를 불러옴
         setTimeout(async () => { 
             await fetchData(); 
-            alert("🗑️ 삭제 완료!"); 
+            alert("삭제 완료 🗑️"); 
             cancelEdit(); 
         }, 3000);
     }
