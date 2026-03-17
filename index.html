@@ -55,11 +55,8 @@
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--main); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* -----------------------------------------------------------------
-           [수정 부분] 좁은 화면에서도 무조건 1줄로 표시되도록 최적화
-           ----------------------------------------------------------------- */
         .game-item { 
-            padding: 12px 8px; /* 좌우 패딩을 줄여 공간 확보 */
+            padding: 12px 8px; 
             border: 1px solid #eee; 
             margin-top: 10px; 
             border-radius: 15px; 
@@ -73,16 +70,16 @@
             flex: 1; 
             min-width: 0; 
             padding-right: 5px; 
-            white-space: nowrap; /* 무조건 1줄 유지 */
+            white-space: nowrap; 
             overflow: hidden; 
-            text-overflow: clip; /* 말줄임표 대신 끝까지 표시 시도 */
-            font-size: 11.5px; /* 글자 크기를 더 작게 조정 */
-            letter-spacing: -0.5px; /* 글자 간격을 좁혀서 공간 확보 */
+            text-overflow: clip; 
+            font-size: 11.5px; 
+            letter-spacing: -0.5px; 
             line-height: 1.4;
         }
         .game-btns { 
             display: flex; 
-            gap: 8px; /* 버튼 사이 간격 축소 */
+            gap: 8px; 
             flex-shrink: 0; 
         }
         
@@ -216,7 +213,6 @@
             let html = `<p style="font-size:12px; color:var(--edit); font-weight:bold; margin:20px 0 8px 0;">⌵ 이 날의 경기 (수정하려면 터치)</p>`;
             games.forEach((g, idx) => {
                 const names = g.ranks.filter(n => n && n.trim() !== "");
-                // 구분자 간격을 줄이기 위해 공백 없이 화살표 사용
                 html += `
                 <div class="game-item" onclick="enterEditMode(${g.round}, '${names.join(',')}')">
                     <div class="game-info">
@@ -235,6 +231,9 @@
         }
     }
 
+    /* -----------------------------------------------------------------
+       [수정 부분] SAVE/UPDATE 시 모든 순위가 유실 없이 전송되도록 로직 수정
+       ----------------------------------------------------------------- */
     async function saveGame() {
         const count = parseInt(document.getElementById('playerCount').value);
         const ranks = [];
@@ -246,11 +245,20 @@
         if(new Set(ranks).size !== ranks.length) return alert("❌ 쌍둥이여? 잘 선택혀!(중복!)");
 
         showLoading(true, "기록 저장 중");
+        
+        // 데이터 유실 방지를 위해 정제된 배열 데이터 생성
+        const payload = { 
+            action: editMode ? "UPDATE" : "SAVE", 
+            date: selectedDateStr, 
+            ranks: ranks, // 2~5명 전체 배열 전송
+            round: editRound 
+        };
+
         try {
             await fetch(GAS_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: ranks, round: editRound })
+                body: JSON.stringify(payload)
             });
             setTimeout(async () => { 
                 await fetchData(); 
@@ -278,7 +286,8 @@
     function enterEditMode(round, rankStr) {
         editMode = true; 
         editRound = round;
-        updateInputFields(rankStr.split(','));
+        const currentRanks = rankStr.split(',');
+        updateInputFields(currentRanks);
         document.getElementById('editBadge').style.display = 'block';
         const mainBtn = document.getElementById('mainBtn');
         mainBtn.innerText = "경기 기록 수정 완료";
