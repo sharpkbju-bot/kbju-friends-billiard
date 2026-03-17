@@ -244,7 +244,7 @@
         }
         if(new Set(ranks).size !== ranks.length) return alert("❌ 쌍둥이여? 잘 선택혀!(중복!)");
 
-        showLoading(true, "기록 저장 중.");
+        showLoading(true, "기록 저장 중");
         const success = await sendToGas({ action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: ranks, round: editRound });
         
         setTimeout(async () => { 
