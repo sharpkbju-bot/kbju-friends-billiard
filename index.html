@@ -44,7 +44,6 @@
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--main); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* 경기 항목 스타일 최적화 */
         .game-item { 
             padding: 14px; 
             border: 1px solid #eee; 
@@ -63,12 +62,12 @@
             white-space: nowrap; 
             overflow: hidden; 
             text-overflow: ellipsis; 
-            font-size: 13.5px; /* 폰트 약간 축소 */
+            font-size: 13.5px;
         }
         .game-btns { 
             display: flex; 
             gap: 12px; 
-            flex-shrink: 0; /* 버튼이 줄어들거나 줄바꿈되지 않게 고정 */
+            flex-shrink: 0;
         }
         
         .rich-msg { background: #fff3cd; padding: 15px; border-radius: 18px; text-align: center; font-size: 14px; color: #856404; font-weight: bold; margin-top: 15px; border: 2px solid #ffeeba; }
@@ -233,6 +232,7 @@
         try {
             await fetch(GAS_URL, {
                 method: 'POST',
+                mode: 'no-cors', // GAS 리디렉션 대응
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: ranks, round: editRound })
             });
@@ -283,20 +283,29 @@
     async function deleteGame(event, round) {
         event.stopPropagation();
         if (!confirm("이 경기를 정말 삭제하시겠습니까?")) return;
-        showLoading(true, "기록 삭제 중.");
+        
+        showLoading(true, "기록 삭제 중");
         try {
+            // POST 요청 시 redirect 옵션과 no-cors 모드를 적절히 사용하여 GAS 통신 오류 방지
             await fetch(GAS_URL, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: "DELETE", round: round })
+                body: JSON.stringify({ 
+                    action: "DELETE", 
+                    round: Number(round) // 숫자로 확실히 변환
+                })
             });
+            
+            // no-cors 모드에서는 응답 확인이 불가하므로 시간차를 두고 데이터 갱신
             setTimeout(async () => { 
                 await fetchData(); 
-                alert("삭제되었습니다! 🗑️"); 
+                alert("삭제 처리를 요청했습니다! 🗑️"); 
                 cancelEdit(); 
             }, 1500);
         } catch (e) {
-            alert("연결 오류가 발생했습니다.");
+            console.error(e);
+            alert("연결 오류가 발생했습니다. 네트워크 상태를 확인하세요.");
             showLoading(false);
         }
     }
@@ -335,11 +344,14 @@
         try {
             await fetch(GAS_URL, { 
                 method: 'POST', 
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: "RESET" }) 
             });
-            alert("초기화가 완료되었습니다."); 
-            location.reload(); 
+            setTimeout(() => {
+                alert("초기화 요청을 보냈습니다."); 
+                location.reload(); 
+            }, 1500);
         } catch (e) { 
             alert("초기화 중 오류가 발생했습니다."); 
             showLoading(false); 
