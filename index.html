@@ -75,7 +75,7 @@
 </head>
 <body>
 
-<div id="loading"><div class="spinner"></div><div id="loadingText">데이터 로딩 중. 기둘려!</div></div>
+<div id="loading"><div class="spinner"></div><div id="loadingText">데이터 로딩 중</div></div>
 
 <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-weight:bold;">
@@ -87,7 +87,7 @@
 </div>
 
 <div class="card">
-    <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 15px 0; color:#333;">📅 날짜 로딩 중!</h2>
+    <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 15px 0; color:#333;">📅 날짜 선택</h2>
     <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:12px; background: var(--edit); padding: 10px; border-radius: 10px; text-align: center;">✏️ 기존 기록 수정 중</div>
     
     <div class="setup-row">
@@ -124,7 +124,7 @@
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbydLVWsYRqpc9EA-w3csoyAe9XFfMYPZZlBLjXzb_jI-p-demBzQd__vqvJyKo_f6T7/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwmMY_hXYG2mVPl2LgpZs2DVxGFhDIktrWXAWnDuG_PDeRxNOHb0bg1YjjPF9UWoKReLg/exec"; 
     const players = ["경배", "원석", "진웅", "창한", "정석"];
     
     let gameLogs = [];
@@ -139,12 +139,7 @@
     }
 
     async function fetchData() {
-        renderAll(); 
-        if(!GAS_URL || GAS_URL.includes("URL_입력")) {
-            document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
-            return;
-        }
-        showLoading(true, "클라우드 데이터 동기화 중");
+        showLoading(true, "데이터 동기화 중");
         try {
             const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
             if(!response.ok) throw new Error();
@@ -152,7 +147,7 @@
             gameLogs = rawData.map(g => ({ ...g, dateStr: formatDate(g.date) }));
             renderAll();
         } catch (e) {
-            console.error("Data fetch error");
+            console.error("Fetch error");
         } finally {
             showLoading(false);
             document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
@@ -197,7 +192,7 @@
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
         const listArea = document.getElementById('dayGameList');
         if(games.length > 0) {
-            let html = `<p style="font-size:12px; color:var(--edit); font-weight:bold; margin:20px 0 8px 0;">⌵ 이 날의 경기 (수정하려면 터치)</p>`;
+            let html = `<p style="font-size:12px; color:var(--edit); font-weight:bold; margin:20px 0 8px 0;">⌵ 이 날의 경기</p>`;
             games.forEach((g, idx) => {
                 const names = g.ranks.filter(n => n && n.trim() !== "");
                 html += `
@@ -208,7 +203,7 @@
                     </div>
                     <div class="game-btns">
                         <div style="color:var(--edit); font-size:12px; font-weight:bold; cursor:pointer;" onclick="enterEditMode('${g.round}', '${names.join(',')}')">수정</div>
-                        <div style="color:#3CB371; font-size:12px; font-weight:bold; cursor:pointer;" onclick="deleteGame(event, '${g.round}')">삭제</div>
+                        <div style="color:#ff4757; font-size:12px; font-weight:bold; cursor:pointer;" onclick="deleteGame(event, ${g.round})">삭제</div>
                     </div>
                 </div>`;
             });
@@ -219,6 +214,7 @@
     }
 
     async function sendToGas(payload) {
+        // GAS는 POST 응답 시 CORS 오류를 자주 뱉으므로 no-cors 모드로 전송
         try {
             await fetch(GAS_URL, {
                 method: 'POST',
@@ -228,7 +224,7 @@
             });
             return true;
         } catch (e) {
-            console.error(e);
+            console.error("Send Error:", e);
             return false;
         }
     }
@@ -241,16 +237,19 @@
             if(!v) return alert("선수를 모두 지정해 주세요!");
             ranks.push(v);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("❌ 쌍둥이여? 잘 선택혀!(중복!)");
+        if(new Set(ranks).size !== ranks.length) return alert("쌍둥이여? 잘 확인혀!(중복)");
 
-        showLoading(true, "기록 저장 중!");
-        await sendToGas({ action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: ranks, round: editRound });
+        showLoading(true, "저장 중");
+        // 저장/수정 시에도 round가 있다면 숫자로 변환하여 전송
+        const payload = { 
+            action: editMode ? "UPDATE" : "SAVE", 
+            date: selectedDateStr, 
+            ranks: ranks, 
+            round: editRound ? Number(editRound) : null 
+        };
         
-        setTimeout(async () => { 
-            await fetchData(); 
-            alert("저장 완료! ✅"); 
-            cancelEdit(); 
-        }, 2000);
+        await sendToGas(payload);
+        setTimeout(async () => { await fetchData(); alert("저장되었습니다!"); cancelEdit(); }, 2500);
     }
 
     function updateInputFields(preFillData = null) {
@@ -273,12 +272,10 @@
         const mainBtn = document.getElementById('mainBtn');
         mainBtn.innerText = "경기 기록 수정 완료";
         mainBtn.classList.add('edit-btn');
-        window.scrollTo({ top: 200, behavior: 'smooth' });
     }
 
     function cancelEdit() {
-        editMode = false; 
-        editRound = null;
+        editMode = false; editRound = null;
         document.getElementById('editBadge').style.display = 'none';
         const mainBtn = document.getElementById('mainBtn');
         mainBtn.innerText = "기록 저장";
@@ -290,19 +287,21 @@
         if (event) event.stopPropagation();
         if (!confirm("이 경기를 정말 삭제하시겠습니까?")) return;
         
-        showLoading(true, "기록 삭제 중");
+        showLoading(true, "서버에서 삭제 처리 중");
         
-        // round를 문자열로 명시적으로 변환하여 GAS 서버에 전달
-        await sendToGas({ 
+        // CRITICAL: round를 반드시 Number로 변환하여 전송 (시트의 숫자 데이터와 매칭)
+        const payload = { 
             action: "DELETE", 
-            round: String(round) 
-        });
+            round: Number(round) 
+        };
 
-        // 삭제 후 스프레드시트 업데이트 시간을 고려해 3초 뒤에 다시 데이터를 불러옴
+        await sendToGas(payload);
+
+        // 삭제 처리 후 시트 갱신 시간을 충분히 확보 (3초)
         setTimeout(async () => { 
             await fetchData(); 
-            alert("삭제 완료 🗑️"); 
-            cancelEdit(); 
+            alert("정상적으로 삭제되었습니다."); 
+            cancelEdit();
         }, 3000);
     }
 
@@ -327,21 +326,15 @@
         if (maxL > 0) {
             const losers = players.filter(p => stats[p].ranks[4] === maxL);
             richArea.style.display = 'block';
-            richArea.innerHTML = `💸 이판도 나? 다들 카드까봐! (최고 꼴찌 ${maxL}회)<br><span style="font-size:20px; color:var(--accent);">${losers.join(', ')}</span>`;
-        } else { 
-            richArea.style.display = 'none'; 
-        }
+            richArea.innerHTML = `이판도 나냐! 다들 카드까봐! 꼴찌 (${maxL}회): <span style="font-size:20px; color:var(--accent);">${losers.join(', ')}</span>`;
+        } else { richArea.style.display = 'none'; }
     }
 
     async function startResetProcess() {
-        const pass = confirm("🚨 경고: 모든 데이터가 영구적으로 삭제됩니다.\n정말 초기화하시겠습니까?");
-        if (!pass) return;
-        showLoading(true, "서버 데이터를 비우는 중");
+        if (!confirm("🚨 정말 모든 데이터를 초기화하시겠습니까?")) return;
+        showLoading(true, "초기화 중");
         await sendToGas({ action: "RESET" });
-        setTimeout(() => {
-            alert("초기화 처리가 완료되었습니다."); 
-            location.reload(); 
-        }, 1500);
+        setTimeout(() => location.reload(), 2000);
     }
 
     function changeMonth(v) { 
@@ -349,15 +342,12 @@
         renderCalendar(); 
     }
 
-    function showLoading(v, text = "처리 중") { 
+    function showLoading(v, text = "") { 
         document.getElementById('loadingText').innerText = text;
         document.getElementById('loading').style.display = v ? 'flex' : 'none'; 
     }
 
-    window.onload = () => {
-        updateInputFields();
-        fetchData();
-    };
+    window.onload = fetchData;
 </script>
 </body>
 </html>
