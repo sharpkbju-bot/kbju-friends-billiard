@@ -300,7 +300,7 @@
             // no-cors 모드에서는 응답 확인이 불가하므로 시간차를 두고 데이터 갱신
             setTimeout(async () => { 
                 await fetchData(); 
-                alert("삭제 처리를 요청했습니다! 🗑️"); 
+                alert("삭제 완료! 🗑️"); 
                 cancelEdit(); 
             }, 1500);
         } catch (e) {
