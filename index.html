@@ -218,6 +218,22 @@
         }
     }
 
+    async function sendToGas(payload) {
+        // GAS와의 통신을 위한 통합 헬퍼 함수
+        try {
+            await fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors', // CORS 오류 원천 차단
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            });
+            return true;
+        } catch (e) {
+            console.error("통신 오류:", e);
+            return false;
+        }
+    }
+
     async function saveGame() {
         const count = parseInt(document.getElementById('playerCount').value);
         const ranks = [];
@@ -229,21 +245,13 @@
         if(new Set(ranks).size !== ranks.length) return alert("❌ 쌍둥이여? 잘 선택혀!(중복!)");
 
         showLoading(true, "기록 저장 중.");
-        try {
-            await fetch(GAS_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: ranks, round: editRound })
-            });
-            setTimeout(async () => { 
-                await fetchData(); 
-                alert("성공적으로 저장되었습니다! ✅"); 
-                cancelEdit(); 
-            }, 1500);
-        } catch (e) {
-            alert("연결 오류가 발생했습니다.");
-            showLoading(false);
-        }
+        const success = await sendToGas({ action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: ranks, round: editRound });
+        
+        setTimeout(async () => { 
+            await fetchData(); 
+            alert("저장 처리가 완료되었습니다! ✅"); 
+            cancelEdit(); 
+        }, 1500);
     }
 
     function updateInputFields(preFillData = null) {
@@ -283,30 +291,15 @@
         if (event) event.stopPropagation();
         if (!confirm("이 경기를 정말 삭제하시겠습니까?")) return;
         
-        showLoading(true, "기록 삭제 중");
-        try {
-            // 전송 데이터를 문자열 형식이 아닌 명확한 객체로 전달
-            const payload = {
-                action: "DELETE",
-                round: String(round) // GAS에서 찾기 쉽도록 문자열로 변환하여 전송
-            };
+        showLoading(true, "기록 삭제 중.");
+        // action과 round를 명확히 전송
+        await sendToGas({ action: "DELETE", round: String(round) });
 
-            await fetch(GAS_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
-            });
-
-            // GAS 특성상 삭제 반영에 시간이 걸릴 수 있으므로 2초 대기 후 새로고침
-            setTimeout(async () => { 
-                await fetchData(); 
-                alert("🗑️ 삭제 완료!"); 
-                cancelEdit(); 
-            }, 2000);
-        } catch (e) {
-            alert("연결 오류가 발생했습니다.");
-            showLoading(false);
-        }
+        setTimeout(async () => { 
+            await fetchData(); 
+            alert("🗑️ 삭제 완료!"); 
+            cancelEdit(); 
+        }, 1500);
     }
 
     function renderStats() {
@@ -340,20 +333,11 @@
         const pass = confirm("🚨 경고: 모든 데이터가 영구적으로 삭제됩니다.\n정말 초기화하시겠습니까?");
         if (!pass) return;
         showLoading(true, "서버 데이터를 비우는 중");
-        try {
-            await fetch(GAS_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: "RESET" }) 
-            });
-            setTimeout(() => {
-                alert("초기화가 완료되었습니다."); 
-                location.reload(); 
-            }, 1500);
-        } catch (e) { 
-            alert("초기화 중 오류가 발생했습니다."); 
-            showLoading(false); 
-        }
+        await sendToGas({ action: "RESET" });
+        setTimeout(() => {
+            alert("초기화 처리가 완료되었습니다."); 
+            location.reload(); 
+        }, 1500);
     }
 
     function changeMonth(v) { 
