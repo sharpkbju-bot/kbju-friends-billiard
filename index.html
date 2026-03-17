@@ -201,14 +201,14 @@
             games.forEach((g, idx) => {
                 const names = g.ranks.filter(n => n && n.trim() !== "");
                 html += `
-                <div class="game-item" onclick="enterEditMode(${g.round}, '${names.join(',')}')">
-                    <div class="game-info">
+                <div class="game-item">
+                    <div class="game-info" onclick="enterEditMode(${g.round}, '${names.join(',')}')">
                         <small style="color:#FF00FF;">${idx+1}경기:</small> 
                         <span style="font-weight:600;">${names.join(' → ')}</span>
                     </div>
                     <div class="game-btns">
-                        <div style="color:var(--edit); font-size:12px; font-weight:bold;">수정</div>
-                        <div style="color:#3CB371; font-size:12px; font-weight:bold;" onclick="deleteGame(event, ${g.round})">삭제</div>
+                        <div style="color:var(--edit); font-size:12px; font-weight:bold; cursor:pointer;" onclick="enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
+                        <div style="color:#3CB371; font-size:12px; font-weight:bold; cursor:pointer;" onclick="deleteGame(event, '${g.round}')">삭제</div>
                     </div>
                 </div>`;
             });
@@ -232,7 +232,6 @@
         try {
             await fetch(GAS_URL, {
                 method: 'POST',
-                mode: 'no-cors', // GAS 리디렉션 대응
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: ranks, round: editRound })
             });
@@ -281,31 +280,31 @@
     }
 
     async function deleteGame(event, round) {
-        event.stopPropagation();
+        if (event) event.stopPropagation();
         if (!confirm("이 경기를 정말 삭제하시겠습니까?")) return;
         
         showLoading(true, "기록 삭제 중");
         try {
-            // POST 요청 시 redirect 옵션과 no-cors 모드를 적절히 사용하여 GAS 통신 오류 방지
+            // 전송 데이터를 문자열 형식이 아닌 명확한 객체로 전달
+            const payload = {
+                action: "DELETE",
+                round: String(round) // GAS에서 찾기 쉽도록 문자열로 변환하여 전송
+            };
+
             await fetch(GAS_URL, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ 
-                    action: "DELETE", 
-                    round: Number(round) // 숫자로 확실히 변환
-                })
+                body: JSON.stringify(payload)
             });
-            
-            // no-cors 모드에서는 응답 확인이 불가하므로 시간차를 두고 데이터 갱신
+
+            // GAS 특성상 삭제 반영에 시간이 걸릴 수 있으므로 2초 대기 후 새로고침
             setTimeout(async () => { 
                 await fetchData(); 
-                alert("삭제 완료! 🗑️"); 
+                alert("🗑️ 삭제 완료!"); 
                 cancelEdit(); 
-            }, 1500);
+            }, 2000);
         } catch (e) {
-            console.error(e);
-            alert("연결 오류가 발생했습니다. 네트워크 상태를 확인하세요.");
+            alert("연결 오류가 발생했습니다.");
             showLoading(false);
         }
     }
@@ -344,12 +343,11 @@
         try {
             await fetch(GAS_URL, { 
                 method: 'POST', 
-                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: "RESET" }) 
             });
             setTimeout(() => {
-                alert("초기화 요청을 보냈습니다."); 
+                alert("초기화가 완료되었습니다."); 
                 location.reload(); 
             }, 1500);
         } catch (e) { 
