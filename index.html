@@ -137,7 +137,7 @@
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzu_4BDNBp9O5NP8-64mpJjUWgP4Yyy5rFzeKjk2HV7fYKndteto2Lf_kdOC6EWlwvNnw/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxziABM-iWSYhVRSFdbvO6dteFYPiXRmDQ49i7dSJMMQ3jHlZAqxfZ34mWR4OKrYZK4wQ/exec"; 
     const players = ["경배", "원석", "진웅", "창한", "정석"];
     
     let gameLogs = [];
@@ -231,9 +231,6 @@
         }
     }
 
-    /* -----------------------------------------------------------------
-       [수정 부분] SAVE/UPDATE 시 모든 순위가 유실 없이 전송되도록 로직 수정
-       ----------------------------------------------------------------- */
     async function saveGame() {
         const count = parseInt(document.getElementById('playerCount').value);
         const ranks = [];
@@ -246,11 +243,10 @@
 
         showLoading(true, "기록 저장 중");
         
-        // 데이터 유실 방지를 위해 정제된 배열 데이터 생성
         const payload = { 
             action: editMode ? "UPDATE" : "SAVE", 
             date: selectedDateStr, 
-            ranks: ranks, // 2~5명 전체 배열 전송
+            ranks: ranks, 
             round: editRound 
         };
 
@@ -326,16 +322,27 @@
         }
     }
 
+    /* -----------------------------------------------------------------
+       [수정 부분] 인원수에 관계없이 마지막 요소를 꼴찌(💀)로 강제 집계
+       ----------------------------------------------------------------- */
     function renderStats() {
         let stats = {};
         players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
         gameLogs.forEach(g => {
             const actual = g.ranks.filter(n => n && n.trim() !== "");
+            const lastIdx = actual.length - 1; // 마지막 인덱스 확보 (3명이면 2번, 4명이면 3번)
+
             actual.forEach((name, idx) => {
                 if(stats[name]) {
                     stats[name].played++;
-                    if (idx === actual.length - 1 && actual.length > 1) stats[name].ranks[4]++; 
-                    else if (idx < 4) stats[name].ranks[idx]++;
+                    // 1) 만약 이 친구가 마지막 순서라면 무조건 꼴찌(인덱스 4)에 누적
+                    if (idx === lastIdx && actual.length > 1) {
+                        stats[name].ranks[4]++; 
+                    } 
+                    // 2) 마지막이 아닌 등수들은 해당 칸에 누적 (4위까지)
+                    else if (idx < 4) {
+                        stats[name].ranks[idx]++;
+                    }
                 }
             });
         });
