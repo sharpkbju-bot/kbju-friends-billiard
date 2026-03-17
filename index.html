@@ -291,7 +291,7 @@
         if (event) event.stopPropagation();
         if (!confirm("이 경기를 정말 삭제하시겠습니까?")) return;
         
-        showLoading(true, "기록 삭제 중.");
+        showLoading(true, "기록 삭제 중");
         // action과 round를 명확히 전송
         await sendToGas({ action: "DELETE", round: String(round) });
 
