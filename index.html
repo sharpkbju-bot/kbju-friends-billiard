@@ -28,9 +28,6 @@
         .input-row { display: flex; align-items: center; margin-bottom: 10px; }
         .input-row label { width: 55px; font-size: 13px; font-weight: bold; color: var(--main); }
         
-        /* -----------------------------------------------------------------
-           [수정 부분] 드롭다운 박스 텍스트 중앙 정렬
-           ----------------------------------------------------------------- */
         select { 
             flex: 1; 
             padding: 12px; 
@@ -39,8 +36,8 @@
             font-size: 15px; 
             background: #fff; 
             appearance: none; 
-            text-align: center;      /* 텍스트 가로 중앙 정렬 */
-            text-align-last: center; /* 선택된 값 중앙 정렬 (일부 브라우저 대응) */
+            text-align: center; 
+            text-align-last: center; 
         }
         
         button.save-btn { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 15px; font-weight: bold; margin-top: 10px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 12px rgba(0,123,255,0.3); }
@@ -58,8 +55,11 @@
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--main); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
+        /* -----------------------------------------------------------------
+           [수정 부분] 좁은 화면에서도 무조건 1줄로 표시되도록 최적화
+           ----------------------------------------------------------------- */
         .game-item { 
-            padding: 14px; 
+            padding: 12px 8px; /* 좌우 패딩을 줄여 공간 확보 */
             border: 1px solid #eee; 
             margin-top: 10px; 
             border-radius: 15px; 
@@ -72,17 +72,17 @@
         .game-info { 
             flex: 1; 
             min-width: 0; 
-            padding-right: 10px; 
-            white-space: normal; 
-            word-break: keep-all; 
-            overflow: visible; 
-            text-overflow: clip; 
-            font-size: 12.5px; 
+            padding-right: 5px; 
+            white-space: nowrap; /* 무조건 1줄 유지 */
+            overflow: hidden; 
+            text-overflow: clip; /* 말줄임표 대신 끝까지 표시 시도 */
+            font-size: 11.5px; /* 글자 크기를 더 작게 조정 */
+            letter-spacing: -0.5px; /* 글자 간격을 좁혀서 공간 확보 */
             line-height: 1.4;
         }
         .game-btns { 
             display: flex; 
-            gap: 12px; 
+            gap: 8px; /* 버튼 사이 간격 축소 */
             flex-shrink: 0; 
         }
         
@@ -216,11 +216,12 @@
             let html = `<p style="font-size:12px; color:var(--edit); font-weight:bold; margin:20px 0 8px 0;">⌵ 이 날의 경기 (수정하려면 터치)</p>`;
             games.forEach((g, idx) => {
                 const names = g.ranks.filter(n => n && n.trim() !== "");
+                // 구분자 간격을 줄이기 위해 공백 없이 화살표 사용
                 html += `
                 <div class="game-item" onclick="enterEditMode(${g.round}, '${names.join(',')}')">
                     <div class="game-info">
-                        <small style="color:#FF00FF;">${idx+1}경기:</small> 
-                        <span style="font-weight:600;">${names.join(' → ')}</span>
+                        <small style="color:#FF00FF;">${idx+1}G:</small> 
+                        <span style="font-weight:600;">${names.join('→')}</span>
                     </div>
                     <div class="game-btns">
                         <div style="color:var(--edit); font-size:12px; font-weight:bold;">수정</div>
