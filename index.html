@@ -245,12 +245,12 @@
         }
         if(new Set(ranks).size !== ranks.length) return alert("❌ 쌍둥이여? 잘 선택혀!(중복!)");
 
-        showLoading(true, "기록 저장 중.");
+        showLoading(true, "기록 저장 중. 기둘려!");
         await sendToGas({ action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: ranks, round: editRound });
         
         setTimeout(async () => { 
             await fetchData(); 
-            alert("저장 처리가 완료되었습니다! ✅"); 
+            alert("저장 완료! ✅"); 
             cancelEdit(); 
         }, 2000);
     }
