@@ -132,12 +132,14 @@
 
 <div class="danger-zone">
     <div style="color:#9400d3; font-weight:900; margin-bottom:12px; font-size:16px;">[위험 구역]</div>
-    <button class="reset-btn" onclick="startResetProcess()">⚠️ 모든 데이터 초기화 (복구 불가)</button>
+    <div id="resetSteps">
+        <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
+    </div>
     <div style="font-size:12px; color:#808000; margin-top:12px; line-height:1.4;">이 버튼은 모든 전적 데이터를 삭제합니다.<br>신중하게 결정해 주세요.</div>
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxziABM-iWSYhVRSFdbvO6dteFYPiXRmDQ49i7dSJMMQ3jHlZAqxfZ34mWR4OKrYZK4wQ/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby-Iheo9iLywifHsnyxybHgxvajkeJiGQ1fs2_Xo1kouCPpVgni8VcePaBaG9aKU_rr-w/exec"; 
     const players = ["경배", "원석", "진웅", "창한", "정석"];
     
     let gameLogs = [];
@@ -322,24 +324,19 @@
         }
     }
 
-    /* -----------------------------------------------------------------
-       [수정 부분] 인원수에 관계없이 마지막 요소를 꼴찌(💀)로 강제 집계
-       ----------------------------------------------------------------- */
     function renderStats() {
         let stats = {};
         players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
         gameLogs.forEach(g => {
             const actual = g.ranks.filter(n => n && n.trim() !== "");
-            const lastIdx = actual.length - 1; // 마지막 인덱스 확보 (3명이면 2번, 4명이면 3번)
+            const lastIdx = actual.length - 1;
 
             actual.forEach((name, idx) => {
                 if(stats[name]) {
                     stats[name].played++;
-                    // 1) 만약 이 친구가 마지막 순서라면 무조건 꼴찌(인덱스 4)에 누적
                     if (idx === lastIdx && actual.length > 1) {
                         stats[name].ranks[4]++; 
                     } 
-                    // 2) 마지막이 아닌 등수들은 해당 칸에 누적 (4위까지)
                     else if (idx < 4) {
                         stats[name].ranks[idx]++;
                     }
@@ -360,9 +357,39 @@
         }
     }
 
-    async function startResetProcess() {
-        const pass = confirm("🚨 경고: 모든 데이터가 영구적으로 삭제됩니다.\n정말 초기화하시겠습니까?");
-        if (!pass) return;
+    /* -----------------------------------------------------------------
+       [수정 부분] 초기화 3단계 확인 절차
+       ----------------------------------------------------------------- */
+    function confirmReset(step) {
+        const container = document.getElementById('resetSteps');
+        if (step === 1) {
+            container.innerHTML = `
+                <div style="color:red; font-weight:bold; margin-bottom:10px;">[1단계] 정말 삭제할 거야?</div>
+                <button class="reset-btn" style="background:#f39c12;" onclick="confirmReset(2)">응, 진짜 삭제할래</button>
+                <button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>
+            `;
+        } else if (step === 2) {
+            container.innerHTML = `
+                <div style="color:red; font-weight:bold; margin-bottom:10px;">[2단계] 진짜 복구 안 된다니까?</div>
+                <button class="reset-btn" style="background:#e67e22;" onclick="confirmReset(3)">알았어, 마지막 확인!</button>
+                <button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>
+            `;
+        } else if (step === 3) {
+            container.innerHTML = `
+                <div style="color:red; font-weight:bold; margin-bottom:10px;">[최종 확인] 지금 즉시 삭제합니다.</div>
+                <button class="reset-btn" onclick="executeReset()">🔥 데이터 즉시 삭제 (복구 불가)</button>
+                <button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>
+            `;
+        }
+    }
+
+    function cancelReset() {
+        document.getElementById('resetSteps').innerHTML = `
+            <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
+        `;
+    }
+
+    async function executeReset() {
         showLoading(true, "서버 데이터를 비우는 중");
         try {
             await fetch(GAS_URL, { 
@@ -375,6 +402,7 @@
         } catch (e) { 
             alert("초기화 중 오류가 발생했습니다."); 
             showLoading(false); 
+            cancelReset();
         }
     }
 
