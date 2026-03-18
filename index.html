@@ -44,7 +44,6 @@
             transition: all 0.3s;
         }
 
-        /* 중복 선택 시 강조 스타일 */
         select.duplicate-error {
             border: 3px solid var(--accent);
             background-color: #fff0f0;
@@ -184,9 +183,8 @@
             const rawData = await response.json();
             gameLogs = rawData.map(g => ({ ...g, dateStr: formatDate(g.date) }));
             renderAll();
-        } catch (e) {
-            console.error("Data fetch error");
-        } finally {
+        } catch (e) { console.error("Data fetch error"); } 
+        finally {
             showLoading(false);
             document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
         }
@@ -251,6 +249,9 @@
         } else { listArea.innerHTML = ""; }
     }
 
+    /* -----------------------------------------------------------------
+       [결함 수정] 저장/수정 시 5열 전체를 명시적으로 제어하여 유실 방지
+       ----------------------------------------------------------------- */
     async function saveGame() {
         const count = parseInt(document.getElementById('playerCount').value);
         const ranks = [];
@@ -260,38 +261,44 @@
             ranks.push(el.value);
         }
         if(new Set(ranks).size !== ranks.length) return alert("❌ 누가 쌍둥이여? 잘 선택혀!(중복)");
+        
         showLoading(true, "기록 저장 중");
-        const finalRanks = [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""];
-        const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: finalRanks, round: editRound };
+        
+        // 유실 방지 핵심: 수정 시에도 항상 5개의 요소를 가진 배열로 정규화
+        const finalRanks = [
+            ranks[0] || "",
+            ranks[1] || "",
+            ranks[2] || "",
+            ranks[3] || "",
+            ranks[4] || ""
+        ];
+
+        const payload = { 
+            action: editMode ? "UPDATE" : "SAVE", 
+            date: selectedDateStr, 
+            ranks: finalRanks, 
+            round: editRound 
+        };
+
         try {
             await fetch(GAS_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             });
-            setTimeout(async () => { await fetchData(); alert("저장 성공! ✅"); cancelEdit(); }, 1500);
+            setTimeout(async () => { await fetchData(); alert("성공적으로 저장되었습니다! ✅"); cancelEdit(); }, 1500);
         } catch (e) { alert("연결 오류가 발생했습니다."); showLoading(false); }
     }
 
-    /* -----------------------------------------------------------------
-       [수정 핵심] 중복 선택 실시간 감시 및 강조 로직 보강
-       ----------------------------------------------------------------- */
     function checkDuplicates() {
         const count = parseInt(document.getElementById('playerCount').value);
-        const selects = [];
         const values = [];
-
-        // 모든 셀렉트 박스와 값 수집
+        const selects = [];
         for(let i=1; i<=count; i++) {
             const el = document.getElementById('rank'+i);
-            selects.push(el);
-            values.push(el.value);
+            if(el) { selects.push(el); values.push(el.value); }
         }
-
-        // 초기화: 일단 모든 에러 클래스 제거
         selects.forEach(s => s.classList.remove('duplicate-error'));
-
-        // 중복 검사 및 클래스 부여
         values.forEach((val, idx) => {
             if (val && values.filter(v => v === val).length > 1) {
                 selects[idx].classList.add('duplicate-error');
@@ -300,23 +307,27 @@
     }
 
     function updateInputFields(preFillData = null) {
-        const count = preFillData ? preFillData.length : parseInt(document.getElementById('playerCount').value);
-        if(!preFillData) document.getElementById('playerCount').value = count;
+        // 수정 모드일 경우 데이터의 길이에 맞춰 인원수 셀렉트 박스도 강제 동기화 (유실 방지 핵심)
+        if(preFillData) {
+            document.getElementById('playerCount').value = preFillData.length;
+        }
+        
+        const count = parseInt(document.getElementById('playerCount').value);
         const area = document.getElementById('inputArea');
         let html = '';
         for(let i=1; i<=count; i++) {
             const label = i === count ? "꼴찌💀" : `${i}위`;
-            // onchange="checkDuplicates()" 추가하여 실시간 감시
             html += `<div class="input-row"><label>${label}</label><select id="rank${i}" onchange="checkDuplicates()"><option value="">선수 선택</option>${players.map(p => `<option value="${p}" ${preFillData && preFillData[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
         }
         area.innerHTML = html;
-        if(preFillData) checkDuplicates(); // 수정 모드 진입 시 즉시 체크
+        if(preFillData) checkDuplicates();
     }
 
     function enterEditMode(round, rankStr) {
         editMode = true; 
         editRound = round;
         const currentRanks = rankStr.split(',');
+        // 필드 업데이트 전 인원수 동기화 포함됨
         updateInputFields(currentRanks);
         document.getElementById('editBadge').style.display = 'block';
         const mainBtn = document.getElementById('mainBtn');
@@ -345,7 +356,7 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: "DELETE", round: round })
             });
-            setTimeout(async () => { await fetchData(); alert("삭제 완료! 🗑️"); cancelEdit(); }, 1500);
+            setTimeout(async () => { await fetchData(); alert("삭제되었습니다! 🗑️"); cancelEdit(); }, 1500);
         } catch (e) { alert("연결 오류가 발생했습니다."); showLoading(false); }
     }
 
@@ -385,18 +396,12 @@
 
     function confirmReset(step) {
         const container = document.getElementById('resetSteps');
-        if (step === 1) {
-            container.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[1단계] 정말 삭제할 거야?</div><button class="reset-btn" style="background:#f39c12;" onclick="confirmReset(2)">응, 진짜 삭제할래</button><button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>`;
-        } else if (step === 2) {
-            container.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[2단계] 진짜 복구 안 된다니까?</div><button class="reset-btn" style="background:#e67e22;" onclick="confirmReset(3)">알았어, 마지막 확인!</button><button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>`;
-        } else if (step === 3) {
-            container.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[최종 확인] 지금 즉시 삭제합니다.</div><button class="reset-btn" onclick="executeReset()">🔥 데이터 즉시 삭제 (복구 불가)</button><button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>`;
-        }
+        if (step === 1) { container.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[1단계] 정말 삭제할 거야?</div><button class="reset-btn" style="background:#f39c12;" onclick="confirmReset(2)">응, 진짜 삭제할래</button><button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>`; }
+        else if (step === 2) { container.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[2단계] 진짜 복구 안 된다니까?</div><button class="reset-btn" style="background:#e67e22;" onclick="confirmReset(3)">알았어, 마지막 확인!</button><button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>`; }
+        else if (step === 3) { container.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[최종 확인] 지금 즉시 삭제합니다.</div><button class="reset-btn" onclick="executeReset()">🔥 데이터 즉시 삭제 (복구 불가)</button><button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>`; }
     }
 
-    function cancelReset() {
-        document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`;
-    }
+    function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
 
     async function executeReset() {
         showLoading(true, "서버 데이터를 비우는 중");
