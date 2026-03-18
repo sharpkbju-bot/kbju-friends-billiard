@@ -139,7 +139,7 @@
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxDRhocVFFXW0aRH5tYupYlQNFaSppLhZN65TX5ewyyfGXTCFhmo4KPwCRNYBud6-pflA/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby-Iheo9iLywifHsnyxybHgxvajkeJiGQ1fs2_Xo1kouCPpVgni8VcePaBaG9aKU_rr-w/exec"; 
     const players = ["경배", "원석", "진웅", "창한", "정석"];
     
     let gameLogs = [];
@@ -233,22 +233,38 @@
         }
     }
 
+    /* -----------------------------------------------------------------
+       [결함 수정] 모든 순위(최대 5명)를 유실 없이 서버로 전송하도록 보강
+       ----------------------------------------------------------------- */
     async function saveGame() {
         const count = parseInt(document.getElementById('playerCount').value);
         const ranks = [];
+        
+        // 현재 선택된 인원수만큼만 먼저 수집
         for(let i=1; i<=count; i++) {
-            const v = document.getElementById('rank'+i).value;
-            if(!v) return alert("선수를 모두 지정해 주세요!");
-            ranks.push(v);
+            const el = document.getElementById('rank'+i);
+            if(!el || !el.value) return alert("선수를 모두 지정해 주세요!");
+            ranks.push(el.value);
         }
+        
         if(new Set(ranks).size !== ranks.length) return alert("❌ 쌍둥이여? 잘 선택혀!(중복!)");
 
         showLoading(true, "기록 저장 중");
         
+        // 데이터 유실 방지 핵심: 수정 시 구글 시트의 빈 열(4위, 5위 등)을 덮어쓰지 않도록
+        // 항상 5칸짜리 고정 배열 구조를 만들어서 보냅니다. (나머지는 빈 문자열)
+        const finalRanks = [
+            ranks[0] || "",
+            ranks[1] || "",
+            ranks[2] || "",
+            ranks[3] || "",
+            ranks[4] || ""
+        ];
+
         const payload = { 
             action: editMode ? "UPDATE" : "SAVE", 
             date: selectedDateStr, 
-            ranks: ranks, 
+            ranks: finalRanks, // 꼼꼼하게 정제된 5인 기준 데이터 전송
             round: editRound 
         };
 
@@ -357,9 +373,6 @@
         }
     }
 
-    /* -----------------------------------------------------------------
-       [수정 부분] 초기화 3단계 확인 절차
-       ----------------------------------------------------------------- */
     function confirmReset(step) {
         const container = document.getElementById('resetSteps');
         if (step === 1) {
