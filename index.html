@@ -286,7 +286,7 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             });
-            setTimeout(async () => { await fetchData(); alert("성공적으로 저장되었습니다! ✅"); cancelEdit(); }, 1500);
+            setTimeout(async () => { await fetchData(); alert("저장 성공! ✅"); cancelEdit(); }, 1500);
         } catch (e) { alert("연결 오류가 발생했습니다."); showLoading(false); }
     }
 
@@ -356,7 +356,7 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: "DELETE", round: round })
             });
-            setTimeout(async () => { await fetchData(); alert("삭제되었습니다! 🗑️"); cancelEdit(); }, 1500);
+            setTimeout(async () => { await fetchData(); alert("삭제 완료! 🗑️"); cancelEdit(); }, 1500);
         } catch (e) { alert("연결 오류가 발생했습니다."); showLoading(false); }
     }
 
