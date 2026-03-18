@@ -19,10 +19,13 @@
         .card { background: white; border-radius: 20px; padding: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); margin-bottom: 20px; }
         
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-top: 10px; }
-        .day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; font-size: 14px; position: relative; background: #fff; border: 1px solid #f0f0f0; transition: 0.2s; }
+        .day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; font-size: 14px; position: relative; background: #fff; border: 1px solid #f0f0f0; transition: 0.2s; color: #333; }
         
-        .day.today { background: var(--today) !important; color: #d0006e; font-weight: bold; }
-        
+        /* 토요일/일요일/공휴일 색상 스타일 */
+        .day.sat { color: #5dade2; } /* 연한 파란색 */
+        .day.sun, .day.holiday { color: #f1948a; } /* 연한 빨간색 */
+
+        .day.today { background: var(--today) !important; color: #d0006e !important; font-weight: bold; }
         .day.selected { background: var(--main) !important; color: white !important; font-weight: bold; border: 2px solid #0056b3; z-index: 1; transform: scale(1.05); }
         .has-record { background: #e8f9ee !important; border: 2.5px solid var(--success) !important; font-weight: bold; color: #155724; }
         .has-record::after { content: ''; position: absolute; bottom: 4px; width: 6px; height: 6px; background: var(--success); border-radius: 50%; }
@@ -170,6 +173,14 @@
         return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
 
+    // 공휴일 체크 로직 (양력 기준 주요 공휴일)
+    function isHoliday(date) {
+        const m = date.getMonth() + 1;
+        const d = date.getDate();
+        const holidays = ["1-1", "3-1", "5-5", "6-6", "8-15", "10-3", "10-9", "12-25"];
+        return holidays.includes(`${m}-${d}`);
+    }
+
     async function fetchData() {
         renderAll(); 
         if(!GAS_URL || GAS_URL.includes("URL_입력")) {
@@ -204,18 +215,34 @@
         const month = currentViewDate.getMonth();
         const realTodayStr = formatDate(new Date());
         document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
-        ["일","월","화","수","목","금","토"].forEach(d => {
-            grid.innerHTML += `<div style="font-size:12px;color:#aaa;padding-bottom:5px;">${d}</div>`;
+        
+        // 요일 헤더 색상 적용
+        ["일","월","화","수","목","금","토"].forEach((d, idx) => {
+            let colorStyle = "color:#aaa;";
+            if(idx === 0) colorStyle = "color:#f1948a;"; // 일요일 헤더
+            if(idx === 6) colorStyle = "color:#5dade2;"; // 토요일 헤더
+            grid.innerHTML += `<div style="font-size:12px;${colorStyle}padding-bottom:5px;">${d}</div>`;
         });
+
         const firstDay = new Date(year, month, 1).getDay();
         const lastDate = new Date(year, month + 1, 0).getDate();
         for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
+        
         for (let d = 1; d <= lastDate; d++) {
-            const dStr = formatDate(new Date(year, month, d));
+            const dateObj = new Date(year, month, d);
+            const dStr = formatDate(dateObj);
+            const dayOfWeek = dateObj.getDay(); // 0:일, 6:토
+            
+            let dayClass = "";
+            if (dayOfWeek === 0) dayClass = "sun";
+            else if (dayOfWeek === 6) dayClass = "sat";
+            if (isHoliday(dateObj)) dayClass = "holiday"; // 공휴일 우선순위
+
             const isSelected = dStr === selectedDateStr ? 'selected' : '';
             const isToday = dStr === realTodayStr ? 'today' : '';
             const hasRecord = gameLogs.some(g => g.dateStr === dStr) ? 'has-record' : '';
-            grid.innerHTML += `<div class="day ${isSelected} ${isToday} ${hasRecord}" onclick="selectDate('${dStr}')">${d}</div>`;
+            
+            grid.innerHTML += `<div class="day ${dayClass} ${isSelected} ${isToday} ${hasRecord}" onclick="selectDate('${dStr}')">${d}</div>`;
         }
     }
 
@@ -249,37 +276,18 @@
         } else { listArea.innerHTML = ""; }
     }
 
-    /* -----------------------------------------------------------------
-       [결함 수정] 저장/수정 시 5열 전체를 명시적으로 제어하여 유실 방지
-       ----------------------------------------------------------------- */
     async function saveGame() {
         const count = parseInt(document.getElementById('playerCount').value);
         const ranks = [];
         for(let i=1; i<=count; i++) {
             const el = document.getElementById('rank'+i);
-            if(!el || !el.value) return alert("친구를 선택해 줄래?");
+            if(!el || !el.value) return alert("친구를 모두 지정해 줄래?");
             ranks.push(el.value);
         }
         if(new Set(ranks).size !== ranks.length) return alert("❌ 누가 쌍둥이여? 잘 선택혀!(중복)");
-        
         showLoading(true, "기록 저장 중");
-        
-        // 유실 방지 핵심: 수정 시에도 항상 5개의 요소를 가진 배열로 정규화
-        const finalRanks = [
-            ranks[0] || "",
-            ranks[1] || "",
-            ranks[2] || "",
-            ranks[3] || "",
-            ranks[4] || ""
-        ];
-
-        const payload = { 
-            action: editMode ? "UPDATE" : "SAVE", 
-            date: selectedDateStr, 
-            ranks: finalRanks, 
-            round: editRound 
-        };
-
+        const finalRanks = [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""];
+        const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: finalRanks, round: editRound };
         try {
             await fetch(GAS_URL, {
                 method: 'POST',
@@ -307,11 +315,7 @@
     }
 
     function updateInputFields(preFillData = null) {
-        // 수정 모드일 경우 데이터의 길이에 맞춰 인원수 셀렉트 박스도 강제 동기화 (유실 방지 핵심)
-        if(preFillData) {
-            document.getElementById('playerCount').value = preFillData.length;
-        }
-        
+        if(preFillData) document.getElementById('playerCount').value = preFillData.length;
         const count = parseInt(document.getElementById('playerCount').value);
         const area = document.getElementById('inputArea');
         let html = '';
@@ -327,7 +331,6 @@
         editMode = true; 
         editRound = round;
         const currentRanks = rankStr.split(',');
-        // 필드 업데이트 전 인원수 동기화 포함됨
         updateInputFields(currentRanks);
         document.getElementById('editBadge').style.display = 'block';
         const mainBtn = document.getElementById('mainBtn');
