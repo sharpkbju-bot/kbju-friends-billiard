@@ -21,7 +21,6 @@
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-top: 10px; }
         .day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; font-size: 14px; position: relative; background: #fff; border: 1px solid #f0f0f0; transition: 0.2s; }
         
-        /* 오늘 날짜 핑크색 강조 */
         .day.today { background: var(--today) !important; color: #d0006e; font-weight: bold; }
         
         .day.selected { background: var(--main) !important; color: white !important; font-weight: bold; border: 2px solid #0056b3; z-index: 1; transform: scale(1.05); }
@@ -42,6 +41,21 @@
             appearance: none; 
             text-align: center; 
             text-align-last: center; 
+            transition: all 0.3s;
+        }
+
+        /* 중복 선택 시 강조 스타일 */
+        select.duplicate-error {
+            border: 3px solid var(--accent);
+            background-color: #fff0f0;
+            color: var(--accent);
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
         
         button.save-btn { width: 100%; padding: 16px; background: var(--main); color: white; border: none; border-radius: 15px; font-weight: bold; margin-top: 10px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 12px rgba(0,123,255,0.3); }
@@ -184,19 +198,13 @@
         renderGameList();
     }
 
-    /* -----------------------------------------------------------------
-       [수정 핵심] 오늘 날짜 핑크색 강조를 위한 renderCalendar 로직
-       ----------------------------------------------------------------- */
     function renderCalendar() {
         const grid = document.getElementById('calendarGrid');
         if(!grid) return;
         grid.innerHTML = "";
         const year = currentViewDate.getFullYear();
         const month = currentViewDate.getMonth();
-        
-        // 실제 '오늘'의 날짜 정보
         const realTodayStr = formatDate(new Date());
-
         document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
         ["일","월","화","수","목","금","토"].forEach(d => {
             grid.innerHTML += `<div style="font-size:12px;color:#aaa;padding-bottom:5px;">${d}</div>`;
@@ -207,9 +215,8 @@
         for (let d = 1; d <= lastDate; d++) {
             const dStr = formatDate(new Date(year, month, d));
             const isSelected = dStr === selectedDateStr ? 'selected' : '';
-            const isToday = dStr === realTodayStr ? 'today' : ''; // 오늘 여부 확인
+            const isToday = dStr === realTodayStr ? 'today' : '';
             const hasRecord = gameLogs.some(g => g.dateStr === dStr) ? 'has-record' : '';
-            
             grid.innerHTML += `<div class="day ${isSelected} ${isToday} ${hasRecord}" onclick="selectDate('${dStr}')">${d}</div>`;
         }
     }
@@ -252,7 +259,7 @@
             if(!el || !el.value) return alert("친구를 선택해 줄래?");
             ranks.push(el.value);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("❌ 쌍둥이여? 잘 선택혀!(중복!)");
+        if(new Set(ranks).size !== ranks.length) return alert("❌ 누가 쌍둥이여? 잘 선택혀!(중복)");
         showLoading(true, "기록 저장 중");
         const finalRanks = [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""];
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: finalRanks, round: editRound };
@@ -266,6 +273,32 @@
         } catch (e) { alert("연결 오류가 발생했습니다."); showLoading(false); }
     }
 
+    /* -----------------------------------------------------------------
+       [수정 핵심] 중복 선택 실시간 감시 및 강조 로직 보강
+       ----------------------------------------------------------------- */
+    function checkDuplicates() {
+        const count = parseInt(document.getElementById('playerCount').value);
+        const selects = [];
+        const values = [];
+
+        // 모든 셀렉트 박스와 값 수집
+        for(let i=1; i<=count; i++) {
+            const el = document.getElementById('rank'+i);
+            selects.push(el);
+            values.push(el.value);
+        }
+
+        // 초기화: 일단 모든 에러 클래스 제거
+        selects.forEach(s => s.classList.remove('duplicate-error'));
+
+        // 중복 검사 및 클래스 부여
+        values.forEach((val, idx) => {
+            if (val && values.filter(v => v === val).length > 1) {
+                selects[idx].classList.add('duplicate-error');
+            }
+        });
+    }
+
     function updateInputFields(preFillData = null) {
         const count = preFillData ? preFillData.length : parseInt(document.getElementById('playerCount').value);
         if(!preFillData) document.getElementById('playerCount').value = count;
@@ -273,9 +306,11 @@
         let html = '';
         for(let i=1; i<=count; i++) {
             const label = i === count ? "꼴찌💀" : `${i}위`;
-            html += `<div class="input-row"><label>${label}</label><select id="rank${i}"><option value="">선수 선택</option>${players.map(p => `<option value="${p}" ${preFillData && preFillData[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
+            // onchange="checkDuplicates()" 추가하여 실시간 감시
+            html += `<div class="input-row"><label>${label}</label><select id="rank${i}" onchange="checkDuplicates()"><option value="">선수 선택</option>${players.map(p => `<option value="${p}" ${preFillData && preFillData[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
         }
         area.innerHTML = html;
+        if(preFillData) checkDuplicates(); // 수정 모드 진입 시 즉시 체크
     }
 
     function enterEditMode(round, rankStr) {
@@ -310,7 +345,7 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: "DELETE", round: round })
             });
-            setTimeout(async () => { await fetchData(); alert("삭제되었습니다! 🗑️"); cancelEdit(); }, 1500);
+            setTimeout(async () => { await fetchData(); alert("삭제 완료! 🗑️"); cancelEdit(); }, 1500);
         } catch (e) { alert("연결 오류가 발생했습니다."); showLoading(false); }
     }
 
