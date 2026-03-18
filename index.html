@@ -62,7 +62,6 @@
         .danger-zone { margin-top: 50px; padding: 25px; border: 2px dashed #ff4757; border-radius: 25px; background: #fff5f5; text-align: center; }
         .reset-btn { width: 100%; background: #ff4757; color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,71,87,0.4); margin-bottom: 15px; }
         
-        /* [수정] 종료 버튼 스타일: 연한 보라색(Medium Purple) 테마 */
         .exit-btn {
             width: 100%; background: linear-gradient(135deg, #9370db, #8a2be2); color: white; border: 3px solid #800080; padding: 16px; border-radius: 15px;
             font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 6px 15px rgba(147, 112, 219, 0.4); text-shadow: 0 2px 3px rgba(0,0,0,0.2);
@@ -76,6 +75,8 @@
         
         .game-item { padding: 12px 8px; border: 1px solid #eee; margin-top: 10px; border-radius: 15px; background: #fafafa; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
         .game-info { flex: 1; min-width: 0; padding-right: 5px; white-space: nowrap; overflow: hidden; text-overflow: clip; font-size: 11.5px; letter-spacing: -0.5px; line-height: 1.4; }
+        /* 버튼 영역 복구 */
+        .game-btns { display: flex; gap: 8px; flex-shrink: 0; }
         
         .rich-msg { background: #fff3cd; padding: 15px; border-radius: 18px; text-align: center; font-size: 14px; color: #856404; font-weight: bold; margin-top: 15px; border: 2px solid #ffeeba; }
 
@@ -102,7 +103,7 @@
         <div id="exit-message" class="modal-text" style="font-size:16px; font-weight:bold; color:#333; line-height:1.6; margin-bottom:20px;">
             즐거운 시간 되셨나요?<br>앱을 종료하시겠습니까?
         </div>
-        <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); box-shadow:none; margin-bottom:10px;" onclick="closeAppWindow()">OK</button>
+        <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); box-shadow:none; margin-bottom:10px;" onclick="closeAppWindow()">알겠어!</button>
         <button class="save-btn" style="background:#666; box-shadow:none; margin:0;" onclick="closeExitModal()">취소</button>
     </div>
 </div>
@@ -257,6 +258,9 @@
         renderAll();
     }
 
+    /* -----------------------------------------------------------------
+       [복구] 게임 리스트 렌더링 함수 (수정/삭제 버튼 포함)
+       ----------------------------------------------------------------- */
     function renderGameList() {
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
         const listArea = document.getElementById('dayGameList');
@@ -264,7 +268,18 @@
             let html = `<p style="font-size:12px; color:var(--edit); font-weight:bold; margin:20px 0 8px 0;">⌵ 이 날의 게임 (수정하려면 터치)</p>`;
             games.forEach((g, idx) => {
                 const names = g.ranks.filter(n => n && n.trim() !== "");
-                html += `<div class="game-item" onclick="enterEditMode(${g.round}, '${names.join(',')}')"><div class="game-info"><small style="color:#FF00FF;">${idx+1}G:</small> <span style="font-weight:600;">${names.join('→')}</span></div></div>`;
+                // 버튼 영역과 클릭 이벤트들을 다시 살렸습니다.
+                html += `
+                <div class="game-item" onclick="enterEditMode(${g.round}, '${names.join(',')}')">
+                    <div class="game-info">
+                        <small style="color:#FF00FF;">${idx+1}G:</small> 
+                        <span style="font-weight:600;">${names.join('→')}</span>
+                    </div>
+                    <div class="game-btns">
+                        <div style="color:var(--edit); font-size:12px; font-weight:bold;">수정</div>
+                        <div style="color:#3CB371; font-size:12px; font-weight:bold;" onclick="deleteGame(event, ${g.round})">삭제</div>
+                    </div>
+                </div>`;
             });
             listArea.innerHTML = html;
         } else { listArea.innerHTML = ""; }
@@ -275,16 +290,16 @@
         const ranks = [];
         for(let i=1; i<=count; i++) {
             const el = document.getElementById('rank'+i);
-            if(!el || !el.value) return alert("친구를 선택해줄래?");
+            if(!el || !el.value) return alert("선수를 모두 지정해 주세요!");
             ranks.push(el.value);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("❌ 누가 쌍둥이여? 잘 선택혀!(중복)");
+        if(new Set(ranks).size !== ranks.length) return alert("❌ 중복된 선수가 있습니다!");
         showLoading(true, "기록 저장 중");
         const finalRanks = [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""];
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: finalRanks, round: editRound };
         try {
             await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
-            setTimeout(async () => { await fetchData(); alert("저장 성공! ✅"); cancelEdit(); }, 1500);
+            setTimeout(async () => { await fetchData(); alert("성공적으로 저장되었습니다! ✅"); cancelEdit(); }, 1500);
         } catch (e) { alert("연결 오류가 발생했습니다."); showLoading(false); }
     }
 
@@ -330,6 +345,19 @@
         mainBtn.innerText = "기록 저장";
         mainBtn.classList.remove('edit-btn');
         updateInputFields();
+    }
+
+    /* -----------------------------------------------------------------
+       [복구] 게임 삭제 함수
+       ----------------------------------------------------------------- */
+    async function deleteGame(event, round) {
+        event.stopPropagation(); // 부모 클릭(수정 모드 진입) 차단
+        if (!confirm("이 게임를 정말 삭제하시겠습니까?")) return;
+        showLoading(true, "기록 삭제 중");
+        try {
+            await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "DELETE", round: round }) });
+            setTimeout(async () => { await fetchData(); alert("삭제되었습니다! 🗑️"); cancelEdit(); }, 1500);
+        } catch (e) { alert("연결 오류가 발생했습니다."); showLoading(false); }
     }
 
     function renderStats() {
