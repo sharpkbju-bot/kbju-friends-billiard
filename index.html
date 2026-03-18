@@ -101,7 +101,7 @@
     <div class="modal-content">
         <div class="modal-icon" style="font-size:50px; margin-bottom:15px;">👋</div>
         <div id="exit-message" class="modal-text" style="font-size:16px; font-weight:bold; color:#333; line-height:1.6; margin-bottom:20px;">
-            즐거운 시간 되셨나요?<br>앱을 종료하시겠습니까?
+            오늘도 모두 즐거웠지?<br>앱을 종료할까?
         </div>
         <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); box-shadow:none; margin-bottom:10px;" onclick="closeAppWindow()">OK</button>
         <button class="save-btn" style="background:#666; box-shadow:none; margin:0;" onclick="closeExitModal()">취소</button>
@@ -156,7 +156,7 @@
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
     <button class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button>
-    <div style="font-size:12px; color:#808000; margin-top:12px; line-height:1.4;">이 버튼들은 매우 신중하게 터치해야 합니다.</div>
+    <div style="font-size:12px; color:#808000; margin-top:12px; line-height:1.4;">초기화 버튼은 매우 신중하게 터치해야 합니다.</div>
 </div>
 
 <script>
@@ -352,8 +352,8 @@
        ----------------------------------------------------------------- */
     async function deleteGame(event, round) {
         event.stopPropagation(); // 부모 클릭(수정 모드 진입) 차단
-        if (!confirm("이 게임를 정말 삭제하시겠습니까?")) return;
-        showLoading(true, "기록 삭제 중");
+        if (!confirm("이 게임를 정말 삭제할까요?")) return;
+        showLoading(true, "게임 삭제 중");
         try {
             await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "DELETE", round: round }) });
             setTimeout(async () => { await fetchData(); alert("삭제되었습니다! 🗑️"); cancelEdit(); }, 1500);
