@@ -47,10 +47,7 @@
         .input-row { display: flex; align-items: center; margin-bottom: 10px; }
         .input-row label { width: 55px; font-size: 13px; font-weight: bold; color: var(--main); }
         
-        select { 
-            flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 15px; background: #fff; appearance: none; text-align: center; text-align-last: center; transition: all 0.3s;
-        }
-
+        select { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 15px; background: #fff; appearance: none; text-align: center; text-align-last: center; transition: all 0.3s; }
         select.duplicate-error { border: 3px solid var(--accent); background-color: #fff0f0; color: var(--accent); animation: shake 0.4s; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
         
@@ -65,13 +62,11 @@
         .danger-zone { margin-top: 50px; padding: 25px; border: 2px dashed #ff4757; border-radius: 25px; background: #fff5f5; text-align: center; }
         .reset-btn { width: 100%; background: #ff4757; color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,71,87,0.4); margin-bottom: 15px; }
         
-        /* [신규] 종료 버튼 스타일: 강조된 레드 그라데이션 */
         .exit-btn {
             width: 100%; background: linear-gradient(135deg, #dc3545, #bd2130); color: white; border: 3px solid #b21f2d; padding: 16px; border-radius: 15px;
             font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 6px 15px rgba(220,53,69,0.5); text-shadow: 0 2px 3px rgba(0,0,0,0.3);
             transition: all 0.2s;
         }
-        .exit-btn:active { transform: translateY(2px) scale(0.98); box-shadow: 0 3px 8px rgba(220,53,69,0.4); }
 
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; font-weight: bold; color: var(--main); }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--main); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom: 15px; }
@@ -79,21 +74,14 @@
         
         .game-item { padding: 12px 8px; border: 1px solid #eee; margin-top: 10px; border-radius: 15px; background: #fafafa; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
         .game-info { flex: 1; min-width: 0; padding-right: 5px; white-space: nowrap; overflow: hidden; text-overflow: clip; font-size: 11.5px; letter-spacing: -0.5px; line-height: 1.4; }
-        .game-btns { display: flex; gap: 8px; flex-shrink: 0; }
         
         .rich-msg { background: #fff3cd; padding: 15px; border-radius: 18px; text-align: center; font-size: 14px; color: #856404; font-weight: bold; margin-top: 15px; border: 2px solid #ffeeba; }
 
-        /* [신규] 종료 안내창(Modal) 스타일 */
         #exit-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);
             display: none; justify-content: center; align-items: center; z-index: 10001; opacity: 0; transition: opacity 0.3s;
         }
-        .modal-content {
-            background: white; padding: 30px; border-radius: 20px; text-align: center; width: 80%; max-width: 300px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.3s ease-out;
-        }
-        .modal-icon { font-size: 50px; margin-bottom: 15px; }
-        .modal-text { font-size: 16px; font-weight: bold; color: #333; line-height: 1.6; margin-bottom: 20px; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; width: 80%; max-width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.3s ease-out; }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
@@ -108,9 +96,12 @@
 
 <div id="exit-modal">
     <div class="modal-content">
-        <div class="modal-icon">👋</div>
-        <div class="modal-text"> 다들 즐거웠지?<br>앱을 종료하려면<br>브라우저 탭을 닫아줘!</div>
-        <button class="save-btn" style="background:#666; box-shadow:none; margin:0;" onclick="closeExitModal()">알겠어!</button>
+        <div class="modal-icon" style="font-size:50px; margin-bottom:15px;">👋</div>
+        <div id="exit-message" class="modal-text" style="font-size:16px; font-weight:bold; color:#333; line-height:1.6; margin-bottom:20px;">
+            즐거운 시간 되셨나요?<br>앱을 종료하시겠습니까?
+        </div>
+        <button id="final-exit-btn" class="save-btn" style="background:#dc3545; box-shadow:none; margin-bottom:10px;" onclick="closeAppWindow()">알겠어!</button>
+        <button class="save-btn" style="background:#666; box-shadow:none; margin:0;" onclick="closeExitModal()">취소</button>
     </div>
 </div>
 
@@ -161,8 +152,8 @@
     <div id="resetSteps">
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
-    <button class="exit-btn" onclick="showExitModal()">🚪 앱 종료 (브라우저 닫기 안내)</button>
-    <div style="font-size:12px; color:#808000; margin-top:12px; line-height:1.4;">위 버튼들은 매우 신중하게 결정해 주세요.</div>
+    <button class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button>
+    <div style="font-size:12px; color:#808000; margin-top:12px; line-height:1.4;">이 버튼들은 매우 신중하게 결정해 주세요.</div>
 </div>
 
 <script>
@@ -271,7 +262,7 @@
             let html = `<p style="font-size:12px; color:var(--edit); font-weight:bold; margin:20px 0 8px 0;">⌵ 이 날의 게임 (수정하려면 터치)</p>`;
             games.forEach((g, idx) => {
                 const names = g.ranks.filter(n => n && n.trim() !== "");
-                html += `<div class="game-item" onclick="enterEditMode(${g.round}, '${names.join(',')}')"><div class="game-info"><small style="color:#FF00FF;">${idx+1}G:</small> <span style="font-weight:600;">${names.join('→')}</span></div><div class="game-btns"><div style="color:var(--edit); font-size:12px; font-weight:bold;">수정</div><div style="color:#3CB371; font-size:12px; font-weight:bold;" onclick="deleteGame(event, ${g.round})">삭제</div></div></div>`;
+                html += `<div class="game-item" onclick="enterEditMode(${g.round}, '${names.join(',')}')"><div class="game-info"><small style="color:#FF00FF;">${idx+1}G:</small> <span style="font-weight:600;">${names.join('→')}</span></div></div>`;
             });
             listArea.innerHTML = html;
         } else { listArea.innerHTML = ""; }
@@ -282,16 +273,16 @@
         const ranks = [];
         for(let i=1; i<=count; i++) {
             const el = document.getElementById('rank'+i);
-            if(!el || !el.value) return alert("친구를 선택해줄래?");
+            if(!el || !el.value) return alert("선수를 모두 지정해 주세요!");
             ranks.push(el.value);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("❌ 누가 쌍둥이여? 잘 선택혀!(중복)");
+        if(new Set(ranks).size !== ranks.length) return alert("❌ 중복된 선수가 있습니다!");
         showLoading(true, "기록 저장 중");
         const finalRanks = [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""];
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: finalRanks, round: editRound };
         try {
             await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
-            setTimeout(async () => { await fetchData(); alert("저장 성공! ✅"); cancelEdit(); }, 1500);
+            setTimeout(async () => { await fetchData(); alert("성공적으로 저장되었습니다! ✅"); cancelEdit(); }, 1500);
         } catch (e) { alert("연결 오류가 발생했습니다."); showLoading(false); }
     }
 
@@ -337,16 +328,6 @@
         mainBtn.innerText = "기록 저장";
         mainBtn.classList.remove('edit-btn');
         updateInputFields();
-    }
-
-    async function deleteGame(event, round) {
-        event.stopPropagation();
-        if (!confirm("이 게임를 정말 삭제할거야?")) return;
-        showLoading(true, "기록 삭제 중");
-        try {
-            await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "DELETE", round: round }) });
-            setTimeout(async () => { await fetchData(); alert("삭제 완료! 🗑️"); cancelEdit(); }, 1500);
-        } catch (e) { alert("연결 오류가 발생했습니다."); showLoading(false); }
     }
 
     function renderStats() {
@@ -396,24 +377,32 @@
     }
 
     /* -----------------------------------------------------------------
-       [신규] 종료 안내창(Modal) 제어 함수
+       [종료 기능 수정] 윈도우 닫기 시도 및 대안 안내
        ----------------------------------------------------------------- */
     function showExitModal() {
         const modal = document.getElementById('exit-modal');
         modal.style.display = 'flex';
-        // 부드러운 나타남 효과를 위해 애니메이션 프레임 확보
-        requestAnimationFrame(() => {
-            modal.style.opacity = '1';
-        });
+        requestAnimationFrame(() => modal.style.opacity = '1');
     }
 
     function closeExitModal() {
         const modal = document.getElementById('exit-modal');
         modal.style.opacity = '0';
-        // 페이드 아웃 애니메이션 시간(0.3s) 대기 후 display 변경
+        setTimeout(() => modal.style.display = 'none', 300);
+    }
+
+    function closeAppWindow() {
+        // 1. 기본 창 닫기 시도
+        window.close();
+        
+        // 2. 닫히지 않았을 경우를 대비한 대안 (일부 환경용)
         setTimeout(() => {
-            modal.style.display = 'none';
-        }, 300);
+            if (!window.closed) {
+                // 모달 메시지 변경하여 사용자 안내
+                document.getElementById('exit-message').innerHTML = "보안상 창을 자동으로 닫을 수 없습니다.<br><span style='color:red;'>브라우저 탭을 직접 닫아주세요!</span>";
+                document.getElementById('final-exit-btn').style.display = "none";
+            }
+        }, 500);
     }
 
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
