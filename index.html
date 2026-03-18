@@ -131,7 +131,7 @@
 </div>
 
 <div class="danger-zone">
-    <div style="color:#9400d3; font-weight:900; margin-bottom:12px; font-size:16px;">[과거를 지우고 싶지?]</div>
+    <div style="color:#9400d3; font-weight:900; margin-bottom:12px; font-size:16px;">[너의 과거를 지우고 싶지?]</div>
     <div id="resetSteps">
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
@@ -139,7 +139,7 @@
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwUpY1RRO7eWDcRMh8PGLwnD-fgqNYm-hNQNWHjuNO1CBW24r9v4dDZOzTbhZasfoMUUA/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby-S6Kc8ugrHsMtdYbx1UzJTqpJ60ZqBv0oznCCDuilyi6e6stfnIqUVCBwMhVqBNLGCg/exec"; 
     const players = ["경배", "원석", "진웅", "창한", "정석"];
     
     let gameLogs = [];
@@ -233,52 +233,25 @@
         }
     }
 
-    /* -----------------------------------------------------------------
-       [결함 수정] 모든 순위(최대 5명)를 유실 없이 서버로 전송하도록 보강
-       ----------------------------------------------------------------- */
     async function saveGame() {
         const count = parseInt(document.getElementById('playerCount').value);
         const ranks = [];
-        
-        // 현재 선택된 인원수만큼만 먼저 수집
         for(let i=1; i<=count; i++) {
             const el = document.getElementById('rank'+i);
-            if(!el || !el.value) return alert("선수를 모두 지정해 주세요!");
+            if(!el || !el.value) return alert("선수를 선택해 줄래?");
             ranks.push(el.value);
         }
-        
         if(new Set(ranks).size !== ranks.length) return alert("❌ 쌍둥이여? 잘 선택혀!(중복!)");
-
         showLoading(true, "기록 저장 중");
-        
-        // 데이터 유실 방지 핵심: 수정 시 구글 시트의 빈 열(4위, 5위 등)을 덮어쓰지 않도록
-        // 항상 5칸짜리 고정 배열 구조를 만들어서 보냅니다. (나머지는 빈 문자열)
-        const finalRanks = [
-            ranks[0] || "",
-            ranks[1] || "",
-            ranks[2] || "",
-            ranks[3] || "",
-            ranks[4] || ""
-        ];
-
-        const payload = { 
-            action: editMode ? "UPDATE" : "SAVE", 
-            date: selectedDateStr, 
-            ranks: finalRanks, // 꼼꼼하게 정제된 5인 기준 데이터 전송
-            round: editRound 
-        };
-
+        const finalRanks = [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""];
+        const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: finalRanks, round: editRound };
         try {
             await fetch(GAS_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             });
-            setTimeout(async () => { 
-                await fetchData(); 
-                alert("성공적으로 저장되었습니다! ✅"); 
-                cancelEdit(); 
-            }, 1500);
+            setTimeout(async () => { await fetchData(); alert("저장 완료! ✅"); cancelEdit(); }, 1500);
         } catch (e) {
             alert("연결 오류가 발생했습니다.");
             showLoading(false);
@@ -321,7 +294,7 @@
 
     async function deleteGame(event, round) {
         event.stopPropagation();
-        if (!confirm("이 경기를 정말 삭제하시겠습니까?")) return;
+        if (!confirm("이 경기를 정말 삭제할거야?")) return;
         showLoading(true, "기록 삭제 중");
         try {
             await fetch(GAS_URL, {
@@ -329,110 +302,93 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: "DELETE", round: round })
             });
-            setTimeout(async () => { 
-                await fetchData(); 
-                alert("삭제되었습니다! 🗑️"); 
-                cancelEdit(); 
-            }, 1500);
-        } catch (e) {
-            alert("연결 오류가 발생했습니다.");
-            showLoading(false);
-        }
+            setTimeout(async () => { await fetchData(); alert("삭제 완료! 🗑️"); cancelEdit(); }, 1500);
+        } catch (e) { alert("연결 오류가 발생했습니다."); showLoading(false); }
     }
 
+    /* -----------------------------------------------------------------
+       [수정 핵심] 1위(파랑) / 꼴찌(빨강) 최다 빈도 멤버 이름 강조 로집
+       ----------------------------------------------------------------- */
     function renderStats() {
         let stats = {};
         players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
+        
         gameLogs.forEach(g => {
             const actual = g.ranks.filter(n => n && n.trim() !== "");
             const lastIdx = actual.length - 1;
-
             actual.forEach((name, idx) => {
                 if(stats[name]) {
                     stats[name].played++;
-                    if (idx === lastIdx && actual.length > 1) {
-                        stats[name].ranks[4]++; 
-                    } 
-                    else if (idx < 4) {
-                        stats[name].ranks[idx]++;
-                    }
+                    if (idx === lastIdx && actual.length > 1) stats[name].ranks[4]++; 
+                    else if (idx < 4) stats[name].ranks[idx]++;
                 }
             });
         });
-        document.getElementById('statsBody').innerHTML = players.sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]).map(p => `<tr><td><strong>${p}</strong></td><td>${stats[p].played}</td><td>${stats[p].ranks[0]}</td><td>${stats[p].ranks[1]}</td><td>${stats[p].ranks[2]}</td><td>${stats[p].ranks[3]}</td><td style="color:red; font-weight:bold;">${stats[p].ranks[4]}</td></tr>`).join('');
+
+        // 최다 1위 및 최다 꼴찌 횟수 파악
+        let maxFirst = 0;
+        let maxLast = 0;
+        players.forEach(p => {
+            if (stats[p].ranks[0] > maxFirst) maxFirst = stats[p].ranks[0];
+            if (stats[p].ranks[4] > maxLast) maxLast = stats[p].ranks[4];
+        });
+
+        const sortedPlayers = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
+
+        document.getElementById('statsBody').innerHTML = sortedPlayers.map(p => {
+            // 색상 결정 로직 (공동 순위 포함)
+            let nameStyle = "font-weight:bold;";
+            if (maxFirst > 0 && stats[p].ranks[0] === maxFirst) nameStyle += "color:blue;";
+            if (maxLast > 0 && stats[p].ranks[4] === maxLast) nameStyle += "color:red;";
+
+            return `<tr>
+                <td><span style="${nameStyle}">${p}</span></td>
+                <td>${stats[p].played}</td>
+                <td>${stats[p].ranks[0]}</td>
+                <td>${stats[p].ranks[1]}</td>
+                <td>${stats[p].ranks[2]}</td>
+                <td>${stats[p].ranks[3]}</td>
+                <td style="color:red; font-weight:bold;">${stats[p].ranks[4]}</td>
+            </tr>`;
+        }).join('');
         
-        let maxL = 0; 
-        players.forEach(p => { if(stats[p].ranks[4] > maxL) maxL = stats[p].ranks[4]; });
         const richArea = document.getElementById('richFriendArea');
-        if (maxL > 0) {
-            const losers = players.filter(p => stats[p].ranks[4] === maxL);
+        if (maxLast > 0) {
+            const losers = players.filter(p => stats[p].ranks[4] === maxLast);
             richArea.style.display = 'block';
-            richArea.innerHTML = `💸 이판도 나? 다들 카드까봐! (최고 꼴찌 ${maxL}회)<br><span style="font-size:20px; color:var(--accent);">${losers.join(', ')}</span>`;
-        } else { 
-            richArea.style.display = 'none'; 
-        }
+            richArea.innerHTML = `💸 이판도 나? 다들 카드까봐! (최고 꼴찌 ${maxLast}회)<br><span style="font-size:20px; color:var(--accent);">${losers.join(', ')}</span>`;
+        } else { richArea.style.display = 'none'; }
     }
 
     function confirmReset(step) {
         const container = document.getElementById('resetSteps');
         if (step === 1) {
-            container.innerHTML = `
-                <div style="color:red; font-weight:bold; margin-bottom:10px;">[1단계] 정말 삭제할 거야?</div>
-                <button class="reset-btn" style="background:#f39c12;" onclick="confirmReset(2)">응, 진짜 삭제할래</button>
-                <button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>
-            `;
+            container.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[1단계] 정말 삭제할 거야?</div><button class="reset-btn" style="background:#f39c12;" onclick="confirmReset(2)">응, 진짜 삭제할래</button><button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>`;
         } else if (step === 2) {
-            container.innerHTML = `
-                <div style="color:red; font-weight:bold; margin-bottom:10px;">[2단계] 진짜 복구 안 된다니까?</div>
-                <button class="reset-btn" style="background:#e67e22;" onclick="confirmReset(3)">알았어, 마지막 확인!</button>
-                <button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>
-            `;
+            container.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[2단계] 진짜 복구 안 된다니까?</div><button class="reset-btn" style="background:#e67e22;" onclick="confirmReset(3)">알았어, 마지막 확인!</button><button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>`;
         } else if (step === 3) {
-            container.innerHTML = `
-                <div style="color:red; font-weight:bold; margin-bottom:10px;">[최종 확인] 지금 즉시 삭제합니다.</div>
-                <button class="reset-btn" onclick="executeReset()">🔥 데이터 즉시 삭제 (복구 불가)</button>
-                <button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>
-            `;
+            container.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[최종 확인] 지금 즉시 삭제할게.</div><button class="reset-btn" onclick="executeReset()">🔥 데이터 즉시 삭제 (복구 불가)</button><button class="save-btn" style="margin-top:10px; background:#666;" onclick="cancelReset()">취소</button>`;
         }
     }
 
     function cancelReset() {
-        document.getElementById('resetSteps').innerHTML = `
-            <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
-        `;
+        document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`;
     }
 
     async function executeReset() {
         showLoading(true, "서버 데이터를 비우는 중");
         try {
-            await fetch(GAS_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: "RESET" }) 
-            });
-            alert("초기화가 완료되었습니다."); 
-            location.reload(); 
-        } catch (e) { 
-            alert("초기화 중 오류가 발생했습니다."); 
-            showLoading(false); 
-            cancelReset();
-        }
+            await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "RESET" }) });
+            alert("초기화가 완료되었습니다."); location.reload(); 
+        } catch (e) { alert("초기화 중 오류가 발생했습니다."); showLoading(false); cancelReset(); }
     }
 
-    function changeMonth(v) { 
-        currentViewDate.setMonth(currentViewDate.getMonth() + v); 
-        renderCalendar(); 
-    }
-
+    function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
     function showLoading(v, text = "처리 중") { 
         document.getElementById('loadingText').innerText = text;
         document.getElementById('loading').style.display = v ? 'flex' : 'none'; 
     }
-
-    window.onload = () => {
-        updateInputFields();
-        fetchData();
-    };
+    window.onload = () => { updateInputFields(); fetchData(); };
 </script>
 </body>
 </html>
