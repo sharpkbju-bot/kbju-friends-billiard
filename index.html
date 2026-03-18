@@ -13,7 +13,7 @@
     <title>경배와 친구들 당구</title>
     
     <style>
-        :root { --main: #007bff; --bg: #f4f7f6; --accent: #ff4757; --success: #2ed573; --edit: #f39c12; --today: #ffc0cb; --exit: #dc3545; }
+        :root { --main: #007bff; --bg: #f4f7f6; --accent: #ff4757; --success: #2ed573; --edit: #f39c12; --today: #ffc0cb; --exit-purple: #9370db; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: env(safe-area-inset-top) 15px 100px 15px; }
         
         #welcome-screen {
@@ -62,11 +62,13 @@
         .danger-zone { margin-top: 50px; padding: 25px; border: 2px dashed #ff4757; border-radius: 25px; background: #fff5f5; text-align: center; }
         .reset-btn { width: 100%; background: #ff4757; color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,71,87,0.4); margin-bottom: 15px; }
         
+        /* [수정] 종료 버튼 스타일: 연한 보라색(Medium Purple) 테마 */
         .exit-btn {
-            width: 100%; background: linear-gradient(135deg, #dc3545, #bd2130); color: white; border: 3px solid #b21f2d; padding: 16px; border-radius: 15px;
-            font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 6px 15px rgba(220,53,69,0.5); text-shadow: 0 2px 3px rgba(0,0,0,0.3);
+            width: 100%; background: linear-gradient(135deg, #9370db, #8a2be2); color: white; border: 3px solid #800080; padding: 16px; border-radius: 15px;
+            font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 6px 15px rgba(147, 112, 219, 0.4); text-shadow: 0 2px 3px rgba(0,0,0,0.2);
             transition: all 0.2s;
         }
+        .exit-btn:active { transform: translateY(2px) scale(0.98); }
 
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; font-weight: bold; color: var(--main); }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--main); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom: 15px; }
@@ -100,7 +102,7 @@
         <div id="exit-message" class="modal-text" style="font-size:16px; font-weight:bold; color:#333; line-height:1.6; margin-bottom:20px;">
             즐거운 시간 되셨나요?<br>앱을 종료하시겠습니까?
         </div>
-        <button id="final-exit-btn" class="save-btn" style="background:#dc3545; box-shadow:none; margin-bottom:10px;" onclick="closeAppWindow()">알겠어!</button>
+        <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); box-shadow:none; margin-bottom:10px;" onclick="closeAppWindow()">OK</button>
         <button class="save-btn" style="background:#666; box-shadow:none; margin:0;" onclick="closeExitModal()">취소</button>
     </div>
 </div>
@@ -273,16 +275,16 @@
         const ranks = [];
         for(let i=1; i<=count; i++) {
             const el = document.getElementById('rank'+i);
-            if(!el || !el.value) return alert("선수를 모두 지정해 주세요!");
+            if(!el || !el.value) return alert("친구를 선택해줄래?");
             ranks.push(el.value);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("❌ 중복된 선수가 있습니다!");
+        if(new Set(ranks).size !== ranks.length) return alert("❌ 누가 쌍둥이여? 잘 선택혀!(중복)");
         showLoading(true, "기록 저장 중");
         const finalRanks = [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""];
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: finalRanks, round: editRound };
         try {
             await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
-            setTimeout(async () => { await fetchData(); alert("성공적으로 저장되었습니다! ✅"); cancelEdit(); }, 1500);
+            setTimeout(async () => { await fetchData(); alert("저장 성공! ✅"); cancelEdit(); }, 1500);
         } catch (e) { alert("연결 오류가 발생했습니다."); showLoading(false); }
     }
 
@@ -376,9 +378,6 @@
         catch (e) { alert("초기화 중 오류가 발생했습니다."); showLoading(false); cancelReset(); }
     }
 
-    /* -----------------------------------------------------------------
-       [종료 기능 수정] 윈도우 닫기 시도 및 대안 안내
-       ----------------------------------------------------------------- */
     function showExitModal() {
         const modal = document.getElementById('exit-modal');
         modal.style.display = 'flex';
@@ -392,13 +391,9 @@
     }
 
     function closeAppWindow() {
-        // 1. 기본 창 닫기 시도
         window.close();
-        
-        // 2. 닫히지 않았을 경우를 대비한 대안 (일부 환경용)
         setTimeout(() => {
             if (!window.closed) {
-                // 모달 메시지 변경하여 사용자 안내
                 document.getElementById('exit-message').innerHTML = "보안상 창을 자동으로 닫을 수 없습니다.<br><span style='color:red;'>브라우저 탭을 직접 닫아주세요!</span>";
                 document.getElementById('final-exit-btn').style.display = "none";
             }
