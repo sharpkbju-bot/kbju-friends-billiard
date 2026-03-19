@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3256/3256247.png">
     
-    <title>경배와 친구들의 Pro Billiard</title>
+    <title>경배와 친구들의 Pro Billiard Score</title>
     
     <style>
         :root { 
@@ -23,6 +23,7 @@
             --exit-purple: #9370db;
             --shadow: 8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff;
             --inner-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
+            --btn-shadow: 4px 4px 10px #b8c2d1, -4px -4px 10px #ffffff;
         }
 
         body { 
@@ -67,6 +68,8 @@
         .day.today { background: var(--today) !important; color: #d0006e !important; font-weight: bold; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1); }
         .day.selected { background: var(--main) !important; color: white !important; font-weight: bold; transform: scale(1.1); z-index: 5; box-shadow: 0 5px 15px rgba(74,144,226,0.4); }
         
+        /* [수정] 기록 있는 날짜 연두색 배경 및 점 표시 */
+        .has-record { background: #e8f5e9 !important; border: 1px solid rgba(46, 213, 115, 0.2) !important; }
         .has-record::after { 
             content: ''; position: absolute; bottom: 5px; width: 5px; height: 5px; 
             background: var(--success); border-radius: 50%; box-shadow: 0 0 3px var(--success);
@@ -76,37 +79,51 @@
         .input-row { display: flex; align-items: center; margin-bottom: 15px; }
         .input-row label { width: 60px; font-size: 13px; font-weight: 800; color: #555; }
         
-        /* [수정] 중앙 정렬 보강 */
         select { 
             flex: 1; padding: 14px; border-radius: 15px; border: none; font-size: 15px; 
             background: #f0f3f7; box-shadow: var(--inner-shadow);
             color: #333; font-weight: 600; transition: all 0.3s; 
-            -webkit-appearance: none;
-            text-align: center; text-align-last: center; /* 중앙 정렬 */
+            -webkit-appearance: none; text-align: center; text-align-last: center;
         }
         select:focus { outline: none; box-shadow: inset 2px 2px 5px #b8c2d1, inset -2px -2px 5px #ffffff; }
-        select.duplicate-error { color: var(--accent); box-shadow: inset 2px 2px 5px rgba(255,0,0,0.2); animation: shake 0.4s; }
-
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
         
+        /* [수정] 저장 버튼 입체감 강화 */
         button.save-btn { 
-            width: 100%; padding: 18px; background: var(--main); color: white; border: none; border-radius: 18px; 
+            width: 100%; padding: 18px; 
+            background: linear-gradient(145deg, #53a0f5, #4282cb); 
+            color: white; border: none; border-radius: 18px; 
             font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px; 
-            box-shadow: 5px 5px 10px #d1d9e6, -5px -5px 10px #ffffff; transition: 0.2s;
+            box-shadow: 6px 6px 12px #c2cbd8, -4px -4px 10px #ffffff; 
+            border-top: 1px solid rgba(255,255,255,0.3);
+            transition: 0.2s;
         }
-        button.edit-btn { background: var(--edit) !important; }
-        button:active { transform: scale(0.98); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2); }
+        button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
+        button:active { transform: scale(0.97); box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2); }
 
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
         .stats-table th { padding: 12px 5px; color: #888; border-bottom: 1px solid #ddd; }
         .stats-table td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.03); font-weight: 600; }
         
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: #f0f3f7; box-shadow: var(--shadow); text-align: center; }
-        .reset-btn { width: 100%; background: #ff4757; color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 15px; box-shadow: 3px 3px 8px #d1d9e6; cursor: pointer; }
         
+        /* [수정] 초기화 버튼 입체감 강화 */
+        .reset-btn { 
+            width: 100%; background: linear-gradient(145deg, #ff5e6c, #e6404e); 
+            color: white; border: none; padding: 16px; border-radius: 15px; 
+            font-weight: bold; margin-bottom: 15px; 
+            box-shadow: 4px 4px 10px #d1d9e6, -2px -2px 8px #ffffff;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer; 
+        }
+        
+        /* [수정] 앱 종료 버튼 입체감 강화 */
         .exit-btn {
-            width: 100%; background: linear-gradient(135deg, #9370db, #8a2be2); color: white; border: none; padding: 18px; border-radius: 18px;
-            font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 4px 4px 10px #d1d9e6; text-shadow: 0 2px 3px rgba(0,0,0,0.2);
+            width: 100%; background: linear-gradient(145deg, #a586e6, #8162c8); 
+            color: white; border: none; padding: 18px; border-radius: 18px;
+            font-weight: 800; font-size: 16px; cursor: pointer; 
+            box-shadow: 6px 6px 12px #d1d9e6, -4px -4px 10px #ffffff;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            text-shadow: 0 2px 3px rgba(0,0,0,0.2);
             transition: all 0.2s;
         }
 
@@ -132,7 +149,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <div class="welcome-logo">🎱</div>
-        <div class="welcome-text">경배와 친구들의<br>당구 세계에 오신걸 환영합니다.<br><br>Creator 주경배</div>
+        <div class="welcome-text">경배와 친구들의<br>당구 세계에 오신걸 환영합니다.</div>
     </div>
 </div>
 
@@ -140,14 +157,14 @@
     <div class="modal-content">
         <div style="font-size:50px; margin-bottom:15px;">👋</div>
         <div id="exit-message" style="font-size:16px; font-weight:800; color:#333; line-height:1.6; margin-bottom:25px;">
-            다들 오늘도 즐거웠니?<br>다음게 또 보자!
+            즐거운 시간 되셨나요?<br>앱을 종료하시겠습니까?
         </div>
-        <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); margin-bottom:12px; box-shadow:none;" onclick="closeAppWindow()">OK</button>
+        <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); margin-bottom:12px; box-shadow:none;" onclick="closeAppWindow()">알겠어!</button>
         <button class="save-btn" style="background:#abb2b9; box-shadow:none; margin:0;" onclick="closeExitModal()">나중에</button>
     </div>
 </div>
 
-<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">데이터 동기화 중. 기둘려!</div></div>
+<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">데이터 동기화 중...</div></div>
 
 <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800;">
@@ -229,7 +246,7 @@
             document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
             return;
         }
-        showLoading(true, "클라우드에 기록 동기화 중");
+        showLoading(true, "클라우드 동기화 중...");
         try {
             const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
             const rawData = await response.json();
@@ -316,11 +333,11 @@
         const ranks = [];
         for(let i=1; i<=count; i++) {
             const val = document.getElementById('rank'+i).value;
-            if(!val) return alert("친구를 선택해줄래?");
+            if(!val) return alert("선수를 모두 선택해!");
             ranks.push(val);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥이여? 잘 선택혀!(중복)");
-        showLoading(true, "저장 중");
+        if(new Set(ranks).size !== ranks.length) return alert("중복 선수가 있어!");
+        showLoading(true, "저장 중...");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -367,10 +384,10 @@
     async function deleteGame(e, round) {
         e.stopPropagation();
         if(!confirm("정말 삭제해?")) return;
-        showLoading(true, "삭제 중");
+        showLoading(true, "삭제 중...");
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) });
-            setTimeout(() => { fetchData(); alert("삭제 완료. 🗑️"); }, 1200);
+            setTimeout(() => { fetchData(); alert("삭제됨! 🗑️"); }, 1200);
         } catch (e) { showLoading(false); }
     }
 
@@ -395,27 +412,25 @@
         const rich = document.getElementById('richFriendArea');
         if(maxLast > 0) {
             const losers = players.filter(p => stats[p].ranks[4] === maxLast);
-            // [수정] 오늘의 물주 옆에 꼴찌 횟수 다시 표시되도록 수정
             const loserInfo = losers.map(p => `${p}(${stats[p].ranks[4]}회)`).join(', ');
             rich.style.display = 'block';
-            rich.innerHTML = `💸 야! 이 게임도 또 나야! 다들 카드까봐!<br><span style="font-size:20px; color:var(--accent); font-weight:900;">${loserInfo}</span>`;
+            rich.innerHTML = `💸 야! 이 게임도 또 나야? 다들 카드까봐!<br><span style="font-size:20px; color:var(--accent); font-weight:900;">${loserInfo}</span>`;
         } else {
             rich.style.display = 'none';
         }
     }
 
-    /* [수정] 초기화 팝업 단계별 버튼 로직 및 간격 보강 */
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
-        if(step === 1) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[1단계] 정말 삭제할 거야?</div><button class="reset-btn" style="background:#f39c12;" onclick="confirmReset(2)">응, 진짜 삭제할래</button><button class="save-btn" style="margin-top:5px; margin-bottom:25px; background:#666; box-shadow:none;" onclick="cancelReset()">취소</button>`;
-        else if(step === 2) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[2단계] 진짜 복구 안 된다니까?</div><button class="reset-btn" style="background:#e67e22;" onclick="confirmReset(3)">알았어, 마지막 확인!</button><button class="save-btn" style="margin-top:5px; margin-bottom:25px; background:#666; box-shadow:none;" onclick="cancelReset()">취소</button>`;
-        else if(step === 3) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[최종 확인] 지금 즉시 삭제합니다.</div><button class="reset-btn" onclick="executeReset()">🔥 데이터 즉시 삭제</button><button class="save-btn" style="margin-top:5px; margin-bottom:25px; background:#666; box-shadow:none;" onclick="cancelReset()">취소</button>`;
+        if(step === 1) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[1단계] 정말 삭제할 거야?</div><button class="reset-btn" style="background:linear-gradient(145deg, #f39c12, #d68910);" onclick="confirmReset(2)">응, 진짜 삭제할래</button><button class="save-btn" style="margin-top:5px; margin-bottom:25px; background:linear-gradient(145deg, #888, #666); box-shadow:none;" onclick="cancelReset()">취소</button>`;
+        else if(step === 2) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[2단계] 진짜 복구 안 된다니까?</div><button class="reset-btn" style="background:linear-gradient(145deg, #e67e22, #ca6f1e);" onclick="confirmReset(3)">알았어, 마지막 확인!</button><button class="save-btn" style="margin-top:5px; margin-bottom:25px; background:linear-gradient(145deg, #888, #666); box-shadow:none;" onclick="cancelReset()">취소</button>`;
+        else if(step === 3) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[최종 확인] 지금 즉시 삭제합니다.</div><button class="reset-btn" onclick="executeReset()">🔥 데이터 즉시 삭제</button><button class="save-btn" style="margin-top:5px; margin-bottom:25px; background:linear-gradient(145deg, #888, #666); box-shadow:none;" onclick="cancelReset()">취소</button>`;
     }
 
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
 
     async function executeReset() {
-        showLoading(true, "초기화 중");
+        showLoading(true, "초기화 중...");
         await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
         location.reload();
     }
