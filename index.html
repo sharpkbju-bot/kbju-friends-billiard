@@ -7,8 +7,8 @@
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="경배와 친구들">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3256/3256247.png">
+    <meta name="apple-mobile-web-app-title" content="경배당구">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3408/3408506.png">
     
     <title>우리들의 Billiard World</title>
     
@@ -379,7 +379,7 @@
             ranks.push(val);
         }
         if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥이여? 잘 선택혀!(중복)");
-        showLoading(true, "기록 저장 중");
+        showLoading(true, "순위 저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -465,12 +465,11 @@
         } else rich.style.display = 'none';
     }
 
-    // [수정 완료] 명확한 3단계 초기화 컨펌 로직
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) {
             el.innerHTML = `
-                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 정말 모든 데이터를 지울까요?</div>
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 정말로 모든 데이터를 지울까요?</div>
                 <button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button>
                 <button class="cancel-btn" onclick="cancelReset()">NO</button>
             `;
@@ -482,9 +481,9 @@
             `;
         } else if(step === 3) {
             el.innerHTML = `
-                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[3단계] 최종 확인입니다. 정말 삭제합니다.</div>
-                <button class="reset-btn" style="background:var(--accent); font-size:18px;" onclick="executeReset()">🔥 지금 즉시 모든 데이터 삭제</button>
-                <button class="cancel-btn" onclick="cancelReset()">아냐, 누르지마! (취소)</button>
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[최종] 마지막 확인입니다. 모두 삭제합니다!</div>
+                <button class="reset-btn" style="background:var(--accent); font-size:18px;" onclick="executeReset()">🔥 OK</button>
+                <button class="cancel-btn" onclick="cancelReset()">아냐, 누르지마!(취소)</button>
             `;
         }
     }
