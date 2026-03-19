@@ -386,7 +386,7 @@
 
     async function deleteGame(e, round) {
         e.stopPropagation();
-        if(!confirm("정말 삭제해?")) return;
+        if(!confirm("정말 삭제할거야?")) return;
         showLoading(true, "기록 삭제 중");
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) });
