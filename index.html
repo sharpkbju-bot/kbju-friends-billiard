@@ -193,7 +193,7 @@
     </div>
     
     <div id="inputArea"></div>
-    <button id="mainBtn" class="save-btn" onclick="saveGame()">기록 저장</button>
+    <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
     
     <div id="dayGameList"></div>
 </div>
@@ -340,11 +340,11 @@
             ranks.push(val);
         }
         if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥이여? 잘 선택혀!(중복)");
-        showLoading(true, "저장 중");
+        showLoading(true, "순위 저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-            setTimeout(() => { fetchData(); alert("저장 완료. ✨"); cancelEdit(); }, 1200);
+            setTimeout(() => { fetchData(); alert("저장 완료 ✨"); cancelEdit(); }, 1200);
         } catch (e) { alert("오류 발생!"); showLoading(false); }
     }
 
@@ -389,7 +389,7 @@
         editMode = false; editRound = null;
         document.getElementById('editBadge').style.display = 'none';
         const btn = document.getElementById('mainBtn');
-        btn.innerText = "기록 저장"; btn.classList.remove('edit-btn');
+        btn.innerText = "순위 저장"; btn.classList.remove('edit-btn');
         updateInputFields();
     }
 
@@ -399,7 +399,7 @@
         showLoading(true, "삭제 중");
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) });
-            setTimeout(() => { fetchData(); alert("삭제 완료. 🗑️"); }, 1200);
+            setTimeout(() => { fetchData(); alert("삭제 완료 🗑️"); }, 1200);
         } catch (e) { showLoading(false); }
     }
 
