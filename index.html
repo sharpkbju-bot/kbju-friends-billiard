@@ -354,7 +354,7 @@
         let html = '';
         for(let i=1; i<=count; i++) {
             const label = i === count ? "꼴찌💀" : `${i}위`;
-            html += `<div class="input-row"><label>${label}</label><select id="rank${i}" onchange="checkDuplicates()"><option value="">선택</option>${players.map(p => `<option value="${p}" ${preFill && preFill[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
+            html += `<div class="input-row"><label>${label}</label><select id="rank${i}" onchange="checkDuplicates()"><option value="">친구 선택</option>${players.map(p => `<option value="${p}" ${preFill && preFill[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
         }
         document.getElementById('inputArea').innerHTML = html;
         if(preFill) checkDuplicates();
