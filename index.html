@@ -3,42 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-   
+    
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3256/3256247.png">
-   
+    
     <title>우리들의 Billiard World</title>
-   
+    
     <style>
-        :root {
-            --main: #4a90e2;
-            --bg: #f0f3f7;
-            --accent: #ff4757;
-            --success: #2ed573;
-            --edit: #f39c12;
-            --today: #ffc0cb;
+        :root { 
+            --main: #4a90e2; 
+            --bg: #f0f3f7; 
+            --accent: #ff4757; 
+            --success: #2ed573; 
+            --edit: #f39c12; 
+            --today: #ffc0cb; 
             --exit-purple: #9370db;
             --shadow: 8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff;
             --inner-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
             --btn-shadow: 4px 4px 10px #b8c2d1, -4px -4px 10px #ffffff;
         }
 
-        body {
-            font-family: -apple-system, sans-serif;
-            margin: 0;
+        body { 
+            font-family: -apple-system, sans-serif; 
+            margin: 0; 
             padding: env(safe-area-inset-top) 15px 100px 15px;
             background: var(--bg);
-            background-image:
+            background-image: 
                 radial-gradient(at 0% 0%, rgba(74, 144, 226, 0.15) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(147, 112, 219, 0.15) 0px, transparent 50%);
             background-attachment: fixed;
             min-height: 100vh;
             color: #444;
         }
-       
+        
         #welcome-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #4a90e2, #9370db);
@@ -50,54 +50,54 @@
         .welcome-text { font-size: 20px; font-weight: bold; line-height: 1.5; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card {
-            background: #f0f3f7; border-radius: 28px; padding: 22px;
+        .card { 
+            background: #f0f3f7; border-radius: 28px; padding: 22px; 
             box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4);
         }
-       
+        
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; margin-top: 15px; }
-        .day {
-            aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-radius: 14px; cursor: pointer; font-size: 14px; position: relative;
-            background: #f0f3f7; box-shadow: 3px 3px 6px #d1d9e6, -3px -3px 6px #ffffff;
+        .day { 
+            aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            border-radius: 14px; cursor: pointer; font-size: 14px; position: relative; 
+            background: #f0f3f7; box-shadow: 3px 3px 6px #d1d9e6, -3px -3px 6px #ffffff; 
             transition: 0.2s; color: #333; border: 1.5px solid transparent;
         }
-       
-        .day.sat { color: #4a90e2; }
-        .day.sun, .day.holiday { color: #ff6b6b; }
+        
+        .day.sat { color: #4a90e2; } 
+        .day.sun, .day.holiday { color: #ff6b6b; } 
         .day.today { background: var(--today) !important; color: #d0006e !important; font-weight: bold; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1); }
         .day.selected { background: var(--main) !important; color: white !important; font-weight: bold; transform: scale(1.1); z-index: 5; box-shadow: 0 5px 15px rgba(74,144,226,0.4); }
-       
+        
         .has-record { background: #e8f5e9 !important; border: 1.5px solid var(--success) !important; }
-        .has-record::after {
-            content: ''; position: absolute; bottom: 5px; width: 5px; height: 5px;
+        .has-record::after { 
+            content: ''; position: absolute; bottom: 5px; width: 5px; height: 5px; 
             background: var(--success); border-radius: 50%; box-shadow: 0 0 3px var(--success);
         }
-       
+        
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); }
         .input-row { display: flex; align-items: center; margin-bottom: 15px; }
         .input-row label { width: 60px; font-size: 13px; font-weight: 800; color: #555; }
-       
-        select {
-            flex: 1; padding: 14px; border-radius: 15px; border: none; font-size: 15px;
+        
+        select { 
+            flex: 1; padding: 14px; border-radius: 15px; border: none; font-size: 15px; 
             background: #f0f3f7; box-shadow: var(--inner-shadow);
-            color: #333; font-weight: 600; transition: all 0.3s;
+            color: #333; font-weight: 600; transition: all 0.3s; 
             -webkit-appearance: none; text-align: center; text-align-last: center;
         }
         select:focus { outline: none; box-shadow: inset 2px 2px 5px #b8c2d1, inset -2px -2px 5px #ffffff; }
 
-        .duplicate-error {
+        .duplicate-error { 
             box-shadow: inset 4px 4px 8px #fbcbc4, inset -4px -4px 8px #ffffff !important;
             border: 2px solid var(--accent) !important;
             color: var(--accent) !important;
         }
-       
-        button.save-btn {
-            width: 100%; padding: 18px;
-            background: linear-gradient(145deg, #53a0f5, #4282cb);
-            color: white; border: none; border-radius: 18px;
-            font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px;
-            box-shadow: 6px 6px 12px #c2cbd8, -4px -4px 10px #ffffff;
+        
+        button.save-btn { 
+            width: 100%; padding: 18px; 
+            background: linear-gradient(145deg, #53a0f5, #4282cb); 
+            color: white; border: none; border-radius: 18px; 
+            font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px; 
+            box-shadow: 6px 6px 12px #c2cbd8, -4px -4px 10px #ffffff; 
             border-top: 1px solid rgba(255,255,255,0.3);
             transition: 0.2s;
         }
@@ -107,22 +107,22 @@
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
         .stats-table th { padding: 12px 5px; color: #888; border-bottom: 1px solid #ddd; }
         .stats-table td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.03); font-weight: 600; }
-       
+        
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: #f0f3f7; box-shadow: var(--shadow); text-align: center; }
-       
-        .reset-btn {
-            width: 100%; background: linear-gradient(145deg, #ff5e6c, #e6404e);
-            color: white; border: none; padding: 16px; border-radius: 15px;
-            font-weight: bold; margin-bottom: 15px;
+        
+        .reset-btn { 
+            width: 100%; background: linear-gradient(145deg, #ff5e6c, #e6404e); 
+            color: white; border: none; padding: 16px; border-radius: 15px; 
+            font-weight: bold; margin-bottom: 15px; 
             box-shadow: 4px 4px 10px #d1d9e6, -2px -2px 8px #ffffff;
             border-top: 1px solid rgba(255,255,255,0.2);
-            cursor: pointer;
+            cursor: pointer; 
         }
-       
+        
         .exit-btn {
-            width: 100%; background: linear-gradient(145deg, #a586e6, #8162c8);
+            width: 100%; background: linear-gradient(145deg, #a586e6, #8162c8); 
             color: white; border: none; padding: 18px; border-radius: 18px;
-            font-weight: 800; font-size: 16px; cursor: pointer;
+            font-weight: 800; font-size: 16px; cursor: pointer; 
             box-shadow: 6px 6px 12px #d1d9e6, -4px -4px 10px #ffffff;
             border-top: 1px solid rgba(255,255,255,0.3);
             text-shadow: 0 2px 3px rgba(0,0,0,0.2);
@@ -132,12 +132,11 @@
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(240,243,247,0.9); display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         .spinner { border: 5px solid #d1d9e6; border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-       
-        /* [수정] 게임 목록 레이아웃 최적화 (한 줄 표시용) */
+        
         .game-item { padding: 15px 10px; border-radius: 18px; background: #f0f3f7; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--inner-shadow); }
         .game-info { font-size: 11px; font-weight: 800; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; margin-right: 5px; }
         .game-btns { display: flex; gap: 8px; flex-shrink: 0; font-size: 11px; font-weight: bold; }
-       
+        
         .rich-msg { background: #f0f3f7; padding: 20px; border-radius: 22px; text-align: center; box-shadow: var(--inner-shadow); margin-top: 20px; color: #856404; font-weight: 800; }
 
         #exit-modal {
@@ -162,12 +161,12 @@
         <div id="exit-message" style="font-size:16px; font-weight:800; color:#333; line-height:1.6; margin-bottom:25px;">
             오늘도 다들 즐거웠니?<br>다음에 또 보자!
         </div>
-        <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); margin-bottom:12px; box-shadow:none;" onclick="closeAppWindow()">알겠어!</button>
+        <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); margin-bottom:12px; box-shadow:none;" onclick="closeAppWindow()">OK</button>
         <button class="save-btn" style="background:#abb2b9; box-shadow:none; margin:0;" onclick="closeExitModal()">취소</button>
     </div>
 </div>
 
-<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">데이터 동기화 중. 기둘려!</div></div>
+<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">순위 데이터 동기화 중. 기둘려!</div></div>
 
 <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800;">
@@ -181,7 +180,7 @@
 <div class="card">
     <h2 id="selectedDateTitle" style="font-size:18px; margin:0 0 20px 0; color:#333; font-weight:800;">📅 날짜 확인 중</h2>
     <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:15px; background: var(--edit); padding: 12px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(243,156,18,0.3);">✏️ 기록 수정 중</div>
-   
+    
     <div class="setup-row">
         <span style="font-size:15px; font-weight:800; color:#555;">게임 인원</span>
         <select id="playerCount" style="flex:none; width:100px; box-shadow: var(--inner-shadow);" onchange="updateInputFields()">
@@ -191,10 +190,10 @@
             <option value="5">5명</option>
         </select>
     </div>
-   
+    
     <div id="inputArea"></div>
     <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
-   
+    
     <div id="dayGameList"></div>
 </div>
 
@@ -210,7 +209,7 @@
 </div>
 
 <div class="danger-zone">
-    <div style="color:var(--exit-purple); font-weight:900; margin-bottom:15px; font-size:16px; letter-spacing:1px;">SETTINGS</div>
+    <div style="color:var(--exit-purple); font-weight:900; margin-bottom:15px; font-size:16px; letter-spacing:1px;">초기화 버튼은 함부로 터치하지 마세요.</div>
     <div id="resetSteps">
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
@@ -218,9 +217,9 @@
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycby-S6Kc8ugrHsMtdYbx1UzJTqpJ60ZqBv0oznCCDuilyi6e6stfnIqUVCBwMhVqBNLGCg/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby-S6Kc8ugrHsMtdYbx1UzJTqpJ60ZqBv0oznCCDuilyi6e6stfnIqUVCBwMhVqBNLGCg/exec"; 
     const players = ["경배", "원석", "정석", "진웅", "창한"];
-   
+    
     let gameLogs = [];
     let currentViewDate = new Date();
     let selectedDateStr = new Date().toLocaleDateString('sv-SE');
@@ -244,7 +243,7 @@
     }
 
     async function fetchData() {
-        renderAll();
+        renderAll(); 
         if(!GAS_URL || GAS_URL.includes("URL_입력")) {
             document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
             return;
@@ -255,7 +254,7 @@
             const rawData = await response.json();
             gameLogs = rawData.map(g => ({ ...g, dateStr: formatDate(g.date) }));
             renderAll();
-        } catch (e) { console.error("Fetch error"); }
+        } catch (e) { console.error("Fetch error"); } 
         finally {
             showLoading(false);
             document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
@@ -275,7 +274,7 @@
         const month = currentViewDate.getMonth();
         const realTodayStr = formatDate(new Date());
         document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
-       
+        
         ["일","월","화","수","목","금","토"].forEach((d, idx) => {
             let color = "#aaa";
             if(idx === 0) color = "#ff6b6b";
@@ -286,7 +285,7 @@
         const firstDay = new Date(year, month, 1).getDay();
         const lastDate = new Date(year, month + 1, 0).getDate();
         for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
-       
+        
         for (let d = 1; d <= lastDate; d++) {
             const dateObj = new Date(year, month, d);
             const dStr = formatDate(dateObj);
@@ -312,13 +311,13 @@
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
         const listArea = document.getElementById('dayGameList');
         if(games.length > 0) {
-            let html = `<p style="font-size:12px; color:#00B9FF; font-weight:800; margin:27px 0 10px 0; text-align:center;">GAME RECORD</p>`;
+            let html = `<p style="font-size:12px; color:#00B9FF; font-weight:800; margin:28px 0 10px 0; text-align:center;">GAME RECORD</p>`;
             games.forEach((g, idx) => {
                 const names = g.ranks.filter(n => n && n.trim() !== "");
                 html += `
                 <div class="game-item" onclick="enterEditMode(${g.round}, '${names.join(',')}')">
                     <div class="game-info">
-                        <span style="color:var(--main); margin-right:4px;">${idx+1}G</span>
+                        <span style="color:var(--main); margin-right:4px;">${idx+1}G</span> 
                         ${names.join('→')}
                     </div>
                     <div class="game-btns">
@@ -354,7 +353,7 @@
         let html = '';
         for(let i=1; i<=count; i++) {
             const label = i === count ? "꼴찌💀" : `${i}위`;
-            html += `<div class="input-row"><label>${label}</label><select id="rank${i}" onchange="checkDuplicates()"><option value="">친구 선택</option>${players.map(p => `<option value="${p}" ${preFill && preFill[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
+            html += `<div class="input-row"><label>${label}</label><select id="rank${i}" onchange="checkDuplicates()"><option value="">선택</option>${players.map(p => `<option value="${p}" ${preFill && preFill[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
         }
         document.getElementById('inputArea').innerHTML = html;
         if(preFill) checkDuplicates();
@@ -412,21 +411,22 @@
         let maxLast = Math.max(...players.map(p => stats[p].ranks[4]));
 
         const sorted = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
-       
+        
         document.getElementById('statsBody').innerHTML = sorted.map(p => {
             let nameStyle = "";
             if (maxFirst > 0 && stats[p].ranks[0] === maxFirst) nameStyle = "color:var(--main);";
             if (maxLast > 0 && stats[p].ranks[4] === maxLast) nameStyle = "color:var(--accent);";
-           
+            
             return `<tr><td style="${nameStyle} font-weight:800;">${p}</td><td>${stats[p].played}</td><td>${stats[p].ranks[0]}</td><td>${stats[p].ranks[1]}</td><td>${stats[p].ranks[2]}</td><td>${stats[p].ranks[3]}</td><td style="color:red;">${stats[p].ranks[4]}회</td></tr>`;
         }).join('');
-       
+        
         const rich = document.getElementById('richFriendArea');
         if(maxLast > 0) {
             const losers = players.filter(p => stats[p].ranks[4] === maxLast);
-            const loserInfo = losers.map(p => `${p}(${stats[p].ranks[4]}회)`).join(', ');
+            // [수정] 오늘의 물주 표시 방식 변경: 이름1, 이름2 (n회)
+            const loserNames = losers.join(', ');
             rich.style.display = 'block';
-            rich.innerHTML = `💸 야! 또 나야? 다들 카드까봐!<br><span style="font-size:20px; color:var(--accent); font-weight:900;">${loserInfo}</span>`;
+            rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:20px; color:var(--accent); font-weight:900;">${loserNames} (${maxLast}회)</span>`;
         } else {
             rich.style.display = 'none';
         }
