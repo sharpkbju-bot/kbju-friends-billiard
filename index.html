@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3256/3256247.png">
     
-    <title>경배와 친구들의 당구 게임</title>
+    <title>경배와 친구들 당구 게임</title>
     
     <style>
         :root { 
@@ -47,43 +47,40 @@
         .welcome-content { animation: fadeInUp 1s ease-out; }
         .welcome-logo { font-size: 60px; margin-bottom: 20px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
         .welcome-text { font-size: 20px; font-weight: bold; line-height: 1.5; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 카드 디자인: 입체감 강화 */
         .card { 
-            background: #f0f3f7;
-            border-radius: 28px; 
-            padding: 22px; 
-            box-shadow: var(--shadow);
-            margin-bottom: 25px; 
-            border: 1px solid rgba(255,255,255,0.4);
+            background: #f0f3f7; border-radius: 28px; padding: 22px; 
+            box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4);
         }
         
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; margin-top: 15px; }
-        .day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 14px; cursor: pointer; font-size: 14px; position: relative; background: #f0f3f7; box-shadow: 3px 3px 6px #d1d9e6, -3px -3px 6px #ffffff; transition: 0.2s; color: #333; border: none; }
+        .day { 
+            aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            border-radius: 14px; cursor: pointer; font-size: 14px; position: relative; 
+            background: #f0f3f7; box-shadow: 3px 3px 6px #d1d9e6, -3px -3px 6px #ffffff; 
+            transition: 0.2s; color: #333; border: none; 
+        }
         
         .day.sat { color: #4a90e2; } 
         .day.sun, .day.holiday { color: #ff6b6b; } 
-
         .day.today { background: var(--today) !important; color: #d0006e !important; font-weight: bold; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1); }
         .day.selected { background: var(--main) !important; color: white !important; font-weight: bold; transform: scale(1.1); z-index: 5; box-shadow: 0 5px 15px rgba(74,144,226,0.4); }
-        .has-record { border: 2px solid var(--success) !important; }
+        
+        /* [복구] 달력 하단 점 표시 스타일 */
+        .has-record::after { 
+            content: ''; position: absolute; bottom: 5px; width: 5px; height: 5px; 
+            background: var(--success); border-radius: 50%; box-shadow: 0 0 3px var(--success);
+        }
         
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        
-        /* [입체감 포인트] 입력 필드 스타일 */
         .input-row { display: flex; align-items: center; margin-bottom: 15px; }
         .input-row label { width: 60px; font-size: 13px; font-weight: 800; color: #555; }
         
         select { 
             flex: 1; padding: 14px; border-radius: 15px; border: none; font-size: 15px; 
-            background: #f0f3f7; 
-            box-shadow: var(--inner-shadow);
-            color: #333; font-weight: 600; transition: all 0.3s;
-            -webkit-appearance: none;
+            background: #f0f3f7; box-shadow: var(--inner-shadow);
+            color: #333; font-weight: 600; transition: all 0.3s; -webkit-appearance: none;
         }
         select:focus { outline: none; box-shadow: inset 2px 2px 5px #b8c2d1, inset -2px -2px 5px #ffffff; }
         select.duplicate-error { color: var(--accent); box-shadow: inset 2px 2px 5px rgba(255,0,0,0.2); animation: shake 0.4s; }
@@ -93,8 +90,7 @@
         button.save-btn { 
             width: 100%; padding: 18px; background: var(--main); color: white; border: none; border-radius: 18px; 
             font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px; 
-            box-shadow: 5px 5px 10px #d1d9e6, -5px -5px 10px #ffffff;
-            transition: 0.2s;
+            box-shadow: 5px 5px 10px #d1d9e6, -5px -5px 10px #ffffff; transition: 0.2s;
         }
         button.edit-btn { background: var(--edit) !important; }
         button:active { transform: scale(0.98); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2); }
@@ -104,7 +100,7 @@
         .stats-table td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.03); font-weight: 600; }
         
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: #f0f3f7; box-shadow: var(--shadow); text-align: center; }
-        .reset-btn { width: 100%; background: #ff4757; color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 15px; box-shadow: 3px 3px 8px #d1d9e6; }
+        .reset-btn { width: 100%; background: #ff4757; color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 15px; box-shadow: 3px 3px 8px #d1d9e6; cursor: pointer; }
         
         .exit-btn {
             width: 100%; background: linear-gradient(135deg, #9370db, #8a2be2); color: white; border: none; padding: 18px; border-radius: 18px;
@@ -114,12 +110,13 @@
 
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(240,243,247,0.9); display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         .spinner { border: 5px solid #d1d9e6; border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .game-item { padding: 15px; border-radius: 18px; background: #f0f3f7; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--inner-shadow); }
         .game-info { font-size: 12px; font-weight: 700; color: #555; }
         .game-btns { display: flex; gap: 12px; }
         
-        .rich-msg { background: #f0f3f7; padding: 20px; border-radius: 22px; text-align: center; box-shadow: var(--inner-shadow); margin-top: 20px; color: #856404; }
+        .rich-msg { background: #f0f3f7; padding: 20px; border-radius: 22px; text-align: center; box-shadow: var(--inner-shadow); margin-top: 20px; color: #856404; font-weight: 800; }
 
         #exit-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);
@@ -133,7 +130,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <div class="welcome-logo">🎱</div>
-        <div class="welcome-text">우리들의<br>당구 세계에 오신걸 환영합니다.<br><br>Creator 주경배</div>
+        <div class="welcome-text">경배와 친구들의<br>당구 세계에 오신걸 환영합니다.<br><br>Creator 주경배</div>
     </div>
 </div>
 
@@ -141,14 +138,14 @@
     <div class="modal-content">
         <div style="font-size:50px; margin-bottom:15px;">👋</div>
         <div id="exit-message" style="font-size:16px; font-weight:800; color:#333; line-height:1.6; margin-bottom:25px;">
-            다들 즐거웠니?<br>다음에 봐!
+            오늘도 모두 즐거웠니?<br>다음에 또 만나!
         </div>
         <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); margin-bottom:12px; box-shadow:none;" onclick="closeAppWindow()">OK</button>
         <button class="save-btn" style="background:#abb2b9; box-shadow:none; margin:0;" onclick="closeExitModal()">나중에</button>
     </div>
 </div>
 
-<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">데이터 동기화 중...</div></div>
+<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">데이터 동기화 중</div></div>
 
 <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800;">
@@ -193,7 +190,7 @@
 <div class="danger-zone">
     <div style="color:var(--exit-purple); font-weight:900; margin-bottom:15px; font-size:16px; letter-spacing:1px;">SETTINGS</div>
     <div id="resetSteps">
-        <button class="reset-btn" onclick="confirmReset(1)">⚠️ 데이터 초기화</button>
+        <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
     <button class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button>
 </div>
@@ -293,7 +290,7 @@
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
         const listArea = document.getElementById('dayGameList');
         if(games.length > 0) {
-            let html = `<p style="font-size:12px; color:#888; font-weight:800; margin:25px 0 10px 0; text-align:center;">── 게임 목록 ──</p>`;
+            let html = `<p style="font-size:12px; color:#888; font-weight:800; margin:25px 0 10px 0; text-align:center;"> GAME SCORE </p>`;
             games.forEach((g, idx) => {
                 const names = g.ranks.filter(n => n && n.trim() !== "");
                 html += `
@@ -303,8 +300,8 @@
                         ${names.join(' → ')}
                     </div>
                     <div class="game-btns">
-                        <span style="color:var(--edit);">수정</span>
-                        <span style="color:var(--success);" onclick="deleteGame(event, ${g.round})">삭제</span>
+                        <span style="color:var(--edit); cursor:pointer;">수정</span>
+                        <span style="color:var(--success); cursor:pointer;" onclick="deleteGame(event, ${g.round})">삭제</span>
                     </div>
                 </div>`;
             });
@@ -317,11 +314,11 @@
         const ranks = [];
         for(let i=1; i<=count; i++) {
             const val = document.getElementById('rank'+i).value;
-            if(!val) return alert("친구를 선택해줄래?");
+            if(!val) return alert("친구를 선택해 줄래?");
             ranks.push(val);
         }
         if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥이여? 잘 선택혀!(중복)");
-        showLoading(true, "저장 중");
+        showLoading(true, "저장 중...");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -390,19 +387,24 @@
         });
         const sorted = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
         let maxLast = Math.max(...players.map(p => stats[p].ranks[4]));
-        document.getElementById('statsBody').innerHTML = sorted.map(p => `<tr><td>${p}</td><td>${stats[p].played}</td><td>${stats[p].ranks[0]}</td><td>${stats[p].ranks[1]}</td><td>${stats[p].ranks[2]}</td><td>${stats[p].ranks[3]}</td><td style="color:red;">${stats[p].ranks[4]}</td></tr>`).join('');
+        // [복구] 꼴찌 횟수 다시 표시되도록 수정
+        document.getElementById('statsBody').innerHTML = sorted.map(p => `<tr><td>${p}</td><td>${stats[p].played}</td><td>${stats[p].ranks[0]}</td><td>${stats[p].ranks[1]}</td><td>${stats[p].ranks[2]}</td><td>${stats[p].ranks[3]}</td><td style="color:red;">${stats[p].ranks[4]}회</td></tr>`).join('');
         const rich = document.getElementById('richFriendArea');
         if(maxLast > 0) {
             rich.style.display = 'block';
-            rich.innerHTML = `💸 지금까지의 최고 물주는 바로 나!<br><span style="font-size:20px; color:var(--accent); font-weight:900;">${players.filter(p => stats[p].ranks[4] === maxLast).join(', ')}</span>`;
+            rich.innerHTML = `💸 오늘의 물주는 바로 나!<br><span style="font-size:20px; color:var(--accent); font-weight:900;">${players.filter(p => stats[p].ranks[4] === maxLast).join(', ')}</span>`;
         }
     }
 
+    /* [복구] 초기화 팝업 단계별 버튼 로직 */
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
-        if(step === 1) el.innerHTML = `<button class="reset-btn" style="background:#f39c12;" onclick="confirmReset(2)">진짜 지워?</button>`;
-        else if(step === 2) el.innerHTML = `<button class="reset-btn" onclick="executeReset()">응, 다 지워!</button>`;
+        if(step === 1) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[1단계] 정말 삭제할 거야?</div><button class="reset-btn" style="background:#f39c12;" onclick="confirmReset(2)">응, 진짜 삭제할래</button><button class="save-btn" style="margin-top:10px; background:#666; box-shadow:none;" onclick="cancelReset()">취소</button>`;
+        else if(step === 2) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[2단계] 진짜 복구 안 된다니까?</div><button class="reset-btn" style="background:#e67e22;" onclick="confirmReset(3)">알았어, 마지막 확인!</button><button class="save-btn" style="margin-top:10px; background:#666; box-shadow:none;" onclick="cancelReset()">취소</button>`;
+        else if(step === 3) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[최종 확인] 지금 즉시 삭제합니다.</div><button class="reset-btn" onclick="executeReset()">🔥 데이터 즉시 삭제</button><button class="save-btn" style="margin-top:10px; background:#666; box-shadow:none;" onclick="cancelReset()">취소</button>`;
     }
+
+    function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
 
     async function executeReset() {
         showLoading(true, "초기화 중");
@@ -410,15 +412,9 @@
         location.reload();
     }
 
-    function showExitModal() { 
-        const m = document.getElementById('exit-modal');
-        m.style.display = 'flex';
-    }
+    function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-    function closeAppWindow() {
-        window.close();
-        setTimeout(() => { document.getElementById('exit-message').innerHTML = "탭을 직접 닫아주세요!"; }, 500);
-    }
+    function closeAppWindow() { window.close(); setTimeout(() => { document.getElementById('exit-message').innerHTML = "탭을 직접 닫아주세요!"; }, 500); }
 
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
