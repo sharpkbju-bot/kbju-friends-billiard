@@ -188,7 +188,7 @@
 </div>
 
 <div class="danger-zone">
-    <div style="color:var(--exit-purple); font-weight:900; margin-bottom:15px; font-size:16px; letter-spacing:1px;">SETTINGS</div>
+    <div style="color:var(--exit-purple); font-weight:900; margin-bottom:15px; font-size:16px; letter-spacing:1px;">[위험! 초기화 버튼 클릭 주의]</div>
     <div id="resetSteps">
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
@@ -392,7 +392,7 @@
         const rich = document.getElementById('richFriendArea');
         if(maxLast > 0) {
             rich.style.display = 'block';
-            rich.innerHTML = `💸 오늘의 물주는 바로 나!<br><span style="font-size:20px; color:var(--accent); font-weight:900;">${players.filter(p => stats[p].ranks[4] === maxLast).join(', ')}</span>`;
+            rich.innerHTML = `💸 야! 이 게임도 또 나야? 다들 카드까봐!<br><span style="font-size:20px; color:var(--accent); font-weight:900;">${players.filter(p => stats[p].ranks[4] === maxLast).join(', ')}</span>`;
         }
     }
 
