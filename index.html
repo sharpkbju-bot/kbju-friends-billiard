@@ -312,7 +312,7 @@
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
         const listArea = document.getElementById('dayGameList');
         if(games.length > 0) {
-            let html = `<p style="font-size:12px; color:#888; font-weight:800; margin:25px 0 10px 0; text-align:center;">── 경기 목록 ──</p>`;
+            let html = `<p style="font-size:12px; color:#00FF00; font-weight:800; margin:30px 0 10px 0; text-align:center;"> GAME RECORD </p>`;
             games.forEach((g, idx) => {
                 const names = g.ranks.filter(n => n && n.trim() !== "");
                 html += `
