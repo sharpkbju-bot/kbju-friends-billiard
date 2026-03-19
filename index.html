@@ -85,6 +85,13 @@
             -webkit-appearance: none; text-align: center; text-align-last: center;
         }
         select:focus { outline: none; box-shadow: inset 2px 2px 5px #b8c2d1, inset -2px -2px 5px #ffffff; }
+
+        /* [수정] 이름 중복 시 붉은색 강조 CSS 복구 */
+        .duplicate-error { 
+            box-shadow: inset 4px 4px 8px #fbcbc4, inset -4px -4px 8px #ffffff !important;
+            border: 2px solid var(--accent) !important;
+            color: var(--accent) !important;
+        }
         
         button.save-btn { 
             width: 100%; padding: 18px; 
@@ -145,7 +152,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <div class="welcome-logo">🎱</div>
-        <div class="welcome-text">경배와 친구들의<br>당구 세계에 오신걸 환영합니다.</div>
+        <div class="welcome-text">경배와 친구들의<br>당구 세계에 오신걸 환영합니다.<br><br>Creator  주경배</div>
     </div>
 </div>
 
@@ -153,14 +160,14 @@
     <div class="modal-content">
         <div style="font-size:50px; margin-bottom:15px;">👋</div>
         <div id="exit-message" style="font-size:16px; font-weight:800; color:#333; line-height:1.6; margin-bottom:25px;">
-            즐거운 시간 되셨나요?<br>앱을 종료하시겠습니까?
+            오늘도 다들 즐거웠니?<br>다음에 또 보자!
         </div>
-        <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); margin-bottom:12px; box-shadow:none;" onclick="closeAppWindow()">알겠어!</button>
+        <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); margin-bottom:12px; box-shadow:none;" onclick="closeAppWindow()">OK</button>
         <button class="save-btn" style="background:#abb2b9; box-shadow:none; margin:0;" onclick="closeExitModal()">나중에</button>
     </div>
 </div>
 
-<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">데이터 동기화 중...</div></div>
+<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">데이터 동기화 중. 기둘려!</div></div>
 
 <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800;">
@@ -203,7 +210,7 @@
 </div>
 
 <div class="danger-zone">
-    <div style="color:var(--exit-purple); font-weight:900; margin-bottom:15px; font-size:16px; letter-spacing:1px;">SETTINGS</div>
+    <div style="color:var(--exit-purple); font-weight:900; margin-bottom:15px; font-size:16px; letter-spacing:1px;">[초기화 버튼은 함부로 터치하지 마세요.]</div>
     <div id="resetSteps">
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
@@ -242,7 +249,7 @@
             document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
             return;
         }
-        showLoading(true, "클라우드 동기화 중...");
+        showLoading(true, "클라우드 동기화 중");
         try {
             const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
             const rawData = await response.json();
@@ -305,7 +312,7 @@
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
         const listArea = document.getElementById('dayGameList');
         if(games.length > 0) {
-            let html = `<p style="font-size:12px; color:#888; font-weight:800; margin:25px 0 10px 0; text-align:center;">── 게임 목록 ──</p>`;
+            let html = `<p style="font-size:12px; color:#888; font-weight:800; margin:25px 0 10px 0; text-align:center;"> GAME RECORD </p>`;
             games.forEach((g, idx) => {
                 const names = g.ranks.filter(n => n && n.trim() !== "");
                 html += `
@@ -329,15 +336,15 @@
         const ranks = [];
         for(let i=1; i<=count; i++) {
             const val = document.getElementById('rank'+i).value;
-            if(!val) return alert("선수를 모두 선택해!");
+            if(!val) return alert("친구를 선택해줄래?");
             ranks.push(val);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("중복 선수가 있어!");
-        showLoading(true, "저장 중...");
+        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥이여? 잘 선택혀!(중복)");
+        showLoading(true, "저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-            setTimeout(() => { fetchData(); alert("저장 완료! ✨"); cancelEdit(); }, 1200);
+            setTimeout(() => { fetchData(); alert("저장 완료. ✨"); cancelEdit(); }, 1200);
         } catch (e) { alert("오류 발생!"); showLoading(false); }
     }
 
@@ -353,11 +360,20 @@
         if(preFill) checkDuplicates();
     }
 
+    // [수정] 중복 시 .duplicate-error 클래스를 적용하여 붉게 표시하는 로직 복구
     function checkDuplicates() {
         const selects = Array.from(document.querySelectorAll('#inputArea select'));
         const values = selects.map(s => s.value);
+        
+        // 일단 모든 강조 제거
         selects.forEach(s => s.classList.remove('duplicate-error'));
-        values.forEach((v, i) => { if(v && values.filter(x => x === v).length > 1) selects[i].classList.add('duplicate-error'); });
+        
+        // 중복값 찾아서 해당 select들에 강조 클래스 추가
+        values.forEach((v, i) => { 
+            if(v && values.filter(x => x === v).length > 1) {
+                selects[i].classList.add('duplicate-error');
+            } 
+        });
     }
 
     function enterEditMode(round, rankStr) {
@@ -379,11 +395,11 @@
 
     async function deleteGame(e, round) {
         e.stopPropagation();
-        if(!confirm("정말 삭제해?")) return;
-        showLoading(true, "삭제 중...");
+        if(!confirm("정말 삭제할거야?")) return;
+        showLoading(true, "삭제 중");
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) });
-            setTimeout(() => { fetchData(); alert("삭제됨! 🗑️"); }, 1200);
+            setTimeout(() => { fetchData(); alert("삭제 완료. 🗑️"); }, 1200);
         } catch (e) { showLoading(false); }
     }
 
@@ -401,13 +417,11 @@
             });
         });
 
-        // [수정] 강조 로직을 위한 최대값 계산
         let maxFirst = Math.max(...players.map(p => stats[p].ranks[0]));
         let maxLast = Math.max(...players.map(p => stats[p].ranks[4]));
 
         const sorted = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
         
-        // [수정] 최다 1위는 파란색, 최다 꼴찌는 빨간색 이름 강조
         document.getElementById('statsBody').innerHTML = sorted.map(p => {
             let nameStyle = "";
             if (maxFirst > 0 && stats[p].ranks[0] === maxFirst) nameStyle = "color:var(--main);";
@@ -421,7 +435,7 @@
             const losers = players.filter(p => stats[p].ranks[4] === maxLast);
             const loserInfo = losers.map(p => `${p}(${stats[p].ranks[4]}회)`).join(', ');
             rich.style.display = 'block';
-            rich.innerHTML = `💸 오늘의 물주는 바로 나!<br><span style="font-size:20px; color:var(--accent); font-weight:900;">${loserInfo}</span>`;
+            rich.innerHTML = `💸 야! 이 게임도 또 나냐? 다들 카드까봐!<br><span style="font-size:20px; color:var(--accent); font-weight:900;">${loserInfo}</span>`;
         } else {
             rich.style.display = 'none';
         }
@@ -437,7 +451,7 @@
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
 
     async function executeReset() {
-        showLoading(true, "초기화 중...");
+        showLoading(true, "초기화 중");
         await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
         location.reload();
     }
