@@ -420,6 +420,7 @@
     function cancelEdit() {
         editMode = false; editRound = null; document.getElementById('editBadge').style.display = 'none';
         const btn = document.getElementById('mainBtn'); btn.innerText = "순위 저장"; btn.classList.remove('edit-btn');
+        document.getElementById('playerCount').value = "3";
         updateInputFields();
     }
 
@@ -432,7 +433,6 @@
         } catch (e) { showLoading(false); }
     }
 
-    // [복구 완료] 전적 테이블에서 1위는 파란색, 꼴찌는 빨간색으로 이름 표시
     function renderStats() {
         let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
         gameLogs.forEach(g => {
@@ -452,8 +452,8 @@
 
         document.getElementById('statsBody').innerHTML = sortedByWin.map(p => {
             let nameStyle = "font-weight:800;";
-            if(stats[p].ranks[0] === maxWins && maxWins > 0) nameStyle += "color:#007bff;"; // 1위 파란색
-            if(stats[p].ranks[4] === maxLasts && maxLasts > 0) nameStyle += "color:#ff4757;"; // 꼴찌 빨간색
+            if(stats[p].ranks[0] === maxWins && maxWins > 0) nameStyle += "color:#007bff;";
+            if(stats[p].ranks[4] === maxLasts && maxLasts > 0) nameStyle += "color:#ff4757;";
             
             return `<tr><td style="${nameStyle}">${p}</td><td>${stats[p].played}</td><td>${stats[p].ranks[0]}</td><td>${stats[p].ranks[1]}</td><td>${stats[p].ranks[2]}</td><td>${stats[p].ranks[3]}</td><td style="color:red;">${stats[p].ranks[4]}회</td></tr>`;
         }).join('');
@@ -465,18 +465,26 @@
         } else rich.style.display = 'none';
     }
 
-    // [복구 완료] 초기화 3단계 컨펌 로직 및 취소 버튼
+    // [수정 완료] 명확한 3단계 초기화 컨펌 로직
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) {
             el.innerHTML = `
-                <button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">응, 진짜 삭제할래</button>
-                <button class="cancel-btn" onclick="cancelReset()">취소</button>
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">정말로 모든 데이터를 지울까요? (1/2)</div>
+                <button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">네, 확인했습니다</button>
+                <button class="cancel-btn" onclick="cancelReset()">아니오 (취소)</button>
             `;
         } else if(step === 2) {
             el.innerHTML = `
-                <button class="reset-btn" style="background:var(--accent); font-size:18px;" onclick="executeReset()">🔥 데이터 즉시 삭제</button>
-                <button class="cancel-btn" onclick="cancelReset()">취소</button>
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">복구가 절대 불가능합니다. 계속할까요? (2/2)</div>
+                <button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">네, 알고 있습니다</button>
+                <button class="cancel-btn" onclick="cancelReset()">취소하기</button>
+            `;
+        } else if(step === 3) {
+            el.innerHTML = `
+                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">마지막 단계입니다. 지웁니다!</div>
+                <button class="reset-btn" style="background:var(--accent); font-size:18px;" onclick="executeReset()">🔥 지금 즉시 모든 데이터 삭제</button>
+                <button class="cancel-btn" onclick="cancelReset()">아냐! 누르지마 (취소)</button>
             `;
         }
     }
