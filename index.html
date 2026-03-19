@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3256/3256247.png">
     
-    <title>경배와 친구들 당구</title>
+    <title>경배와 친구들의 Pro Billiard</title>
     
     <style>
         :root { 
@@ -67,7 +67,6 @@
         .day.today { background: var(--today) !important; color: #d0006e !important; font-weight: bold; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1); }
         .day.selected { background: var(--main) !important; color: white !important; font-weight: bold; transform: scale(1.1); z-index: 5; box-shadow: 0 5px 15px rgba(74,144,226,0.4); }
         
-        /* [복구] 달력 하단 점 표시 스타일 */
         .has-record::after { 
             content: ''; position: absolute; bottom: 5px; width: 5px; height: 5px; 
             background: var(--success); border-radius: 50%; box-shadow: 0 0 3px var(--success);
@@ -77,10 +76,13 @@
         .input-row { display: flex; align-items: center; margin-bottom: 15px; }
         .input-row label { width: 60px; font-size: 13px; font-weight: 800; color: #555; }
         
+        /* [수정] 중앙 정렬 보강 */
         select { 
             flex: 1; padding: 14px; border-radius: 15px; border: none; font-size: 15px; 
             background: #f0f3f7; box-shadow: var(--inner-shadow);
-            color: #333; font-weight: 600; transition: all 0.3s; -webkit-appearance: none;
+            color: #333; font-weight: 600; transition: all 0.3s; 
+            -webkit-appearance: none;
+            text-align: center; text-align-last: center; /* 중앙 정렬 */
         }
         select:focus { outline: none; box-shadow: inset 2px 2px 5px #b8c2d1, inset -2px -2px 5px #ffffff; }
         select.duplicate-error { color: var(--accent); box-shadow: inset 2px 2px 5px rgba(255,0,0,0.2); animation: shake 0.4s; }
@@ -130,7 +132,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <div class="welcome-logo">🎱</div>
-        <div class="welcome-text">경배와 친구들의<br>당구 세계에 오신걸 환영합니다.</div>
+        <div class="welcome-text">경배와 친구들의<br>당구 세계에 오신걸 환영합니다.<br><br>Creator 주경배</div>
     </div>
 </div>
 
@@ -138,14 +140,14 @@
     <div class="modal-content">
         <div style="font-size:50px; margin-bottom:15px;">👋</div>
         <div id="exit-message" style="font-size:16px; font-weight:800; color:#333; line-height:1.6; margin-bottom:25px;">
-            즐거운 시간 되셨나요?<br>앱을 종료하시겠습니까?
+            다들 오늘도 즐거웠니?<br>다음게 또 보자!
         </div>
-        <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); margin-bottom:12px; box-shadow:none;" onclick="closeAppWindow()">알겠어!</button>
+        <button id="final-exit-btn" class="save-btn" style="background:linear-gradient(135deg, #9370db, #8a2be2); margin-bottom:12px; box-shadow:none;" onclick="closeAppWindow()">OK</button>
         <button class="save-btn" style="background:#abb2b9; box-shadow:none; margin:0;" onclick="closeExitModal()">나중에</button>
     </div>
 </div>
 
-<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">데이터 동기화 중...</div></div>
+<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">데이터 동기화 중. 기둘려!</div></div>
 
 <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800;">
@@ -161,7 +163,7 @@
     <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:15px; background: var(--edit); padding: 12px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(243,156,18,0.3);">✏️ 기록 수정 중</div>
     
     <div class="setup-row">
-        <span style="font-size:15px; font-weight:800; color:#555;">경기 인원</span>
+        <span style="font-size:15px; font-weight:800; color:#555;">게임 인원</span>
         <select id="playerCount" style="flex:none; width:100px; box-shadow: var(--inner-shadow);" onchange="updateInputFields()">
             <option value="2">2명</option>
             <option value="3" selected>3명</option>
@@ -227,7 +229,7 @@
             document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
             return;
         }
-        showLoading(true, "클라우드 동기화 중...");
+        showLoading(true, "클라우드에 기록 동기화 중");
         try {
             const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
             const rawData = await response.json();
@@ -290,7 +292,7 @@
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
         const listArea = document.getElementById('dayGameList');
         if(games.length > 0) {
-            let html = `<p style="font-size:12px; color:#888; font-weight:800; margin:25px 0 10px 0; text-align:center;">── 경기 목록 ──</p>`;
+            let html = `<p style="font-size:12px; color:#888; font-weight:800; margin:25px 0 10px 0; text-align:center;">── 게임 목록 ──</p>`;
             games.forEach((g, idx) => {
                 const names = g.ranks.filter(n => n && n.trim() !== "");
                 html += `
@@ -314,11 +316,11 @@
         const ranks = [];
         for(let i=1; i<=count; i++) {
             const val = document.getElementById('rank'+i).value;
-            if(!val) return alert("선수를 모두 선택해!");
+            if(!val) return alert("친구를 선택해줄래?");
             ranks.push(val);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("중복 선수가 있어!");
-        showLoading(true, "저장 중...");
+        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥이여? 잘 선택혀!(중복)");
+        showLoading(true, "저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -365,10 +367,10 @@
     async function deleteGame(e, round) {
         e.stopPropagation();
         if(!confirm("정말 삭제해?")) return;
-        showLoading(true, "삭제 중...");
+        showLoading(true, "삭제 중");
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) });
-            setTimeout(() => { fetchData(); alert("삭제됨! 🗑️"); }, 1200);
+            setTimeout(() => { fetchData(); alert("삭제 완료. 🗑️"); }, 1200);
         } catch (e) { showLoading(false); }
     }
 
@@ -387,27 +389,33 @@
         });
         const sorted = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
         let maxLast = Math.max(...players.map(p => stats[p].ranks[4]));
-        // [복구] 꼴찌 횟수 다시 표시되도록 수정
+        
         document.getElementById('statsBody').innerHTML = sorted.map(p => `<tr><td>${p}</td><td>${stats[p].played}</td><td>${stats[p].ranks[0]}</td><td>${stats[p].ranks[1]}</td><td>${stats[p].ranks[2]}</td><td>${stats[p].ranks[3]}</td><td style="color:red;">${stats[p].ranks[4]}회</td></tr>`).join('');
+        
         const rich = document.getElementById('richFriendArea');
         if(maxLast > 0) {
+            const losers = players.filter(p => stats[p].ranks[4] === maxLast);
+            // [수정] 오늘의 물주 옆에 꼴찌 횟수 다시 표시되도록 수정
+            const loserInfo = losers.map(p => `${p}(${stats[p].ranks[4]}회)`).join(', ');
             rich.style.display = 'block';
-            rich.innerHTML = `💸 오늘의 물주는 바로 나!<br><span style="font-size:20px; color:var(--accent); font-weight:900;">${players.filter(p => stats[p].ranks[4] === maxLast).join(', ')}</span>`;
+            rich.innerHTML = `💸 야! 이 게임도 또 나야! 다들 카드까봐!<br><span style="font-size:20px; color:var(--accent); font-weight:900;">${loserInfo}</span>`;
+        } else {
+            rich.style.display = 'none';
         }
     }
 
-    /* [복구] 초기화 팝업 단계별 버튼 로직 */
+    /* [수정] 초기화 팝업 단계별 버튼 로직 및 간격 보강 */
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
-        if(step === 1) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[1단계] 정말 삭제할 거야?</div><button class="reset-btn" style="background:#f39c12;" onclick="confirmReset(2)">응, 진짜 삭제할래</button><button class="save-btn" style="margin-top:10px; background:#666; box-shadow:none;" onclick="cancelReset()">취소</button>`;
-        else if(step === 2) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[2단계] 진짜 복구 안 된다니까?</div><button class="reset-btn" style="background:#e67e22;" onclick="confirmReset(3)">알았어, 마지막 확인!</button><button class="save-btn" style="margin-top:10px; background:#666; box-shadow:none;" onclick="cancelReset()">취소</button>`;
-        else if(step === 3) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[최종 확인] 지금 즉시 삭제합니다.</div><button class="reset-btn" onclick="executeReset()">🔥 데이터 즉시 삭제</button><button class="save-btn" style="margin-top:10px; background:#666; box-shadow:none;" onclick="cancelReset()">취소</button>`;
+        if(step === 1) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[1단계] 정말 삭제할 거야?</div><button class="reset-btn" style="background:#f39c12;" onclick="confirmReset(2)">응, 진짜 삭제할래</button><button class="save-btn" style="margin-top:5px; margin-bottom:25px; background:#666; box-shadow:none;" onclick="cancelReset()">취소</button>`;
+        else if(step === 2) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[2단계] 진짜 복구 안 된다니까?</div><button class="reset-btn" style="background:#e67e22;" onclick="confirmReset(3)">알았어, 마지막 확인!</button><button class="save-btn" style="margin-top:5px; margin-bottom:25px; background:#666; box-shadow:none;" onclick="cancelReset()">취소</button>`;
+        else if(step === 3) el.innerHTML = `<div style="color:red; font-weight:bold; margin-bottom:10px;">[최종 확인] 지금 즉시 삭제합니다.</div><button class="reset-btn" onclick="executeReset()">🔥 데이터 즉시 삭제</button><button class="save-btn" style="margin-top:5px; margin-bottom:25px; background:#666; box-shadow:none;" onclick="cancelReset()">취소</button>`;
     }
 
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
 
     async function executeReset() {
-        showLoading(true, "초기화 중...");
+        showLoading(true, "초기화 중");
         await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
         location.reload();
     }
