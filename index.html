@@ -157,7 +157,7 @@
         select { 
             padding: 12px; 
             border-radius: 15px; 
-            border: 2px solid transparent; /* 기본 테두리 */
+            border: 2px solid transparent; 
             font-size: 14px; 
             background: #f0f3f7; 
             box-shadow: var(--inner-shadow);
@@ -178,7 +178,6 @@
             flex: 1;
         }
 
-        /* [복구] 중복 선택 시 붉은 테두리 스타일 */
         .duplicate-error {
             border-color: var(--accent) !important;
             box-shadow: 0 0 10px rgba(255, 71, 87, 0.3), var(--inner-shadow) !important;
@@ -378,7 +377,7 @@
             if(!val) return alert("친구를 선택해줄래?");
             ranks.push(val);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("중복된 친구가 있어요!");
+        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥이여? 잘 선택혀!(중복)");
         showLoading(true, "기록 저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try {
@@ -399,7 +398,6 @@
         if(preFill) checkDuplicates();
     }
 
-    // [복구 완료] 중복 체크 시 붉은 테두리 적용 함수
     function checkDuplicates() {
         const selects = Array.from(document.querySelectorAll('#inputArea select'));
         const values = selects.map(s => s.value);
@@ -455,11 +453,16 @@
         } else rich.style.display = 'none';
     }
 
+    // [복구] 초기화 3단계 컨펌 로직
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
-        if(step === 1) el.innerHTML = `<button class="reset-btn" style="background:#f39c12" onclick="confirmReset(2)">응, 진짜 삭제할래</button>`;
-        else if(step === 2) el.innerHTML = `<button class="reset-btn" onclick="executeReset()">🔥 데이터 즉시 삭제</button>`;
+        if(step === 1) {
+            el.innerHTML = `<button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">응, 진짜 삭제할래</button>`;
+        } else if(step === 2) {
+            el.innerHTML = `<button class="reset-btn" style="background:var(--accent)" onclick="executeReset()">🔥 데이터 즉시 삭제</button>`;
+        }
     }
+    
     async function executeReset() { showLoading(true, "기록 초기화 중"); await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); }
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
