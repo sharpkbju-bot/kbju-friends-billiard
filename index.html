@@ -491,7 +491,7 @@
         } else if(step === 2) {
             el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구가 불가능합니다. 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
         } else if(step === 3) {
-            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[최종 확인] 마지막입니다. 정말 지웁니다!</div><button class="reset-btn" style="background:var(--accent); font-size:18px;" onclick="executeReset()">🔥 OK. 삭제해!</button><button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다!(취소)</button>`;
+            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[최종 확인] 마지막입니다. 정말 지웁니다!</div><button class="reset-btn" style="background:var(--accent); font-size:15px;" onclick="executeReset()">🔥 OK. 삭제해!</button><button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다!(취소)</button>`;
         }
     }
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
