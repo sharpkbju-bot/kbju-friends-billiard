@@ -28,7 +28,18 @@
             --record-dot: #e67e22; 
             --shadow: 8px 8px 16px #cfd4d9, -8px -8px 16px #ffffff;
             --inner-shadow: inset 3px 3px 7px #cfd4d9, inset -3px -3px 7px #ffffff;
-            --duplicate-bg: #ebedff; 
+            
+            /* 순위별 전용 컬러 정의 */
+            --rank1: #2196f3; /* 1위: 블루 */
+            --rank2: #27ae60; /* 2위: 그린 */
+            --rank3: #8e44ad; /* 3위: 퍼플 */
+            --rank4: #f39c12; /* 4위: 오렌지 */
+            --rankL: #ff4757; /* 꼴찌: 레드 */
+            
+            /* 중복 체크 스타일 정의 */
+            --dup-bg: #fffde7;    /* 연한 노란색 */
+            --dup-border: #ff80ab; /* 핑크 테두리 */
+            --dup-text: #7b1fa2;   /* 퍼플 글자 */
         }
 
         body { 
@@ -138,10 +149,11 @@
             -webkit-appearance: none; text-align: center; text-align-last: center; 
         }
 
+        /* [수정됨] 중복 체크 드롭다운 스타일: 연노랑 배경, 핑크 테두리, 퍼플 글자 */
         select.duplicate-error {
-            background: var(--duplicate-bg) !important;
-            border: 2px solid #c7d2fe !important;
-            color: #5c67f2 !important;
+            background: var(--dup-bg) !important;
+            border: 2px solid var(--dup-border) !important;
+            color: var(--dup-text) !important;
         }
 
         button.save-btn { width: 100%; padding: 18px; background: linear-gradient(145deg, #95a5a6, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px; box-shadow: 5px 5px 10px #cfd4d9, -3px -3px 8px #ffffff; transition: 0.2s; }
@@ -385,7 +397,7 @@
         } catch (e) { showLoading(false); }
     }
 
-    /* 누적 전적 렌더링 시 1위(파랑) / 꼴찌(빨강) 강조 로직 */
+    /* [수정됨] 누적 전적 렌더링 시 모든 순위 최다 기록자 컬러 강조 로직 */
     function renderStats() {
         let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
         gameLogs.forEach(g => {
@@ -400,24 +412,34 @@
         });
         const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
         
-        // 최다 1위수와 최다 꼴찌수 계산
-        const maxWins = Math.max(...players.map(p => stats[p].ranks[0]));
-        const maxLasts = Math.max(...players.map(p => stats[p].ranks[4]));
+        // 각 순위별 최다 횟수 계산
+        const maxCounts = [0, 1, 2, 3, 4].map(idx => Math.max(...players.map(p => stats[p].ranks[idx])));
         
         document.getElementById('statsBody').innerHTML = sortedByWin.map(p => {
             let nameStyle = "font-weight:800;";
-            // 1위 최다 득점자 파란색 강조
-            if(stats[p].ranks[0] === maxWins && maxWins > 0) nameStyle += "color:#2196f3;";
-            // 꼴찌 최다 기록자 빨간색 강조 (기존 주황색에서 붉은색 계열로 변경)
-            if(stats[p].ranks[4] === maxLasts && maxLasts > 0) nameStyle += "color:#ff4757;";
             
-            return `<tr><td style="${nameStyle}">${p}</td><td>${stats[p].played}</td><td>${stats[p].ranks[0]}</td><td>${stats[p].ranks[1]}</td><td>${stats[p].ranks[2]}</td><td>${stats[p].ranks[3]}</td><td style="color:#e67e22;">${stats[p].ranks[4]}회</td></tr>`;
+            // 최다 기록 여부에 따른 조건부 컬러 (상수 대신 변수화된 컬러 사용)
+            if(stats[p].ranks[0] === maxCounts[0] && maxCounts[0] > 0) nameStyle += `color:var(--rank1);`;
+            else if(stats[p].ranks[4] === maxCounts[4] && maxCounts[4] > 0) nameStyle += `color:var(--rankL);`;
+            else if(stats[p].ranks[1] === maxCounts[1] && maxCounts[1] > 0) nameStyle += `color:var(--rank2);`;
+            else if(stats[p].ranks[2] === maxCounts[2] && maxCounts[2] > 0) nameStyle += `color:var(--rank3);`;
+            else if(stats[p].ranks[3] === maxCounts[3] && maxCounts[3] > 0) nameStyle += `color:var(--rank4);`;
+            
+            return `<tr>
+                <td style="${nameStyle}">${p}</td>
+                <td>${stats[p].played}</td>
+                <td style="${stats[p].ranks[0] === maxCounts[0] && maxCounts[0] > 0 ? 'color:var(--rank1)' : ''}">${stats[p].ranks[0]}</td>
+                <td style="${stats[p].ranks[1] === maxCounts[1] && maxCounts[1] > 0 ? 'color:var(--rank2)' : ''}">${stats[p].ranks[1]}</td>
+                <td style="${stats[p].ranks[2] === maxCounts[2] && maxCounts[2] > 0 ? 'color:var(--rank3)' : ''}">${stats[p].ranks[2]}</td>
+                <td style="${stats[p].ranks[3] === maxCounts[3] && maxCounts[3] > 0 ? 'color:var(--rank4)' : ''}">${stats[p].ranks[3]}</td>
+                <td style="color:var(--rankL);">${stats[p].ranks[4]}회</td>
+            </tr>`;
         }).join('');
         
         const rich = document.getElementById('richFriendArea');
-        if(maxLasts > 0) {
-            const losers = players.filter(p => stats[p].ranks[4] === maxLasts);
-            rich.style.display = 'block'; rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:17px; color:#ff4757; font-weight:900;">${losers.join(', ')} (${maxLasts}회)</span>`;
+        if(maxCounts[4] > 0) {
+            const losers = players.filter(p => stats[p].ranks[4] === maxCounts[4]);
+            rich.style.display = 'block'; rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')} (${maxCounts[4]}회)</span>`;
         } else rich.style.display = 'none';
     }
 
