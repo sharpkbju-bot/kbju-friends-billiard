@@ -28,6 +28,7 @@
             --record-dot: #e67e22; 
             --shadow: 8px 8px 16px #cfd4d9, -8px -8px 16px #ffffff;
             --inner-shadow: inset 3px 3px 7px #cfd4d9, inset -3px -3px 7px #ffffff;
+            --duplicate-bg: #ebedff; /* 중복 선택 시 연한 퍼플 배경 */
         }
 
         body { 
@@ -120,7 +121,6 @@
         .card { background: var(--bg); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.04); }
         
-        /* [수정됨] 게임 인원 선택 드롭다운용 별도 스타일 (우측 정렬 및 좁은 폭 고정) */
         select#playerCount {
             flex: none !important;
             width: 85px !important;
@@ -131,12 +131,18 @@
         .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
         .input-row label { width: 55px; font-size: 13px; font-weight: 800; color: #777; flex-shrink: 0; }
         
-        /* 일반 드롭다운 (순위 선택용) - 화면을 꽉 채우도록 설정 */
         select { 
             flex: 1;
             padding: 12px; border-radius: 15px; border: 2px solid transparent; font-size: 14px; 
             background: var(--bg); box-shadow: var(--inner-shadow); color: #444; font-weight: 600; 
             -webkit-appearance: none; text-align: center; text-align-last: center; 
+        }
+
+        /* 중복 선택 시 표시되는 클래스 */
+        select.duplicate-error {
+            background: var(--duplicate-bg) !important;
+            border: 2px solid #c7d2fe !important;
+            color: #5c67f2 !important;
         }
 
         button.save-btn { width: 100%; padding: 18px; background: linear-gradient(145deg, #95a5a6, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px; box-shadow: 5px 5px 10px #cfd4d9, -3px -3px 8px #ffffff; transition: 0.2s; }
@@ -347,11 +353,20 @@
         if(preFill) checkDuplicates();
     }
 
+    /* 중복 선택 시 해당 이름을 연한 퍼플 컬러로 강조하는 함수 */
     function checkDuplicates() {
         const selects = Array.from(document.querySelectorAll('#inputArea select'));
         const values = selects.map(s => s.value);
+        
+        // 모든 에러 클래스 초기화
         selects.forEach(s => s.classList.remove('duplicate-error'));
-        values.forEach((v, i) => { if(v && values.filter(x => x === v).length > 1) selects[i].classList.add('duplicate-error'); });
+        
+        // 중복값 확인하여 클래스 추가
+        values.forEach((v, i) => { 
+            if(v && values.filter(x => x === v).length > 1) {
+                selects[i].classList.add('duplicate-error');
+            } 
+        });
     }
 
     function enterEditMode(round, rankStr) {
