@@ -7,7 +7,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="경배당구">
+    <meta name="apple-mobile-web-app-title" content="경배와 친구들">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3408/3408506.png">
     
     <title>우리들의 Billiard World</title>
@@ -20,7 +20,7 @@
             --success: #27ae60; 
             --edit: #f39c12; 
             --today: #ffc0cb; 
-            --selected-pink: #ffd1dc; /* [수정] 선택된 날짜용 연분홍색 */
+            --selected-pink: #ffffd1; /* [수정] 아주 밝고 화사한 날짜용 노란색 */
             --exit-purple: #9370db;
             --shadow: 10px 10px 20px #c1c9d6, -10px -10px 20px #ffffff;
             --inner-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
@@ -51,7 +51,7 @@
         
         /* [수정] 웰컴 텍스트: 글자 크기 축소 및 영문 필기체 스타일 적용 */
         .welcome-text { 
-            font-size: 15px; 
+            font-size: 14px; 
             font-weight: 300; 
             line-height: 1.6; 
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -131,10 +131,10 @@
             box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1); 
         }
         
-        /* [수정] 선택된 날짜 디자인: 연한 핑크색 적용 */
+        /* [수정] 선택된 날짜 디자인: 아주 밝고 화사한 노란색 적용 */
         .day.selected { 
             background: var(--selected-pink) !important; 
-            color: #d81b60 !important; 
+            color: #ffffd1 !important; 
             transform: scale(1.1); 
             z-index: 5; 
             box-shadow: 0 8px 15px rgba(255, 182, 193, 0.5); 
@@ -401,7 +401,7 @@
             if(!val) return alert("친구를 선택해줄래?");
             ranks.push(val);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("중복된 친구가 있어요!");
+        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥이여? 잘 선택혀!(중복)");
         showLoading(true, "기록 저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try {
@@ -487,11 +487,11 @@
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) {
-            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">정말로 모든 데이터를 지울까요? (1/2)</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">네, 확인했습니다</button><button class="cancel-btn" onclick="cancelReset()">아니오 (취소)</button>`;
+            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 정말 모든 데이터를 지울까요?</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
         } else if(step === 2) {
-            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">복구가 절대 불가능합니다. 계속할까요? (2/2)</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">네, 알고 있습니다</button><button class="cancel-btn" onclick="cancelReset()">취소하기</button>`;
+            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구가 불가능합니다. 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
         } else if(step === 3) {
-            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">마지막 단계입니다. 지웁니다!</div><button class="reset-btn" style="background:var(--accent); font-size:18px;" onclick="executeReset()">🔥 지금 즉시 모든 데이터 삭제</button><button class="cancel-btn" onclick="cancelReset()">아냐! 누르지마 (취소)</button>`;
+            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[최종 확인] 마지막. 모두 삭제합니다!</div><button class="reset-btn" style="background:var(--accent); font-size:18px;" onclick="executeReset()">🔥 OK. 삭제해!</button><button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
         }
     }
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
