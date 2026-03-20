@@ -43,10 +43,14 @@
             background: linear-gradient(135deg, #4a90e2, #9370db);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 10000; transition: opacity 0.8s ease-out; color: white; text-align: center;
+            pointer-events: none; /* 화면 클릭 방해 금지 */
         }
         .welcome-content { animation: fadeInUp 1s ease-out; }
         .welcome-logo { font-size: 60px; margin-bottom: 20px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
-        .welcome-text { font-size: 20px; font-weight: bold; line-height: 1.5; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        
+        /* [수정] 글씨 크기 조절 (기존 20px -> 17px) */
+        .welcome-text { font-size: 17px; font-weight: bold; line-height: 1.5; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .calendar-card {
@@ -65,7 +69,6 @@
             margin-bottom: 20px;
         }
 
-        /* 원래대로 복구 */
         .nav-btn {
             border: none;
             background: #f0f3f7;
@@ -185,7 +188,6 @@
             color: var(--accent) !important;
         }
         
-        /* 원래대로 복구 */
         button.save-btn { 
             width: 100%; padding: 18px; 
             background: linear-gradient(145deg, #53a0f5, #4282cb); 
@@ -201,8 +203,6 @@
         .stats-table td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.03); font-weight: 600; }
         
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: #f0f3f7; box-shadow: var(--shadow); text-align: center; }
-        
-        /* 원래대로 복구 */
         .reset-btn { width: 100%; background: linear-gradient(145deg, #ff5e6c, #e6404e); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 4px 4px 10px #d1d9e6, -2px -2px 8px #ffffff; cursor: pointer; }
         .cancel-btn { width: 100%; background: #bdc3c7; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; box-shadow: 4px 4px 10px #d1d9e6, -2px -2px 8px #ffffff; cursor: pointer; }
         .exit-btn { width: 100%; background: linear-gradient(145deg, #a586e6, #8162c8); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 6px 6px 12px #d1d9e6, -4px -4px 10px #ffffff; }
@@ -214,7 +214,6 @@
         .game-item { padding: 15px 10px; border-radius: 18px; background: #f0f3f7; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--inner-shadow); }
         .game-info { font-size: 11px; font-weight: 800; color: #444; overflow: hidden; text-overflow: ellipsis; flex: 1; }
         
-        /* [유지] 수정/삭제 버튼 입체감 디자인 유지 */
         .game-btns { display: flex; gap: 8px; flex-shrink: 0; font-size: 11px; font-weight: bold; }
         .game-btns span {
             padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.1);
@@ -401,7 +400,7 @@
             if(!val) return alert("친구를 선택해줄래?");
             ranks.push(val);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥이여? 잘 선택혀!(중복));
+        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥이여? 잘 선택혀!(중복)");
         showLoading(true, "기록 저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try {
@@ -532,7 +531,22 @@
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
 
-    window.onload = () => { updateInputFields(); fetchData(); setTimeout(() => { document.getElementById('welcome-screen').style.opacity = '0'; setTimeout(() => document.getElementById('welcome-screen').style.display = 'none', 800); }, 2000); };
+    // [수정] 웰컴 화면 자동 종료 로직 강화
+    window.onload = () => { 
+        updateInputFields(); 
+        fetchData(); 
+        
+        // 데이터 로딩 상태와 무관하게 2.5초 후 실행
+        setTimeout(() => { 
+            const ws = document.getElementById('welcome-screen');
+            if(ws) {
+                ws.style.opacity = '0'; 
+                setTimeout(() => {
+                    ws.style.display = 'none';
+                }, 800); 
+            }
+        }, 2500); 
+    };
 </script>
 </body>
 </html>
