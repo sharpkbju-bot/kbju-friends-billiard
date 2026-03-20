@@ -19,13 +19,13 @@
             --accent: #ff4757; 
             --success: #27ae60; 
             --edit: #f39c12; 
-            --today-bg: #e3f2fd; /* 오늘 날짜 배경 */
-            --today-border: #2196f3; /* 오늘 날짜 테두리 */
-            --select-bg: #fff0f3; /* 선택된 날짜 배경 */
-            --select-border: #ff4d6d; /* 선택된 날짜 테두리 */
-            --record-bg: #e8f5e9; /* 기록 있는 날 배경 (연한 그린) */
-            --record-border: #4caf50; /* 기록 있는 날 테두리 (진한 그린) */
-            --record-dot: #e67e22; /* 기록 하단 포인트 */
+            --today-bg: #e3f2fd; 
+            --today-border: #2196f3; 
+            --select-bg: #fff0f3; 
+            --select-border: #ff4d6d; 
+            --record-bg: #e8f5e9; 
+            --record-border: #4caf50; 
+            --record-dot: #e67e22; 
             --shadow: 8px 8px 16px #cfd4d9, -8px -8px 16px #ffffff;
             --inner-shadow: inset 3px 3px 7px #cfd4d9, inset -3px -3px 7px #ffffff;
         }
@@ -90,7 +90,6 @@
         .day.sat { color: #5dade2; } 
         .day.sun, .day.holiday { color: #e67e22; } 
         
-        /* 오늘 날짜 스타일 */
         .day.today { 
             background: var(--today-bg) !important; 
             color: var(--today-border) !important; 
@@ -98,7 +97,6 @@
             box-shadow: inset 2px 2px 5px rgba(33, 150, 243, 0.1); 
         }
         
-        /* 선택된 날짜 스타일 */
         .day.selected { 
             background: var(--select-bg) !important; 
             color: var(--select-border) !important; 
@@ -108,14 +106,12 @@
             border: 2px solid var(--select-border) !important;
         }
         
-        /* [수정] 기록 있는 날짜 스타일: 연한 그린 배경 + 진한 그린 테두리 */
         .day.has-record { 
             background: var(--record-bg) !important; 
             border: 2px solid var(--record-border) !important;
             color: #2e7d32 !important;
         }
         
-        /* 기록 표시 하단 포인트 컬러 */
         .day.has-record::after { 
             content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; 
             background: var(--record-dot); border-radius: 50%; 
@@ -123,9 +119,20 @@
         
         .card { background: var(--bg); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.04); }
-        .input-row { display: flex; align-items: center; margin-bottom: 15px; }
-        .input-row label { width: 60px; font-size: 13px; font-weight: 800; color: #777; }
-        select { padding: 12px; border-radius: 15px; border: 2px solid transparent; font-size: 14px; background: var(--bg); box-shadow: var(--inner-shadow); color: #444; font-weight: 600; -webkit-appearance: none; text-align: center; text-align-last: center; }
+        
+        /* [수정] 입력 행 레이아웃 최적화 */
+        .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .input-row label { width: 55px; font-size: 13px; font-weight: 800; color: #777; flex-shrink: 0; }
+        
+        /* [수정] 드롭다운 박스 폭을 가득 채우도록 변경 */
+        select { 
+            flex: 1;
+            width: 100%;
+            padding: 12px; border-radius: 15px; border: 2px solid transparent; font-size: 14px; 
+            background: var(--bg); box-shadow: var(--inner-shadow); color: #444; font-weight: 600; 
+            -webkit-appearance: none; text-align: center; text-align-last: center; 
+        }
+
         button.save-btn { width: 100%; padding: 18px; background: linear-gradient(145deg, #95a5a6, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px; box-shadow: 5px 5px 10px #cfd4d9, -3px -3px 8px #ffffff; transition: 0.2s; }
         button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
