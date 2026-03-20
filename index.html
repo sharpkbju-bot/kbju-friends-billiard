@@ -450,13 +450,23 @@
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
 
-    /* 아이폰 최적화 종료 처리 */
+    /* 기기 감지 및 최적화 종료 처리 */
     function closeAppWindow() { 
-        window.location.replace("about:blank");
-        setTimeout(() => {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        
+        if (isIOS) {
+            // 아이폰 전용 로직
+            window.location.replace("about:blank");
+            setTimeout(() => {
+                window.close();
+                window.history.pushState(null, null, "about:blank");
+            }, 100);
+        } else {
+            // 안드로이드 및 기타 기기용 기존 종료 로직
             window.close();
-            window.history.pushState(null, null, "about:blank");
-        }, 100);
+            // 브라우저 권한상 close가 안될 경우를 대비한 대체
+            window.location.replace("about:blank");
+        }
     }
     
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
@@ -467,7 +477,7 @@
         setTimeout(() => { 
             const ws = document.getElementById('welcome-screen');
             if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); }
-        }, 4500); // 웰컴 노출 시간 4.5초로 연장됨
+        }, 4500); 
     };
 </script>
 </body>
