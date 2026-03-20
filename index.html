@@ -450,15 +450,10 @@
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
 
-    /* 아이폰 최적화 종료 처리 */
     function closeAppWindow() { 
-        // 1단계: 모든 정보가 보이지 않도록 빈 페이지로 강제 리다이렉트 (보안상 최우선)
         window.location.replace("about:blank");
-        
-        // 2단계: 브라우저 종료 시도 (스크립트 팝업인 경우만 작동)
         setTimeout(() => {
             window.close();
-            // 3단계: 여전히 안 닫힐 경우 히스토리를 덮어써서 뒤로가기 방지
             window.history.pushState(null, null, "about:blank");
         }, 100);
     }
@@ -471,7 +466,7 @@
         setTimeout(() => { 
             const ws = document.getElementById('welcome-screen');
             if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); }
-        }, 2500); 
+        }, 4500); 
     };
 </script>
 </body>
