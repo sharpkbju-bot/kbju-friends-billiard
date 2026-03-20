@@ -178,15 +178,15 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <div class="welcome-logo">🎱</div>
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br>Created by<br>Ju Kyung Bae</div>
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by<br>Ju Kyung Bae</div>
     </div>
 </div>
 
 <div id="exit-modal">
     <div class="modal-content">
         <div style="font-size:50px; margin-bottom:15px;">👋</div>
-        <div style="font-size:16px; font-weight:800; color:#444; line-height:1.6; margin-bottom:25px;">오늘도 다들 즐거웠니?<br>다음에 또 보자!</div>
-        <button class="save-btn" style="margin-bottom:12px; box-shadow:none;" onclick="closeAppWindow()">OK</button>
+        <div id="exit-msg" style="font-size:16px; font-weight:800; color:#444; line-height:1.6; margin-bottom:25px;">오늘도 다들 즐거웠니?<br>다음에 또 보자!</div>
+        <button id="exit-confirm-btn" class="save-btn" style="margin-bottom:12px; box-shadow:none;" onclick="closeAppWindow()">OK</button>
         <button class="save-btn" style="background:#abb2b9; box-shadow:none; margin:0; width: 100%;" onclick="closeExitModal()">취소</button>
     </div>
 </div>
@@ -446,9 +446,31 @@
     }
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
     async function executeReset() { showLoading(true, "초기화 중"); await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); }
+    
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
-    function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-    function closeAppWindow() { location.href = "about:blank"; window.close(); }
+    function closeExitModal() { 
+        document.getElementById('exit-modal').style.display = 'none'; 
+        document.getElementById('exit-msg').innerHTML = "오늘도 다들 즐거웠니?<br>다음에 또 보자!";
+        document.getElementById('exit-confirm-btn').style.display = "block";
+    }
+    
+    /* 아이폰 종료 대응 로직 */
+    function closeAppWindow() { 
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
+        // 1단계: 창 닫기 시도
+        window.close();
+        
+        // 2단계: 빈 페이지 이동 (히스토리 삭제 효과)
+        location.href = "about:blank"; 
+        
+        // 아이폰/PWA 환경인 경우 안내 메시지 전환
+        if (isIOS || (window.navigator.standalone)) {
+            document.getElementById('exit-msg').innerHTML = "<span style='color:var(--accent)'>아이폰 보안 정책에 따라<br>브라우저가 자동으로 닫히지 않습니다.</span><br><br>홈 버튼이나 스와이프를 이용해<br>직접 앱을 종료해 주세요! 👋";
+            document.getElementById('exit-confirm-btn').style.display = "none";
+        }
+    }
+    
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
 
