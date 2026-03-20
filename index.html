@@ -29,17 +29,15 @@
             --shadow: 8px 8px 16px #cfd4d9, -8px -8px 16px #ffffff;
             --inner-shadow: inset 3px 3px 7px #cfd4d9, inset -3px -3px 7px #ffffff;
             
-            /* 순위별 전용 컬러 정의 */
-            --rank1: #2196f3; /* 1위: 블루 */
-            --rank2: #27ae60; /* 2위: 그린 */
-            --rank3: #8e44ad; /* 3위: 퍼플 */
-            --rank4: #f39c12; /* 4위: 오렌지 */
-            --rankL: #ff4757; /* 꼴찌: 레드 */
+            --rank1: #2196f3; 
+            --rank2: #27ae60; 
+            --rank3: #8e44ad; 
+            --rank4: #f39c12; 
+            --rankL: #ff4757; 
             
-            /* 중복 체크 스타일 정의 */
-            --dup-bg: #fffde7;    /* 연한 노란색 */
-            --dup-border: #ff80ab; /* 핑크 테두리 */
-            --dup-text: #7b1fa2;   /* 퍼플 글자 */
+            --dup-bg: #fffde7;    
+            --dup-border: #ff80ab; 
+            --dup-text: #7b1fa2;   
         }
 
         body { 
@@ -149,7 +147,6 @@
             -webkit-appearance: none; text-align: center; text-align-last: center; 
         }
 
-        /* [수정됨] 중복 체크 드롭다운 스타일: 연노랑 배경, 핑크 테두리, 퍼플 글자 */
         select.duplicate-error {
             background: var(--dup-bg) !important;
             border: 2px solid var(--dup-border) !important;
@@ -158,9 +155,9 @@
 
         button.save-btn { width: 100%; padding: 18px; background: linear-gradient(145deg, #95a5a6, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px; box-shadow: 5px 5px 10px #cfd4d9, -3px -3px 8px #ffffff; transition: 0.2s; }
         button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
-        .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
-        .stats-table th { padding: 12px 5px; color: #999; border-bottom: 1px solid #ddd; }
-        .stats-table td { padding: 14px 5px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 600; }
+        .stats-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
+        .stats-table th { padding: 12px 2px; color: #999; border-bottom: 1px solid #ddd; }
+        .stats-table td { padding: 14px 2px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 600; }
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--bg); box-shadow: var(--shadow); text-align: center; }
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 4px 4px 10px #cfd4d9, -2px -2px 8px #ffffff; }
         .cancel-btn { width: 100%; background: #bdc3c7; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; box-shadow: 4px 4px 10px #cfd4d9, -2px -2px 8px #ffffff; }
@@ -228,7 +225,7 @@
     <h2 style="font-size:17px; margin:0 0 15px 0; color:#444; font-weight:800;">📊 멤버별 누적 전적</h2>
     <table class="stats-table">
         <thead>
-            <tr><th>이름</th><th>참여</th><th>1위🥇</th><th>2위</th><th>3위</th><th>4위</th><th style="color:#e67e22;">꼴찌💀</th></tr>
+            <tr><th>이름</th><th>참여</th><th>1위🥇</th><th>2위</th><th>3위</th><th>4위</th><th>꼴찌💀</th><th>승률</th></tr>
         </thead>
         <tbody id="statsBody"></tbody>
     </table>
@@ -397,7 +394,6 @@
         } catch (e) { showLoading(false); }
     }
 
-    /* [수정됨] 누적 전적 렌더링 시 모든 순위 최다 기록자 컬러 강조 로직 */
     function renderStats() {
         let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
         gameLogs.forEach(g => {
@@ -411,14 +407,12 @@
             });
         });
         const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
-        
-        // 각 순위별 최다 횟수 계산
         const maxCounts = [0, 1, 2, 3, 4].map(idx => Math.max(...players.map(p => stats[p].ranks[idx])));
         
         document.getElementById('statsBody').innerHTML = sortedByWin.map(p => {
             let nameStyle = "font-weight:800;";
+            const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             
-            // 최다 기록 여부에 따른 조건부 컬러 (상수 대신 변수화된 컬러 사용)
             if(stats[p].ranks[0] === maxCounts[0] && maxCounts[0] > 0) nameStyle += `color:var(--rank1);`;
             else if(stats[p].ranks[4] === maxCounts[4] && maxCounts[4] > 0) nameStyle += `color:var(--rankL);`;
             else if(stats[p].ranks[1] === maxCounts[1] && maxCounts[1] > 0) nameStyle += `color:var(--rank2);`;
@@ -433,6 +427,7 @@
                 <td style="${stats[p].ranks[2] === maxCounts[2] && maxCounts[2] > 0 ? 'color:var(--rank3)' : ''}">${stats[p].ranks[2]}</td>
                 <td style="${stats[p].ranks[3] === maxCounts[3] && maxCounts[3] > 0 ? 'color:var(--rank4)' : ''}">${stats[p].ranks[3]}</td>
                 <td style="color:var(--rankL);">${stats[p].ranks[4]}회</td>
+                <td style="font-size:10px; color:#777;">${winRate}%</td>
             </tr>`;
         }).join('');
         
