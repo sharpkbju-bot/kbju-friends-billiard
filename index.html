@@ -163,7 +163,7 @@
     </div>
 </div>
 
-<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">데이터 동기화 중...</div></div>
+<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">순위 데이터 동기화 중</div></div>
 
 <div class="calendar-card">
     <div class="calendar-header">
@@ -304,15 +304,15 @@
 
     async function saveGame() {
         const todayStr = formatDate(new Date());
-        if(selectedDateStr > todayStr) return alert("미래 기록은 안 돼!");
+        if(selectedDateStr > todayStr) return alert("미래에서 온거야? 오늘이 며칠인지 확인해!");
         const count = parseInt(document.getElementById('playerCount').value);
         const ranks = [];
         for(let i=1; i<=count; i++) {
             const val = document.getElementById('rank'+i).value;
-            if(!val) return alert("친구를 선택해줘!");
+            if(!val) return alert("친구를 선택해줄래?");
             ranks.push(val);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("중복된 친구가 있어!");
+        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
         showLoading(true, "저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try {
@@ -392,9 +392,9 @@
 
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
-        if(step === 1) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">데이터를 지울까요?</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
-        else if(step === 2) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">복구 불가! 계속?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
-        else if(step === 3) el.innerHTML = `<button class="reset-btn" style="background:var(--accent); font-size:18px;" onclick="executeReset()">🔥 삭제 실행</button><button class="cancel-btn" onclick="cancelReset()">취소</button>`;
+        if(step === 1) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 데이터를 지울까요?</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
+        else if(step === 2) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구 불가입니다! 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
+        else if(step === 3) el.innerHTML = `<button class="reset-btn" style="background:var(--accent); font-size:16px;" onclick="executeReset()">[최종 확인] 🔥 마지막. 모두 삭제합니다.</button><button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
     }
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
     async function executeReset() { showLoading(true, "초기화 중"); await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); }
