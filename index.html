@@ -23,6 +23,8 @@
             --today-border: #2196f3; /* 오늘 날짜 테두리 */
             --select-bg: #fff0f3; /* 선택된 날짜 배경 */
             --select-border: #ff4d6d; /* 선택된 날짜 테두리 */
+            --record-bg: #e8f5e9; /* 기록 있는 날 배경 (연한 그린) */
+            --record-border: #4caf50; /* 기록 있는 날 테두리 (진한 그린) */
             --record-dot: #e67e22; /* 기록 하단 포인트 */
             --shadow: 8px 8px 16px #cfd4d9, -8px -8px 16px #ffffff;
             --inner-shadow: inset 3px 3px 7px #cfd4d9, inset -3px -3px 7px #ffffff;
@@ -76,7 +78,6 @@
 
         .weekday { font-size: 11px; font-weight: 900; padding-bottom: 10px; color: #95a5a6; }
 
-        /* [수정] 달력 날짜 기본 스타일 */
         .day { 
             aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
             border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; position: relative; 
@@ -89,7 +90,7 @@
         .day.sat { color: #5dade2; } 
         .day.sun, .day.holiday { color: #e67e22; } 
         
-        /* [수정] 오늘 날짜 스타일 강조 */
+        /* 오늘 날짜 스타일 */
         .day.today { 
             background: var(--today-bg) !important; 
             color: var(--today-border) !important; 
@@ -97,7 +98,7 @@
             box-shadow: inset 2px 2px 5px rgba(33, 150, 243, 0.1); 
         }
         
-        /* [수정] 선택된 날짜 스타일 강조 */
+        /* 선택된 날짜 스타일 */
         .day.selected { 
             background: var(--select-bg) !important; 
             color: var(--select-border) !important; 
@@ -107,19 +108,19 @@
             border: 2px solid var(--select-border) !important;
         }
         
-        /* [수정] 기록 있는 날짜 스타일 강조 */
+        /* [수정] 기록 있는 날짜 스타일: 연한 그린 배경 + 진한 그린 테두리 */
         .day.has-record { 
-            background: linear-gradient(145deg, #f4f6f7, #d5dbdb) !important; 
-            border: 1px solid #bdc3c7; 
-        }
-        /* 기록 표시 하단 포인트 컬러 */
-        .day.has-record::after { 
-            content: ''; position: absolute; bottom: 6px; width: 6px; height: 6px; 
-            background: var(--record-dot); border-radius: 50%; 
-            box-shadow: 0 0 4px rgba(230, 126, 34, 0.5);
+            background: var(--record-bg) !important; 
+            border: 2px solid var(--record-border) !important;
+            color: #2e7d32 !important;
         }
         
-        /* 나머지 UI 스타일 유지 */
+        /* 기록 표시 하단 포인트 컬러 */
+        .day.has-record::after { 
+            content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; 
+            background: var(--record-dot); border-radius: 50%; 
+        }
+        
         .card { background: var(--bg); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.04); }
         .input-row { display: flex; align-items: center; margin-bottom: 15px; }
