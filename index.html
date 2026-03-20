@@ -14,13 +14,13 @@
     
     <style>
         :root { 
-            --main: #7f8c8d; /* 세련된 그레이 메인 컬러 */
-            --bg: #eceef1; /* 연한 파스텔톤 그레이 배경 */
+            --main: #7f8c8d; 
+            --bg: #eceef1; 
             --accent: #ff4757; 
             --success: #27ae60; 
             --edit: #f39c12; 
-            --today: #d5dbdb; /* 오늘 날짜 차분한 그레이 */
-            --selected-pink: #fdf2f4; /* 선택된 날짜는 살짝 온기 있는 핑크 화이트 */
+            --today: #d5dbdb; 
+            --selected-pink: #fdf2f4; 
             --exit-purple: #95a5a6;
             --shadow: 8px 8px 16px #cfd4d9, -8px -8px 16px #ffffff;
             --inner-shadow: inset 3px 3px 7px #cfd4d9, inset -3px -3px 7px #ffffff;
@@ -31,7 +31,6 @@
             margin: 0; 
             padding: env(safe-area-inset-top) 15px 100px 15px;
             background: var(--bg);
-            /* 부드러운 파스텔 그레이 그라데이션 */
             background-image: 
                 radial-gradient(at 0% 0%, rgba(200, 200, 200, 0.2) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(180, 180, 180, 0.2) 0px, transparent 50%);
@@ -40,22 +39,22 @@
             color: #444;
         }
         
+        /* [복구] 기존 웰컴 화면 배경 (블루-퍼플 그라데이션) */
         #welcome-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            /* 웰컴 화면도 파스텔 그레이 톤으로 변경 */
-            background: linear-gradient(135deg, #bdc3c7, #95a5a6);
+            background: linear-gradient(135deg, #4a90e2, #9370db);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 10000; transition: opacity 0.8s ease-out; color: white; text-align: center;
             pointer-events: none;
         }
         .welcome-content { animation: fadeInUp 1s ease-out; }
-        .welcome-logo { font-size: 50px; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
+        .welcome-logo { font-size: 50px; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
         
         .welcome-text { 
             font-size: 14px; 
             font-weight: 300; 
             line-height: 1.6; 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
             font-family: "Apple Chancery", "Snell Roundhand", "Comic Sans MS", cursive;
         }
         
