@@ -450,6 +450,7 @@
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
 
+    /* 아이폰 최적화 종료 처리 */
     function closeAppWindow() { 
         window.location.replace("about:blank");
         setTimeout(() => {
@@ -466,7 +467,7 @@
         setTimeout(() => { 
             const ws = document.getElementById('welcome-screen');
             if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); }
-        }, 4500); 
+        }, 4500); // 웰컴 노출 시간 4.5초로 연장됨
     };
 </script>
 </body>
