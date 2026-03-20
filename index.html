@@ -28,7 +28,7 @@
             --record-dot: #e67e22; 
             --shadow: 8px 8px 16px #cfd4d9, -8px -8px 16px #ffffff;
             --inner-shadow: inset 3px 3px 7px #cfd4d9, inset -3px -3px 7px #ffffff;
-            --duplicate-bg: #ebedff; /* 중복 선택 시 연한 퍼플 배경 */
+            --duplicate-bg: #ebedff; 
         }
 
         body { 
@@ -91,6 +91,7 @@
         .day.sat { color: #5dade2; } 
         .day.sun, .day.holiday { color: #e67e22; } 
         
+        /* [수정됨] 오늘 날짜 스타일 - 기록 여부보다 우선순위를 높이기 위해 하단에 배치 및 !important 사용 */
         .day.today { 
             background: var(--today-bg) !important; 
             color: var(--today-border) !important; 
@@ -108,9 +109,9 @@
         }
         
         .day.has-record { 
-            background: var(--record-bg) !important; 
-            border: 2px solid var(--record-border) !important;
-            color: #2e7d32 !important;
+            background: var(--record-bg); 
+            border: 2px solid var(--record-border);
+            color: #2e7d32;
         }
         
         .day.has-record::after { 
@@ -138,7 +139,6 @@
             -webkit-appearance: none; text-align: center; text-align-last: center; 
         }
 
-        /* 중복 선택 시 표시되는 클래스 */
         select.duplicate-error {
             background: var(--duplicate-bg) !important;
             border: 2px solid #c7d2fe !important;
@@ -353,15 +353,10 @@
         if(preFill) checkDuplicates();
     }
 
-    /* 중복 선택 시 해당 이름을 연한 퍼플 컬러로 강조하는 함수 */
     function checkDuplicates() {
         const selects = Array.from(document.querySelectorAll('#inputArea select'));
         const values = selects.map(s => s.value);
-        
-        // 모든 에러 클래스 초기화
         selects.forEach(s => s.classList.remove('duplicate-error'));
-        
-        // 중복값 확인하여 클래스 추가
         values.forEach((v, i) => { 
             if(v && values.filter(x => x === v).length > 1) {
                 selects[i].classList.add('duplicate-error');
