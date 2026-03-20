@@ -120,14 +120,19 @@
         .card { background: var(--bg); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.04); }
         
-        /* [수정] 입력 행 레이아웃 최적화 */
+        /* 인원 선택용 드롭다운 (우측 정렬 및 폭 조절) */
+        #playerCount {
+            width: auto;
+            min-width: 80px;
+            padding: 10px;
+        }
+
         .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
         .input-row label { width: 55px; font-size: 13px; font-weight: 800; color: #777; flex-shrink: 0; }
         
-        /* [수정] 드롭다운 박스 폭을 가득 채우도록 변경 */
+        /* 일반 드롭다운 (순위 선택용) 폭 가득 채우기 */
         select { 
             flex: 1;
-            width: 100%;
             padding: 12px; border-radius: 15px; border: 2px solid transparent; font-size: 14px; 
             background: var(--bg); box-shadow: var(--inner-shadow); color: #444; font-weight: 600; 
             -webkit-appearance: none; text-align: center; text-align-last: center; 
