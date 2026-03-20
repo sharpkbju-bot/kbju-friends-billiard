@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"> 
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -20,13 +20,14 @@
             --success: #27ae60; 
             --edit: #f39c12; 
             --today: #ffc0cb; 
+            --selected-pink: #ffd1dc; /* [수정] 선택된 날짜용 연분홍색 */
             --exit-purple: #9370db;
             --shadow: 10px 10px 20px #c1c9d6, -10px -10px 20px #ffffff;
             --inner-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
         }
 
         body { 
-            font-family: -apple-system, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             margin: 0; 
             padding: env(safe-area-inset-top) 15px 100px 15px;
             background: var(--bg);
@@ -43,13 +44,19 @@
             background: linear-gradient(135deg, #4a90e2, #9370db);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 10000; transition: opacity 0.8s ease-out; color: white; text-align: center;
-            pointer-events: none; /* 화면 클릭 방해 금지 */
+            pointer-events: none;
         }
         .welcome-content { animation: fadeInUp 1s ease-out; }
-        .welcome-logo { font-size: 60px; margin-bottom: 20px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+        .welcome-logo { font-size: 50px; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
         
-        /* [수정] 글씨 크기 조절 (기존 20px -> 17px) */
-        .welcome-text { font-size: 17px; font-weight: bold; line-height: 1.5; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        /* [수정] 웰컴 텍스트: 글자 크기 축소 및 영문 필기체 스타일 적용 */
+        .welcome-text { 
+            font-size: 15px; 
+            font-weight: 300; 
+            line-height: 1.6; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-family: "Apple Chancery", "Snell Roundhand", "Comic Sans MS", cursive;
+        }
         
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -124,13 +131,14 @@
             box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1); 
         }
         
+        /* [수정] 선택된 날짜 디자인: 연한 핑크색 적용 */
         .day.selected { 
-            background: linear-gradient(145deg, #4a90e2, #3b76ba) !important; 
-            color: white !important; 
+            background: var(--selected-pink) !important; 
+            color: #d81b60 !important; 
             transform: scale(1.1); 
             z-index: 5; 
-            box-shadow: 0 10px 20px rgba(74,144,226,0.4); 
-            border: none;
+            box-shadow: 0 8px 15px rgba(255, 182, 193, 0.5); 
+            border: 2px solid #ffb6c1;
         }
         
         .day.has-record { 
@@ -147,7 +155,7 @@
             background: var(--success); 
             border-radius: 50%; 
         }
-        .day.selected.has-record::after { background: white; }
+        .day.selected.has-record::after { background: #d81b60; }
         
         .card { 
             background: #f0f3f7; border-radius: 28px; padding: 22px; 
@@ -173,14 +181,8 @@
             transition: all 0.2s;
         }
 
-        #playerCount {
-            flex: none;
-            width: 110px;
-        }
-
-        #inputArea select {
-            flex: 1;
-        }
+        #playerCount { flex: none; width: 110px; }
+        #inputArea select { flex: 1; }
 
         .duplicate-error {
             border-color: var(--accent) !important;
@@ -233,7 +235,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <div class="welcome-logo">🎱</div>
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br>Create by 주경배</div>
+        <div class="welcome-text">경배와 친구들의<br>Welcome to the Billiard World<br><br>Created by Ju Kyeong-bae</div>
     </div>
 </div>
 
@@ -392,7 +394,6 @@
         if(selectedDateStr > todayStr) {
             return alert("미래에서 왔냐? 🛸 오늘 또는 과거 날짜만 저장할 수 있어!");
         }
-
         const count = parseInt(document.getElementById('playerCount').value);
         const ranks = [];
         for(let i=1; i<=count; i++) {
@@ -400,7 +401,7 @@
             if(!val) return alert("친구를 선택해줄래?");
             ranks.push(val);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥이여? 잘 선택혀!(중복)");
+        if(new Set(ranks).size !== ranks.length) return alert("중복된 친구가 있어요!");
         showLoading(true, "기록 저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try {
@@ -467,19 +468,15 @@
                 }
             });
         });
-
         const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
         const maxWins = stats[sortedByWin[0]].ranks[0];
         const maxLasts = Math.max(...players.map(p => stats[p].ranks[4]));
-
         document.getElementById('statsBody').innerHTML = sortedByWin.map(p => {
             let nameStyle = "font-weight:800;";
             if(stats[p].ranks[0] === maxWins && maxWins > 0) nameStyle += "color:#007bff;";
             if(stats[p].ranks[4] === maxLasts && maxLasts > 0) nameStyle += "color:#ff4757;";
-            
             return `<tr><td style="${nameStyle}">${p}</td><td>${stats[p].played}</td><td>${stats[p].ranks[0]}</td><td>${stats[p].ranks[1]}</td><td>${stats[p].ranks[2]}</td><td>${stats[p].ranks[3]}</td><td style="color:red;">${stats[p].ranks[4]}회</td></tr>`;
         }).join('');
-
         const rich = document.getElementById('richFriendArea');
         if(maxLasts > 0) {
             const losers = players.filter(p => stats[p].ranks[4] === maxLasts);
@@ -490,60 +487,29 @@
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) {
-            el.innerHTML = `
-                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 정말 모든 데이터를 지울까요?</div>
-                <button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button>
-                <button class="cancel-btn" onclick="cancelReset()">NO</button>
-            `;
+            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">정말로 모든 데이터를 지울까요? (1/2)</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">네, 확인했습니다</button><button class="cancel-btn" onclick="cancelReset()">아니오 (취소)</button>`;
         } else if(step === 2) {
-            el.innerHTML = `
-                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구가 불가능합니다. 계속할까요?</div>
-                <button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button>
-                <button class="cancel-btn" onclick="cancelReset()">NO</button>
-            `;
+            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">복구가 절대 불가능합니다. 계속할까요? (2/2)</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">네, 알고 있습니다</button><button class="cancel-btn" onclick="cancelReset()">취소하기</button>`;
         } else if(step === 3) {
-            el.innerHTML = `
-                <div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[최종 확인] 마지막. 모두 삭제합니다.</div>
-                <button class="reset-btn" style="background:var(--accent); font-size:18px;" onclick="executeReset()">🔥 OK. 삭제해!</button>
-                <button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>
-            `;
+            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">마지막 단계입니다. 지웁니다!</div><button class="reset-btn" style="background:var(--accent); font-size:18px;" onclick="executeReset()">🔥 지금 즉시 모든 데이터 삭제</button><button class="cancel-btn" onclick="cancelReset()">아냐! 누르지마 (취소)</button>`;
         }
     }
-
-    function cancelReset() {
-        document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`;
-    }
-    
+    function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
     async function executeReset() { showLoading(true, "기록 초기화 중"); await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); }
-    
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-    
-    function closeAppWindow() { 
-        window.opener = null;
-        window.open('', '_self');
-        window.close();
-        setTimeout(() => {
-            location.href = "about:blank";
-        }, 100);
-    }
-
+    function closeAppWindow() { window.opener = null; window.open('', '_self'); window.close(); setTimeout(() => { location.href = "about:blank"; }, 100); }
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
 
-    // [수정] 웰컴 화면 자동 종료 로직 강화
     window.onload = () => { 
         updateInputFields(); 
         fetchData(); 
-        
-        // 데이터 로딩 상태와 무관하게 2.5초 후 실행
         setTimeout(() => { 
             const ws = document.getElementById('welcome-screen');
             if(ws) {
                 ws.style.opacity = '0'; 
-                setTimeout(() => {
-                    ws.style.display = 'none';
-                }, 800); 
+                setTimeout(() => { ws.style.display = 'none'; }, 800); 
             }
         }, 2500); 
     };
