@@ -21,7 +21,7 @@
             --success: #27ae60; 
             --edit: #f39c12; 
             --today: #ffc0cb; 
-            --selected-yellow: #ffffd1; /* 화사한 노란색 배경 */
+            --selected-yellow: #ffffd1; 
             --exit-purple: #9370db;
             --shadow: 10px 10px 20px #c1c9d6, -10px -10px 20px #ffffff;
             --inner-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
@@ -131,7 +131,6 @@
             box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1); 
         }
         
-        /* [수정] 선택된 날짜 가독성 개선: 배경 노랑 + 글자 진한 핑크 */
         .day.selected { 
             background: var(--selected-yellow) !important; 
             color: #d81b60 !important; 
@@ -300,6 +299,11 @@
 </div>
 
 <script>
+    // 서비스 워커 등록 (앱 설치형 PWA 필수 요건)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+
     const GAS_URL = "https://script.google.com/macros/s/AKfycby-S6Kc8ugrHsMtdYbx1UzJTqpJ60ZqBv0oznCCDuilyi6e6stfnIqUVCBwMhVqBNLGCg/exec"; 
     const players = ["경배", "원석", "정석", "진웅", "창한"];
     let gameLogs = [];
@@ -402,11 +406,37 @@
             ranks.push(val);
         }
         if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥이여? 잘 선택혀!(중복)");
+        
         showLoading(true, "기록 저장 중");
-        const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
+
+        // [결함 수정] 날짜 변경 시 기존 기록 중복 방지 로직
+        if (editMode) {
+            const originalGame = gameLogs.find(g => g.round === editRound);
+            if (originalGame && originalGame.dateStr !== selectedDateStr) {
+                try {
+                    // 날짜가 바뀌었으므로 기존 라운드 데이터를 삭제
+                    await fetch(GAS_URL, { 
+                        method: 'POST', 
+                        body: JSON.stringify({ action: "DELETE", round: editRound }) 
+                    });
+                } catch (e) { console.error("날짜 변경 중 기존 기록 삭제 오류"); }
+            }
+        }
+
+        const payload = { 
+            action: editMode ? "UPDATE" : "SAVE", 
+            date: selectedDateStr, 
+            ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], 
+            round: editRound 
+        };
+
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-            setTimeout(() => { fetchData(); alert("저장 완료 ✨"); cancelEdit(); }, 1200);
+            setTimeout(() => { 
+                fetchData(); 
+                alert("저장 완료 ✨"); 
+                cancelEdit(); 
+            }, 1200);
         } catch (e) { alert("오류 발생!"); showLoading(false); }
     }
 
