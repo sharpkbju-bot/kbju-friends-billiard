@@ -91,7 +91,6 @@
         .day.sat { color: #5dade2; } 
         .day.sun, .day.holiday { color: #e67e22; } 
         
-        /* [수정됨] 오늘 날짜 스타일 - 기록 여부보다 우선순위를 높이기 위해 하단에 배치 및 !important 사용 */
         .day.today { 
             background: var(--today-bg) !important; 
             color: var(--today-border) !important; 
@@ -386,6 +385,7 @@
         } catch (e) { showLoading(false); }
     }
 
+    /* 누적 전적 렌더링 시 1위(파랑) / 꼴찌(빨강) 강조 로직 */
     function renderStats() {
         let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
         gameLogs.forEach(g => {
@@ -399,18 +399,25 @@
             });
         });
         const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
-        const maxWins = stats[sortedByWin[0]].ranks[0];
+        
+        // 최다 1위수와 최다 꼴찌수 계산
+        const maxWins = Math.max(...players.map(p => stats[p].ranks[0]));
         const maxLasts = Math.max(...players.map(p => stats[p].ranks[4]));
+        
         document.getElementById('statsBody').innerHTML = sortedByWin.map(p => {
             let nameStyle = "font-weight:800;";
-            if(stats[p].ranks[0] === maxWins && maxWins > 0) nameStyle += "color:#7f8c8d;";
-            if(stats[p].ranks[4] === maxLasts && maxLasts > 0) nameStyle += "color:#e67e22;";
+            // 1위 최다 득점자 파란색 강조
+            if(stats[p].ranks[0] === maxWins && maxWins > 0) nameStyle += "color:#2196f3;";
+            // 꼴찌 최다 기록자 빨간색 강조 (기존 주황색에서 붉은색 계열로 변경)
+            if(stats[p].ranks[4] === maxLasts && maxLasts > 0) nameStyle += "color:#ff4757;";
+            
             return `<tr><td style="${nameStyle}">${p}</td><td>${stats[p].played}</td><td>${stats[p].ranks[0]}</td><td>${stats[p].ranks[1]}</td><td>${stats[p].ranks[2]}</td><td>${stats[p].ranks[3]}</td><td style="color:#e67e22;">${stats[p].ranks[4]}회</td></tr>`;
         }).join('');
+        
         const rich = document.getElementById('richFriendArea');
         if(maxLasts > 0) {
             const losers = players.filter(p => stats[p].ranks[4] === maxLasts);
-            rich.style.display = 'block'; rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:17px; color:#e67e22; font-weight:900;">${losers.join(', ')} (${maxLasts}회)</span>`;
+            rich.style.display = 'block'; rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:17px; color:#ff4757; font-weight:900;">${losers.join(', ')} (${maxLasts}회)</span>`;
         } else rich.style.display = 'none';
     }
 
