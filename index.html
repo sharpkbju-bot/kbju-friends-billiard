@@ -8,7 +8,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3408/3408506.png">
+    
+    <link rel="apple-touch-icon" href="image_0.png">
     
     <title>우리들의 Billiard World</title>
     
@@ -61,7 +62,10 @@
             pointer-events: none;
         }
         .welcome-content { animation: fadeInUp 1s ease-out; }
-        .welcome-logo { font-size: 50px; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+        
+        /* [수정됨] 웰컴 화면의 로고 이미지로 새로운 아이콘 파일 적용 */
+        .welcome-logo { width: 60px; height: auto; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+        
         .welcome-text { font-size: 14px; font-weight: 300; line-height: 1.6; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: "Apple Chancery", "Snell Roundhand", "Comic Sans MS", cursive; }
         
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -177,7 +181,7 @@
 
 <div id="welcome-screen">
     <div class="welcome-content">
-        <div class="welcome-logo">🎱</div>
+        <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
         <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by<br>Ju Kyung Bae</div>
     </div>
 </div>
@@ -455,16 +459,13 @@
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         
         if (isIOS) {
-            // 아이폰 전용 로직
             window.location.replace("about:blank");
             setTimeout(() => {
                 window.close();
                 window.history.pushState(null, null, "about:blank");
             }, 100);
         } else {
-            // 안드로이드 및 기타 기기용 기존 종료 로직
             window.close();
-            // 브라우저 권한상 close가 안될 경우를 대비한 대체
             window.location.replace("about:blank");
         }
     }
@@ -477,7 +478,7 @@
         setTimeout(() => { 
             const ws = document.getElementById('welcome-screen');
             if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); }
-        }, 4500); 
+        }, 4500); // 웰컴 노출 시간 4.5초 유지
     };
 </script>
 </body>
