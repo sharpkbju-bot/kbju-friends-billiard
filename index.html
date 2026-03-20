@@ -8,7 +8,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3408/3408506.png">
+    
+    <link rel="apple-touch-icon" href="https://img.icons8.com/external-flat-icons-maxicons/512/external-billiards-sports-flat-icons-maxicons.png">
     
     <title>우리들의 Billiard World</title>
     
@@ -20,7 +21,7 @@
             --success: #27ae60; 
             --edit: #f39c12; 
             --today: #ffc0cb; 
-            --selected-pink: #ffffd1; /* [수정] 아주 밝고 화사한 날짜용 노란색 */
+            --selected-yellow: #ffffd1; /* 화사한 노란색 배경 */
             --exit-purple: #9370db;
             --shadow: 10px 10px 20px #c1c9d6, -10px -10px 20px #ffffff;
             --inner-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
@@ -49,7 +50,6 @@
         .welcome-content { animation: fadeInUp 1s ease-out; }
         .welcome-logo { font-size: 50px; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
         
-        /* [수정] 웰컴 텍스트: 글자 크기 축소 및 영문 필기체 스타일 적용 */
         .welcome-text { 
             font-size: 14px; 
             font-weight: 300; 
@@ -131,10 +131,10 @@
             box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1); 
         }
         
-        /* [수정] 선택된 날짜 디자인: 아주 밝고 화사한 노란색 적용 */
+        /* [수정] 선택된 날짜 가독성 개선: 배경 노랑 + 글자 진한 핑크 */
         .day.selected { 
-            background: var(--selected-pink) !important; 
-            color: #ffffd1 !important; 
+            background: var(--selected-yellow) !important; 
+            color: #d81b60 !important; 
             transform: scale(1.1); 
             z-index: 5; 
             box-shadow: 0 8px 15px rgba(255, 182, 193, 0.5); 
