@@ -401,7 +401,7 @@
             if(!val) return alert("친구를 선택해줄래?");
             ranks.push(val);
         }
-        if(new Set(ranks).size !== ranks.length) return alert("중복된 친구가 있어요!");
+        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
         showLoading(true, "기록 저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try {
