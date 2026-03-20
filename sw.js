@@ -1,12 +1,31 @@
+const CACHE_NAME = 'billiard-v1';
+
+// 설치 시 캐시 저장 (설치 버튼 활성화의 핵심)
 self.addEventListener('install', (e) => {
-  console.log('Service Worker: Installed');
+  e.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll([
+        './',
+        './index.html',
+        './manifest.json'
+      ]);
+    })
+  );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
-  console.log('Service Worker: Activated');
+  e.waitUntil(
+    caches.keys().then((keyList) => {
+      return Promise.all(keyList.map((key) => {
+        if (key !== CACHE_NAME) return caches.delete(key);
+      }));
+    })
+  );
 });
 
 self.addEventListener('fetch', (e) => {
-  // 설치 버튼 활성화를 위한 필수 핸들러 (내용은 비어있어도 무관)
+  e.respondWith(
+    fetch(e.request).catch(() => caches.match(e.request))
+  );
 });
