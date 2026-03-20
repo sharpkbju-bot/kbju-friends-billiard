@@ -7,7 +7,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="경배당구">
+    <meta name="apple-mobile-web-app-title" content="경배와 친구들의 당구 세상">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3408/3408506.png">
     
     <title>우리들의 Billiard World</title>
@@ -487,11 +487,11 @@
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) {
-            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">정말로 모든 데이터를 지울까요? (1/2)</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">네, 확인했습니다</button><button class="cancel-btn" onclick="cancelReset()">아니오 (취소)</button>`;
+            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 정말 모든 데이터를 지울까요?</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
         } else if(step === 2) {
-            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">복구가 절대 불가능합니다. 계속할까요? (2/2)</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">네, 알고 있습니다</button><button class="cancel-btn" onclick="cancelReset()">취소하기</button>`;
+            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구가 불가능합니다. 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
         } else if(step === 3) {
-            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">마지막 단계입니다. 지웁니다!</div><button class="reset-btn" style="background:var(--accent); font-size:18px;" onclick="executeReset()">🔥 지금 즉시 모든 데이터 삭제</button><button class="cancel-btn" onclick="cancelReset()">아냐! 누르지마 (취소)</button>`;
+            el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[최종 확인] 마지막입니다. 정말 지웁니다!</div><button class="reset-btn" style="background:var(--accent); font-size:18px;" onclick="executeReset()">🔥 OK. 삭제해!</button><button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다!(취소)</button>`;
         }
     }
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
