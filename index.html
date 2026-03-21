@@ -124,19 +124,26 @@
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
 
+        /* [수정] 세련된 borderless 버튼 스타일 */
         button.save-btn { 
             width: 100%; padding: 18px; 
-            background: linear-gradient(145deg, #95a5a6, #7f8c8d); 
-            /* 테두리 두께 3px -> 4.5px 강화 */
-            color: white; border: 4.5px solid rgba(0, 0, 0, 0.1); 
+            background: linear-gradient(145deg, #abb2b9, #7f8c8d); 
+            color: white; border: none; /* 테두리 제거 */
             border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; 
-            font-size: 16px; box-shadow: 5px 5px 10px rgba(180, 180, 180, 0.3), -3px -3px 8px rgba(255, 255, 255, 0.7); 
-            transition: 0.2s; 
+            font-size: 16px; 
+            /* 부드러운 입체감 그림자 */
+            box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.2), -2px -2px 6px rgba(255, 255, 255, 0.5);
+            transition: 0.2s all ease;
         }
+        /* 터치 시 눌리는 효과 추가 */
+        button.save-btn:active {
+            transform: scale(0.97);
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2), inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
         button.edit-btn { 
             background: linear-gradient(145deg, #ffae24, #da8c10) !important; 
-            /* 수정 버튼 테두리 두께 강화 */
-            border: 4.5px solid rgba(0, 0, 0, 0.15) !important; 
+            border: none !important; /* 테두리 제거 */
         }
         
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
@@ -144,8 +151,7 @@
         
         .btn-cancel { 
             background: #bdc3c7 !important; color: white !important; 
-            /* 취소 버튼 테두리 두께 강화 */
-            border: 4.5px solid rgba(0, 0, 0, 0.1) !important; 
+            border: none !important; /* 테두리 제거 */
         }
 
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; table-layout: fixed; }
@@ -250,7 +256,8 @@
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec
+"; 
     const players = ["경배", "원석", "정석", "진웅", "창한"];
     let gameLogs = [];
     let currentViewDate = new Date();
