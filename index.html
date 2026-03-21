@@ -193,7 +193,7 @@
 </div>
 
 <div class="card">
-    <h2 style="font-size:17px; margin:0 0 15px 0; color:#444; font-weight:800;">📊 멤버별 누적 전적</h2>
+    <h2 style="font-size:16px; margin:0 0 14px 0; color:#444; font-weight:800;">📊 멤버별 누적 전적</h2>
     <table class="stats-table">
         <thead>
             <tr>
@@ -378,7 +378,7 @@
             
             const b = (val, max) => (val === max && max > 0) ? `style="font-weight:900; font-size:14px;"` : "";
 
-            /* [수정] 승률 폰트 크기 확대: 11px -> 13.5px */
+            /* [수정] 승률 폰트 크기 확대: 11px -> 12.5px */
             return `<tr>
                 <td style="${nameStyle}">${p}</td>
                 <td ${b(stats[p].played, maxCounts.played)}>${stats[p].played}</td>
@@ -387,7 +387,7 @@
                 <td style="color:var(--rank3); ${stats[p].ranks[2] === maxCounts.r2 && maxCounts.r2 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[2]}</td>
                 <td style="color:var(--rank4); ${stats[p].ranks[3] === maxCounts.r3 && maxCounts.r3 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[3]}</td>
                 <td style="color:var(--rankL); ${stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[4]}</td>
-                <td style="font-size:13.5px; color:#006400; font-weight:900;">${winRate}%</td>
+                <td style="font-size:12.5px; color:#006400; font-weight:900;">${winRate}%</td>
             </tr>`;
         }).join('');
         document.getElementById('statsBody').innerHTML = bodyHtml || players.map(p => `<tr><td>${p}</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td></tr>`).join('');
