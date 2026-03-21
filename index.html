@@ -244,7 +244,7 @@
 
     async function fetchData() {
         if(!GAS_URL || GAS_URL.includes("URL_입력")) return;
-        showLoading(true, "Cloud 동기화 중");
+        showLoading(true, "Cloud data 동기화 중");
         try {
             const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
             const rawData = await response.json();
