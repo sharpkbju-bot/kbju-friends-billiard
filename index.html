@@ -156,7 +156,7 @@
 <div id="exit-modal">
     <div class="modal-content">
         <div style="font-size:50px; margin-bottom:15px;">👋</div>
-        <div style="font-size:16px; font-weight:800; color:#444; line-height:1.6; margin-bottom:25px;">오늘도 다들 즐거웠니?<br>다음에 또 보자!</div>
+        <div id="exit-msg" style="font-size:16px; font-weight:800; color:#444; line-height:1.6; margin-bottom:25px;">오늘도 다들 즐거웠니?<br>다음에 또 보자!</div>
         <button class="save-btn" style="margin-bottom:12px; box-shadow:none;" onclick="closeAppWindow()">OK</button>
         <button class="save-btn" style="background:#abb2b9; box-shadow:none; margin:0; width: 100%;" onclick="closeExitModal()">취소</button>
     </div>
@@ -216,7 +216,7 @@
     <div id="resetSteps">
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
-    <button class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button>
+    <button id="exitBtn" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button>
 </div>
 
 <script>
@@ -363,7 +363,6 @@
         });
         
         const bodyHtml = sortedByWin.map(p => {
-            /* [수정] 모든 이름에도 Bold(900) 처리 적용 */
             let nameStyle = "font-weight:900;";
             const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`;
@@ -441,6 +440,13 @@
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
     window.onload = () => { 
+        /* [수정] 아이폰 사용자를 위한 문구 자동 변경 로직 */
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if(isIOS) {
+            document.getElementById('exitBtn').innerText = "📱 홈 화면으로";
+            document.getElementById('exit-msg').innerHTML = "아이폰은 시스템 정책상<br>직접 쓸어올려서 종료해야 해.<br>다음에 또 보자!";
+        }
+
         updateInputFields(); 
         renderStats(); 
         fetchData(); 
