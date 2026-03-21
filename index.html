@@ -38,7 +38,10 @@
             
             --dup-bg: #fffde7;    
             --dup-border: #ff80ab; 
-            --dup-text: #7b1fa2;   
+            --dup-text: #7b1fa2;
+            
+            /* 카드 배경색: 연한 그린 적용 */
+            --card-bg: rgba(232, 245, 233, 0.7); 
         }
 
         body { 
@@ -68,7 +71,7 @@
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .calendar-card {
-            background: rgba(255, 255, 255, 0.6);
+            background: var(--card-bg);
             backdrop-filter: blur(5px);
             border-radius: 32px;
             padding: 24px 18px;
@@ -104,7 +107,7 @@
         .day.has-record { background: var(--record-bg); border: 2px solid var(--record-border); color: #2e7d32; }
         .day.has-record::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--record-dot); border-radius: 50%; }
         
-        .card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
+        .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.04); }
         
         select#playerCount { flex: none !important; width: 85px !important; padding: 8px !important; margin-left: auto; }
@@ -119,7 +122,6 @@
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
 
-        /* 저장 및 수정 버튼: 테두리 추가 */
         button.save-btn { 
             width: 100%; padding: 18px; 
             background: linear-gradient(145deg, #95a5a6, #7f8c8d); 
@@ -133,11 +135,9 @@
             border: 2px solid rgba(0, 0, 0, 0.15) !important; 
         }
         
-        /* 버튼 그룹 가로 배치를 위한 스타일 */
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .btn-group button { flex: 1; margin-top: 0 !important; }
         
-        /* 취소 버튼: 테두리 추가 */
         .btn-cancel { 
             background: #bdc3c7 !important; color: white !important; 
             border: 2px solid rgba(0, 0, 0, 0.1) !important; 
@@ -147,7 +147,7 @@
         .stats-table th { padding: 12px 1px; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -0.5px; }
         .stats-table td { padding: 14px 1px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 700; }
         
-        .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
+        .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 4px 4px 10px rgba(180, 180, 180, 0.3), -2px -2px 8px rgba(255, 255, 255, 0.7); }
         .cancel-btn { width: 100%; background: #bdc3c7; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; }
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; box-shadow: 6px 6px 12px rgba(180, 180, 180, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.7); }
