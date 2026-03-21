@@ -238,7 +238,7 @@
     <h2 style="font-size:17px; margin:0 0 15px 0; color:#444; font-weight:800;">📊 멤버별 누적 전적</h2>
     <table class="stats-table">
         <thead>
-            <tr><th>이름</th><th>참여</th><th>1위🥇</th><th>2위</th><th>3위</th><th>4위</th><th>승률</th><th>꼴찌💀</th></tr>
+            <tr><th>이름</th><th>참여</th><th>1위🥇</th><th>2위</th><th>3위</th><th>4위</th><th>꼴찌💀</th><th>승률</th></tr>
         </thead>
         <tbody id="statsBody"></tbody>
     </table>
@@ -436,11 +436,11 @@
                 <td style="${nameStyle}">${p}</td>
                 <td>${stats[p].played}</td>
                 <td style="${stats[p].ranks[0] === maxCounts[0] && maxCounts[0] > 0 ? 'color:var(--rank1)' : ''}">${stats[p].ranks[0]}</td>
-                <td>${stats[p].ranks[1]}</td>
-                <td>${stats[p].ranks[2]}</td>
-                <td>${stats[p].ranks[3]}</td>
-                <td style="font-size:10px; color:#006400; font-weight:bold;">${winRate}%</td>
+                <td style="color:var(--rank2)">${stats[p].ranks[1]}</td>
+                <td style="color:var(--rank3)">${stats[p].ranks[2]}</td>
+                <td style="color:var(--rank4)">${stats[p].ranks[3]}</td>
                 <td style="color:var(--rankL);">${stats[p].ranks[4]}회</td>
+                <td style="font-size:10px; color:#006400; font-weight:bold;">${winRate}%</td>
             </tr>`;
         }).join('');
         
