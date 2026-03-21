@@ -254,10 +254,15 @@
         renderGameList(); 
     }
 
-    /* [추가] 공휴일 판별 함수 */
+    /* [수정] 2026년 기준 공휴일 및 대체공휴일 리스트 업데이트 */
     function isHoliday(year, month, day) {
-        const holidays = ["1-1", "3-1", "5-5", "6-6", "7-17", "8-15", "10-3", "10-9", "12-25"];
-        return holidays.includes(`${month + 1}-${day}`);
+        const dStr = `${month + 1}-${day}`;
+        // 고정 공휴일
+        const fixedHolidays = ["1-1", "3-1", "5-5", "6-6", "7-17", "8-15", "10-3", "10-9", "12-25"];
+        // 2026년 가변 공휴일 (설날, 추석, 석가탄신일 및 관련 대체공휴일)
+        const variable2026 = ["2-16", "2-17", "2-18", "2-19", "5-24", "5-25", "9-24", "9-25", "9-26", "9-28"];
+        
+        return fixedHolidays.includes(dStr) || (year === 2026 && variable2026.includes(dStr));
     }
 
     function renderCalendar() {
@@ -279,7 +284,6 @@
         for (let d = 1; d <= lastDate; d++) {
             const dStr = formatDate(new Date(year, month, d));
             const dayOfWeek = new Date(year, month, d).getDay();
-            /* [수정] 일요일 혹은 공휴일인 경우 holiday 클래스 추가 */
             let dayClass = (dayOfWeek === 0 || isHoliday(year, month, d)) ? "sun holiday" : (dayOfWeek === 6 ? "sat" : "");
             const isToday = dStr === realTodayStr ? 'today' : '';
             const isSelected = dStr === selectedDateStr ? 'selected' : '';
