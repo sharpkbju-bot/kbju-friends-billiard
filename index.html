@@ -132,8 +132,10 @@
         
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
-        .spinner { border: 5px solid #d1d9e6; border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { rotate(360deg); } }
+        
+        /* [수정] 로딩 스피너 애니메이션 확실하게 복구 */
+        .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .game-item { padding: 15px 10px; border-radius: 18px; background: rgba(236, 238, 241, 0.4); margin-top: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--inner-shadow); }
         .game-info { font-size: 11px; font-weight: 800; color: #555; overflow: hidden; text-overflow: ellipsis; flex: 1; }
@@ -348,31 +350,46 @@
                 }
             });
         });
+
         const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
-        const maxCounts = [0, 4].map(idx => Math.max(...players.map(p => stats[p].ranks[idx])));
+        
+        /* [수정] 참여~꼴찌 중 가장 횟수 많은 숫자 찾기 (Bold 처리용) */
+        const maxCounts = { played: 0, r0: 0, r1: 0, r2: 0, r3: 0, r4: 0 };
+        players.forEach(p => {
+            maxCounts.played = Math.max(maxCounts.played, stats[p].played);
+            maxCounts.r0 = Math.max(maxCounts.r0, stats[p].ranks[0]);
+            maxCounts.r1 = Math.max(maxCounts.r1, stats[p].ranks[1]);
+            maxCounts.r2 = Math.max(maxCounts.r2, stats[p].ranks[2]);
+            maxCounts.r3 = Math.max(maxCounts.r3, stats[p].ranks[3]);
+            maxCounts.r4 = Math.max(maxCounts.r4, stats[p].ranks[4]);
+        });
         
         const bodyHtml = sortedByWin.map(p => {
             let nameStyle = "font-weight:800;";
             const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
-            if(stats[p].ranks[0] === maxCounts[0] && maxCounts[0] > 0) nameStyle += `color:var(--rank1);`;
-            else if(stats[p].ranks[4] === maxCounts[1] && maxCounts[1] > 0) nameStyle += `color:var(--rankL);`;
+            if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`;
+            else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
             
+            /* [수정] 최고 수치에 Bold 적용 헬퍼 */
+            const b = (val, max) => (val === max && max > 0) ? `style="font-weight:900; font-size:13px;"` : "";
+
             return `<tr>
-                <td style="${nameStyle}">${p}</td><td>${stats[p].played}</td>
-                <td style="${stats[p].ranks[0] === maxCounts[0] && maxCounts[0] > 0 ? 'color:var(--rank1)' : ''}">${stats[p].ranks[0]}</td>
-                <td style="color:var(--rank2)">${stats[p].ranks[1]}</td>
-                <td style="color:var(--rank3)">${stats[p].ranks[2]}</td>
-                <td style="color:var(--rank4)">${stats[p].ranks[3]}</td>
-                <td style="color:var(--rankL);">${stats[p].ranks[4]}회</td>
+                <td style="${nameStyle}">${p}</td>
+                <td ${b(stats[p].played, maxCounts.played)}>${stats[p].played}</td>
+                <td style="${stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0 ? 'color:var(--rank1);' : ''} ${stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0 ? 'font-weight:900; font-size:13px;' : ''}">${stats[p].ranks[0]}</td>
+                <td style="color:var(--rank2); ${stats[p].ranks[1] === maxCounts.r1 && maxCounts.r1 > 0 ? 'font-weight:900; font-size:13px;' : ''}">${stats[p].ranks[1]}</td>
+                <td style="color:var(--rank3); ${stats[p].ranks[2] === maxCounts.r2 && maxCounts.r2 > 0 ? 'font-weight:900; font-size:13px;' : ''}">${stats[p].ranks[2]}</td>
+                <td style="color:var(--rank4); ${stats[p].ranks[3] === maxCounts.r3 && maxCounts.r3 > 0 ? 'font-weight:900; font-size:13px;' : ''}">${stats[p].ranks[3]}</td>
+                <td style="color:var(--rankL); ${stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0 ? 'font-weight:900; font-size:13px;' : ''}">${stats[p].ranks[4]}회</td>
                 <td style="font-size:10px; color:#006400; font-weight:bold;">${winRate}%</td>
             </tr>`;
         }).join('');
         document.getElementById('statsBody').innerHTML = bodyHtml || players.map(p => `<tr><td>${p}</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td></tr>`).join('');
         
         const rich = document.getElementById('richFriendArea');
-        if(maxCounts[1] > 0) {
-            const losers = players.filter(p => stats[p].ranks[4] === maxCounts[1]);
-            rich.style.display = 'block'; rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')} (${maxCounts[1]}회)</span>`;
+        if(maxCounts.r4 > 0) {
+            const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4);
+            rich.style.display = 'block'; rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')} (${maxCounts.r4}회)</span>`;
         } else rich.style.display = 'none';
     }
 
@@ -415,20 +432,13 @@
 
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-    
-    /* [수정] 안드로이드 종료 로직 최적화 */
     function closeAppWindow() {
-        if (window.history.length > 1) {
-            window.history.back(); // 히스토리가 있다면 뒤로가기
-        }
-        window.close(); // 창 닫기 시도
-        
-        // 0.1초 후에도 창이 안 닫혔을 경우 (안드로이드 대응)
+        if (window.history.length > 1) window.history.back();
+        window.close();
         setTimeout(() => {
             window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
         }, 100);
     }
-    
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
