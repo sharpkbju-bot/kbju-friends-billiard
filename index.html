@@ -121,9 +121,11 @@
 
         button.save-btn { width: 100%; padding: 18px; background: linear-gradient(145deg, #95a5a6, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px; box-shadow: 5px 5px 10px rgba(180, 180, 180, 0.3), -3px -3px 8px rgba(255, 255, 255, 0.7); transition: 0.2s; }
         button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
-        .stats-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
-        .stats-table th { padding: 12px 2px; color: #999; border-bottom: 1px solid #ddd; }
-        .stats-table td { padding: 14px 2px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 600; }
+        
+        /* [수정] 전적 테이블 글자 크기 확대 및 여백 조정 */
+        .stats-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; table-layout: fixed; }
+        .stats-table th { padding: 12px 1px; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -0.5px; }
+        .stats-table td { padding: 14px 1px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 700; }
         
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 4px 4px 10px rgba(180, 180, 180, 0.3), -2px -2px 8px rgba(255, 255, 255, 0.7); }
@@ -196,14 +198,14 @@
     <table class="stats-table">
         <thead>
             <tr>
-                <th>이름</th>
+                <th style="width:16%">이름</th>
                 <th>참여</th>
                 <th style="color:var(--rank1)">1위🥇</th>
                 <th style="color:var(--rank2)">2위</th>
                 <th style="color:var(--rank3)">3위</th>
                 <th style="color:var(--rank4)">4위</th>
                 <th style="color:var(--rankL)">꼴찌💀</th>
-                <th>승률</th>
+                <th style="width:16%">승률</th>
             </tr>
         </thead>
         <tbody id="statsBody"></tbody>
@@ -254,14 +256,10 @@
         renderGameList(); 
     }
 
-    /* [수정] 2026년 기준 공휴일 및 대체공휴일 리스트 업데이트 */
     function isHoliday(year, month, day) {
         const dStr = `${month + 1}-${day}`;
-        // 고정 공휴일
         const fixedHolidays = ["1-1", "3-1", "5-5", "6-6", "7-17", "8-15", "10-3", "10-9", "12-25"];
-        // 2026년 가변 공휴일 (설날, 추석, 석가탄신일 및 관련 대체공휴일)
         const variable2026 = ["2-16", "2-17", "2-18", "2-19", "5-24", "5-25", "9-24", "9-25", "9-26", "9-28"];
-        
         return fixedHolidays.includes(dStr) || (year === 2026 && variable2026.includes(dStr));
     }
 
@@ -374,22 +372,22 @@
         });
         
         const bodyHtml = sortedByWin.map(p => {
-            let nameStyle = "font-weight:900;";
+            let nameStyle = "font-weight:900; letter-spacing:-0.5px;";
             const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`;
             else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
             
-            const b = (val, max) => (val === max && max > 0) ? `style="font-weight:900; font-size:13px;"` : "";
+            const b = (val, max) => (val === max && max > 0) ? `style="font-weight:900; font-size:14px;"` : "";
 
             return `<tr>
                 <td style="${nameStyle}">${p}</td>
                 <td ${b(stats[p].played, maxCounts.played)}>${stats[p].played}</td>
-                <td style="${stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0 ? 'color:var(--rank1);' : ''} ${stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0 ? 'font-weight:900; font-size:13px;' : ''}">${stats[p].ranks[0]}</td>
-                <td style="color:var(--rank2); ${stats[p].ranks[1] === maxCounts.r1 && maxCounts.r1 > 0 ? 'font-weight:900; font-size:13px;' : ''}">${stats[p].ranks[1]}</td>
-                <td style="color:var(--rank3); ${stats[p].ranks[2] === maxCounts.r2 && maxCounts.r2 > 0 ? 'font-weight:900; font-size:13px;' : ''}">${stats[p].ranks[2]}</td>
-                <td style="color:var(--rank4); ${stats[p].ranks[3] === maxCounts.r3 && maxCounts.r3 > 0 ? 'font-weight:900; font-size:13px;' : ''}">${stats[p].ranks[3]}</td>
-                <td style="color:var(--rankL); ${stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0 ? 'font-weight:900; font-size:13px;' : ''}">${stats[p].ranks[4]}회</td>
-                <td style="font-size:10px; color:#006400; font-weight:bold;">${winRate}%</td>
+                <td style="${stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0 ? 'color:var(--rank1);' : ''} ${stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[0]}</td>
+                <td style="color:var(--rank2); ${stats[p].ranks[1] === maxCounts.r1 && maxCounts.r1 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[1]}</td>
+                <td style="color:var(--rank3); ${stats[p].ranks[2] === maxCounts.r2 && maxCounts.r2 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[2]}</td>
+                <td style="color:var(--rank4); ${stats[p].ranks[3] === maxCounts.r3 && maxCounts.r3 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[3]}</td>
+                <td style="color:var(--rankL); ${stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[4]}</td>
+                <td style="font-size:11px; color:#006400; font-weight:900;">${winRate}%</td>
             </tr>`;
         }).join('');
         document.getElementById('statsBody').innerHTML = bodyHtml || players.map(p => `<tr><td>${p}</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td></tr>`).join('');
