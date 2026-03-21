@@ -119,13 +119,29 @@
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
 
-        button.save-btn { width: 100%; padding: 18px; background: linear-gradient(145deg, #95a5a6, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px; box-shadow: 5px 5px 10px rgba(180, 180, 180, 0.3), -3px -3px 8px rgba(255, 255, 255, 0.7); transition: 0.2s; }
-        button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
+        /* 저장 및 수정 버튼: 테두리 추가 */
+        button.save-btn { 
+            width: 100%; padding: 18px; 
+            background: linear-gradient(145deg, #95a5a6, #7f8c8d); 
+            color: white; border: 2px solid rgba(0, 0, 0, 0.1); /* 테두리 추가 */
+            border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; 
+            font-size: 16px; box-shadow: 5px 5px 10px rgba(180, 180, 180, 0.3), -3px -3px 8px rgba(255, 255, 255, 0.7); 
+            transition: 0.2s; 
+        }
+        button.edit-btn { 
+            background: linear-gradient(145deg, #ffae24, #da8c10) !important; 
+            border: 2px solid rgba(0, 0, 0, 0.15) !important; /* 수정 모드 테두리 */
+        }
         
         /* 버튼 그룹 가로 배치를 위한 스타일 */
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .btn-group button { flex: 1; margin-top: 0 !important; }
-        .btn-cancel { background: #bdc3c7 !important; color: white !important; }
+        
+        /* 취소 버튼: 테두리 추가 */
+        .btn-cancel { 
+            background: #bdc3c7 !important; color: white !important; 
+            border: 2px solid rgba(0, 0, 0, 0.1) !important; /* 취소 버튼 테두리 */
+        }
 
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; table-layout: fixed; }
         .stats-table th { padding: 12px 1px; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -0.5px; }
@@ -244,7 +260,7 @@
 
     async function fetchData() {
         if(!GAS_URL || GAS_URL.includes("URL_입력")) return;
-        showLoading(true, "Cloud data 동기화 중");
+        showLoading(true, "Cloud 동기화 중");
         try {
             const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
             const rawData = await response.json();
