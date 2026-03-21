@@ -36,7 +36,6 @@
             --rank4: #f39c12; 
             --rankL: #ff4757; 
             
-            /* [복구] 중복 표시용 스타일 */
             --dup-bg: #fffde7;    
             --dup-border: #ff80ab; 
             --dup-text: #7b1fa2;   
@@ -118,7 +117,6 @@
             -webkit-appearance: none; text-align: center; text-align-last: center; 
         }
 
-        /* [복구] 중복 에러 스타일 */
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
 
         button.save-btn { width: 100%; padding: 18px; background: linear-gradient(145deg, #95a5a6, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px; box-shadow: 5px 5px 10px rgba(180, 180, 180, 0.3), -3px -3px 8px rgba(255, 255, 255, 0.7); transition: 0.2s; }
@@ -135,7 +133,7 @@
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
         .spinner { border: 5px solid #d1d9e6; border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { rotate(360deg); } }
         
         .game-item { padding: 15px 10px; border-radius: 18px; background: rgba(236, 238, 241, 0.4); margin-top: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--inner-shadow); }
         .game-info { font-size: 11px; font-weight: 800; color: #555; overflow: hidden; text-overflow: ellipsis; flex: 1; }
@@ -196,7 +194,16 @@
     <h2 style="font-size:17px; margin:0 0 15px 0; color:#444; font-weight:800;">📊 멤버별 누적 전적</h2>
     <table class="stats-table">
         <thead>
-            <tr><th>이름</th><th>참여</th><th>1위🥇</th><th>2위</th><th>3위</th><th>4위</th><th>꼴찌💀</th><th>승률</th></tr>
+            <tr>
+                <th>이름</th>
+                <th>참여</th>
+                <th style="color:var(--rank1)">1위🥇</th>
+                <th style="color:var(--rank2)">2위</th>
+                <th style="color:var(--rank3)">3위</th>
+                <th style="color:var(--rank4)">4위</th>
+                <th style="color:var(--rankL)">꼴찌💀</th>
+                <th>승률</th>
+            </tr>
         </thead>
         <tbody id="statsBody"></tbody>
     </table>
@@ -275,7 +282,6 @@
 
     function selectDate(dateStr) { if(editMode) cancelEdit(); selectedDateStr = dateStr; document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`; renderCalendar(); renderGameList(); }
 
-    /* [복구] 중복 친구 선택 시 핑크색 강조 로직 */
     function checkDuplicates() {
         const selects = Array.from(document.querySelectorAll('#inputArea select'));
         const values = selects.map(s => s.value);
@@ -300,7 +306,6 @@
     }
 
     async function saveGame() {
-        /* [복구] 오늘 이후 날짜 저장 방지 로직 */
         const todayStr = formatDate(new Date());
         if(selectedDateStr > todayStr) return alert("미래에서 온거야? 오늘이 며칠인지 확인해!");
 
@@ -312,7 +317,6 @@
             ranks.push(val);
         }
         
-        /* [복구] 중복 체크 알림 문구 */
         if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
 
         showLoading(true, "저장 중");
@@ -323,7 +327,6 @@
         } catch (e) { alert("오류 발생!"); showLoading(false); }
     }
 
-    /* [복구] 초기화 3단계 확인 로직 */
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 데이터를 지울까요?</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
@@ -412,7 +415,20 @@
 
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-    function closeAppWindow() { window.location.replace("about:blank"); }
+    
+    /* [수정] 안드로이드 종료 로직 최적화 */
+    function closeAppWindow() {
+        if (window.history.length > 1) {
+            window.history.back(); // 히스토리가 있다면 뒤로가기
+        }
+        window.close(); // 창 닫기 시도
+        
+        // 0.1초 후에도 창이 안 닫혔을 경우 (안드로이드 대응)
+        setTimeout(() => {
+            window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
+        }, 100);
+    }
+    
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
