@@ -122,7 +122,6 @@
         button.save-btn { width: 100%; padding: 18px; background: linear-gradient(145deg, #95a5a6, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px; box-shadow: 5px 5px 10px rgba(180, 180, 180, 0.3), -3px -3px 8px rgba(255, 255, 255, 0.7); transition: 0.2s; }
         button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
         
-        /* [수정] 전적 테이블 글자 크기 확대 및 여백 조정 */
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; table-layout: fixed; }
         .stats-table th { padding: 12px 1px; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -0.5px; }
         .stats-table td { padding: 14px 1px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 700; }
@@ -200,11 +199,11 @@
             <tr>
                 <th style="width:16%">이름</th>
                 <th>참여</th>
-                <th style="color:var(--rank1)">1위</th>
+                <th style="color:var(--rank1)">1위🥇</th>
                 <th style="color:var(--rank2)">2위</th>
                 <th style="color:var(--rank3)">3위</th>
                 <th style="color:var(--rank4)">4위</th>
-                <th style="color:var(--rankL)">꼴찌</th>
+                <th style="color:var(--rankL)">꼴찌💀</th>
                 <th style="width:16%">승률</th>
             </tr>
         </thead>
@@ -379,6 +378,7 @@
             
             const b = (val, max) => (val === max && max > 0) ? `style="font-weight:900; font-size:14px;"` : "";
 
+            /* [수정] 승률 폰트 크기 확대: 11px -> 13.5px */
             return `<tr>
                 <td style="${nameStyle}">${p}</td>
                 <td ${b(stats[p].played, maxCounts.played)}>${stats[p].played}</td>
@@ -387,7 +387,7 @@
                 <td style="color:var(--rank3); ${stats[p].ranks[2] === maxCounts.r2 && maxCounts.r2 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[2]}</td>
                 <td style="color:var(--rank4); ${stats[p].ranks[3] === maxCounts.r3 && maxCounts.r3 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[3]}</td>
                 <td style="color:var(--rankL); ${stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[4]}</td>
-                <td style="font-size:11px; color:#006400; font-weight:900;">${winRate}%</td>
+                <td style="font-size:13.5px; color:#006400; font-weight:900;">${winRate}%</td>
             </tr>`;
         }).join('');
         document.getElementById('statsBody').innerHTML = bodyHtml || players.map(p => `<tr><td>${p}</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td></tr>`).join('');
