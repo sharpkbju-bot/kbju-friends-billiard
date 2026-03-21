@@ -133,7 +133,6 @@
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
         
-        /* [수정] 로딩 스피너 애니메이션 확실하게 복구 */
         .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
@@ -353,7 +352,6 @@
 
         const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
         
-        /* [수정] 참여~꼴찌 중 가장 횟수 많은 숫자 찾기 (Bold 처리용) */
         const maxCounts = { played: 0, r0: 0, r1: 0, r2: 0, r3: 0, r4: 0 };
         players.forEach(p => {
             maxCounts.played = Math.max(maxCounts.played, stats[p].played);
@@ -365,12 +363,12 @@
         });
         
         const bodyHtml = sortedByWin.map(p => {
-            let nameStyle = "font-weight:800;";
+            /* [수정] 모든 이름에도 Bold(900) 처리 적용 */
+            let nameStyle = "font-weight:900;";
             const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`;
             else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
             
-            /* [수정] 최고 수치에 Bold 적용 헬퍼 */
             const b = (val, max) => (val === max && max > 0) ? `style="font-weight:900; font-size:13px;"` : "";
 
             return `<tr>
