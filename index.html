@@ -35,10 +35,6 @@
             --rank3: #8e44ad; 
             --rank4: #f39c12; 
             --rankL: #ff4757; 
-            
-            --dup-bg: #fffde7;    
-            --dup-border: #ff80ab; 
-            --dup-text: #7b1fa2;   
         }
 
         body { 
@@ -86,7 +82,6 @@
             font-size: 14px;
             cursor: pointer; color: #777; transition: 0.2s;
         }
-        .nav-btn:active { box-shadow: var(--inner-shadow); transform: scale(0.95); }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
         .weekday { font-size: 11px; font-weight: 900; padding-bottom: 10px; color: #95a5a6; }
 
@@ -98,7 +93,6 @@
             transition: 0.3s all cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             color: #555; border: 1px solid rgba(255,255,255,0.4);
         }
-        
         .day.sat { color: #5dade2; } 
         .day.sun, .day.holiday { color: #e67e22; } 
         .day.today { background: var(--today-bg) !important; color: var(--today-border) !important; border: 2px solid var(--today-border) !important; }
@@ -118,18 +112,15 @@
             background: rgba(236, 238, 241, 0.4); box-shadow: var(--inner-shadow); color: #444; font-weight: 600; 
             -webkit-appearance: none; text-align: center; text-align-last: center; 
         }
-
-        select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
+        .duplicate-error { background: #fffde7 !important; border: 2px solid #ff80ab !important; }
 
         button.save-btn { width: 100%; padding: 18px; background: linear-gradient(145deg, #95a5a6, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; font-size: 16px; box-shadow: 5px 5px 10px rgba(180, 180, 180, 0.3), -3px -3px 8px rgba(255, 255, 255, 0.7); transition: 0.2s; }
-        button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
         .stats-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
         .stats-table th { padding: 12px 2px; color: #999; border-bottom: 1px solid #ddd; }
         .stats-table td { padding: 14px 2px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 600; }
         
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
-        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 4px 4px 10px rgba(180, 180, 180, 0.3), -2px -2px 8px rgba(255, 255, 255, 0.7); }
-        .cancel-btn { width: 100%; background: #bdc3c7; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; }
+        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; }
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; box-shadow: 6px 6px 12px rgba(180, 180, 180, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.7); }
         
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
@@ -140,7 +131,7 @@
         .game-item { padding: 15px 10px; border-radius: 18px; background: rgba(236, 238, 241, 0.4); margin-top: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--inner-shadow); }
         .game-info { font-size: 11px; font-weight: 800; color: #555; overflow: hidden; text-overflow: ellipsis; flex: 1; }
         .game-btns { display: flex; gap: 8px; flex-shrink: 0; font-size: 11px; font-weight: bold; }
-        .game-btns span { padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(240,240,240,0.8) 100%); }
+        .game-btns span { padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); background: rgba(255,255,255,0.8); }
         #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
         .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 30px; text-align: center; width: 80%; max-width: 320px; box-shadow: 15px 15px 40px rgba(0,0,0,0.1); }
     </style>
@@ -187,7 +178,6 @@
             <option value="5">5명</option>
         </select>
     </div>
-    
     <div id="inputArea"></div>
     <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
     <div id="dayGameList"></div>
@@ -201,11 +191,10 @@
         </thead>
         <tbody id="statsBody"></tbody>
     </table>
-    <div id="richFriendArea" class="rich-msg" style="display:none; background: var(--bg); padding: 20px; border-radius: 22px; text-align: center; box-shadow: var(--inner-shadow); margin-top: 20px; color: #7f8c8d; font-weight: 800;"></div>
+    <div id="richFriendArea" style="display:none; background: var(--bg); padding: 20px; border-radius: 22px; text-align: center; box-shadow: var(--inner-shadow); margin-top: 20px; color: #7f8c8d; font-weight: 800;"></div>
 </div>
 
 <div class="danger-zone">
-    <div style="color:var(--exit-purple); font-weight:900; margin-bottom:15px; font-size:12px;">초기화 버튼은 함부로 터치하지 마세요.</div>
     <div id="resetSteps">
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
@@ -221,18 +210,9 @@
     let editMode = false;
     let editRound = null;
 
-    function formatDate(dateInput) {
-        const d = new Date(dateInput);
+    function formatDate(dInput) {
+        const d = new Date(dInput);
         return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-    }
-
-    function isHoliday(date) {
-        const y = date.getFullYear(); const m = date.getMonth() + 1; const d = date.getDate();
-        const ymd = `${y}-${m}-${d}`;
-        const fixedHolidays = ["1-1", "3-1", "5-5", "6-6", "7-17", "8-15", "10-1", "10-3", "10-9", "12-25"];
-        if (fixedHolidays.includes(`${m}-${d}`)) return true;
-        const variableHolidays = ["2026-2-16", "2026-2-17", "2026-2-18", "2026-5-24", "2026-5-25", "2026-9-24", "2026-9-25", "2026-9-26"];
-        return variableHolidays.includes(ymd);
     }
 
     async function fetchData() {
@@ -247,7 +227,6 @@
         finally { 
             showLoading(false); 
             document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
-            renderAll(); // 데이터 수신 후 최종 확정 렌더링
         }
     }
 
@@ -264,114 +243,25 @@
         document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
         
         ["일","월","화","수","목","금","토"].forEach((d, idx) => {
-            let color = "#95a5a6";
-            if(idx === 0) color = "#e67e22";
-            if(idx === 6) color = "#5dade2";
+            let color = (idx === 0) ? "#e67e22" : (idx === 6 ? "#5dade2" : "#95a5a6");
             grid.innerHTML += `<div class="weekday" style="color:${color}">${d}</div>`;
         });
 
         const firstDay = new Date(year, month, 1).getDay();
         const lastDate = new Date(year, month + 1, 0).getDate();
         for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
-        
         for (let d = 1; d <= lastDate; d++) {
-            const dateObj = new Date(year, month, d);
-            const dStr = formatDate(dateObj);
-            const dayOfWeek = dateObj.getDay();
-            let dayClass = "";
-            if (dayOfWeek === 0 || isHoliday(dateObj)) dayClass = "sun";
-            else if (dayOfWeek === 6) dayClass = "sat";
-            const isSelected = dStr === selectedDateStr ? 'selected' : '';
+            const dStr = formatDate(new Date(year, month, d));
+            const dayOfWeek = new Date(year, month, d).getDay();
+            let dayClass = (dayOfWeek === 0) ? "sun" : (dayOfWeek === 6 ? "sat" : "");
             const isToday = dStr === realTodayStr ? 'today' : '';
+            const isSelected = dStr === selectedDateStr ? 'selected' : '';
             const hasRecord = gameLogs.some(g => g.dateStr === dStr) ? 'has-record' : '';
             grid.innerHTML += `<div class="day ${dayClass} ${isSelected} ${isToday} ${hasRecord}" onclick="selectDate('${dStr}')">${d}</div>`;
         }
     }
 
-    function selectDate(dateStr) { if(editMode) cancelEdit(); selectedDateStr = dateStr; document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`; renderCalendar(); renderGameList(); }
-
-    function renderGameList() {
-        const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
-        const listArea = document.getElementById('dayGameList');
-        if(games.length > 0) {
-            let html = `<p style="font-size:14px; color:#7f8c8d; font-weight:800; margin:28px 0 10px 0; text-align:center; letter-spacing:1px;">GAME RECORD</p>`;
-            games.forEach((g, idx) => {
-                const names = g.ranks.filter(n => n && n.trim() !== "");
-                html += `<div class="game-item" onclick="enterEditMode(${g.round}, '${names.join(',')}')">
-                    <div class="game-info"><span style="color:var(--main); margin-right:4px;">${idx+1}G</span> ${names.join('→')}</div>
-                    <div class="game-btns">
-                        <span style="color:var(--edit); cursor:pointer;" onclick="enterEditMode(${g.round}, '${names.join(',')}')">수정</span>
-                        <span style="color:var(--success); cursor:pointer;" onclick="deleteGame(event, ${g.round})">삭제</span>
-                    </div>
-                </div>`;
-            });
-            listArea.innerHTML = html;
-        } else { listArea.innerHTML = ""; }
-    }
-
-    async function saveGame() {
-        const todayStr = formatDate(new Date());
-        if(selectedDateStr > todayStr) return alert("미래에서 온거야? 오늘이 며칠인지 확인해!");
-        const count = parseInt(document.getElementById('playerCount').value);
-        const ranks = [];
-        for(let i=1; i<=count; i++) {
-            const val = document.getElementById('rank'+i).value;
-            if(!val) return alert("친구를 선택해줄래?");
-            ranks.push(val);
-        }
-        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
-        showLoading(true, "저장 중");
-        const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
-        try {
-            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-            setTimeout(() => { fetchData(); alert("저장 완료 ✨"); cancelEdit(); }, 1200);
-        } catch (e) { alert("오류 발생!"); showLoading(false); }
-    }
-
-    function updateInputFields(preFill = null) {
-        if(preFill) document.getElementById('playerCount').value = preFill.length;
-        const count = parseInt(document.getElementById('playerCount').value);
-        let html = '';
-        for(let i=1; i<=count; i++) {
-            const label = i === count ? "꼴찌💀" : `${i}위`;
-            html += `<div class="input-row"><label>${label}</label><select id="rank${i}" onchange="checkDuplicates()"><option value="">선택</option>${players.map(p => `<option value="${p}" ${preFill && preFill[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
-        }
-        document.getElementById('inputArea').innerHTML = html;
-        if(preFill) checkDuplicates();
-    }
-
-    function checkDuplicates() {
-        const selects = Array.from(document.querySelectorAll('#inputArea select'));
-        const values = selects.map(s => s.value);
-        selects.forEach(s => s.classList.remove('duplicate-error'));
-        values.forEach((v, i) => { 
-            if(v && values.filter(x => x === v).length > 1) {
-                selects[i].classList.add('duplicate-error');
-            } 
-        });
-    }
-
-    function enterEditMode(round, rankStr) {
-        editMode = true; editRound = round; updateInputFields(rankStr.split(','));
-        document.getElementById('editBadge').style.display = 'block';
-        const btn = document.getElementById('mainBtn'); btn.innerText = "수정 완료"; btn.classList.add('edit-btn');
-        window.scrollTo({ top: 200, behavior: 'smooth' });
-    }
-
-    function cancelEdit() {
-        editMode = false; editRound = null; document.getElementById('editBadge').style.display = 'none';
-        const btn = document.getElementById('mainBtn'); btn.innerText = "순위 저장"; btn.classList.remove('edit-btn');
-        document.getElementById('playerCount').value = "3"; updateInputFields();
-    }
-
-    async function deleteGame(e, round) {
-        e.stopPropagation(); if(!confirm("정말 삭제할거야?")) return;
-        showLoading(true, "삭제 중");
-        try {
-            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) });
-            setTimeout(() => { fetchData(); alert("삭제 완료 🗑️"); }, 1200);
-        } catch (e) { showLoading(false); }
-    }
+    function selectDate(dateStr) { selectedDateStr = dateStr; document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`; renderAll(); }
 
     function renderStats() {
         let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
@@ -385,29 +275,27 @@
                 }
             });
         });
-        const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
+
+        const sorted = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
         const maxCounts = [0, 4].map(idx => Math.max(...players.map(p => stats[p].ranks[idx])));
         
-        const bodyHtml = sortedByWin.map(p => {
-            let nameStyle = "font-weight:800;";
+        document.getElementById('statsBody').innerHTML = sorted.map(p => {
             const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
-            if(stats[p].ranks[0] === maxCounts[0] && maxCounts[0] > 0) nameStyle += `color:var(--rank1);`;
-            else if(stats[p].ranks[4] === maxCounts[1] && maxCounts[1] > 0) nameStyle += `color:var(--rankL);`;
-            
+            let nStyle = "font-weight:800;";
+            if(stats[p].ranks[0] === maxCounts[0] && maxCounts[0] > 0) nStyle += "color:var(--rank1);";
+            else if(stats[p].ranks[4] === maxCounts[1] && maxCounts[1] > 0) nStyle += "color:var(--rankL);";
+
             return `<tr>
-                <td style="${nameStyle}">${p}</td>
-                <td>${stats[p].played}</td>
+                <td style="${nStyle}">${p}</td><td>${stats[p].played}</td>
                 <td style="${stats[p].ranks[0] === maxCounts[0] && maxCounts[0] > 0 ? 'color:var(--rank1)' : ''}">${stats[p].ranks[0]}</td>
                 <td style="color:var(--rank2)">${stats[p].ranks[1]}</td>
                 <td style="color:var(--rank3)">${stats[p].ranks[2]}</td>
                 <td style="color:var(--rank4)">${stats[p].ranks[3]}</td>
-                <td style="color:var(--rankL);">${stats[p].ranks[4]}회</td>
+                <td style="color:var(--rankL)">${stats[p].ranks[4]}회</td>
                 <td style="font-size:10px; color:#006400; font-weight:bold;">${winRate}%</td>
             </tr>`;
         }).join('');
-        
-        document.getElementById('statsBody').innerHTML = bodyHtml || players.map(p => `<tr><td>${p}</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td></tr>`).join('');
-        
+
         const rich = document.getElementById('richFriendArea');
         if(maxCounts[1] > 0) {
             const losers = players.filter(p => stats[p].ranks[4] === maxCounts[1]);
@@ -415,33 +303,77 @@
         } else rich.style.display = 'none';
     }
 
-    function confirmReset(step) {
-        const el = document.getElementById('resetSteps');
-        if(step === 1) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 데이터를 지울까요?</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
-        else if(step === 2) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구 불가입니다! 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
-        else if(step === 3) el.innerHTML = `<button class="reset-btn" style="background:var(--accent); font-size:16px;" onclick="executeReset()">[최종 확인] 🔥 마지막. 모두 삭제합니다.</button><button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
+    function renderGameList() {
+        const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
+        const listArea = document.getElementById('dayGameList');
+        if(games.length > 0) {
+            let html = `<p style="font-size:14px; color:#7f8c8d; font-weight:800; margin:28px 0 10px 0; text-align:center;">GAME RECORD</p>`;
+            games.forEach((g, idx) => {
+                const names = g.ranks.filter(n => n && n.trim() !== "");
+                html += `<div class="game-item">
+                    <div class="game-info"><span>${idx+1}G</span> ${names.join('→')}</div>
+                    <div class="game-btns">
+                        <span style="color:var(--edit)" onclick="enterEditMode(${g.round}, '${names.join(',')}')">수정</span>
+                        <span style="color:var(--success)" onclick="deleteGame(event, ${g.round})">삭제</span>
+                    </div>
+                </div>`;
+            });
+            listArea.innerHTML = html;
+        } else listArea.innerHTML = "";
     }
-    function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
-    async function executeReset() { showLoading(true, "초기화 중"); await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); }
-    
+
+    function updateInputFields(preFill = null) {
+        const count = parseInt(document.getElementById('playerCount').value);
+        let html = '';
+        for(let i=1; i<=count; i++) {
+            const label = i === count ? "꼴찌💀" : `${i}위`;
+            html += `<div class="input-row"><label>${label}</label><select id="rank${i}">${players.map(p => `<option value="${p}" ${preFill && preFill[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
+        }
+        document.getElementById('inputArea').innerHTML = html;
+    }
+
+    async function saveGame() {
+        const count = parseInt(document.getElementById('playerCount').value);
+        const ranks = [];
+        for(let i=1; i<=count; i++) ranks.push(document.getElementById('rank'+i).value);
+        if(new Set(ranks).size !== ranks.length) return alert("중복된 친구가 있어요!");
+        showLoading(true, "저장 중");
+        try {
+            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: ranks, round: editRound }) });
+            location.reload();
+        } catch (e) { showLoading(false); }
+    }
+
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-    function closeAppWindow() { window.location.replace("about:blank"); }
     
-    function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
-    function showLoading(v, t) { 
-        document.getElementById('loadingText').innerText = t; 
-        document.getElementById('loading').style.display = v ? 'flex' : 'none'; 
+    function closeAppWindow() {
+        // 아이폰/브라우저 앱 종료 최적화 로직
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function() { window.history.go(1); };
+        
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if(isIOS) {
+            // iOS는 직접 종료가 어려우므로 홈 화면 유도 (빈 페이지 처리 안 함)
+            alert("홈 화면으로 나가시려면 홈 버튼이나 바를 이용해 주세요!");
+            closeExitModal();
+        } else {
+            window.open('', '_self', ''); 
+            window.close();
+        }
     }
+
+    function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
+    function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
     window.onload = () => { 
         updateInputFields(); 
-        renderAll(); // 즉시 실행하여 표 틀 구성
-        fetchData(); // 비동기 데이터 수신 시작
+        renderStats(); // 초기 0점 상태 표 미리 그리기
+        fetchData(); 
         setTimeout(() => { 
             const ws = document.getElementById('welcome-screen');
-            if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); }
-        }, 4500);
+            if(ws) ws.style.opacity = '0'; 
+        }, 4000);
     };
 </script>
 </body>
