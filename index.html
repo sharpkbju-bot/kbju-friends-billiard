@@ -130,7 +130,6 @@
             color: white; border: none;
             border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; 
             font-size: 16px; 
-            /* [수정] 기본 저장 및 모달 버튼 그림자 대폭 강화 */
             box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.38), -2px -2px 8px rgba(255, 255, 255, 0.5);
             transition: 0.2s all ease;
         }
@@ -157,10 +156,8 @@
         .stats-table td { padding: 14px 1px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 700; }
         
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
-        /* [수정] 데이터 초기화 버튼 그림자 농도 및 거리 강화 */
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); }
         .cancel-btn { width: 100%; background: #bdc3c7; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; }
-        /* [수정] 앱 종료 버튼 그림자 농도 및 거리 강화 */
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); }
         
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
@@ -190,7 +187,7 @@
     <div class="modal-content">
         <div style="font-size:50px; margin-bottom:15px;">👋</div>
         <div id="exit-msg" style="font-size:16px; font-weight:800; color:#444; line-height:1.6; margin-bottom:25px;">오늘도 다들 즐거웠니?<br>다음에 또 보자!</div>
-        <button class="save-btn" style="margin-bottom:12px;" onclick="closeAppWindow()">OK</button>
+        <button class="save-btn" id="modalOkBtn" style="margin-bottom:12px;" onclick="closeAppWindow()">OK</button>
         <button class="save-btn" style="background:#abb2b9; margin:0; width: 100%;" onclick="closeExitModal()">취소</button>
     </div>
 </div>
@@ -382,7 +379,21 @@
     async function deleteGame(e, round) { e.stopPropagation(); if(!confirm("정말 삭제할거야?")) return; showLoading(true, "삭제 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) }); setTimeout(() => fetchData(), 1200); } catch (e) { showLoading(false); } }
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-    function closeAppWindow() { if (window.history.length > 1) window.history.back(); window.close(); setTimeout(() => { window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end"; }, 100); }
+    
+    /* [수정] 아이폰 종료 로직 최적화 */
+    function closeAppWindow() { 
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if(isIOS) {
+            // 아이폰은 주소 이동 없이 모달만 닫음 (오류 방지)
+            closeExitModal();
+        } else {
+            // 안드로이드 및 기타 환경
+            if (window.history.length > 1) window.history.back(); 
+            window.close(); 
+            setTimeout(() => { window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end"; }, 100); 
+        }
+    }
+
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
@@ -396,6 +407,8 @@
         if(isIOS) {
             document.getElementById('exitBtn').innerText = "📱 홈 화면으로";
             document.getElementById('exit-msg').innerHTML = "아이폰은 시스템 정책상<br>직접 쓸어올려서 종료해야 해!<br>다음에 또 보자!";
+            // 아이폰일 경우 OK 버튼 텍스트를 "확인"으로 변경하여 혼동 방지
+            document.getElementById('modalOkBtn').innerText = "확인";
         }
         updateInputFields(); 
         renderStats(); 
