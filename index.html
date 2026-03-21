@@ -124,18 +124,16 @@
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
 
-        /* [수정] 세련된 borderless 버튼 스타일 */
+        /* 세련된 borderless 버튼 스타일 */
         button.save-btn { 
             width: 100%; padding: 18px; 
             background: linear-gradient(145deg, #abb2b9, #7f8c8d); 
             color: white; border: none; /* 테두리 제거 */
             border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; 
             font-size: 16px; 
-            /* 부드러운 입체감 그림자 */
             box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.2), -2px -2px 6px rgba(255, 255, 255, 0.5);
             transition: 0.2s all ease;
         }
-        /* 터치 시 눌리는 효과 추가 */
         button.save-btn:active {
             transform: scale(0.97);
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2), inset 2px 2px 4px rgba(0, 0, 0, 0.1);
@@ -143,7 +141,7 @@
 
         button.edit-btn { 
             background: linear-gradient(145deg, #ffae24, #da8c10) !important; 
-            border: none !important; /* 테두리 제거 */
+            border: none !important; 
         }
         
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
@@ -151,7 +149,7 @@
         
         .btn-cancel { 
             background: #bdc3c7 !important; color: white !important; 
-            border: none !important; /* 테두리 제거 */
+            border: none !important; 
         }
 
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; table-layout: fixed; }
@@ -256,6 +254,7 @@
 </div>
 
 <script>
+    // [복구 완료] 실제 구글 앱스 스크립트 배포 주소로 다시 연결했습니다.
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec
 "; 
     const players = ["경배", "원석", "정석", "진웅", "창한"];
@@ -285,11 +284,7 @@
         }
     }
 
-    function renderAll() { 
-        renderCalendar(); 
-        renderStats(); 
-        renderGameList(); 
-    }
+    function renderAll() { renderCalendar(); renderStats(); renderGameList(); }
 
     function isHoliday(year, month, day) {
         const dStr = `${month + 1}-${day}`;
@@ -303,84 +298,46 @@
         const year = currentViewDate.getFullYear(); const month = currentViewDate.getMonth();
         const realTodayStr = formatDate(new Date());
         document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
-        
         ["일","월","화","수","목","금","토"].forEach((d, idx) => {
-            let color = "#95a5a6";
-            if(idx === 0) color = "#e67e22";
-            if(idx === 6) color = "#5dade2";
+            let color = "#95a5a6"; if(idx === 0) color = "#e67e22"; if(idx === 6) color = "#5dade2";
             grid.innerHTML += `<div class="weekday" style="color:${color}">${d}</div>`;
         });
-
-        const firstDay = new Date(year, month, 1).getDay();
-        const lastDate = new Date(year, month + 1, 0).getDate();
+        const firstDay = new Date(year, month, 1).getDay(); const lastDate = new Date(year, month + 1, 0).getDate();
         for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
         for (let d = 1; d <= lastDate; d++) {
-            const dStr = formatDate(new Date(year, month, d));
-            const dayOfWeek = new Date(year, month, d).getDay();
+            const dStr = formatDate(new Date(year, month, d)); const dayOfWeek = new Date(year, month, d).getDay();
             let dayClass = (dayOfWeek === 0 || isHoliday(year, month, d)) ? "sun holiday" : (dayOfWeek === 6 ? "sat" : "");
-            const isToday = dStr === realTodayStr ? 'today' : '';
-            const isSelected = dStr === selectedDateStr ? 'selected' : '';
+            const isToday = dStr === realTodayStr ? 'today' : ''; const isSelected = dStr === selectedDateStr ? 'selected' : '';
             const hasRecord = gameLogs.some(g => g.dateStr === dStr) ? 'has-record' : '';
             grid.innerHTML += `<div class="day ${dayClass} ${isSelected} ${isToday} ${hasRecord}" onclick="selectDate('${dStr}')">${d}</div>`;
         }
     }
 
     function selectDate(dateStr) { if(editMode) cancelEdit(); selectedDateStr = dateStr; document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`; renderCalendar(); renderGameList(); }
-
     function checkDuplicates() {
-        const selects = Array.from(document.querySelectorAll('#inputArea select'));
-        const values = selects.map(s => s.value);
+        const selects = Array.from(document.querySelectorAll('#inputArea select')); const values = selects.map(s => s.value);
         selects.forEach(s => s.classList.remove('duplicate-error'));
-        values.forEach((v, i) => { 
-            if(v && values.filter(x => x === v).length > 1) {
-                selects[i].classList.add('duplicate-error');
-            } 
-        });
+        values.forEach((v, i) => { if(v && values.filter(x => x === v).length > 1) selects[i].classList.add('duplicate-error'); });
     }
-
     function updateInputFields(preFill = null) {
         if(preFill) document.getElementById('playerCount').value = preFill.length;
-        const count = parseInt(document.getElementById('playerCount').value);
-        let html = '';
+        const count = parseInt(document.getElementById('playerCount').value); let html = '';
         for(let i=1; i<=count; i++) {
             const label = i === count ? "꼴찌💀" : `${i}위`;
             html += `<div class="input-row"><label>${label}</label><select id="rank${i}" onchange="checkDuplicates()"><option value="">선택</option>${players.map(p => `<option value="${p}" ${preFill && preFill[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
         }
-        document.getElementById('inputArea').innerHTML = html;
-        if(preFill) checkDuplicates();
+        document.getElementById('inputArea').innerHTML = html; if(preFill) checkDuplicates();
     }
-
-    function resetInputs() {
-        if(editMode) {
-            cancelEdit();
-        } else {
-            document.getElementById('playerCount').value = "3";
-            updateInputFields();
-        }
-    }
-
+    function resetInputs() { if(editMode) cancelEdit(); else { document.getElementById('playerCount').value = "3"; updateInputFields(); } }
     async function saveGame() {
-        const todayStr = formatDate(new Date());
-        if(selectedDateStr > todayStr) return alert("미래에서 온거야? 오늘이 며칠인지 확인해!");
-
-        const count = parseInt(document.getElementById('playerCount').value);
-        const ranks = [];
-        for(let i=1; i<=count; i++) {
-            const val = document.getElementById('rank'+i).value;
-            if(!val) return alert("친구를 선택해줄래?");
-            ranks.push(val);
-        }
-        
+        const todayStr = formatDate(new Date()); if(selectedDateStr > todayStr) return alert("미래에서 온거야? 오늘이 며칠인지 확인해!");
+        const count = parseInt(document.getElementById('playerCount').value); const ranks = [];
+        for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("친구를 선택해줄래?"); ranks.push(val); }
         if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
-
         showLoading(true, "저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
-        try {
-            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-            setTimeout(() => { fetchData(); alert("저장 완료 ✨"); cancelEdit(); }, 1200);
-        } catch (e) { alert("오류 발생!"); showLoading(false); }
+        try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); setTimeout(() => { fetchData(); alert("저장 완료 ✨"); cancelEdit(); }, 1200); } catch (e) { alert("오류 발생!"); showLoading(false); }
     }
-
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 데이터를 지울까요?</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
@@ -389,123 +346,61 @@
     }
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
     async function executeReset() { showLoading(true, "초기화 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); } catch(e) { showLoading(false); } }
-
     function renderStats() {
         let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
         gameLogs.forEach(g => {
             const actual = g.ranks.filter(n => n.trim() !== "");
-            actual.forEach((name, idx) => {
-                if(stats[name]) {
-                    stats[name].played++;
-                    if (idx === actual.length - 1 && actual.length > 1) stats[name].ranks[4]++;
-                    else if (idx < 4) stats[name].ranks[idx]++;
-                }
-            });
+            actual.forEach((name, idx) => { if(stats[name]) { stats[name].played++; if (idx === actual.length - 1 && actual.length > 1) stats[name].ranks[4]++; else if (idx < 4) stats[name].ranks[idx]++; } });
         });
-
         const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
-        
         const maxCounts = { played: 0, r0: 0, r1: 0, r2: 0, r3: 0, r4: 0 };
         players.forEach(p => {
-            maxCounts.played = Math.max(maxCounts.played, stats[p].played);
-            maxCounts.r0 = Math.max(maxCounts.r0, stats[p].ranks[0]);
-            maxCounts.r1 = Math.max(maxCounts.r1, stats[p].ranks[1]);
-            maxCounts.r2 = Math.max(maxCounts.r2, stats[p].ranks[2]);
-            maxCounts.r3 = Math.max(maxCounts.r3, stats[p].ranks[3]);
-            maxCounts.r4 = Math.max(maxCounts.r4, stats[p].ranks[4]);
+            maxCounts.played = Math.max(maxCounts.played, stats[p].played); maxCounts.r0 = Math.max(maxCounts.r0, stats[p].ranks[0]);
+            maxCounts.r1 = Math.max(maxCounts.r1, stats[p].ranks[1]); maxCounts.r2 = Math.max(maxCounts.r2, stats[p].ranks[2]);
+            maxCounts.r3 = Math.max(maxCounts.r3, stats[p].ranks[3]); maxCounts.r4 = Math.max(maxCounts.r4, stats[p].ranks[4]);
         });
-        
         const bodyHtml = sortedByWin.map(p => {
-            let nameStyle = "font-weight:900; letter-spacing:-0.5px;";
-            const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
-            if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`;
-            else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
-            
+            let nameStyle = "font-weight:900; letter-spacing:-0.5px;"; const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
+            if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`; else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
             const b = (val, max) => (val === max && max > 0) ? `style="font-weight:900; font-size:14px;"` : "";
-
-            return `<tr>
-                <td style="${nameStyle}">${p}</td>
-                <td ${b(stats[p].played, maxCounts.played)}>${stats[p].played}</td>
-                <td style="${stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0 ? 'color:var(--rank1);' : ''} ${stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[0]}</td>
-                <td style="color:var(--rank2); ${stats[p].ranks[1] === maxCounts.r1 && maxCounts.r1 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[1]}</td>
-                <td style="color:var(--rank3); ${stats[p].ranks[2] === maxCounts.r2 && maxCounts.r2 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[2]}</td>
-                <td style="color:var(--rank4); ${stats[p].ranks[3] === maxCounts.r3 && maxCounts.r3 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[3]}</td>
-                <td style="color:var(--rankL); ${stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[4]}</td>
-                <td style="font-size:12.5px; color:#006400; font-weight:900;">${winRate}%</td>
-            </tr>`;
+            return `<tr><td style="${nameStyle}">${p}</td><td ${b(stats[p].played, maxCounts.played)}>${stats[p].played}</td><td style="${stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0 ? 'color:var(--rank1); font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[0]}</td><td style="color:var(--rank2); ${stats[p].ranks[1] === maxCounts.r1 && maxCounts.r1 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[1]}</td><td style="color:var(--rank3); ${stats[p].ranks[2] === maxCounts.r2 && maxCounts.r2 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[2]}</td><td style="color:var(--rank4); ${stats[p].ranks[3] === maxCounts.r3 && maxCounts.r3 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[3]}</td><td style="color:var(--rankL); ${stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[4]}</td><td style="font-size:12.5px; color:#006400; font-weight:900;">${winRate}%</td></tr>`;
         }).join('');
         document.getElementById('statsBody').innerHTML = bodyHtml || players.map(p => `<tr><td>${p}</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td></tr>`).join('');
-        
         const richFriend = document.getElementById('richFriendArea');
-        if(maxCounts.r4 > 0) {
-            const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4);
-            richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')} (${maxCounts.r4}회)</span>`;
-        } else richFriend.style.display = 'none';
+        if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')} (${maxCounts.r4}회)</span>`; } else richFriend.style.display = 'none';
     }
-
     function renderGameList() {
-        const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
-        const listArea = document.getElementById('dayGameList');
+        const games = gameLogs.filter(g => g.dateStr === selectedDateStr); const listArea = document.getElementById('dayGameList');
         if(games.length > 0) {
             let html = `<p style="font-size:14px; color:#7f8c8d; font-weight:800; margin:28px 0 10px 0; text-align:center;">GAME RECORD</p>`;
-            games.forEach((g, idx) => {
-                const names = g.ranks.filter(n => n && n.trim() !== "");
-                html += `<div class="game-item">
-                    <div class="game-info"><span>${idx+1}G</span> ${names.join('→')}</div>
-                    <div class="game-btns">
-                        <span style="color:var(--edit)" onclick="enterEditMode(${g.round}, '${names.join(',')}')">수정</span>
-                        <span style="color:var(--success)" onclick="deleteGame(event, ${g.round})">삭제</span>
-                    </div>
-                </div>`;
-            });
+            games.forEach((g, idx) => { const names = g.ranks.filter(n => n && n.trim() !== ""); html += `<div class="game-item"><div class="game-info"><span>${idx+1}G</span> ${names.join('→')}</div><div class="game-btns"><span style="color:var(--edit)" onclick="enterEditMode(${g.round}, '${names.join(',')}')">수정</span><span style="color:var(--success)" onclick="deleteGame(event, ${g.round})">삭제</span></div></div>`; });
             listArea.innerHTML = html;
         } else listArea.innerHTML = "";
     }
-
-    function enterEditMode(round, rankStr) {
-        editMode = true; editRound = round; updateInputFields(rankStr.split(','));
-        document.getElementById('editBadge').style.display = 'block';
-        const btn = document.getElementById('mainBtn'); btn.innerText = "수정 완료"; btn.classList.add('edit-btn');
-    }
-
-    function cancelEdit() {
-        editMode = false; editRound = null; document.getElementById('editBadge').style.display = 'none';
-        const btn = document.getElementById('mainBtn'); btn.innerText = "순위 저장"; btn.classList.remove('edit-btn');
-        document.getElementById('playerCount').value = "3"; updateInputFields();
-    }
-
-    async function deleteGame(e, round) {
-        e.stopPropagation(); if(!confirm("정말 삭제할거야?")) return;
-        showLoading(true, "삭제 중");
-        try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) }); setTimeout(() => fetchData(), 1200); } catch (e) { showLoading(false); }
-    }
-
+    function enterEditMode(round, rankStr) { editMode = true; editRound = round; updateInputFields(rankStr.split(',')); document.getElementById('editBadge').style.display = 'block'; const btn = document.getElementById('mainBtn'); btn.innerText = "수정 완료"; btn.classList.add('edit-btn'); }
+    function cancelEdit() { editMode = false; editRound = null; document.getElementById('editBadge').style.display = 'none'; const btn = document.getElementById('mainBtn'); btn.innerText = "순위 저장"; btn.classList.remove('edit-btn'); document.getElementById('playerCount').value = "3"; updateInputFields(); }
+    async function deleteGame(e, round) { e.stopPropagation(); if(!confirm("정말 삭제할거야?")) return; showLoading(true, "삭제 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) }); setTimeout(() => fetchData(), 1200); } catch (e) { showLoading(false); } }
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-    function closeAppWindow() {
-        if (window.history.length > 1) window.history.back();
-        window.close();
-        setTimeout(() => {
-            window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
-        }, 100);
-    }
+    function closeAppWindow() { if (window.history.length > 1) window.history.back(); window.close(); setTimeout(() => { window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end"; }, 100); }
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
     window.onload = () => { 
+        // 웰컴 화면 제거 로직 (네트워크 상태와 무관하게 3.5초 뒤 실행)
+        setTimeout(() => { 
+            const ws = document.getElementById('welcome-screen');
+            if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); }
+        }, 3500);
+
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if(isIOS) {
             document.getElementById('exitBtn').innerText = "📱 홈 화면으로";
             document.getElementById('exit-msg').innerHTML = "아이폰은 시스템 정책상<br>직접 쓸어올려서 종료해야 해!<br>다음에 또 보자!";
         }
-
         updateInputFields(); 
         renderStats(); 
-        fetchData(); 
-        setTimeout(() => { 
-            const ws = document.getElementById('welcome-screen');
-            if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); }
-        }, 3500);
+        fetchData(); // Cloud 데이터 동기화 시작
     };
 </script>
 </body>
