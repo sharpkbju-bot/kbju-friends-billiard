@@ -254,6 +254,12 @@
         renderGameList(); 
     }
 
+    /* [추가] 공휴일 판별 함수 */
+    function isHoliday(year, month, day) {
+        const holidays = ["1-1", "3-1", "5-5", "6-6", "7-17", "8-15", "10-3", "10-9", "12-25"];
+        return holidays.includes(`${month + 1}-${day}`);
+    }
+
     function renderCalendar() {
         const grid = document.getElementById('calendarGrid'); grid.innerHTML = "";
         const year = currentViewDate.getFullYear(); const month = currentViewDate.getMonth();
@@ -273,7 +279,8 @@
         for (let d = 1; d <= lastDate; d++) {
             const dStr = formatDate(new Date(year, month, d));
             const dayOfWeek = new Date(year, month, d).getDay();
-            let dayClass = (dayOfWeek === 0) ? "sun" : (dayOfWeek === 6 ? "sat" : "");
+            /* [수정] 일요일 혹은 공휴일인 경우 holiday 클래스 추가 */
+            let dayClass = (dayOfWeek === 0 || isHoliday(year, month, d)) ? "sun holiday" : (dayOfWeek === 6 ? "sat" : "");
             const isToday = dStr === realTodayStr ? 'today' : '';
             const isSelected = dStr === selectedDateStr ? 'selected' : '';
             const hasRecord = gameLogs.some(g => g.dateStr === dStr) ? 'has-record' : '';
@@ -440,11 +447,10 @@
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
     window.onload = () => { 
-        /* [수정] 아이폰 사용자를 위한 문구 자동 변경 로직 */
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if(isIOS) {
             document.getElementById('exitBtn').innerText = "📱 홈 화면으로";
-            document.getElementById('exit-msg').innerHTML = "아이폰은 시스템 정책상<br>직접 쓸어올려서 종료해야 해.<br>다음에 또 보자!";
+            document.getElementById('exit-msg').innerHTML = "아이폰은 시스템 정책상<br>직접 쓸어올려서 종료해야 해!<br>다음에 또 보자!";
         }
 
         updateInputFields(); 
