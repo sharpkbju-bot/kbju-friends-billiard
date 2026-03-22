@@ -111,7 +111,7 @@
         .day.has-record::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--record-dot); border-radius: 50%; }
         
         .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
-        .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+        .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; }
         
         select#playerCount { flex: none !important; width: 85px !important; padding: 8px !important; margin-left: auto; }
         .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
@@ -174,10 +174,12 @@
         #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
         .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 30px; text-align: center; width: 80%; max-width: 320px; box-shadow: 15px 15px 40px rgba(0,0,0,0.1); }
 
-        /* [수정] 라디오 버튼 스타일: 글자 크기 17px, 날짜 높이에 맞춤 */
-        .zoom-wrap { display: flex; gap: 12px; font-size: 17px; font-weight: 800; color: #444; align-items: center; }
+        .zoom-wrap { display: flex; gap: 10px; font-size: 15px; font-weight: 800; justify-content: flex-end; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
         .zoom-wrap label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
-        .zoom-wrap input { width: 18px; height: 18px; margin: 0; cursor: pointer; }
+        .zoom-wrap input { width: 16px; height: 16px; margin: 0; cursor: pointer; }
+        /* [수정] 라디오 버튼 텍스트별 컬러 지정 */
+        .color-purple { color: #9b59b6; }
+        .color-pink { color: #ff69b4; }
     </style>
 </head>
 <body>
@@ -210,14 +212,7 @@
 </div>
 
 <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 id="selectedDateTitle" style="font-size:17px; margin:0; color:#444; font-weight:800;">📅 날짜 확인 중</h2>
-        <div class="zoom-wrap">
-            <label><input type="radio" name="z" value="1" ${currentZoom==='1'?'checked':''} onclick="changeZoom('1')"> 기본</label>
-            <label><input type="radio" name="z" value="1.2" ${currentZoom==='1.2'?'checked':''} onclick="changeZoom('1.2')"> 120%</label>
-        </div>
-    </div>
-
+    <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 20px 0; color:#444; font-weight:800;">📅 날짜 확인 중</h2>
     <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:15px; background: var(--edit); padding: 12px; border-radius: 12px; text-align: center;">✏️ 기록 수정 중</div>
 
     <div class="setup-row">
@@ -229,6 +224,12 @@
             <option value="5">5명</option>
         </select>
     </div>
+
+    <div class="zoom-wrap">
+        <label class="color-purple"><input type="radio" name="z" value="1" ${currentZoom==='1'?'checked':''} onclick="changeZoom('1')"> 기본</label>
+        <label class="color-pink"><input type="radio" name="z" value="1.2" ${currentZoom==='1.2'?'checked':''} onclick="changeZoom('1.2')"> 확대</label>
+    </div>
+
     <div id="inputArea"></div>
     <div class="btn-group">
         <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
