@@ -41,6 +41,10 @@
             --dup-text: #7b1fa2;
             
             --card-bg: rgba(243, 230, 255, 0.7); 
+
+            /* [추가] 수정 모드 시 드롭다운 스타일 */
+            --edit-mode-bg: #e1f5fe;
+            --edit-mode-border: #9b59b6;
         }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; }
@@ -122,6 +126,13 @@
             -webkit-appearance: none; text-align: center; text-align-last: center; 
         }
 
+        /* [수정] 수정 모드 시의 셀렉트 박스 스타일 */
+        .edit-active select {
+            background-color: var(--edit-mode-bg) !important;
+            border: 2px solid var(--edit-mode-border) !important;
+            color: #333 !important;
+        }
+
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
 
         button.save-btn { 
@@ -174,7 +185,6 @@
         .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* [개선] 게임 아이템 뉴모피즘 스타일 및 인터랙션 */
         .game-item { 
             position: relative;
             padding: 18px 15px; 
@@ -201,23 +211,26 @@
         }
         .game-info span { color: #888; margin-right: 8px; font-size: 11px; }
 
-        /* [추가] 터치 시 나타나는 반투명 액션 레이어 */
         .action-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(8px);
-            display: none; /* 기본 숨김 */
-            justify-content: center; align-items: center; gap: 20px;
+            background: rgba(255, 255, 255, 0.15); /* 더 투명하게 */
+            backdrop-filter: blur(12px); /* 블러 강화 */
+            display: none; 
+            justify-content: center; align-items: center; gap: 12px;
             z-index: 10; animation: fadeIn 0.2s ease;
         }
         .action-overlay.active { display: flex; }
 
+        /* [수정] 오버레이 버튼 디자인 및 투명도 조절 */
         .overlay-btn {
-            padding: 8px 24px; border-radius: 12px; font-weight: 900; font-size: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.3);
+            padding: 6px 16px; border-radius: 10px; font-weight: 900; font-size: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.4);
+            transition: 0.2s;
         }
-        .btn-overlay-edit { background: rgba(255, 160, 0, 0.85); color: white; }
-        .btn-overlay-del { background: rgba(255, 50, 80, 0.85); color: white; }
+        .overlay-btn:active { transform: scale(0.9); }
+        .btn-overlay-edit { background: rgba(255, 160, 0, 0.6); color: white; } /* 반투명 Amber */
+        .btn-overlay-del { background: rgba(255, 50, 80, 0.6); color: white; }  /* 반투명 Red */
+        .btn-overlay-cancel { background: rgba(120, 120, 120, 0.6); color: white; } /* 반투명 Gray */
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -233,7 +246,7 @@
         .color-pink { color: #ff69b4; }
     </style>
 </head>
-<body>
+<body id="app-body">
 
 <div id="welcome-screen">
     <div class="welcome-content">
@@ -262,7 +275,7 @@
     <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
-<div class="card">
+<div class="card" id="inputCard">
     <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 20px 0; color:#444; font-weight:800;">📅 날짜 확인 중</h2>
     <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:15px; background: var(--edit); padding: 12px; border-radius: 12px; text-align: center;">✏️ 기록 수정 중</div>
 
@@ -454,7 +467,6 @@
 
     function changeZoom(v) { currentZoom = v; document.body.style.zoom = v; }
 
-    /* [개선된 부분] 렌더링 시 버튼을 없애고 오버레이를 추가함 */
     function renderGameList() {
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr); const listArea = document.getElementById('dayGameList');
         if(games.length > 0) {
@@ -467,6 +479,7 @@
                     <div class="action-overlay">
                         <div class="overlay-btn btn-overlay-edit" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
                         <div class="overlay-btn btn-overlay-del" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>
+                        <div class="overlay-btn btn-overlay-cancel" onclick="event.stopPropagation(); hideActionOverlays()">취소</div>
                     </div>
                 </div>`; 
             });
@@ -474,24 +487,41 @@
         } else listArea.innerHTML = "";
     }
 
-    /* 오버레이 켜고 끄기 */
     function toggleActionOverlay(el) {
         const overlay = el.querySelector('.action-overlay');
         const isActive = overlay.classList.contains('active');
-        document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active')); // 다른거 닫기
+        hideActionOverlays();
         if(!isActive) overlay.classList.add('active');
+    }
+
+    function hideActionOverlays() {
+        document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active'));
     }
 
     function enterEditMode(round, rankStr) { 
         editMode = true; editRound = round; 
         updateInputFields(rankStr.split(',')); 
         document.getElementById('editBadge').style.display = 'block'; 
+        
+        /* [수정] 수정 모드 시 드롭다운 스타일 적용을 위해 클래스 추가 */
+        document.getElementById('inputCard').classList.add('edit-active');
+        
         const btn = document.getElementById('mainBtn'); 
         btn.innerText = "수정 완료"; btn.classList.add('edit-btn');
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // 입력창으로 이동
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function cancelEdit() { editMode = false; editRound = null; document.getElementById('editBadge').style.display = 'none'; const btn = document.getElementById('mainBtn'); btn.innerText = "순위 저장"; btn.classList.remove('edit-btn'); document.getElementById('playerCount').value = "3"; updateInputFields(); }
+    function cancelEdit() { 
+        editMode = false; editRound = null; 
+        document.getElementById('editBadge').style.display = 'none'; 
+        
+        /* [수정] 클래스 제거 */
+        document.getElementById('inputCard').classList.remove('edit-active');
+        
+        const btn = document.getElementById('mainBtn'); 
+        btn.innerText = "순위 저장"; btn.classList.remove('edit-btn'); 
+        document.getElementById('playerCount').value = "3"; updateInputFields(); 
+    }
 
     async function deleteGame(round) { 
         if(!confirm("정말 삭제할거야?")) return; 
@@ -535,10 +565,9 @@
         fetchData(); 
     };
     
-    // 화면 아무데나 클릭 시 액션 오버레이 닫기
     document.addEventListener('click', (e) => {
         if(!e.target.closest('.game-item')) {
-            document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active'));
+            hideActionOverlays();
         }
     });
 </script>
