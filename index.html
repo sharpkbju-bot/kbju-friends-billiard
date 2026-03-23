@@ -43,7 +43,6 @@
             --card-bg: rgba(243, 230, 255, 0.7); 
         }
 
-        /* 전역 터치 하이라이트 제거 */
         * { -webkit-tap-highlight-color: transparent; outline: none; }
 
         body { 
@@ -162,7 +161,6 @@
 
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
         
-        /* [수정] 확대 시 줄바꿈 대응 스타일 */
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); line-height: 1.4; }
         .zoom-br { display: none; }
         body[style*="zoom: 1.2"] .zoom-br { display: inline; }
@@ -176,45 +174,61 @@
         .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .game-item { padding: 15px 10px; border-radius: 18px; background: rgba(236, 238, 241, 0.4); margin-top: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--inner-shadow); }
-        .game-info { font-size: 11px; font-weight: 800; color: #555; overflow: hidden; text-overflow: ellipsis; flex: 1; }
-        .game-btns { display: flex; gap: 8px; flex-shrink: 0; font-size: 11px; font-weight: bold; }
-        .game-btns span { padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(240,240,240,0.8) 100%); }
+        /* [개선] 게임 아이템 뉴모피즘 스타일 및 인터랙션 */
+        .game-item { 
+            position: relative;
+            padding: 18px 15px; 
+            border-radius: 22px; 
+            background: linear-gradient(145deg, #f0f0f0, #ffffff); 
+            margin-top: 15px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8);
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+        .game-item:active { transform: scale(0.98); }
+
+        .game-info { 
+            font-size: 13px; 
+            font-weight: 800; 
+            color: #444; 
+            text-align: center;
+            letter-spacing: -0.5px;
+            width: 100%;
+        }
+        .game-info span { color: #888; margin-right: 8px; font-size: 11px; }
+
+        /* [추가] 터치 시 나타나는 반투명 액션 레이어 */
+        .action-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px);
+            display: none; /* 기본 숨김 */
+            justify-content: center; align-items: center; gap: 20px;
+            z-index: 10; animation: fadeIn 0.2s ease;
+        }
+        .action-overlay.active { display: flex; }
+
+        .overlay-btn {
+            padding: 8px 24px; border-radius: 12px; font-weight: 900; font-size: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.3);
+        }
+        .btn-overlay-edit { background: rgba(255, 160, 0, 0.85); color: white; }
+        .btn-overlay-del { background: rgba(255, 50, 80, 0.85); color: white; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
         .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 30px; text-align: center; width: 80%; max-width: 320px; box-shadow: 15px 15px 40px rgba(0,0,0,0.1); }
 
-        .zoom-wrap { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            margin-bottom: 15px; 
-            padding-bottom: 10px; 
-            border-bottom: 1px solid rgba(0,0,0,0.04); 
-        }
-        .zoom-label-main { 
-            font-size: 14px; 
-            font-weight: 800; 
-            color: #666; 
-        }
-        .zoom-options {
-            display: flex;
-            gap: 12px;
-        }
-        .zoom-options label { 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            cursor: pointer; 
-            font-weight: 900 !important; 
-            font-size: 14px;
-        }
-        .zoom-options input { 
-            order: 1; 
-            width: 16px; 
-            height: 16px; 
-            margin: 0; 
-            cursor: pointer; 
-        }
+        .zoom-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+        .zoom-label-main { font-size: 14px; font-weight: 800; color: #666; }
+        .zoom-options { display: flex; gap: 12px; }
+        .zoom-options label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 900 !important; font-size: 14px; }
+        .zoom-options input { order: 1; width: 16px; height: 16px; margin: 0; cursor: pointer; }
         .color-purple { color: #9b59b6; }
         .color-pink { color: #ff69b4; }
     </style>
@@ -315,7 +329,6 @@
     let editMode = false;
     let editRound = null;
     let currentZoom = "1";
-    
     let isPercentMode = false;
 
     function formatDate(dateInput) {
@@ -368,11 +381,13 @@
     }
 
     function selectDate(dateStr) { if(editMode) cancelEdit(); selectedDateStr = dateStr; document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`; renderCalendar(); renderGameList(); }
+    
     function checkDuplicates() {
         const selects = Array.from(document.querySelectorAll('#inputArea select')); const values = selects.map(s => s.value);
         selects.forEach(s => s.classList.remove('duplicate-error'));
         values.forEach((v, i) => { if(v && values.filter(x => x === v).length > 1) selects[i].classList.add('duplicate-error'); });
     }
+    
     function updateInputFields(preFill = null) {
         if(preFill) document.getElementById('playerCount').value = preFill.length;
         const count = parseInt(document.getElementById('playerCount').value); let html = '';
@@ -382,7 +397,9 @@
         }
         document.getElementById('inputArea').innerHTML = html; if(preFill) checkDuplicates();
     }
+    
     function resetInputs() { if(editMode) cancelEdit(); else { document.getElementById('playerCount').value = "3"; updateInputFields(); } }
+    
     async function saveGame() {
         const todayStr = formatDate(new Date()); if(selectedDateStr > todayStr) return alert("미래에서 온거야? 오늘이 며칠인지 확인해!");
         const count = parseInt(document.getElementById('playerCount').value); const ranks = [];
@@ -392,19 +409,17 @@
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); setTimeout(() => { fetchData(); alert("저장 완료 ✨"); cancelEdit(); }, 1200); } catch (e) { alert("오류 발생!"); showLoading(false); }
     }
+
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 데이터를 지울까요?</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
-        else if(step === 2) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구 불가! 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
+        else if(step === 2) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구 불가입니다! 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
         else if(step === 3) el.innerHTML = `<button class="reset-btn" style="background:var(--accent); font-size:16px;" onclick="executeReset()">[최종 확인] 🔥 마지막.<br class="zoom-br"> 모두 삭제합니다.</button><button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
     }
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
     async function executeReset() { showLoading(true, "초기화 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); } catch(e) { showLoading(false); } }
 
-    function toggleAllMode() {
-        isPercentMode = !isPercentMode;
-        renderStats();
-    }
+    function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
 
     function renderStats() {
         let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
@@ -422,39 +437,15 @@
         const bodyHtml = sortedByWin.map(p => {
             let nameTdContent = p;
             let nameStyle = "font-weight:900; letter-spacing:-0.5px;"; const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
-            
             if (stats[p].ranks[0] === maxCounts.r0 && stats[p].ranks[4] === maxCounts.r4 && maxCounts.r0 > 0) {
-                if (p.length >= 2) {
-                    nameTdContent = `<span style="color:orange;">${p[0]}</span><span style="color:#ff69b4;">${p.substring(1)}</span>`;
-                } else {
-                    nameTdContent = `<span style="color:orange;">${p}</span>`;
-                }
-            } else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) {
-                nameStyle += `color:var(--rankL);`;
-            } else if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) {
-                nameStyle += `color:var(--rank1);`;
-            }
+                nameTdContent = p.length >= 2 ? `<span style="color:orange;">${p[0]}</span><span style="color:#ff69b4;">${p.substring(1)}</span>` : `<span style="color:orange;">${p}</span>`;
+            } else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
+            else if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`;
             
-            const getVal = (val, total) => {
-                if(isPercentMode) { if(total === 0) return '0%'; return ((val/total)*100).toFixed(0) + '%'; }
-                return val;
-            };
+            const getVal = (val, total) => { if(isPercentMode) return total === 0 ? '0%' : ((val/total)*100).toFixed(0) + '%'; return val; };
+            const tdStyle = (val, max, colorVar) => `style="color:var(${colorVar}); ${(val === max && max > 0) ? 'font-weight:900; font-size:14px;' : ''}"`;
 
-            const tdStyle = (val, max, colorVar) => {
-                const bold = (val === max && max > 0) ? 'font-weight:900; font-size:14px;' : '';
-                return `style="color:var(${colorVar}); ${bold}"`;
-            };
-
-            return `<tr>
-                <td style="${nameStyle}">${nameTdContent}</td>
-                <td>${stats[p].played}</td>
-                <td ${tdStyle(stats[p].ranks[0], maxCounts.r0, '--rank1')}>${getVal(stats[p].ranks[0], stats[p].played)}</td>
-                <td ${tdStyle(stats[p].ranks[1], maxCounts.r1, '--rank2')}>${getVal(stats[p].ranks[1], stats[p].played)}</td>
-                <td ${tdStyle(stats[p].ranks[2], maxCounts.r2, '--rank3')}>${getVal(stats[p].ranks[2], stats[p].played)}</td>
-                <td ${tdStyle(stats[p].ranks[3], maxCounts.r3, '--rank4')}>${getVal(stats[p].ranks[3], stats[p].played)}</td>
-                <td ${tdStyle(stats[p].ranks[4], maxCounts.r4, '--rankL')}>${getVal(stats[p].ranks[4], stats[p].played)}</td>
-                <td style="font-size:12px; color:#006400; font-weight:900;">${winRate}%</td>
-            </tr>`;
+            return `<tr><td style="${nameStyle}">${nameTdContent}</td><td>${stats[p].played}</td><td ${tdStyle(stats[p].ranks[0], maxCounts.r0, '--rank1')}>${getVal(stats[p].ranks[0], stats[p].played)}</td><td ${tdStyle(stats[p].ranks[1], maxCounts.r1, '--rank2')}>${getVal(stats[p].ranks[1], stats[p].played)}</td><td ${tdStyle(stats[p].ranks[2], maxCounts.r2, '--rank3')}>${getVal(stats[p].ranks[2], stats[p].played)}</td><td ${tdStyle(stats[p].ranks[3], maxCounts.r3, '--rank4')}>${getVal(stats[p].ranks[3], stats[p].played)}</td><td ${tdStyle(stats[p].ranks[4], maxCounts.r4, '--rankL')}>${getVal(stats[p].ranks[4], stats[p].played)}</td><td style="font-size:12px; color:#006400; font-weight:900;">${winRate}%</td></tr>`;
         }).join('');
         document.getElementById('statsBody').innerHTML = bodyHtml || players.map(p => `<tr><td>${p}</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td></tr>`).join('');
         const richFriend = document.getElementById('richFriendArea');
@@ -463,27 +454,61 @@
 
     function changeZoom(v) { currentZoom = v; document.body.style.zoom = v; }
 
+    /* [개선된 부분] 렌더링 시 버튼을 없애고 오버레이를 추가함 */
     function renderGameList() {
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr); const listArea = document.getElementById('dayGameList');
         if(games.length > 0) {
-            let html = `<div style="text-align:center; margin:28px 0 10px 0;">
-                <span style="font-size:14px; color:#7f8c8d; font-weight:800;">GAME RECORD</span>
-            </div>`;
-            games.forEach((g, idx) => { const names = g.ranks.filter(n => n && n.trim() !== ""); html += `<div class="game-item"><div class="game-info"><span>${idx+1}G</span> ${names.join('→')}</div><div class="game-btns"><span style="color:var(--edit)" onclick="enterEditMode(${g.round}, '${names.join(',')}')">수정</span><span style="color:var(--success)" onclick="deleteGame(event, ${g.round})">삭제</span></div></div>`; });
+            let html = `<div style="text-align:center; margin:28px 0 10px 0;"><span style="font-size:14px; color:#7f8c8d; font-weight:800;">GAME RECORD</span></div>`;
+            games.forEach((g, idx) => { 
+                const names = g.ranks.filter(n => n && n.trim() !== ""); 
+                html += `
+                <div class="game-item" onclick="toggleActionOverlay(this)">
+                    <div class="game-info"><span>${idx+1}G</span> ${names.join(' → ')}</div>
+                    <div class="action-overlay">
+                        <div class="overlay-btn btn-overlay-edit" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
+                        <div class="overlay-btn btn-overlay-del" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>
+                    </div>
+                </div>`; 
+            });
             listArea.innerHTML = html;
         } else listArea.innerHTML = "";
     }
-    function enterEditMode(round, rankStr) { editMode = true; editRound = round; updateInputFields(rankStr.split(',')); document.getElementById('editBadge').style.display = 'block'; const btn = document.getElementById('mainBtn'); btn.innerText = "수정 완료"; btn.classList.add('edit-btn'); }
+
+    /* 오버레이 켜고 끄기 */
+    function toggleActionOverlay(el) {
+        const overlay = el.querySelector('.action-overlay');
+        const isActive = overlay.classList.contains('active');
+        document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active')); // 다른거 닫기
+        if(!isActive) overlay.classList.add('active');
+    }
+
+    function enterEditMode(round, rankStr) { 
+        editMode = true; editRound = round; 
+        updateInputFields(rankStr.split(',')); 
+        document.getElementById('editBadge').style.display = 'block'; 
+        const btn = document.getElementById('mainBtn'); 
+        btn.innerText = "수정 완료"; btn.classList.add('edit-btn');
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // 입력창으로 이동
+    }
+
     function cancelEdit() { editMode = false; editRound = null; document.getElementById('editBadge').style.display = 'none'; const btn = document.getElementById('mainBtn'); btn.innerText = "순위 저장"; btn.classList.remove('edit-btn'); document.getElementById('playerCount').value = "3"; updateInputFields(); }
-    async function deleteGame(e, round) { e.stopPropagation(); if(!confirm("정말 삭제할거야?")) return; showLoading(true, "삭제 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) }); setTimeout(() => fetchData(), 1200); } catch (e) { showLoading(false); } }
+
+    async function deleteGame(round) { 
+        if(!confirm("정말 삭제할거야?")) return; 
+        showLoading(true, "삭제 중"); 
+        try { 
+            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) }); 
+            setTimeout(() => fetchData(), 1200); 
+        } catch (e) { showLoading(false); } 
+    }
+
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
     
     function closeAppWindow() { 
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if(isIOS) {
-            closeExitModal();
-        } else {
+        if(isIOS) closeExitModal();
+        else {
             if (window.history.length > 1) window.history.back(); 
             window.close(); 
             setTimeout(() => { window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end"; }, 100); 
@@ -509,6 +534,13 @@
         renderStats(); 
         fetchData(); 
     };
+    
+    // 화면 아무데나 클릭 시 액션 오버레이 닫기
+    document.addEventListener('click', (e) => {
+        if(!e.target.closest('.game-item')) {
+            document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active'));
+        }
+    });
 </script>
 </body>
 </html>
