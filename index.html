@@ -42,8 +42,8 @@
             
             --card-bg: rgba(243, 230, 255, 0.7); 
 
-            /* [추가] 수정 모드 시 드롭다운 스타일 */
-            --edit-mode-bg: #e1f5fe;
+            /* [수정] 수정 모드 시 드롭다운 스타일 - 연한 그린색으로 변경 */
+            --edit-mode-bg: #e8f5e9;
             --edit-mode-border: #9b59b6;
         }
 
@@ -126,7 +126,6 @@
             -webkit-appearance: none; text-align: center; text-align-last: center; 
         }
 
-        /* [수정] 수정 모드 시의 셀렉트 박스 스타일 */
         .edit-active select {
             background-color: var(--edit-mode-bg) !important;
             border: 2px solid var(--edit-mode-border) !important;
@@ -213,24 +212,23 @@
 
         .action-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.15); /* 더 투명하게 */
-            backdrop-filter: blur(12px); /* 블러 강화 */
+            background: rgba(255, 255, 255, 0.15); 
+            backdrop-filter: blur(12px); 
             display: none; 
             justify-content: center; align-items: center; gap: 12px;
             z-index: 10; animation: fadeIn 0.2s ease;
         }
         .action-overlay.active { display: flex; }
 
-        /* [수정] 오버레이 버튼 디자인 및 투명도 조절 */
         .overlay-btn {
             padding: 6px 16px; border-radius: 10px; font-weight: 900; font-size: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.4);
             transition: 0.2s;
         }
         .overlay-btn:active { transform: scale(0.9); }
-        .btn-overlay-edit { background: rgba(255, 160, 0, 0.6); color: white; } /* 반투명 Amber */
-        .btn-overlay-del { background: rgba(255, 50, 80, 0.6); color: white; }  /* 반투명 Red */
-        .btn-overlay-cancel { background: rgba(120, 120, 120, 0.6); color: white; } /* 반투명 Gray */
+        .btn-overlay-edit { background: rgba(255, 160, 0, 0.6); color: white; } 
+        .btn-overlay-del { background: rgba(255, 50, 80, 0.6); color: white; }  
+        .btn-overlay-cancel { background: rgba(120, 120, 120, 0.6); color: white; } 
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -279,6 +277,14 @@
     <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 20px 0; color:#444; font-weight:800;">📅 날짜 확인 중</h2>
     <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:15px; background: var(--edit); padding: 12px; border-radius: 12px; text-align: center;">✏️ 기록 수정 중</div>
 
+    <div class="zoom-wrap">
+        <span class="zoom-label-main">화면 크기</span>
+        <div class="zoom-options">
+            <label class="color-purple">기본 <input type="radio" name="z" value="1" onclick="changeZoom('1')" checked></label>
+            <label class="color-pink">확대 <input type="radio" name="z" value="1.2" onclick="changeZoom('1.2')"></label>
+        </div>
+    </div>
+
     <div class="setup-row">
         <span style="font-size:14px; font-weight:800; color:#666;">게임 인원</span>
         <select id="playerCount" onchange="updateInputFields()">
@@ -287,14 +293,6 @@
             <option value="4">4명</option>
             <option value="5">5명</option>
         </select>
-    </div>
-
-    <div class="zoom-wrap">
-        <span class="zoom-label-main">화면 크기</span>
-        <div class="zoom-options">
-            <label class="color-purple">기본 <input type="radio" name="z" value="1" onclick="changeZoom('1')" checked></label>
-            <label class="color-pink">확대 <input type="radio" name="z" value="1.2" onclick="changeZoom('1.2')"></label>
-        </div>
     </div>
 
     <div id="inputArea"></div>
@@ -503,7 +501,6 @@
         updateInputFields(rankStr.split(',')); 
         document.getElementById('editBadge').style.display = 'block'; 
         
-        /* [수정] 수정 모드 시 드롭다운 스타일 적용을 위해 클래스 추가 */
         document.getElementById('inputCard').classList.add('edit-active');
         
         const btn = document.getElementById('mainBtn'); 
@@ -515,7 +512,6 @@
         editMode = false; editRound = null; 
         document.getElementById('editBadge').style.display = 'none'; 
         
-        /* [수정] 클래스 제거 */
         document.getElementById('inputCard').classList.remove('edit-active');
         
         const btn = document.getElementById('mainBtn'); 
