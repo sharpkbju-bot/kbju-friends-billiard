@@ -43,7 +43,8 @@
             --card-bg: rgba(243, 230, 255, 0.7); 
 
             --edit-mode-bg: #e8f5e9;
-            --edit-mode-border: #9b59b6;
+            /* 테두리 색상을 퍼플에서 진한 그린으로 변경 */
+            --edit-mode-border: #2d5a27; 
         }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; }
@@ -125,6 +126,7 @@
             -webkit-appearance: none; text-align: center; text-align-last: center; 
         }
 
+        /* 수정 모드 활성화 시 스타일 */
         .edit-active select {
             background-color: var(--edit-mode-bg) !important;
             border: 2px solid var(--edit-mode-border) !important;
@@ -368,7 +370,6 @@
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec"; 
     
-    // [경석] 추가됨
     const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
     
     let gameLogs = [];
@@ -461,7 +462,7 @@
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 데이터를 지울까요?</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
-        else if(step === 2) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구 불가입니다! 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
+        else if(step === 2) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구 불가! 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
         else if(step === 3) el.innerHTML = `<button class="reset-btn" style="background:var(--accent); font-size:16px;" onclick="executeReset()">[최종 확인] 🔥 마지막.<br class="zoom-br"> 모두 삭제합니다.</button><button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
     }
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
@@ -555,6 +556,7 @@
     function cancelEdit() { 
         editMode = false; editRound = null; 
         document.getElementById('editBadge').style.display = 'none'; 
+        /* [수정] 취소 시 테두리 활성화를 확실히 제거하도록 수정 */
         document.getElementById('inputCard').classList.remove('edit-active');
         const btn = document.getElementById('mainBtn'); 
         btn.innerText = "순위 저장"; btn.classList.remove('edit-btn'); 
@@ -595,7 +597,7 @@
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if(isIOS) {
             document.getElementById('exitBtn').innerText = "📱 홈 화면으로";
-            document.getElementById('exit-msg').innerHTML = "아이폰은 시스템 정책상<br>직접 쓸어올려서 종료해야 해!<br>다음에 또 보자!";
+            document.getElementById('exit-msg').innerHTML = "SWIPE UP<br>다음에 또 보자!";
             document.getElementById('modalOkBtn').innerText = "확인";
         }
         updateInputFields(); 
