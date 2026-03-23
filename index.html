@@ -153,7 +153,8 @@
         }
 
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; table-layout: fixed; }
-        .stats-table th { padding: 12px 1px; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -1px; }
+        /* [수정] 꼴찌💀가 잘리지 않고 한 줄에 표시되도록 white-space와 패딩 조정 */
+        .stats-table th { padding: 12px 1px; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -1px; white-space: nowrap; }
         .stats-table td { padding: 14px 1px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 700; white-space: nowrap; overflow: hidden; }
 
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
@@ -191,17 +192,16 @@
             display: flex;
             gap: 12px;
         }
-        /* [수정] 라디오 버튼을 글자 오른쪽으로, 글자 크기는 14px로 동일하게 맞춤 */
         .zoom-options label { 
             display: flex; 
             align-items: center; 
             gap: 6px; 
             cursor: pointer; 
             font-weight: 900 !important; 
-            font-size: 14px; /* 화면 크기 글자와 동일하게 수정 */
+            font-size: 14px;
         }
         .zoom-options input { 
-            order: 1; /* 글자 다음으로 위치 강제 */
+            order: 1; 
             width: 16px; 
             height: 16px; 
             margin: 0; 
