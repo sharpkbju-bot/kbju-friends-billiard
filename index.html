@@ -152,10 +152,12 @@
             border: none !important; 
         }
 
-        .stats-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; table-layout: fixed; }
-        .stats-table th { padding: 12px 1px; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -0.5px; }
-        .stats-table td { padding: 14px 1px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 700; }
-        
+        /* [수정] 테이블 폭 최적화 및 터치 영역 스타일 */
+        .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; table-layout: fixed; }
+        .stats-table th { padding: 12px 1px; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -1px; }
+        .stats-table td { padding: 14px 1px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 700; white-space: nowrap; overflow: hidden; }
+        .toggle-val { cursor: pointer; display: inline-block; width: 100%; min-height: 20px; }
+
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); }
         .cancel-btn { width: 100%; background: #bdc3c7; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; }
@@ -243,12 +245,12 @@
         <thead>
             <tr>
                 <th style="width:16%">이름</th>
-                <th>참여</th>
-                <th style="color:var(--rank1); white-space:nowrap; vertical-align:middle;">1위<span style="font-size:12px; margin-left:1px; display:inline-block; vertical-align:middle;">🥇</span></th>
+                <th style="width:11%">참여</th>
+                <th style="color:var(--rank1); white-space:nowrap; vertical-align:middle;">1위🥇</th>
                 <th style="color:var(--rank2)">2위</th>
                 <th style="color:var(--rank3)">3위</th>
                 <th style="color:var(--rank4)">4위</th>
-                <th style="color:var(--rankL); white-space:nowrap; vertical-align:middle;">꼴찌<span style="font-size:12px; margin-left:1px; display:inline-block; vertical-align:middle;">💀</span></th>
+                <th style="color:var(--rankL); white-space:nowrap; vertical-align:middle;">꼴찌💀</th>
                 <th style="width:16%">승률</th>
             </tr>
         </thead>
@@ -357,6 +359,20 @@
     }
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
     async function executeReset() { showLoading(true, "초기화 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); } catch(e) { showLoading(false); } }
+
+    /* [수정] 전적 수치/확률 토글 함수 */
+    function toggleStat(el, count, total) {
+        if (!total || total === 0) return;
+        const isPercent = el.getAttribute('data-mode') === 'pct';
+        if (isPercent) {
+            el.innerText = count;
+            el.setAttribute('data-mode', 'cnt');
+        } else {
+            el.innerText = ((count / total) * 100).toFixed(0) + '%';
+            el.setAttribute('data-mode', 'pct');
+        }
+    }
+
     function renderStats() {
         let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
         gameLogs.forEach(g => {
@@ -373,8 +389,23 @@
         const bodyHtml = sortedByWin.map(p => {
             let nameStyle = "font-weight:900; letter-spacing:-0.5px;"; const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`; else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
-            const b = (val, max) => (val === max && max > 0) ? `style="font-weight:900; font-size:14px;"` : "";
-            return `<tr><td style="${nameStyle}">${p}</td><td ${b(stats[p].played, maxCounts.played)}>${stats[p].played}</td><td style="${stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0 ? 'color:var(--rank1); font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[0]}</td><td style="color:var(--rank2); ${stats[p].ranks[1] === maxCounts.r1 && maxCounts.r1 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[1]}</td><td style="color:var(--rank3); ${stats[p].ranks[2] === maxCounts.r2 && maxCounts.r2 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[2]}</td><td style="color:var(--rank4); ${stats[p].ranks[3] === maxCounts.r3 && maxCounts.r3 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[3]}</td><td style="color:var(--rankL); ${stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0 ? 'font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[4]}</td><td style="font-size:12.5px; color:#006400; font-weight:900;">${winRate}%</td></tr>`;
+            
+            /* [수정] 2위~꼴찌 셀에 클릭 시 수치/확률 토글 적용 */
+            const getToggleTd = (val, max, colorVar, total) => {
+                const boldStyle = (val === max && max > 0) ? 'font-weight:900; font-size:14px;' : '';
+                return `<td style="color:var(${colorVar}); ${boldStyle}"><span class="toggle-val" data-mode="cnt" onclick="toggleStat(this, ${val}, ${total})">${val}</span></td>`;
+            };
+
+            return `<tr>
+                <td style="${nameStyle}">${p}</td>
+                <td>${stats[p].played}</td>
+                <td style="${stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0 ? 'color:var(--rank1); font-weight:900; font-size:14px;' : ''}">${stats[p].ranks[0]}</td>
+                ${getToggleTd(stats[p].ranks[1], maxCounts.r1, '--rank2', stats[p].played)}
+                ${getToggleTd(stats[p].ranks[2], maxCounts.r2, '--rank3', stats[p].played)}
+                ${getToggleTd(stats[p].ranks[3], maxCounts.r3, '--rank4', stats[p].played)}
+                ${getToggleTd(stats[p].ranks[4], maxCounts.r4, '--rankL', stats[p].played)}
+                <td style="font-size:12px; color:#006400; font-weight:900;">${winRate}%</td>
+            </tr>`;
         }).join('');
         document.getElementById('statsBody').innerHTML = bodyHtml || players.map(p => `<tr><td>${p}</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td></tr>`).join('');
         const richFriend = document.getElementById('richFriendArea');
