@@ -174,11 +174,10 @@
         #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
         .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 30px; text-align: center; width: 80%; max-width: 320px; box-shadow: 15px 15px 40px rgba(0,0,0,0.1); }
 
-        /* [수정] 게임 인원 글자와 열을 맞추고 라디오 버튼을 우측으로 배치 */
         .zoom-wrap { 
             display: flex; 
             align-items: center; 
-            justify-content: space-between; /* 양 끝 정렬로 우측 배치 유도 */
+            justify-content: space-between; 
             margin-bottom: 15px; 
             padding-bottom: 10px; 
             border-bottom: 1px solid rgba(0,0,0,0.04); 
@@ -192,16 +191,17 @@
             display: flex;
             gap: 12px;
         }
+        /* [수정] 라디오 버튼을 글자 오른쪽으로, 글자 크기는 14px로 동일하게 맞춤 */
         .zoom-options label { 
             display: flex; 
-            flex-direction: row-reverse; /* 라디오 버튼을 글자 우측으로 */
             align-items: center; 
             gap: 6px; 
             cursor: pointer; 
             font-weight: 900 !important; 
-            font-size: 15px;
+            font-size: 14px; /* 화면 크기 글자와 동일하게 수정 */
         }
         .zoom-options input { 
+            order: 1; /* 글자 다음으로 위치 강제 */
             width: 16px; 
             height: 16px; 
             margin: 0; 
