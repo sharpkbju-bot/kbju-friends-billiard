@@ -153,9 +153,9 @@
         }
 
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; table-layout: fixed; }
-        /* [수정] 꼴찌💀가 잘리지 않고 한 줄에 표시되도록 white-space와 패딩 조정 */
-        .stats-table th { padding: 12px 1px; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -1px; white-space: nowrap; }
-        .stats-table td { padding: 14px 1px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 700; white-space: nowrap; overflow: hidden; }
+        /* [수정] 표의 열 간격을 확보하기 위해 padding을 소폭 늘리고 글자 겹침 방지 */
+        .stats-table th { padding: 12px 2px; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -1.2px; white-space: nowrap; }
+        .stats-table td { padding: 14px 2px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 700; white-space: nowrap; overflow: hidden; }
 
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); }
