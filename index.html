@@ -153,7 +153,7 @@
         }
 
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; table-layout: fixed; }
-        .stats-table th { padding: 12px 1px; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -1px; cursor: pointer; }
+        .stats-table th { padding: 12px 1px; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -1px; }
         .stats-table td { padding: 14px 1px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 700; white-space: nowrap; overflow: hidden; }
 
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
@@ -244,11 +244,11 @@
             <tr>
                 <th style="width:16%">이름</th>
                 <th style="width:11%">참여</th>
-                <th id="th-rank0" style="color:var(--rank1); white-space:nowrap; vertical-align:middle;" onclick="toggleColumnMode(0)">1위🥇</th>
-                <th id="th-rank1" style="color:var(--rank2)" onclick="toggleColumnMode(1)">2위</th>
-                <th id="th-rank2" style="color:var(--rank3)" onclick="toggleColumnMode(2)">3위</th>
-                <th id="th-rank3" style="color:var(--rank4)" onclick="toggleColumnMode(3)">4위</th>
-                <th id="th-rank4" style="color:var(--rankL); white-space:nowrap; vertical-align:middle;" onclick="toggleColumnMode(4)">꼴찌💀</th>
+                <th style="color:var(--rank1); cursor:pointer;" onclick="toggleAllMode()">1위🥇</th>
+                <th style="color:var(--rank2); cursor:pointer;" onclick="toggleAllMode()">2위</th>
+                <th style="color:var(--rank3); cursor:pointer;" onclick="toggleAllMode()">3위</th>
+                <th style="color:var(--rank4); cursor:pointer;" onclick="toggleAllMode()">4위</th>
+                <th style="color:var(--rankL); cursor:pointer;" onclick="toggleAllMode()">꼴찌💀</th>
                 <th style="width:16%">승률</th>
             </tr>
         </thead>
@@ -275,8 +275,8 @@
     let editRound = null;
     let currentZoom = "1";
     
-    /* [수정] 각 열의 표시 모드 (count/percent) 상태 관리 */
-    let columnModes = [ 'cnt', 'cnt', 'cnt', 'cnt', 'cnt' ];
+    /* [수정] 확률 모드 플래그 */
+    let isPercentMode = false;
 
     function formatDate(dateInput) {
         const d = new Date(dateInput);
@@ -361,9 +361,9 @@
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
     async function executeReset() { showLoading(true, "초기화 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); } catch(e) { showLoading(false); } }
 
-    /* [수정] 열 단위 모드 토글 함수 */
-    function toggleColumnMode(idx) {
-        columnModes[idx] = (columnModes[idx] === 'cnt') ? 'pct' : 'cnt';
+    /* [수정] 헤더 터치 시 전 구간 일괄 모드 전환 */
+    function toggleAllMode() {
+        isPercentMode = !isPercentMode;
         renderStats();
     }
 
@@ -384,9 +384,12 @@
             let nameStyle = "font-weight:900; letter-spacing:-0.5px;"; const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`; else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
             
-            /* [수정] 열 모드에 따라 텍스트 결정 */
-            const getVal = (idx, val, total) => {
-                if(columnModes[idx] === 'pct' && total > 0) return ((val/total)*100).toFixed(0) + '%';
+            /* [수정] 0회인 경우에도 확률 모드라면 0%로 표시되도록 보강 */
+            const getVal = (val, total) => {
+                if(isPercentMode) {
+                    if(total === 0) return '0%';
+                    return ((val/total)*100).toFixed(0) + '%';
+                }
                 return val;
             };
 
@@ -398,11 +401,11 @@
             return `<tr>
                 <td style="${nameStyle}">${p}</td>
                 <td>${stats[p].played}</td>
-                <td ${tdStyle(stats[p].ranks[0], maxCounts.r0, '--rank1')}>${getVal(0, stats[p].ranks[0], stats[p].played)}</td>
-                <td ${tdStyle(stats[p].ranks[1], maxCounts.r1, '--rank2')}>${getVal(1, stats[p].ranks[1], stats[p].played)}</td>
-                <td ${tdStyle(stats[p].ranks[2], maxCounts.r2, '--rank3')}>${getVal(2, stats[p].ranks[2], stats[p].played)}</td>
-                <td ${tdStyle(stats[p].ranks[3], maxCounts.r3, '--rank4')}>${getVal(3, stats[p].ranks[3], stats[p].played)}</td>
-                <td ${tdStyle(stats[p].ranks[4], maxCounts.r4, '--rankL')}>${getVal(4, stats[p].ranks[4], stats[p].played)}</td>
+                <td ${tdStyle(stats[p].ranks[0], maxCounts.r0, '--rank1')}>${getVal(stats[p].ranks[0], stats[p].played)}</td>
+                <td ${tdStyle(stats[p].ranks[1], maxCounts.r1, '--rank2')}>${getVal(stats[p].ranks[1], stats[p].played)}</td>
+                <td ${tdStyle(stats[p].ranks[2], maxCounts.r2, '--rank3')}>${getVal(stats[p].ranks[2], stats[p].played)}</td>
+                <td ${tdStyle(stats[p].ranks[3], maxCounts.r3, '--rank4')}>${getVal(stats[p].ranks[3], stats[p].played)}</td>
+                <td ${tdStyle(stats[p].ranks[4], maxCounts.r4, '--rankL')}>${getVal(stats[p].ranks[4], stats[p].played)}</td>
                 <td style="font-size:12px; color:#006400; font-weight:900;">${winRate}%</td>
             </tr>`;
         }).join('');
