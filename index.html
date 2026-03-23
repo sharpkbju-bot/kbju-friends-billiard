@@ -117,7 +117,9 @@
         
         select#playerCount { flex: none !important; width: 85px !important; padding: 8px !important; margin-left: auto; }
         .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
-        .input-row label { width: 55px; font-size: 13px; font-weight: 800; color: #777; flex-shrink: 0; }
+        
+        /* 꼴찌💀 한 줄 표시를 위해 너비 확장 */
+        .input-row label { width: 70px; font-size: 13px; font-weight: 800; color: #777; flex-shrink: 0; white-space: nowrap; }
         
         select { 
             flex: 1; padding: 12px; border-radius: 15px; border: 2px solid transparent; font-size: 14px; 
@@ -169,7 +171,7 @@
             font-size: 12px; table-layout: fixed; 
         }
         .stats-table th { 
-            padding: 8px 2px; color: #999; font-weight: 900; 
+            padding: 8px 1px; color: #999; font-weight: 900; 
             text-transform: uppercase; font-size: 10px;
             border-bottom: 2px solid rgba(0,0,0,0.05);
         }
@@ -178,28 +180,28 @@
             transition: transform 0.2s;
         }
         .stats-table td { 
-            padding: 12px 2px; text-align: center; 
+            padding: 12px 1px; text-align: center; 
             font-weight: 800; color: #555;
             border-top: 1px solid rgba(255,255,255,0.5);
             border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         .stats-table td:first-child { 
             border-radius: 12px 0 0 12px; border-left: 1px solid rgba(255,255,255,0.5);
-            text-align: left; padding-left: 10px; width: 18%;
+            text-align: left; padding-left: 10px; width: 17%;
         }
+        /* 승률 컬럼 너비 및 우측 여백 조정 */
         .stats-table td:last-child { 
             border-radius: 0 12px 12px 0; border-right: 1px solid rgba(255,255,255,0.5);
-            padding-right: 10px; width: 20%; 
+            padding-right: 18px; width: 23%; text-align: right;
         }
         
         .val-highlight { font-size: 13px; text-shadow: 0 1px 0 rgba(255,255,255,0.8); }
         
-        /* 승률 스타일 수정: 테두리와 배경 삭제 */
         .win-rate-pill {
             color: #27ae60;
             font-size: 11px;
             display: inline-block;
-            text-align: center;
+            text-align: right;
             width: 100%;
             font-weight: 800;
         }
@@ -350,7 +352,7 @@
                 <th style="color:var(--rank3); cursor:pointer;" onclick="toggleAllMode()">3위</th>
                 <th style="color:var(--rank4); cursor:pointer;" onclick="toggleAllMode()">4위</th>
                 <th style="color:var(--rankL); cursor:pointer;" onclick="toggleAllMode()">꼴찌💀</th>
-                <th>승률</th>
+                <th style="text-align:right; padding-right:18px;">승률</th>
             </tr>
         </thead>
         <tbody id="statsBody"></tbody>
@@ -545,7 +547,6 @@
         document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active'));
     }
 
-    // 기록 수정 취소 시 상단 입력 영역까지 초기화하도록 개선
     function handleActionCancel() {
         hideActionOverlays();
         if(editMode) cancelEdit();
