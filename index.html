@@ -83,7 +83,7 @@
             border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
-        .calendar-header { display: flex; justify(content: space-between; align-items: center; margin-bottom: 20px; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .nav-btn {
             border: none;
             background: rgba(236, 238, 241, 0.4);
@@ -171,7 +171,7 @@
         .game-info { font-size: 11px; font-weight: 800; color: #555; overflow: hidden; text-overflow: ellipsis; flex: 1; }
         .game-btns { display: flex; gap: 8px; flex-shrink: 0; font-size: 11px; font-weight: bold; }
         .game-btns span { padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(240,240,240,0.8) 100%); }
-        #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
+        #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify(content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
         .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 30px; text-align: center; width: 80%; max-width: 320px; box-shadow: 15px 15px 40px rgba(0,0,0,0.1); }
 
         .zoom-wrap { display: flex; gap: 10px; font-size: 15px; font-weight: 800; justify-content: flex-start; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
@@ -382,7 +382,6 @@
             let nameTdContent = p;
             let nameStyle = "font-weight:900; letter-spacing:-0.5px;"; const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             
-            /* [수정] 1위와 꼴찌를 동시에 한 경우 '주황색, 핑크색' 순서로 적용 */
             if (stats[p].ranks[0] === maxCounts.r0 && stats[p].ranks[4] === maxCounts.r4 && maxCounts.r0 > 0) {
                 if (p.length >= 2) {
                     nameTdContent = `<span style="color:orange;">${p[0]}</span><span style="color:#ff69b4;">${p.substring(1)}</span>`;
