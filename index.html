@@ -83,7 +83,7 @@
             border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .calendar-header { display: flex; justify(content: space-between; align-items: center; margin-bottom: 20px; }
         .nav-btn {
             border: none;
             background: rgba(236, 238, 241, 0.4);
@@ -379,11 +379,16 @@
             maxCounts.r3 = Math.max(maxCounts.r3, stats[p].ranks[3]); maxCounts.r4 = Math.max(maxCounts.r4, stats[p].ranks[4]);
         });
         const bodyHtml = sortedByWin.map(p => {
+            let nameTdContent = p;
             let nameStyle = "font-weight:900; letter-spacing:-0.5px;"; const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             
-            /* [수정] 1위와 꼴찌를 동시에 한 경우 '무지개 컬러' 우선 적용 */
+            /* [수정] 1위와 꼴찌를 동시에 한 경우 '주황색, 핑크색' 순서로 적용 */
             if (stats[p].ranks[0] === maxCounts.r0 && stats[p].ranks[4] === maxCounts.r4 && maxCounts.r0 > 0) {
-                nameStyle += `background: linear-gradient(to right, red, orange, green, blue, indigo, violet); -webkit-background-clip: text; color: transparent;`;
+                if (p.length >= 2) {
+                    nameTdContent = `<span style="color:orange;">${p[0]}</span><span style="color:#ff69b4;">${p.substring(1)}</span>`;
+                } else {
+                    nameTdContent = `<span style="color:orange;">${p}</span>`;
+                }
             } else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) {
                 nameStyle += `color:var(--rankL);`;
             } else if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) {
@@ -401,7 +406,7 @@
             };
 
             return `<tr>
-                <td style="${nameStyle}">${p}</td>
+                <td style="${nameStyle}">${nameTdContent}</td>
                 <td>${stats[p].played}</td>
                 <td ${tdStyle(stats[p].ranks[0], maxCounts.r0, '--rank1')}>${getVal(stats[p].ranks[0], stats[p].played)}</td>
                 <td ${tdStyle(stats[p].ranks[1], maxCounts.r1, '--rank2')}>${getVal(stats[p].ranks[1], stats[p].played)}</td>
