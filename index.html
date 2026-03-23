@@ -275,7 +275,6 @@
     let editRound = null;
     let currentZoom = "1";
     
-    /* [수정] 확률 모드 플래그 */
     let isPercentMode = false;
 
     function formatDate(dateInput) {
@@ -361,7 +360,6 @@
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
     async function executeReset() { showLoading(true, "초기화 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); } catch(e) { showLoading(false); } }
 
-    /* [수정] 헤더 터치 시 전 구간 일괄 모드 전환 */
     function toggleAllMode() {
         isPercentMode = !isPercentMode;
         renderStats();
@@ -382,14 +380,18 @@
         });
         const bodyHtml = sortedByWin.map(p => {
             let nameStyle = "font-weight:900; letter-spacing:-0.5px;"; const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
-            if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`; else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
             
-            /* [수정] 0회인 경우에도 확률 모드라면 0%로 표시되도록 보강 */
+            /* [수정] 1위와 꼴찌를 동시에 한 경우 '무지개 컬러' 우선 적용 */
+            if (stats[p].ranks[0] === maxCounts.r0 && stats[p].ranks[4] === maxCounts.r4 && maxCounts.r0 > 0) {
+                nameStyle += `background: linear-gradient(to right, red, orange, green, blue, indigo, violet); -webkit-background-clip: text; color: transparent;`;
+            } else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) {
+                nameStyle += `color:var(--rankL);`;
+            } else if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) {
+                nameStyle += `color:var(--rank1);`;
+            }
+            
             const getVal = (val, total) => {
-                if(isPercentMode) {
-                    if(total === 0) return '0%';
-                    return ((val/total)*100).toFixed(0) + '%';
-                }
+                if(isPercentMode) { if(total === 0) return '0%'; return ((val/total)*100).toFixed(0) + '%'; }
                 return val;
             };
 
