@@ -152,18 +152,21 @@
             border: none !important; 
         }
 
-        /* [수정] 테이블 전체 너비를 효율적으로 활용하도록 스타일 최적화 */
         .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; table-layout: fixed; }
         .stats-table th { padding: 12px 0; color: #888; border-bottom: 1px solid #ddd; font-weight: 800; letter-spacing: -1.4px; white-space: nowrap; }
         .stats-table td { padding: 14px 0; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.02); font-weight: 700; white-space: nowrap; overflow: visible; }
         
-        /* [수정] 첫 번째(이름)와 마지막(승률) 열의 여백을 줄여 중간 데이터 공간 확보 */
         .stats-table th:first-child, .stats-table td:first-child { width: 15%; text-align: left; padding-left: 2px; }
         .stats-table th:last-child, .stats-table td:last-child { width: 15%; text-align: right; padding-right: 2px; }
         .stats-table th:nth-child(2), .stats-table td:nth-child(2) { width: 10%; }
 
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
-        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); }
+        
+        /* [수정] 확대 시 줄바꿈 대응 스타일 */
+        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); line-height: 1.4; }
+        .zoom-br { display: none; }
+        body[style*="zoom: 1.2"] .zoom-br { display: inline; }
+
         .cancel-btn { width: 100%; background: #bdc3c7; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; }
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); }
         
@@ -392,8 +395,8 @@
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 데이터를 지울까요?</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
-        else if(step === 2) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구 불가! 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
-        else if(step === 3) el.innerHTML = `<button class="reset-btn" style="background:var(--accent); font-size:16px;" onclick="executeReset()">[최종 확인] 🔥 마지막. 모두 삭제합니다.</button><button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
+        else if(step === 2) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구 불가입니다! 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
+        else if(step === 3) el.innerHTML = `<button class="reset-btn" style="background:var(--accent); font-size:16px;" onclick="executeReset()">[최종 확인] 🔥 마지막.<br class="zoom-br"> 모두 삭제합니다.</button><button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
     }
     function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
     async function executeReset() { showLoading(true, "초기화 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); } catch(e) { showLoading(false); } }
