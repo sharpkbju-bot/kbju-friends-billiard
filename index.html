@@ -187,27 +187,21 @@
             border-radius: 12px 0 0 12px; border-left: 1px solid rgba(255,255,255,0.5);
             text-align: left; padding-left: 10px; width: 18%;
         }
-        /* 승률 셀 너비 및 테두리 돌출 수정 */
         .stats-table td:last-child { 
             border-radius: 0 12px 12px 0; border-right: 1px solid rgba(255,255,255,0.5);
             padding-right: 10px; width: 20%; 
         }
         
         .val-highlight { font-size: 13px; text-shadow: 0 1px 0 rgba(255,255,255,0.8); }
-        /* 승률 알약 모양 스타일 최적화 */
+        
+        /* 승률 스타일 수정: 테두리와 배경 삭제 */
         .win-rate-pill {
-            background: rgba(39, 174, 96, 0.1);
             color: #27ae60;
-            padding: 4px 6px;
-            border-radius: 8px;
-            font-size: 10.5px;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid rgba(39, 174, 96, 0.2);
-            white-space: nowrap;
-            width: auto;
-            max-width: 100%;
+            font-size: 11px;
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+            font-weight: 800;
         }
 
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
@@ -446,7 +440,7 @@
         if(preFill) document.getElementById('playerCount').value = preFill.length;
         const count = parseInt(document.getElementById('playerCount').value); 
         const inputArea = document.getElementById('inputArea');
-        inputArea.innerHTML = ""; // 영역 초기화 보장
+        inputArea.innerHTML = "";
         let html = '';
         for(let i=1; i<=count; i++) {
             const label = i === count ? "꼴찌💀" : `${i}위`;
@@ -532,7 +526,7 @@
                     <div class="action-overlay">
                         <div class="overlay-btn btn-overlay-edit" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
                         <div class="overlay-btn btn-overlay-del" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>
-                        <div class="overlay-btn btn-overlay-cancel" onclick="event.stopPropagation(); hideActionOverlays()">취소</div>
+                        <div class="overlay-btn btn-overlay-cancel" onclick="event.stopPropagation(); handleActionCancel()">취소</div>
                     </div>
                 </div>`; 
             });
@@ -549,6 +543,12 @@
 
     function hideActionOverlays() {
         document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active'));
+    }
+
+    // 기록 수정 취소 시 상단 입력 영역까지 초기화하도록 개선
+    function handleActionCancel() {
+        hideActionOverlays();
+        if(editMode) cancelEdit();
     }
 
     function enterEditMode(round, rankStr) { 
@@ -568,7 +568,6 @@
         const btn = document.getElementById('mainBtn'); 
         btn.innerText = "순위 저장"; btn.classList.remove('edit-btn'); 
         document.getElementById('playerCount').value = "3"; 
-        // 폼 리셋을 강제하기 위해 updateInputFields를 호출
         updateInputFields(); 
         document.querySelectorAll('#inputArea select').forEach(s => s.classList.remove('duplicate-error'));
     }
