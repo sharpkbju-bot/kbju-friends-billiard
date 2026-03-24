@@ -524,11 +524,11 @@
             let html = `<div style="text-align:center; margin:28px 0 10px 0;"><span style="font-size:14px; color:#7f8c8d; font-weight:800;">GAME RECORD</span></div>`;
             games.forEach((g, idx) => { 
                 const names = g.ranks.filter(n => n && n.trim() !== ""); 
-                // GAME RECORD 내 1위 파란색, 꼴찌 빨간색 적용 로직
                 const styledNames = names.map((name, i) => {
-                    if (i === 0) return `<span style="color:var(--rank1)">${name}</span>`;
-                    if (i === names.length - 1 && names.length > 1) return `<span style="color:var(--rankL)">${name}</span>`;
-                    return name;
+                    let style = "font-size: 13px;"; // 모든 이름 글자 크기 통일
+                    if (i === 0) style += "color:var(--rank1);";
+                    if (i === names.length - 1 && names.length > 1) style += "color:var(--rankL);";
+                    return `<span style="${style}">${name}</span>`;
                 });
                 html += `
                 <div class="game-item" onclick="toggleActionOverlay(this)">
