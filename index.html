@@ -278,9 +278,10 @@
             transition: 0.2s;
         }
         .overlay-btn:active { transform: scale(0.9); }
-        .btn-overlay-edit { background: rgba(255, 160, 0, 0.6); color: white; } 
-        .btn-overlay-del { background: rgba(255, 50, 80, 0.6); color: white; }  
-        .btn-overlay-cancel { background: rgba(120, 120, 120, 0.6); color: white; } 
+        /* 버튼 투명도 조정 부분 */
+        .btn-overlay-edit { background: rgba(255, 160, 0, 0.4); color: white; } 
+        .btn-overlay-del { background: rgba(255, 50, 80, 0.4); color: white; }  
+        .btn-overlay-cancel { background: rgba(120, 120, 120, 0.4); color: white; } 
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
