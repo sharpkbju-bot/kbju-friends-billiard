@@ -214,8 +214,7 @@
         .zoom-br { display: none; }
         body[style*="zoom: 1.2"] .zoom-br { display: inline; }
 
-        /* 확대 모드 시 누적 전적 테이블 최적화 (너비 확보) */
-        body[style*="zoom: 1.2"] .stats-card { padding: 15px 4px !important; } /* 카드 좌우 여백 줄여서 너비 확보 */
+        body[style*="zoom: 1.2"] .stats-card { padding: 15px 4px !important; } 
         body[style*="zoom: 1.2"] .stats-table td { font-size: 11px; padding: 8px 0.3px; }
         body[style*="zoom: 1.2"] .val-highlight { font-size: 11.5px; }
         body[style*="zoom: 1.2"] .stats-table td:first-child { padding-left: 5px; }
@@ -233,7 +232,7 @@
         
         .game-item { 
             position: relative;
-            padding: 18px 8px; /* 좌우 여백 축소로 너비 확보 */
+            padding: 18px 8px; 
             border-radius: 22px; 
             background: linear-gradient(145deg, #f0f0f0, #ffffff); 
             margin-top: 15px; 
@@ -248,7 +247,7 @@
         .game-item:active { transform: scale(0.98); }
 
         .game-info { 
-            font-size: 15px; /* 기본 글자 크기 확대 */
+            font-size: 15px; 
             font-weight: 900; 
             color: #444; 
             text-align: center;
@@ -257,13 +256,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            white-space: nowrap; /* 줄바꿈 방지 */
+            white-space: nowrap; 
         }
         
-        /* 확대 모드 시 게임 기록 카드 최적화 (5명 한줄 표시) */
         body[style*="zoom: 1.2"] .game-item { padding: 18px 4px; }
         body[style*="zoom: 1.2"] .game-info { 
-            font-size: 13.5px; /* 확대 시 한줄 유지를 위한 미세 조정 */
+            font-size: 13.5px; 
             letter-spacing: -0.9px; 
             justify-content: center;
         }
@@ -288,12 +286,12 @@
             padding: 6px 16px; border-radius: 10px; font-weight: 900; font-size: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.4);
             transition: 0.2s;
-            color: #1b5e20; /* #2c3e50(다크 그레이), #1b5e20(다크 그린), #4a148c(다크 와인), 딥 네이비 글자색 적용 */
+            color: #1a237e; 
         }
         .overlay-btn:active { transform: scale(0.9); }
-        .btn-overlay-edit { background: rgba(255, 160, 0, 0.2); } /* 수정 버튼 배경 더 투명하게(0.2) */
-        .btn-overlay-del { background: rgba(255, 50, 80, 0.2); } /* 삭제 버튼 배경 더 투명하게(0.2) */
-        .btn-overlay-cancel { background: rgba(120, 120, 120, 0.2); } /* 취소 버튼 배경 더 투명하게(0.2) */
+        .btn-overlay-edit { background: rgba(255, 160, 0, 0.2); } 
+        .btn-overlay-del { background: rgba(255, 50, 80, 0.2); }  
+        .btn-overlay-cancel { background: rgba(120, 120, 120, 0.2); } 
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -620,13 +618,25 @@
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
     
     function closeAppWindow() { 
+        // 1. 브라우저 창 닫기 시도 (가장 기본)
+        window.open('', '_self', ''); 
+        window.close();
+
+        // 2. iOS 대응 
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if(isIOS) closeExitModal();
-        else {
-            if (window.history.length > 1) window.history.back(); 
-            window.close(); 
-            setTimeout(() => { window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end"; }, 100); 
+        if(isIOS) {
+            closeExitModal();
+            if (window.history.length > 1) window.history.back();
+            return;
         }
+
+        // 3. 안드로이드 및 기타 브라우저 (window.close가 실패했을 때 대비)
+        setTimeout(() => {
+            location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
+            setTimeout(() => {
+                window.history.back();
+            }, 100);
+        }, 100);
     }
 
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
