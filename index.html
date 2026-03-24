@@ -421,7 +421,7 @@
 
     function isHoliday(year, month, day) {
         const dStr = `${month + 1}-${day}`;
-        const fixedHolidays = ["1-1", "3-1", "5-5", "6-6", "7-17", "8-15", "10-3", "10-9", "12-25"];
+        const fixedHolidays = ["1-1", "3-1", "5-1", "5-5", "6-6", "7-17", "8-15", "10-3", "10-9", "12-25"];
         const variable2026 = ["2-16", "2-17", "2-18", "2-19", "3-2", "5-24", "5-25", "6-3", "8-17", "9-24", "9-25", "9-26", "10-5"];
         return fixedHolidays.includes(dStr) || (year === 2026 && variable2026.includes(dStr));
     }
