@@ -214,10 +214,13 @@
         .zoom-br { display: none; }
         body[style*="zoom: 1.2"] .zoom-br { display: inline; }
 
-        /* 확대 모드 시 누적 전적 테이블 최적화 */
-        body[style*="zoom: 1.2"] .stats-table td { font-size: 11px; padding: 8px 0.5px; }
-        body[style*="zoom: 1.2"] .val-highlight { font-size: 12px; }
-        body[style*="zoom: 1.2"] .stats-table td:last-child { padding-right: 5px !important; }
+        /* 확대 모드 시 누적 전적 테이블 최적화 (너비 확보) */
+        body[style*="zoom: 1.2"] .stats-card { padding: 15px 4px !important; } /* 카드 좌우 여백 줄여서 너비 확보 */
+        body[style*="zoom: 1.2"] .stats-table td { font-size: 11px; padding: 8px 0.3px; }
+        body[style*="zoom: 1.2"] .val-highlight { font-size: 11.5px; }
+        body[style*="zoom: 1.2"] .stats-table td:first-child { padding-left: 5px; }
+        body[style*="zoom: 1.2"] .stats-table td:last-child { padding-right: 8px !important; }
+        body[style*="zoom: 1.2"] .win-rate-pill { font-size: 10px; }
 
         .cancel-btn { width: 100%; background: #bdc3c7; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; }
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); }
