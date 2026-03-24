@@ -233,7 +233,7 @@
         
         .game-item { 
             position: relative;
-            padding: 18px 15px; 
+            padding: 18px 8px; /* 좌우 여백 축소로 너비 확보 */
             border-radius: 22px; 
             background: linear-gradient(145deg, #f0f0f0, #ffffff); 
             margin-top: 15px; 
@@ -248,8 +248,8 @@
         .game-item:active { transform: scale(0.98); }
 
         .game-info { 
-            font-size: 13px; 
-            font-weight: 800; 
+            font-size: 15px; /* 기본 글자 크기 확대 */
+            font-weight: 900; 
             color: #444; 
             text-align: center;
             letter-spacing: -0.5px;
@@ -257,18 +257,22 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            white-space: nowrap; /* 줄바꿈 방지 */
         }
-        /* 확대 모드에서도 중앙 정렬 유지 및 한줄 표시 */
+        
+        /* 확대 모드 시 게임 기록 카드 최적화 (5명 한줄 표시) */
+        body[style*="zoom: 1.2"] .game-item { padding: 18px 4px; }
         body[style*="zoom: 1.2"] .game-info { 
-            white-space: nowrap;
+            font-size: 13.5px; /* 확대 시 한줄 유지를 위한 미세 조정 */
+            letter-spacing: -0.9px; 
             justify-content: center;
         }
         body[style*="zoom: 1.2"] .game-info span { 
-            font-size: 11.2px !important; 
-            letter-spacing: -0.8px; 
+            font-size: 12px !important; 
+            margin-right: 4px;
         }
 
-        .game-info span { color: #888; margin-right: 8px; font-size: 11px; }
+        .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
 
         .action-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -547,7 +551,7 @@
             games.forEach((g, idx) => { 
                 const names = g.ranks.filter(n => n && n.trim() !== ""); 
                 const styledNames = names.map((name, i) => {
-                    let style = "font-size: 13px;"; 
+                    let style = "font-size: 15px;"; 
                     if (i === 0) style += "color:var(--rank1);";
                     if (i === names.length - 1 && names.length > 1) style += "color:var(--rankL);";
                     return `<span style="${style}">${name}</span>`;
