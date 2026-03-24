@@ -276,7 +276,7 @@
             padding: 6px 16px; border-radius: 10px; font-weight: 900; font-size: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.4);
             transition: 0.2s;
-            color: #f8f9fa; /* 글자 색상을 깨끗한 소프트 화이트로 변경 */
+            color: #1a237e; /* 글자 색상을 딥 네이비로 변경 */
         }
         .overlay-btn:active { transform: scale(0.9); }
         .btn-overlay-edit { background: rgba(255, 160, 0, 0.4); } 
@@ -613,7 +613,7 @@
         else {
             if (window.history.length > 1) window.history.back(); 
             window.close(); 
-            setTimeout(() => { window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end"; }, 100); 
+            setTimeout(() => { window.location.href = \"intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end\"; }, 100); 
         }
     }
 
@@ -628,9 +628,9 @@
 
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if(isIOS) {
-            document.getElementById('exitBtn').innerText = "📱 Return Home";
-            document.getElementById('exit-msg').innerHTML = "SWIPE UP<br>다음에 또 보자!";
-            document.getElementById('modalOkBtn').innerText = "확인";
+            document.getElementById('exitBtn').innerText = \"📱 Return Home\";
+            document.getElementById('exit-msg').innerHTML = \"SWIPE UP<br>다음에 또 보자!\";
+            document.getElementById('modalOkBtn').innerText = \"확인\";
         }
         updateInputFields(); 
         renderStats(); 
