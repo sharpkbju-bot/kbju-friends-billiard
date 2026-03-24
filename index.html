@@ -118,7 +118,6 @@
         select#playerCount { flex: none !important; width: 85px !important; padding: 8px !important; margin-left: auto; }
         .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
         
-        /* 꼴찌💀 한 줄 표시를 위해 너비 확장 */
         .input-row label { width: 70px; font-size: 13px; font-weight: 800; color: #777; flex-shrink: 0; white-space: nowrap; }
         
         select { 
@@ -448,7 +447,6 @@
         inputArea.innerHTML = "";
         let html = '';
         for(let i=1; i<=count; i++) {
-            // 1위 옆에 금메달 이모지 추가 로직 반영
             const label = i === count ? "꼴찌💀" : (i === 1 ? "1위🥇" : `${i}위`);
             html += `<div class="input-row"><label>${label}</label><select id="rank${i}" onchange="checkDuplicates()"><option value="">선택</option>${players.map(p => `<option value="${p}" ${preFill && preFill[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
         }
@@ -526,9 +524,15 @@
             let html = `<div style="text-align:center; margin:28px 0 10px 0;"><span style="font-size:14px; color:#7f8c8d; font-weight:800;">GAME RECORD</span></div>`;
             games.forEach((g, idx) => { 
                 const names = g.ranks.filter(n => n && n.trim() !== ""); 
+                // GAME RECORD 내 1위 파란색, 꼴찌 빨간색 적용 로직
+                const styledNames = names.map((name, i) => {
+                    if (i === 0) return `<span style="color:var(--rank1)">${name}</span>`;
+                    if (i === names.length - 1 && names.length > 1) return `<span style="color:var(--rankL)">${name}</span>`;
+                    return name;
+                });
                 html += `
                 <div class="game-item" onclick="toggleActionOverlay(this)">
-                    <div class="game-info"><span>${idx+1}G</span> ${names.join(' → ')}</div>
+                    <div class="game-info"><span>${idx+1}G</span> ${styledNames.join(' → ')}</div>
                     <div class="action-overlay">
                         <div class="overlay-btn btn-overlay-edit" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
                         <div class="overlay-btn btn-overlay-del" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>
