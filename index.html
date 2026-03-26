@@ -208,6 +208,28 @@
             white-space: nowrap;
         }
 
+        /* 상세 기록 영역 스타일 */
+        .history-area {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #555;
+        }
+
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
         
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); line-height: 1.4; }
@@ -286,8 +308,7 @@
             padding: 6px 16px; border-radius: 10px; font-weight: 900; font-size: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.4);
             transition: 0.2s;
-            color: #1b5e20; /* #2c3e50(다크 그레이), #1b5e20(다크 그린), #4a148c(다크 와인), #1a237e(딥 네이비) 글자색 적용 */
-
+            color: #1a237e; /* 딥 네이비 유지 */
         }
         .overlay-btn:active { transform: scale(0.9); }
         .btn-overlay-edit { background: rgba(255, 160, 0, 0.2); } 
@@ -368,7 +389,7 @@
 </div>
 
 <div class="card stats-card">
-    <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적</h2>
+    <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적 (이름 클릭시 상세)</h2>
     <table class="stats-table">
         <thead>
             <tr>
@@ -384,6 +405,9 @@
         </thead>
         <tbody id="statsBody"></tbody>
     </table>
+    
+    <div id="memberHistoryArea" class="history-area"></div>
+
     <div id="richFriendArea" style="display:none; background: var(--bg); padding: 20px; border-radius: 22px; text-align: center; box-shadow: var(--inner-shadow); margin-top: 20px; color: #7f8c8d; font-weight: 800;"></div>
 </div>
 
@@ -516,7 +540,9 @@
         });
         const bodyHtml = sortedByWin.map(p => {
             let nameTdContent = p;
-            let nameStyle = "font-weight:900; letter-spacing:-0.5px;"; const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
+            let nameStyle = "font-weight:900; letter-spacing:-0.5px; cursor:pointer; text-decoration: underline; text-underline-offset: 3px;"; 
+            const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
+            
             if (stats[p].ranks[0] === maxCounts.r0 && stats[p].ranks[4] === maxCounts.r4 && maxCounts.r0 > 0) {
                 nameTdContent = p.length >= 2 ? `<span style="color:orange;">${p[0]}</span><span style="color:#ff69b4;">${p.substring(1)}</span>` : `<span style="color:orange;">${p}</span>`;
             } else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
@@ -526,7 +552,7 @@
             const tdStyle = (val, max, colorVar) => `style="color:var(${colorVar}); ${(val === max && max > 0) ? 'font-weight:900;' : ''}" class="val-highlight"`;
 
             return `<tr>
-                <td style="${nameStyle}">${nameTdContent}</td>
+                <td style="${nameStyle}" onclick="renderMemberHistory('${p}')">${nameTdContent}</td>
                 <td style="color:#888;">${stats[p].played}</td>
                 <td ${tdStyle(stats[p].ranks[0], maxCounts.r0, '--rank1')}>${getVal(stats[p].ranks[0], stats[p].played)}</td>
                 <td ${tdStyle(stats[p].ranks[1], maxCounts.r1, '--rank2')}>${getVal(stats[p].ranks[1], stats[p].played)}</td>
@@ -539,6 +565,41 @@
         document.getElementById('statsBody').innerHTML = bodyHtml || players.map(p => `<tr><td>${p}</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><span class="win-rate-pill">0.0%</span></td></tr>`).join('');
         const richFriend = document.getElementById('richFriendArea');
         if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')} (${maxCounts.r4}회)</span>`; } else richFriend.style.display = 'none';
+    }
+
+    // [신규] 특정 멤버의 최근 5경기 기록 보기
+    function renderMemberHistory(name) {
+        const historyArea = document.getElementById('memberHistoryArea');
+        // 해당 멤버가 참여한 경기만 필터링 후 최근순 정렬
+        const personalGames = gameLogs
+            .filter(g => g.ranks.includes(name))
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 5);
+
+        if (personalGames.length === 0) return;
+
+        let html = `<div style="font-size:14px; font-weight:900; color:#444; margin-bottom:12px; display:flex; justify-content:space-between;">
+                        <span>🏆 ${name}의 최근 5경기</span>
+                        <span style="color:#999; cursor:pointer;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span>
+                    </div>`;
+        
+        personalGames.forEach(g => {
+            const actual = g.ranks.filter(n => n.trim() !== "");
+            const rankIndex = actual.indexOf(name);
+            const rankLabel = (rankIndex === actual.length - 1 && actual.length > 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
+            let rankColor = "var(--main)";
+            if(rankIndex === 0) rankColor = "var(--rank1)";
+            else if(rankIndex === actual.length - 1) rankColor = "var(--rankL)";
+
+            html += `<div class="history-item">
+                        <span style="color:#888; font-size:11px;">${g.dateStr}</span>
+                        <span style="color:${rankColor}; font-size:14px;">${rankLabel}</span>
+                    </div>`;
+        });
+
+        historyArea.innerHTML = html;
+        historyArea.style.display = 'block';
+        historyArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function changeZoom(v) { currentZoom = v; document.body.style.zoom = v; }
@@ -619,11 +680,9 @@
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
     
     function closeAppWindow() { 
-        // 1. 브라우저 창 닫기 시도 (가장 기본)
         window.open('', '_self', ''); 
         window.close();
 
-        // 2. iOS 대응 
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if(isIOS) {
             closeExitModal();
@@ -631,7 +690,6 @@
             return;
         }
 
-        // 3. 안드로이드 및 기타 브라우저 (window.close가 실패했을 때 대비)
         setTimeout(() => {
             location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
             setTimeout(() => {
