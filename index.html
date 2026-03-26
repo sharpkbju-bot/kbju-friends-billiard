@@ -44,35 +44,60 @@
 
             --edit-mode-bg: #e8f5e9;
             --edit-mode-border: #2d5a27; 
+            
+            /* 기본 모드 전용 텍스트 색상 */
+            --text-main: #444;
+            --text-sub: #666;
+            --text-light: #777;
+            --text-muted: #888;
         }
 
-        /* 다크모드 색상 변수 정의 (기존 코드 유지 위해 하단에 추가) */
+        /* 다크모드 색상 보완 */
         [data-theme='dark'] {
             --main: #bdc3c7;
-            --bg: rgba(30, 30, 30, 0.8);
+            --bg: rgba(30, 30, 30, 0.9);
             --today-bg: #1a237e;
             --today-border: #448aff;
             --select-bg: #4a148c;
             --select-border: #e91e63;
             --record-bg: #1b5e20;
             --record-border: #81c784;
-            --shadow: 8px 8px 16px rgba(0, 0, 0, 0.5), -4px -4px 10px rgba(60, 60, 60, 0.3);
-            --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.6), inset -2px -2px 5px rgba(60, 60, 60, 0.3);
-            --card-bg: rgba(45, 45, 55, 0.85);
+            --shadow: 8px 8px 16px rgba(0, 0, 0, 0.6), -4px -4px 10px rgba(60, 60, 60, 0.2);
+            --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.7), inset -2px -2px 5px rgba(60, 60, 60, 0.2);
+            --card-bg: rgba(35, 35, 45, 0.9);
             --dup-bg: #3e2723;
             --dup-border: #ff5252;
             --dup-text: #ffccbc;
+            
+            /* 다크 모드일 때 글자색을 밝게 변경 */
+            --text-main: #f0f0f0;
+            --text-sub: #d0d0d0;
+            --text-light: #b0b0b0;
+            --text-muted: #999;
         }
 
-        [data-theme='dark'] body { color: #eee; }
-        [data-theme='dark'] .day { background: linear-gradient(145deg, #2c2c2c, #1a1a1a); color: #ccc; box-shadow: 4px 4px 10px rgba(0,0,0,0.5); border: 1px solid #444; }
-        [data-theme='dark'] select { background: rgba(50, 50, 60, 0.6); color: #fff; box-shadow: var(--inner-shadow); }
+        /* 다크모드 전용 요소별 글자색 강제 지정 */
+        [data-theme='dark'] body, 
+        [data-theme='dark'] h2, 
+        [data-theme='dark'] #monthDisplay, 
+        [data-theme='dark'] #selectedDateTitle,
+        [data-theme='dark'] .game-info { color: var(--text-main) !important; }
+
+        [data-theme='dark'] .zoom-label-main,
+        [data-theme='dark'] .setup-row span,
+        [data-theme='dark'] .history-date { color: var(--text-sub) !important; }
+
+        [data-theme='dark'] .input-row label,
+        [data-theme='dark'] .nav-btn { color: var(--text-light) !important; }
+
+        [data-theme='dark'] .day { background: linear-gradient(145deg, #333, #222); color: #ccc; box-shadow: 4px 4px 10px rgba(0,0,0,0.5); border: 1px solid #444; }
+        [data-theme='dark'] select { background: rgba(60, 60, 70, 0.8); color: #fff; box-shadow: var(--inner-shadow); }
         [data-theme='dark'] .game-item { background: linear-gradient(145deg, #2a2a2a, #333); box-shadow: 4px 4px 10px rgba(0,0,0,0.4); }
-        [data-theme='dark'] .game-info { color: #ddd; }
-        [data-theme='dark'] .stats-table tr { background: rgba(50, 50, 60, 0.4); }
+        [data-theme='dark'] .stats-table tr { background: rgba(50, 50, 60, 0.6); }
         [data-theme='dark'] .stats-table td { color: #ccc; border-top: 1px solid #444; }
-        [data-theme='dark'] .stats-table th { background: #1b5e20; color: #aaa; }
-        [data-theme='dark'] #loading::before { background: rgba(20, 20, 20, 0.85); }
+        [data-theme='dark'] .stats-table th { background: #1b5e20; color: #bbb; }
+        [data-theme='dark'] #loading::before { background: rgba(20, 20, 20, 0.9); }
+        [data-theme='dark'] .history-item { background: rgba(50, 40, 20, 0.8); border-color: #ff69b4; color: #eee; }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
@@ -86,8 +111,8 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             min-height: 100vh;
-            color: #444;
-            transition: zoom 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
         #welcome-screen {
@@ -120,7 +145,7 @@
             width: 44px; height: 44px; border-radius: 14px;
             box-shadow: 4px 4px 8px rgba(180, 180, 180, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.7);
             font-size: 14px;
-            cursor: pointer; color: #777; transition: 0.2s;
+            cursor: pointer; color: var(--text-light); transition: 0.2s;
         }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
         .weekday { font-size: 11px; font-weight: 900; padding-bottom: 10px; color: #95a5a6; }
@@ -146,11 +171,11 @@
         select#playerCount { flex: none !important; width: 85px !important; padding: 8px !important; margin-left: auto; }
         .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
         
-        .input-row label { width: 70px; font-size: 13px; font-weight: 800; color: #777; flex-shrink: 0; white-space: nowrap; }
+        .input-row label { width: 70px; font-size: 13px; font-weight: 800; color: var(--text-light); flex-shrink: 0; white-space: nowrap; }
         
         select { 
             flex: 1; padding: 12px; border-radius: 15px; border: 2px solid transparent; font-size: 14px; 
-            background: rgba(236, 238, 241, 0.4); box-shadow: var(--inner-shadow); color: #444; font-weight: 600; 
+            background: rgba(236, 238, 241, 0.4); box-shadow: var(--inner-shadow); color: var(--text-main); font-weight: 600; 
             -webkit-appearance: none; text-align: center; text-align-last: center; 
         }
 
@@ -259,7 +284,7 @@
         }
         .history-date {
             font-size: 14px;
-            color: #666;
+            color: var(--text-sub);
             white-space: nowrap;
         }
         .history-rank {
@@ -319,7 +344,7 @@
         .game-info { 
             font-size: 15px; 
             font-weight: 900; 
-            color: #444; 
+            color: var(--text-main); 
             text-align: center;
             letter-spacing: -0.5px;
             width: 100%;
@@ -340,7 +365,7 @@
             margin-right: 4px;
         }
 
-        .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
+        .game-info span { color: var(--text-muted); margin-right: 8px; font-size: 13px; }
 
         .action-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -369,14 +394,13 @@
         .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 30px; text-align: center; width: 80%; max-width: 320px; box-shadow: 15px 15px 40px rgba(0,0,0,0.1); }
 
         .zoom-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
-        .zoom-label-main { font-size: 14px; font-weight: 800; color: #666; }
+        .zoom-label-main { font-size: 14px; font-weight: 800; color: var(--text-sub); }
         .zoom-options { display: flex; gap: 12px; }
         .zoom-options label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 900 !important; font-size: 14px; }
         .zoom-options input { order: 1; width: 16px; height: 16px; margin: 0; cursor: pointer; }
         .color-purple { color: #9b59b6; }
         .color-pink { color: #ff69b4; }
 
-        /* 다크모드 전환 스위치 스타일 */
         .theme-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
         .theme-toggle { position: relative; width: 50px; height: 26px; }
         .theme-toggle input { opacity: 0; width: 0; height: 0; }
@@ -411,14 +435,14 @@
 <div class="calendar-card">
     <div class="calendar-header">
         <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
-        <span id="monthDisplay" style="font-size:20px; font-weight:900; color:#444; letter-spacing:-1px;"></span>
+        <span id="monthDisplay" style="font-size:20px; font-weight:900; color:var(--text-main); letter-spacing:-1px;"></span>
         <button class="nav-btn" onclick="changeMonth(1)">▶</button>
     </div>
     <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
 <div class="card" id="inputCard">
-    <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 20px 0; color:#444; font-weight:800;">📅 날짜 확인 중</h2>
+    <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 20px 0; color:var(--text-main); font-weight:800;">📅 날짜 확인 중</h2>
     <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:15px; background: var(--edit); padding: 12px; border-radius: 12px; text-align: center;">✏️ 기록 수정 중</div>
 
     <div class="theme-wrap">
@@ -438,7 +462,7 @@
     </div>
 
     <div class="setup-row">
-        <span style="font-size:14px; font-weight:800; color:#666;">게임 인원</span>
+        <span style="font-size:14px; font-weight:800; color:var(--text-sub);">게임 인원</span>
         <select id="playerCount" onchange="updateInputFields()">
             <option value="2">2명</option>
             <option value="3" selected>3명</option>
@@ -456,7 +480,7 @@
 </div>
 
 <div class="card stats-card">
-    <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적 (이름을 터치해 봐!)</h2>
+    <h2 style="font-size:16px; margin:5px 0 14px 10px; color:var(--text-main); font-weight:800;">📊 멤버별 누적 전적 (이름을 터치해 봐!)</h2>
     <table class="stats-table">
         <thead>
             <tr>
@@ -499,7 +523,6 @@
     let currentZoom = "1";
     let isPercentMode = false;
 
-    // 테마 전환 함수 (기존 코드 유지하며 추가)
     function toggleTheme() {
         const isDark = document.getElementById('themeSwitch').checked;
         document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
@@ -627,7 +650,7 @@
 
             return `<tr>
                 <td style="${nameStyle}" onclick="renderMemberHistory('${p}')">${nameTdContent}</td>
-                <td style="color:#888;">${stats[p].played}</td>
+                <td style="color:var(--text-muted);">${stats[p].played}</td>
                 <td ${tdStyle(stats[p].ranks[0], maxCounts.r0, '--rank1')}>${getVal(stats[p].ranks[0], stats[p].played)}</td>
                 <td ${tdStyle(stats[p].ranks[1], maxCounts.r1, '--rank2')}>${getVal(stats[p].ranks[1], stats[p].played)}</td>
                 <td ${tdStyle(stats[p].ranks[2], maxCounts.r2, '--rank3')}>${getVal(stats[p].ranks[2], stats[p].played)}</td>
@@ -656,9 +679,9 @@
             return;
         }
 
-        let html = `<div style="font-size:14px; font-weight:900; color:#444; margin-bottom:12px; display:flex; justify-content:space-between;">
+        let html = `<div style="font-size:14px; font-weight:900; color:var(--text-main); margin-bottom:12px; display:flex; justify-content:space-between;">
                         <span>🏆 ${name}의 최근 5경기</span>
-                        <span style="color:#999; cursor:pointer;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span>
+                        <span style="color:var(--text-muted); cursor:pointer;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span>
                     </div>`;
         
         personalGames.forEach(g => {
@@ -685,7 +708,7 @@
     function renderGameList() {
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr); const listArea = document.getElementById('dayGameList');
         if(games.length > 0) {
-            let html = `<div style="text-align:center; margin:28px 0 10px 0;"><span style="font-size:14px; color:#7f8c8d; font-weight:800;">GAME RECORD</span></div>`;
+            let html = `<div style="text-align:center; margin:28px 0 10px 0;"><span style="font-size:14px; color:var(--text-muted); font-weight:800;">GAME RECORD</span></div>`;
             games.forEach((g, idx) => { 
                 const names = g.ranks.filter(n => n && n.trim() !== ""); 
                 const styledNames = names.map((name, i) => {
@@ -760,19 +783,15 @@
     function closeAppWindow() { 
         window.open('', '_self', ''); 
         window.close();
-
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if(isIOS) {
             closeExitModal();
             if (window.history.length > 1) window.history.back();
             return;
         }
-
         setTimeout(() => {
             location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
-            setTimeout(() => {
-                window.history.back();
-            }, 100);
+            setTimeout(() => { window.history.back(); }, 100);
         }, 100);
     }
 
@@ -780,21 +799,15 @@
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
     window.onload = () => { 
-        // 테마 초기화
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
             document.getElementById('themeSwitch').checked = true;
         }
-
         setTimeout(() => { 
             const ws = document.getElementById('welcome-screen');
-            if(ws) { 
-                ws.style.opacity = '0'; 
-                setTimeout(() => { ws.style.display = 'none'; }, 800); 
-            }
+            if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); }
         }, 3500);
-
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if(isIOS) {
             document.getElementById('exitBtn').innerText = "📱 Return Home";
@@ -805,12 +818,4 @@
         renderStats(); 
         fetchData(); 
     };
-    
-    document.addEventListener('click', (e) => {
-        if(!e.target.closest('.game-item')) {
-            hideActionOverlays();
-        }
-    });
-</script>
-</body>
-</html>
+    document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) hideActionOverlays(); });
