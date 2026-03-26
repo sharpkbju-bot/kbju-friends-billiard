@@ -1,19 +1,14 @@
-
-// share.js - index.html을 수정하지 않고 기능을 추가하는 스크립트
+// share.js - 꼴찌 카드 캡처 오류 보정 버전
 (function() {
-    // 1. 이미지 캡처 라이브러리 로드
     const script = document.createElement('script');
     script.src = "https://html2canvas.hertzen.com/dist/html2canvas.min.js";
     document.head.appendChild(script);
 
     script.onload = () => {
-        // 2. 버튼을 넣을 위치(통계 카드) 찾기
         const interval = setInterval(() => {
             const statsCard = document.querySelector('.stats-card');
             if (statsCard) {
-                clearInterval(interval); // 위치 찾으면 반복 중단
-                
-                // 중복 생성 방지
+                clearInterval(interval);
                 if (document.getElementById('custom-share-btn')) return;
 
                 const shareBtn = document.createElement('button');
@@ -27,21 +22,40 @@
                 `;
 
                 shareBtn.onclick = async () => {
-                    // 웰컴 화면이나 로딩바가 스샷에 찍히지 않도록 처리
+                    // 캡처 전: 꼴찌 카드의 안쪽 그림자(inner-shadow)가 캡처 시 깨지는 현상 방지
+                    const richArea = document.getElementById('richFriendArea');
+                    const originalShadow = richArea ? richArea.style.boxShadow : '';
+                    if(richArea) richArea.style.boxShadow = 'none'; // 캡처 시에만 그림자 제거
+
                     const canvas = await html2canvas(statsCard, {
                         backgroundColor: (document.documentElement.getAttribute('data-theme') === 'dark') ? '#222' : '#fff',
                         scale: 2,
-                        logging: false
+                        useCORS: true,
+                        allowTaint: true,
+                        scrollX: 0,
+                        scrollY: -window.scrollY, // 현재 스크롤 위치 보정
+                        onclone: (clonedDoc) => {
+                            // 복제된 문서에서 스타일 강제 고정 (양옆 깨짐 방지)
+                            const clonedRichArea = clonedDoc.getElementById('richFriendArea');
+                            if(clonedRichArea) {
+                                clonedRichArea.style.boxShadow = 'none';
+                                clonedRichArea.style.border = 'none';
+                                clonedRichArea.style.width = '100%';
+                                clonedRichArea.style.margin = '20px 0 0 0';
+                            }
+                        }
                     });
+
+                    // 캡처 후: 원래 스타일 복구
+                    if(richArea) richArea.style.boxShadow = originalShadow;
 
                     canvas.toBlob(async (blob) => {
                         const file = new File([blob], 'billiard_rank.png', { type: 'image/png' });
                         if (navigator.share) {
                             try {
                                 await navigator.share({ files: [file], title: '당구 전적', text: '오늘의 결과입니다!' });
-                            } catch (e) { /* 취소 시 무시 */ }
+                            } catch (e) { }
                         } else {
-                            alert("공유 기능을 사용할 수 없는 브라우저입니다. 이미지를 저장하세요.");
                             const link = document.createElement('a');
                             link.href = URL.createObjectURL(blob);
                             link.download = 'billiard_rank.png';
@@ -50,10 +64,9 @@
                     }, 'image/png');
                 };
 
-                // '📊 멤버별 누적 전적' 제목 아래에 삽입
                 const title = statsCard.querySelector('h2');
                 title.parentNode.insertBefore(shareBtn, title.nextSibling);
             }
-        }, 500); // 0.5초마다 stats-card가 생성되었는지 확인
+        }, 500);
     };
 })();
