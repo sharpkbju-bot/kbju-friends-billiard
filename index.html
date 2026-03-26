@@ -46,6 +46,34 @@
             --edit-mode-border: #2d5a27; 
         }
 
+        /* 다크모드 색상 변수 정의 (기존 코드 유지 위해 하단에 추가) */
+        [data-theme='dark'] {
+            --main: #bdc3c7;
+            --bg: rgba(30, 30, 30, 0.8);
+            --today-bg: #1a237e;
+            --today-border: #448aff;
+            --select-bg: #4a148c;
+            --select-border: #e91e63;
+            --record-bg: #1b5e20;
+            --record-border: #81c784;
+            --shadow: 8px 8px 16px rgba(0, 0, 0, 0.5), -4px -4px 10px rgba(60, 60, 60, 0.3);
+            --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.6), inset -2px -2px 5px rgba(60, 60, 60, 0.3);
+            --card-bg: rgba(45, 45, 55, 0.85);
+            --dup-bg: #3e2723;
+            --dup-border: #ff5252;
+            --dup-text: #ffccbc;
+        }
+
+        [data-theme='dark'] body { color: #eee; }
+        [data-theme='dark'] .day { background: linear-gradient(145deg, #2c2c2c, #1a1a1a); color: #ccc; box-shadow: 4px 4px 10px rgba(0,0,0,0.5); border: 1px solid #444; }
+        [data-theme='dark'] select { background: rgba(50, 50, 60, 0.6); color: #fff; box-shadow: var(--inner-shadow); }
+        [data-theme='dark'] .game-item { background: linear-gradient(145deg, #2a2a2a, #333); box-shadow: 4px 4px 10px rgba(0,0,0,0.4); }
+        [data-theme='dark'] .game-info { color: #ddd; }
+        [data-theme='dark'] .stats-table tr { background: rgba(50, 50, 60, 0.4); }
+        [data-theme='dark'] .stats-table td { color: #ccc; border-top: 1px solid #444; }
+        [data-theme='dark'] .stats-table th { background: #1b5e20; color: #aaa; }
+        [data-theme='dark'] #loading::before { background: rgba(20, 20, 20, 0.85); }
+
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
         body { 
@@ -59,7 +87,7 @@
             background-attachment: fixed;
             min-height: 100vh;
             color: #444;
-            transition: zoom 0.3s ease;
+            transition: zoom 0.3s ease, background-color 0.3s ease, color 0.3s ease;
         }
         
         #welcome-screen {
@@ -208,7 +236,6 @@
             white-space: nowrap;
         }
 
-        /* 상세 기록 영역 스타일 */
         .history-area {
             margin-top: 15px;
             padding: 15px;
@@ -228,7 +255,7 @@
             font-weight: 800;
             color: #555;
             flex-wrap: nowrap;
-            border: 2.5px solid #ff69b4; /* 핑크색 테두리 및 두께 수정 */
+            border: 2.5px solid #ff69b4;
         }
         .history-date {
             font-size: 14px;
@@ -241,7 +268,6 @@
             white-space: nowrap;
         }
 
-        /* 기록 없음 팝업 스타일 */
         .toast-msg {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.7); color: white; padding: 12px 25px;
@@ -349,6 +375,15 @@
         .zoom-options input { order: 1; width: 16px; height: 16px; margin: 0; cursor: pointer; }
         .color-purple { color: #9b59b6; }
         .color-pink { color: #ff69b4; }
+
+        /* 다크모드 전환 스위치 스타일 */
+        .theme-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+        .theme-toggle { position: relative; width: 50px; height: 26px; }
+        .theme-toggle input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #2196f3; }
+        input:checked + .slider:before { transform: translateX(24px); }
     </style>
 </head>
 <body id="app-body">
@@ -385,6 +420,14 @@
 <div class="card" id="inputCard">
     <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 20px 0; color:#444; font-weight:800;">📅 날짜 확인 중</h2>
     <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:15px; background: var(--edit); padding: 12px; border-radius: 12px; text-align: center;">✏️ 기록 수정 중</div>
+
+    <div class="theme-wrap">
+        <span class="zoom-label-main">다크 모드</span>
+        <label class="theme-toggle">
+            <input type="checkbox" id="themeSwitch" onchange="toggleTheme()">
+            <span class="slider"></span>
+        </label>
+    </div>
 
     <div class="zoom-wrap">
         <span class="zoom-label-main">화면 크기</span>
@@ -455,6 +498,13 @@
     let editRound = null;
     let currentZoom = "1";
     let isPercentMode = false;
+
+    // 테마 전환 함수 (기존 코드 유지하며 추가)
+    function toggleTheme() {
+        const isDark = document.getElementById('themeSwitch').checked;
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
 
     function formatDate(dateInput) {
         const d = new Date(dateInput);
@@ -730,6 +780,13 @@
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
     window.onload = () => { 
+        // 테마 초기화
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.getElementById('themeSwitch').checked = true;
+        }
+
         setTimeout(() => { 
             const ws = document.getElementById('welcome-screen');
             if(ws) { 
