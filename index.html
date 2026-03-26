@@ -221,13 +221,23 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 12px;
+            padding: 10px 14px;
             background: rgba(255, 255, 255, 0.5);
             border-radius: 12px;
-            margin-bottom: 6px;
-            font-size: 13px;
+            margin-bottom: 8px;
             font-weight: 800;
             color: #555;
+            flex-wrap: nowrap; /* 글자가 튀어나오지 않게 설정 */
+        }
+        .history-date {
+            font-size: 14px; /* 날짜 글자 크기 상향 조정 */
+            color: #666;
+            white-space: nowrap;
+        }
+        .history-rank {
+            font-size: 15px;
+            font-weight: 900;
+            white-space: nowrap;
         }
 
         /* 기록 없음 팝업 스타일 */
@@ -250,6 +260,10 @@
         body[style*="zoom: 1.2"] .stats-table td:first-child { padding-left: 5px; }
         body[style*="zoom: 1.2"] .stats-table td:last-child { padding-right: 8px !important; }
         body[style*="zoom: 1.2"] .win-rate-pill { font-size: 10px; }
+        
+        /* 확대 시 날짜 크기 조정 (카드 밖으로 안 나가게 살짝 조절) */
+        body[style*="zoom: 1.2"] .history-date { font-size: 13.5px; }
+        body[style*="zoom: 1.2"] .history-rank { font-size: 14px; }
 
         .cancel-btn { width: 100%; background: #bdc3c7; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; }
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); }
@@ -577,7 +591,6 @@
         if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')} (${maxCounts.r4}회)</span>`; } else richFriend.style.display = 'none';
     }
 
-    // 멤버의 최근 5경기 기록 보기 (기록 없을 시 팝업 노출)
     function renderMemberHistory(name) {
         const historyArea = document.getElementById('memberHistoryArea');
         const personalGames = gameLogs
@@ -585,12 +598,11 @@
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .slice(0, 5);
 
-        // [신규] 기록이 없는 경우 팝업 메시지 노출 로직
         if (personalGames.length === 0) {
             const toast = document.getElementById('toast');
             toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 1500); // 1.5초 후 사라짐
-            historyArea.style.display = 'none'; // 기존 상세 기록 영역은 숨김
+            setTimeout(() => { toast.style.display = 'none'; }, 1500);
+            historyArea.style.display = 'none';
             return;
         }
 
@@ -608,8 +620,8 @@
             else if(rankIndex === actual.length - 1) rankColor = "var(--rankL)";
 
             html += `<div class="history-item">
-                        <span style="color:#888; font-size:11px;">${g.dateStr}</span>
-                        <span style="color:${rankColor}; font-size:14px;">${rankLabel}</span>
+                        <span class="history-date">${g.dateStr}</span>
+                        <span class="history-rank" style="color:${rankColor};">${rankLabel}</span>
                     </div>`;
         });
 
