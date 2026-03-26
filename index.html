@@ -222,15 +222,16 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 252, 212, 0.85); /* 파스텔톤 노란 컬러로 수정 */
             border-radius: 12px;
             margin-bottom: 8px;
             font-weight: 800;
             color: #555;
-            flex-wrap: nowrap; /* 글자가 튀어나오지 않게 설정 */
+            flex-wrap: nowrap;
+            border: 1px solid rgba(255, 240, 150, 0.5);
         }
         .history-date {
-            font-size: 14px; /* 날짜 글자 크기 상향 조정 */
+            font-size: 14px;
             color: #666;
             white-space: nowrap;
         }
@@ -261,7 +262,6 @@
         body[style*="zoom: 1.2"] .stats-table td:last-child { padding-right: 8px !important; }
         body[style*="zoom: 1.2"] .win-rate-pill { font-size: 10px; }
         
-        /* 확대 시 날짜 크기 조정 (카드 밖으로 안 나가게 살짝 조절) */
         body[style*="zoom: 1.2"] .history-date { font-size: 13.5px; }
         body[style*="zoom: 1.2"] .history-rank { font-size: 14px; }
 
@@ -330,7 +330,7 @@
             padding: 6px 16px; border-radius: 10px; font-weight: 900; font-size: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.4);
             transition: 0.2s;
-            color: #1a237e; /* 딥 네이비 유지 */
+            color: #1a237e; 
         }
         .overlay-btn:active { transform: scale(0.9); }
         .btn-overlay-edit { background: rgba(255, 160, 0, 0.2); } 
