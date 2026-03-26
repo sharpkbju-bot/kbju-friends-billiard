@@ -230,6 +230,14 @@
             color: #555;
         }
 
+        /* 기록 없음 팝업 스타일 */
+        .toast-msg {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7); color: white; padding: 12px 25px;
+            border-radius: 20px; font-weight: 800; font-size: 14px; z-index: 10002;
+            display: none; animation: fadeIn 0.3s ease;
+        }
+
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
         
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); line-height: 1.4; }
@@ -337,6 +345,8 @@
         <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by<br>Ju Kyung Bae</div>
     </div>
 </div>
+
+<div id="toast" class="toast-msg">기록 없음</div>
 
 <div id="exit-modal">
     <div class="modal-content">
@@ -567,16 +577,22 @@
         if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')} (${maxCounts.r4}회)</span>`; } else richFriend.style.display = 'none';
     }
 
-    // [신규] 특정 멤버의 최근 5경기 기록 보기
+    // 멤버의 최근 5경기 기록 보기 (기록 없을 시 팝업 노출)
     function renderMemberHistory(name) {
         const historyArea = document.getElementById('memberHistoryArea');
-        // 해당 멤버가 참여한 경기만 필터링 후 최근순 정렬
         const personalGames = gameLogs
             .filter(g => g.ranks.includes(name))
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .slice(0, 5);
 
-        if (personalGames.length === 0) return;
+        // [신규] 기록이 없는 경우 팝업 메시지 노출 로직
+        if (personalGames.length === 0) {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 1500); // 1.5초 후 사라짐
+            historyArea.style.display = 'none'; // 기존 상세 기록 영역은 숨김
+            return;
+        }
 
         let html = `<div style="font-size:14px; font-weight:900; color:#444; margin-bottom:12px; display:flex; justify-content:space-between;">
                         <span>🏆 ${name}의 최근 5경기</span>
