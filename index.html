@@ -8,813 +8,243 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
-    
     <link rel="apple-touch-icon" href="image_0.png">
     
     <title>우리들의 Billiard World</title>
     
     <style>
         :root { 
-            --main: #7f8c8d; 
-            --bg: rgba(236, 238, 241, 0.4); 
-            --accent: #ff4757; 
-            --success: #27ae60; 
-            --edit: #f39c12; 
-            --today-bg: #e3f2fd; 
-            --today-border: #2196f3; 
-            --select-bg: #fff0f3; 
-            --select-border: #ff4d6d; 
-            --record-bg: #e8f5e9; 
-            --record-border: #4caf50; 
-            --record-dot: #e67e22; 
+            --main: #7f8c8d; --bg: rgba(236, 238, 241, 0.4); --accent: #ff4757; 
+            --success: #27ae60; --edit: #f39c12; --today-bg: #e3f2fd; 
+            --today-border: #2196f3; --select-bg: #fff0f3; --select-border: #ff4d6d; 
+            --record-bg: #e8f5e9; --record-border: #4caf50; --record-dot: #e67e22; 
             --shadow: 8px 8px 16px rgba(180, 180, 180, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8);
             --inner-shadow: inset 3px 3px 7px rgba(180, 180, 180, 0.4), inset -3px -3px 7px rgba(255, 255, 255, 0.8);
-            
-            --rank1: #2196f3; 
-            --rank2: #27ae60; 
-            --rank3: #8e44ad; 
-            --rank4: #f39c12; 
-            --rankL: #ff4757; 
-            
-            --dup-bg: #fffde7;    
-            --dup-border: #ff80ab; 
-            --dup-text: #7b1fa2;
-            
-            --card-bg: rgba(243, 230, 255, 0.7); 
-
-            --edit-mode-bg: #e8f5e9;
-            --edit-mode-border: #2d5a27; 
-            
-            /* 추가: 텍스트 색상 변수 */
-            --text-color: #444;
-            --text-sub-color: #555;
-            --text-light-color: #777;
+            --rank1: #0047AB; --rankL: #ff4757; --card-bg: rgba(243, 230, 255, 0.7); 
+            --text-main: #444; --text-sub: #777; --cal-day: #555;
         }
 
-        /* 다크모드 설정: 색상만 수정 */
-        [data-theme='dark'] {
-            --main: #bdc3c7;
-            --bg: rgba(30, 30, 30, 0.9);
-            --today-bg: #1a237e;
-            --today-border: #448aff;
-            --select-bg: #4a148c;
-            --select-border: #e91e63;
-            --record-bg: #1b5e20;
-            --record-border: #81c784;
-            --shadow: 8px 8px 16px rgba(0, 0, 0, 0.6), -4px -4px 10px rgba(60, 60, 60, 0.2);
-            --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.7), inset -2px -2px 5px rgba(60, 60, 60, 0.2);
-            --card-bg: rgba(35, 35, 45, 0.9);
-            --dup-bg: #3e2723;
-            --dup-border: #ff5252;
-            --dup-text: #ffccbc;
-            
-            /* 다크모드 시 글자색 변경 */
-            --text-color: #eeeeee;
-            --text-sub-color: #dddddd;
-            --text-light-color: #bbbbbb;
+        [data-theme="dark"] {
+            --bg: rgba(30, 30, 35, 0.85); --card-bg: rgba(45, 45, 52, 0.95);
+            --shadow: 8px 8px 20px rgba(0, 0, 0, 0.6), -4px -4px 12px rgba(255, 255, 255, 0.05);
+            --inner-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -2px -2px 6px rgba(255, 255, 255, 0.05);
+            --text-main: #eeeeee; --text-sub: #bbbbbb; --cal-day: #ffffff; 
+            --rank1: #4dabf7; --rankL: #ff8a80;
         }
-
-        /* 다크모드에서 검정색 글자들 강제 수정 */
-        [data-theme='dark'] body, 
-        [data-theme='dark'] h2, 
-        [data-theme='dark'] #monthDisplay, 
-        [data-theme='dark'] #selectedDateTitle,
-        [data-theme='dark'] .game-info,
-        [data-theme='dark'] .setup-row span,
-        [data-theme='dark'] .history-item { color: var(--text-color) !important; }
-
-        [data-theme='dark'] .day { color: #ccc; }
-        [data-theme='dark'] select { color: #fff; background: rgba(60, 60, 70, 0.8); }
-        [data-theme='dark'] .stats-table td { color: #ccc; }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
-
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            margin: 0; 
-            padding: env(safe-area-inset-top) 15px 100px 15px;
-            background-image: url('image_1.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            min-height: 100vh;
-            color: var(--text-color);
+            font-family: -apple-system, sans-serif; margin: 0; padding: env(safe-area-inset-top) 15px 100px 15px;
+            background: url('image_1.png') center/cover no-repeat fixed; min-height: 100vh; color: var(--text-main); transition: 0.3s;
         }
-        
+
         #welcome-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #4a90e2, #9370db);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 10000; transition: opacity 0.8s ease-out; color: white; text-align: center;
-            pointer-events: none;
-        }
-        .welcome-content { animation: fadeInUp 1s ease-out; }
-        .welcome-logo { width: 60px; height: auto; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
-        .welcome-text { font-size: 14px; font-weight: 300; line-height: 1.6; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: "Apple Chancery", "Snell Roundhand", "Comic Sans MS", cursive; }
-        
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .calendar-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(5px);
-            border-radius: 32px;
-            padding: 24px 18px;
-            box-shadow: var(--shadow);
-            margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #4a90e2, #9370db);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.8s; color: white;
         }
 
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .nav-btn {
-            border: none;
-            background: rgba(236, 238, 241, 0.4);
-            width: 44px; height: 44px; border-radius: 14px;
-            box-shadow: 4px 4px 8px rgba(180, 180, 180, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-            cursor: pointer; color: #777; transition: 0.2s;
+        .card, .calendar-card {
+            background: var(--card-bg); backdrop-filter: blur(8px); border-radius: 28px; padding: 22px; 
+            box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
-        .weekday { font-size: 11px; font-weight: 900; padding-bottom: 10px; color: #95a5a6; }
-
         .day { 
             aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; position: relative; 
-            background: linear-gradient(145deg, rgba(253, 253, 253, 0.8), rgba(226, 229, 234, 0.8)); 
-            box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.22), -2px -2px 6px rgba(255, 255, 255, 0.8); 
-            transition: 0.3s all cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            color: #555; border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; color: var(--cal-day); 
+            background: rgba(127, 140, 141, 0.05); box-shadow: var(--inner-shadow); position: relative;
         }
-        .day.sat { color: #5dade2; } 
-        .day.sun, .day.holiday { color: #e67e22; } 
-        .day.today { background: var(--today-bg) !important; color: var(--today-border) !important; border: 2px solid var(--today-border) !important; }
-        .day.selected { background: var(--select-bg) !important; color: var(--select-border) !important; transform: scale(1.15); z-index: 5; border: 2px solid var(--select-border) !important; }
-        .day.has-record { background: var(--record-bg); border: 2px solid var(--record-border); color: #2e7d32; }
+        .day.sat { color: #5dade2 !important; } .day.sun, .day.holiday { color: #e67e22 !important; } 
+        .day.selected { background: var(--select-bg) !important; color: var(--select-border) !important; border: 2px solid var(--select-border) !important; z-index: 5; }
         .day.has-record::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--record-dot); border-radius: 50%; }
-        
-        .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
-        .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; }
-        
-        select#playerCount { flex: none !important; width: 85px !important; padding: 8px !important; margin-left: auto; }
+
         .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .input-row label { width: 70px; font-size: 13px; font-weight: 800; color: var(--text-sub); }
+        select { flex: 1; padding: 12px; border-radius: 15px; border: none; background: rgba(127, 140, 141, 0.1); color: var(--text-main); font-weight: 600; text-align: center; -webkit-appearance: none; }
+
+        .save-btn { width: 100%; padding: 18px; border-radius: 18px; font-weight: 800; border: none; font-size: 16px; box-shadow: 0 8px 15px rgba(0,0,0,0.2); cursor: pointer; transition: 0.2s; }
+        .save-btn:active { transform: scale(0.98); }
         
-        .input-row label { width: 70px; font-size: 13px; font-weight: 800; color: #777; flex-shrink: 0; white-space: nowrap; }
-        
-        select { 
-            flex: 1; padding: 12px; border-radius: 15px; border: 2px solid transparent; font-size: 14px; 
-            background: rgba(236, 238, 241, 0.4); box-shadow: var(--inner-shadow); color: #444; font-weight: 600; 
-            -webkit-appearance: none; text-align: center; text-align-last: center; 
-        }
+        .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; }
+        .stats-table td { padding: 12px 2px; text-align: center; font-weight: 800; color: var(--text-main); }
+        .stats-table td:first-child { text-align: left; padding-left: 10px; text-decoration: underline; cursor: pointer; }
 
-        .edit-active select {
-            background-color: var(--edit-mode-bg) !important;
-            border: 2px solid var(--edit-mode-border) !important;
-            color: #333 !important;
-        }
-
-        select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
-
-        button.save-btn { 
-            width: 100%; padding: 18px; 
-            background: linear-gradient(145deg, #abb2b9, #7f8c8d); 
-            color: white; border: none;
-            border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; 
-            font-size: 16px; 
-            box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.38), -2px -2px 8px rgba(255, 255, 255, 0.5);
-            transition: 0.2s all ease;
-        }
-        button.save-btn:active {
-            transform: scale(0.97);
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2), inset 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        button.edit-btn { 
-            background: linear-gradient(145deg, #ffae24, #da8c10) !important; 
-            border: none !important; 
-        }
-        
-        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-group button { flex: 1; margin-top: 0 !important; }
-        
-        .btn-cancel { 
-            background: #bdc3c7 !important; color: white !important; 
-            border: none !important; 
-        }
-
-        .stats-card {
-            padding: 15px 10px !important;
-            overflow: hidden;
-        }
-        .stats-table { 
-            width: 100%; border-collapse: separate; border-spacing: 0 8px; 
-            font-size: 12px; table-layout: fixed; 
-        }
-        .stats-table th { 
-            padding: 8px 1px; color: #999; font-weight: 900; 
-            text-transform: uppercase; font-size: 10px;
-            border-bottom: 2px solid rgba(0,0,0,0.05);
-            background: #e8f5e9;
-        }
-        .stats-table th:first-child { border-radius: 12px 0 0 12px; }
-        .stats-table th:last-child { border-radius: 0 12px 12px 0; }
-        .stats-table tr { 
-            background: rgba(255, 255, 255, 0.4);
-            transition: transform 0.2s;
-        }
-        .stats-table td { 
-            padding: 12px 1px; text-align: center; 
-            font-weight: 800; color: #555;
-            border-top: 1px solid rgba(255,255,255,0.5);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .stats-table td:first-child { 
-            border-radius: 12px 0 0 12px; border-left: 1px solid rgba(255,255,255,0.5);
-            text-align: left; padding-left: 10px; width: 17%;
-        }
-        .stats-table td:last-child { 
-            border-radius: 0 12px 12px 0; border-right: 1px solid rgba(255,255,255,0.5);
-            padding-right: 18px; width: 23%; text-align: right;
-        }
-        
-        .val-highlight { font-size: 13px; text-shadow: 0 1px 0 rgba(255,255,255,0.8); }
-        
-        .win-rate-pill {
-            color: #27ae60;
-            font-size: 11px;
-            display: inline-block;
-            text-align: right;
-            width: 100%;
-            font-weight: 800;
-            white-space: nowrap;
-        }
-
-        .history-area {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 14px;
-            background: rgba(255, 252, 212, 0.85);
-            border-radius: 12px;
-            margin-bottom: 8px;
-            font-weight: 800;
-            color: #555;
-            flex-wrap: nowrap;
-            border: 2.5px solid #ff69b4;
-        }
-        .history-date {
-            font-size: 14px;
-            color: #666;
-            white-space: nowrap;
-        }
-        .history-rank {
-            font-size: 15px;
-            font-weight: 900;
-            white-space: nowrap;
-        }
-
-        .toast-msg {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.7); color: white; padding: 12px 25px;
-            border-radius: 20px; font-weight: 800; font-size: 14px; z-index: 10002;
-            display: none; animation: fadeIn 0.3s ease;
-        }
-
-        .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
-        
-        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); line-height: 1.4; }
-        .zoom-br { display: none; }
-        body[style*="zoom: 1.2"] .zoom-br { display: inline; }
-
-        body[style*="zoom: 1.2"] .stats-card { padding: 15px 4px !important; } 
-        body[style*="zoom: 1.2"] .stats-table td { font-size: 11px; padding: 8px 0.3px; }
-        body[style*="zoom: 1.2"] .val-highlight { font-size: 11.5px; }
-        body[style*="zoom: 1.2"] .stats-table td:first-child { padding-left: 5px; }
-        body[style*="zoom: 1.2"] .stats-table td:last-child { padding-right: 8px !important; }
-        body[style*="zoom: 1.2"] .win-rate-pill { font-size: 10px; }
-        
-        body[style*="zoom: 1.2"] .history-date { font-size: 13.5px; }
-        body[style*="zoom: 1.2"] .history-rank { font-size: 14px; }
-
-        .cancel-btn { width: 100%; background: #bdc3c7; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; }
-        .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.6); }
-        
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
-        #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
-        
-        .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .game-item { 
-            position: relative;
-            padding: 18px 8px; 
-            border-radius: 22px; 
-            background: linear-gradient(145deg, #f0f0f0, #ffffff); 
-            margin-top: 15px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8);
-            cursor: pointer;
-            overflow: hidden;
-            transition: transform 0.2s ease;
-        }
-        .game-item:active { transform: scale(0.98); }
-
-        .game-info { 
-            font-size: 15px; 
-            font-weight: 900; 
-            color: #444; 
-            text-align: center;
-            letter-spacing: -0.5px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            white-space: nowrap; 
-        }
-        
-        body[style*="zoom: 1.2"] .game-item { padding: 18px 4px; }
-        body[style*="zoom: 1.2"] .game-info { 
-            font-size: 13.5px; 
-            letter-spacing: -0.9px; 
-            justify-content: center;
-        }
-        body[style*="zoom: 1.2"] .game-info span { 
-            font-size: 12px !important; 
-            margin-right: 4px;
-        }
-
-        .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
-
-        .action-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.15); 
-            backdrop-filter: blur(12px); 
-            display: none; 
-            justify-content: center; align-items: center; gap: 12px;
-            z-index: 10; animation: fadeIn 0.2s ease;
-        }
-        .action-overlay.active { display: flex; }
-
-        .overlay-btn {
-            padding: 6px 16px; border-radius: 10px; font-weight: 900; font-size: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.4);
-            transition: 0.2s;
-            color: #1a237e; 
-        }
-        .overlay-btn:active { transform: scale(0.9); }
-        .btn-overlay-edit { background: rgba(255, 160, 0, 0.2); } 
-        .btn-overlay-del { background: rgba(255, 50, 80, 0.2); }  
-        .btn-overlay-cancel { background: rgba(120, 120, 120, 0.2); } 
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
-        .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 30px; text-align: center; width: 80%; max-width: 320px; box-shadow: 15px 15px 40px rgba(0,0,0,0.1); }
-
-        .zoom-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
-        .zoom-label-main { font-size: 14px; font-weight: 800; color: #666; }
-        .zoom-options { display: flex; gap: 12px; }
-        .zoom-options label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 900 !important; font-size: 14px; }
-        .zoom-options input { order: 1; width: 16px; height: 16px; margin: 0; cursor: pointer; }
-        .color-purple { color: #9b59b6; }
-        .color-pink { color: #ff69b4; }
-
-        /* 다크모드 토글 스위치 */
-        .theme-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
         .theme-toggle { position: relative; width: 50px; height: 26px; }
         .theme-toggle input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #2196f3; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; border-radius: 34px; transition: .4s; }
+        .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 4px; bottom: 4px; background: white; border-radius: 50%; transition: .4s; }
+        input:checked + .slider { background: #2196f3; }
         input:checked + .slider:before { transform: translateX(24px); }
+
+        #loading { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:9999; flex-direction:column; color:white; }
     </style>
 </head>
 <body id="app-body">
 
 <div id="welcome-screen">
-    <div class="welcome-content">
-        <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by<br>Ju Kyung Bae</div>
+    <div style="text-align:center;">
+        <img src="image_0.png" style="width:60px; margin-bottom:15px;">
+        <div style="font-size:14px; line-height:1.6;">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br>Created by Ju Kyung Bae</div>
     </div>
 </div>
 
-<div id="toast" class="toast-msg">기록 없음</div>
-
-<div id="exit-modal">
-    <div class="modal-content">
-        <div style="font-size:50px; margin-bottom:15px;">👋</div>
-        <div id="exit-msg" style="font-size:16px; font-weight:800; color:#444; line-height:1.6; margin-bottom:25px;">오늘도 다들 즐거웠니?<br>다음에 또 보자!</div>
-        <button class="save-btn" id="modalOkBtn" style="margin-bottom:12px;" onclick="closeAppWindow()">OK</button>
-        <button class="save-btn" style="background:#abb2b9; margin:0; width: 100%;" onclick="closeExitModal()">취소</button>
-    </div>
-</div>
-
-<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">순위 데이터 동기화 중</div></div>
+<div id="loading"><p>데이터 동기화 중...</p></div>
 
 <div class="calendar-card">
-    <div class="calendar-header">
-        <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
-        <span id="monthDisplay" style="font-size:20px; font-weight:900; color:#444; letter-spacing:-1px;"></span>
-        <button class="nav-btn" onclick="changeMonth(1)">▶</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <button onclick="changeMonth(-1)" style="border:none; background:none; font-size:20px; color:var(--text-main);">◀</button>
+        <span id="monthDisplay" style="font-size:20px; font-weight:900;"></span>
+        <button onclick="changeMonth(1)" style="border:none; background:none; font-size:20px; color:var(--text-main);">▶</button>
     </div>
     <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
-<div class="card" id="inputCard">
-    <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 20px 0; color:#444; font-weight:800;">📅 날짜 확인 중</h2>
-    <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:15px; background: var(--edit); padding: 12px; border-radius: 12px; text-align: center;">✏️ 기록 수정 중</div>
-
-    <div class="theme-wrap">
-        <span class="zoom-label-main">다크 모드</span>
-        <label class="theme-toggle">
-            <input type="checkbox" id="themeSwitch" onchange="toggleTheme()">
-            <span class="slider"></span>
-        </label>
+<div class="card">
+    <h2 id="selectedDateTitle" style="font-size:17px; margin-bottom:15px; font-weight:800;">📅 날짜 선택 중</h2>
+    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+        <span style="font-weight:800; color:var(--text-sub);">다크 모드</span>
+        <label class="theme-toggle"><input type="checkbox" id="themeSwitch" onchange="toggleTheme()"><span class="slider"></span></label>
     </div>
-
-    <div class="zoom-wrap">
-        <span class="zoom-label-main">화면 크기</span>
-        <div class="zoom-options">
-            <label class="color-purple">기본 <input type="radio" name="z" value="1" onclick="changeZoom('1')" checked></label>
-            <label class="color-pink">확대 <input type="radio" name="z" value="1.2" onclick="changeZoom('1.2')"></label>
-        </div>
-    </div>
-
-    <div class="setup-row">
-        <span style="font-size:14px; font-weight:800; color:#555;">게임 인원</span>
-        <select id="playerCount" onchange="updateInputFields()">
+    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+        <span style="font-weight:800; color:var(--text-sub);">게임 인원</span>
+        <select id="playerCount" onchange="updateInputFields()" style="width:80px; flex:none;">
             <option value="2">2명</option>
             <option value="3" selected>3명</option>
             <option value="4">4명</option>
             <option value="5">5명</option>
         </select>
     </div>
-
     <div id="inputArea"></div>
-    <div class="btn-group">
-        <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
-        <button class="save-btn btn-cancel" onclick="resetInputs()">취소</button>
+    <div style="display:flex; gap:10px;">
+        <button id="mainBtn" class="save-btn" style="background:#7f8c8d; color:white;" onclick="saveGame()">순위 저장</button>
+        <button class="save-btn" style="background:#bdc3c7; color:white;" onclick="resetInputs()">취소</button>
     </div>
     <div id="dayGameList"></div>
 </div>
 
-<div class="card stats-card">
-    <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적 (이름을 터치해 봐!)</h2>
+<div class="card">
+    <button id="captureBtn" class="save-btn" style="background:linear-gradient(135deg, #6e8efb, #a777e3); color:white; margin-bottom:20px;">📸 전적 스크린샷 공유</button>
+    <h2 style="font-size:16px;">📊 멤버별 누적 전적 (이름을 터치해 봐!)</h2>
     <table class="stats-table">
-        <thead>
-            <tr>
-                <th style="text-align:left; padding-left:10px;">이름</th>
-                <th>참여</th>
-                <th style="color:var(--rank1); cursor:pointer;" onclick="toggleAllMode()">1위🥇</th>
-                <th style="color:var(--rank2); cursor:pointer;" onclick="toggleAllMode()">2위</th>
-                <th style="color:var(--rank3); cursor:pointer;" onclick="toggleAllMode()">3위</th>
-                <th style="color:var(--rank4); cursor:pointer;" onclick="toggleAllMode()">4위</th>
-                <th style="color:var(--rankL); cursor:pointer;" onclick="toggleAllMode()">꼴찌💀</th>
-                <th style="text-align:right; padding-right:18px; white-space:nowrap;">승률</th>
-            </tr>
-        </thead>
+        <thead><tr style="font-size:10px; color:var(--text-sub);"><th>이름</th><th>참여</th><th style="color:var(--rank1)">1위🥇</th><th style="color:var(--rankL)">꼴찌💀</th><th>승률</th></tr></thead>
         <tbody id="statsBody"></tbody>
     </table>
-    
-    <div id="memberHistoryArea" class="history-area"></div>
-
-    <div id="richFriendArea" style="display:none; background: var(--bg); padding: 20px; border-radius: 22px; text-align: center; box-shadow: var(--inner-shadow); margin-top: 20px; color: #7f8c8d; font-weight: 800;"></div>
+    <div id="richFriendArea" style="display:none; padding:15px; background:rgba(0,0,0,0.1); border-radius:15px; text-align:center; font-weight:800; margin-top:15px;"></div>
 </div>
 
-<div class="danger-zone">
-    <div style="color:#7b1fa2; font-weight:900; margin-bottom:15px; font-size:12px;">초기화 버튼은 함부로 터치하지 마세요.</div>
-    <div id="resetSteps">
-        <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
-    </div>
-    <button id="exitBtn" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button>
+<div style="text-align:center; padding:20px;">
+    <p style="color:var(--accent); font-size:11px; font-weight:800;">조작 버튼은 함부로 터치하지 마세요.</p>
+    <button class="save-btn" style="background:#e67e22; color:white; margin-bottom:10px;" onclick="handleReset()">⚠️ 모든 데이터 초기화 (복구 불가)</button>
+    <button class="save-btn" style="background:#7f8c8d; color:white;" onclick="location.reload()">🚪 앱 종료</button>
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec"; 
-    
-    const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
-    
-    let gameLogs = [];
-    let currentViewDate = new Date();
-    let selectedDateStr = new Date().toLocaleDateString('sv-SE');
-    let editMode = false;
-    let editRound = null;
-    let currentZoom = "1";
-    let isPercentMode = false;
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec";
+    const players = ["경배", "진웅", "창한", "원석", "정석", "경석"];
+    const holidays = ["2026-01-01", "2026-02-16", "2026-02-17", "2026-02-18", "2026-03-01", "2026-05-05", "2026-05-24", "2026-06-06", "2026-08-15", "2026-09-24", "2026-09-25", "2026-09-26", "2026-10-03", "2026-10-09", "2026-12-25"];
+    let gameLogs = []; let currentViewDate = new Date(); let selectedDateStr = new Date().toLocaleDateString('sv-SE');
 
-    // 다크모드 전환 함수
     function toggleTheme() {
         const isDark = document.getElementById('themeSwitch').checked;
-        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
     }
 
-    function formatDate(dateInput) {
-        const d = new Date(dateInput);
-        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-    }
-
     async function fetchData() {
-        if(!GAS_URL || GAS_URL.includes("URL_입력")) return;
-        showLoading(true, "Cloud 동기화 중");
-        try {
-            const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
-            const rawData = await response.json();
-            gameLogs = rawData.map(g => ({ ...g, dateStr: formatDate(g.date) }));
-            renderAll(); 
-        } catch (e) { console.error("Fetch error"); } 
-        finally { 
-            showLoading(false); 
-            document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
-        }
+        document.getElementById('loading').style.display = 'flex';
+        try { const res = await fetch(`${GAS_URL}?t=${Date.now()}`); gameLogs = await res.json(); renderAll(); } 
+        catch(e) { console.error(e); }
+        finally { document.getElementById('loading').style.display = 'none'; }
     }
 
     function renderAll() { renderCalendar(); renderStats(); renderGameList(); }
 
-    function isHoliday(year, month, day) {
-        const dStr = `${month + 1}-${day}`;
-        const fixedHolidays = ["1-1", "3-1", "5-1", "5-5", "6-6", "7-17", "8-15", "10-3", "10-9", "12-25"];
-        const variable2026 = ["2-16", "2-17", "2-18", "2-19", "3-2", "5-24", "5-25", "6-3", "8-17", "9-24", "9-25", "9-26", "10-5"];
-        return fixedHolidays.includes(dStr) || (year === 2026 && variable2026.includes(dStr));
-    }
-
     function renderCalendar() {
         const grid = document.getElementById('calendarGrid'); grid.innerHTML = "";
         const year = currentViewDate.getFullYear(); const month = currentViewDate.getMonth();
-        const realTodayStr = formatDate(new Date());
         document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
-        ["일","월","화","수","목","금","토"].forEach((d, idx) => {
-            let color = "#95a5a6"; if(idx === 0) color = "#e67e22"; if(idx === 6) color = "#5dade2";
-            grid.innerHTML += `<div class="weekday" style="color:${color}">${d}</div>`;
-        });
-        const firstDay = new Date(year, month, 1).getDay(); const lastDate = new Date(year, month + 1, 0).getDate();
+        ["일","월","화","수","목","금","토"].forEach(d => grid.innerHTML += `<div style="font-size:11px; font-weight:900; color:#95a5a6;">${d}</div>`);
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
         for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
         for (let d = 1; d <= lastDate; d++) {
-            const dStr = formatDate(new Date(year, month, d)); const dayOfWeek = new Date(year, month, d).getDay();
-            let dayClass = (dayOfWeek === 0 || isHoliday(year, month, d)) ? "sun holiday" : (dayOfWeek === 6 ? "sat" : "");
-            const isToday = dStr === realTodayStr ? 'today' : ''; const isSelected = dStr === selectedDateStr ? 'selected' : '';
-            const hasRecord = gameLogs.some(g => g.dateStr === dStr) ? 'has-record' : '';
-            grid.innerHTML += `<div class="day ${dayClass} ${isSelected} ${isToday} ${hasRecord}" onclick="selectDate('${dStr}')">${d}</div>`;
+            const dStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const isHol = holidays.includes(dStr) ? 'holiday' : '';
+            const isSel = dStr === selectedDateStr ? 'selected' : '';
+            const hasRec = gameLogs.some(g => g.date.split('T')[0] === dStr) ? 'has-record' : '';
+            grid.innerHTML += `<div class="day ${new Date(dStr).getDay()===0?'sun':''} ${new Date(dStr).getDay()===6?'sat':''} ${isHol} ${isSel} ${hasRec}" onclick="selectDate('${dStr}')">${d}</div>`;
         }
     }
 
-    function selectDate(dateStr) { if(editMode) cancelEdit(); selectedDateStr = dateStr; document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`; renderCalendar(); renderGameList(); }
-    
-    function checkDuplicates() {
-        const selects = Array.from(document.querySelectorAll('#inputArea select')); const values = selects.map(s => s.value);
-        selects.forEach(s => s.classList.remove('duplicate-error'));
-        values.forEach((v, i) => { if(v && values.filter(x => x === v).length > 1) selects[i].classList.add('duplicate-error'); });
-    }
-    
-    function updateInputFields(preFill = null) {
-        if(preFill) document.getElementById('playerCount').value = preFill.length;
-        const count = parseInt(document.getElementById('playerCount').value); 
-        const inputArea = document.getElementById('inputArea');
-        inputArea.innerHTML = "";
-        let html = '';
+    function updateInputFields() {
+        const count = document.getElementById('playerCount').value;
+        const area = document.getElementById('inputArea'); area.innerHTML = "";
         for(let i=1; i<=count; i++) {
-            const label = i === count ? "꼴찌💀" : (i === 1 ? "1위🥇" : `${i}위`);
-            html += `<div class="input-row"><label>${label}</label><select id="rank${i}" onchange="checkDuplicates()"><option value="">선택</option>${players.map(p => `<option value="${p}" ${preFill && preFill[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
+            area.innerHTML += `<div class="input-row"><label>${i==count?'꼴찌💀':i+'위'}</label><select id="r${i}"><option value="">선택</option>${players.map(p=>`<option value="${p}">${p}</option>`).join('')}</select></div>`;
         }
-        inputArea.innerHTML = html; if(preFill) checkDuplicates();
     }
-    
-    function resetInputs() { if(editMode) cancelEdit(); else { document.getElementById('playerCount').value = "3"; updateInputFields(); } }
-    
+
     async function saveGame() {
-        const todayStr = formatDate(new Date()); if(selectedDateStr > todayStr) return alert("미래에서 온거야? 오늘이 며칠인지 확인해!");
-        const count = parseInt(document.getElementById('playerCount').value); const ranks = [];
-        for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("친구를 선택해줄래?"); ranks.push(val); }
-        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
-        showLoading(true, "저장 중");
-        const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
-        try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); setTimeout(() => { fetchData(); alert("저장 완료 ✨"); cancelEdit(); }, 1200); } catch (e) { alert("오류 발생!"); showLoading(false); }
+        const ranks = [];
+        for(let i=1; i<=document.getElementById('playerCount').value; i++) {
+            const v = document.getElementById('r'+i).value;
+            if(!v) return alert("친구를 모두 선택해주세요!");
+            ranks.push(v);
+        }
+        if(new Set(ranks).size !== ranks.length) return alert("중복된 친구가 있습니다!");
+        document.getElementById('loading').style.display = 'flex';
+        await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "SAVE", date: selectedDateStr, ranks: ranks }) });
+        fetchData();
     }
-
-    function confirmReset(step) {
-        const el = document.getElementById('resetSteps');
-        if(step === 1) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 데이터를 지울까요?</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
-        else if(step === 2) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구 불가! 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
-        else if(step === 3) el.innerHTML = `<button class="reset-btn" style="background:var(--accent); font-size:16px;" onclick="executeReset()">[최종 확인] 🔥 마지막.<br class="zoom-br"> 모두 삭제합니다.</button><button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
-    }
-    function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
-    async function executeReset() { showLoading(true, "초기화 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); } catch(e) { showLoading(false); } }
-
-    function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
 
     function renderStats() {
-        let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
+        let stats = {}; players.forEach(p => stats[p] = { p:0, r:[0,0,0,0,0] });
         gameLogs.forEach(g => {
-            const actual = g.ranks.filter(n => n.trim() !== "");
-            actual.forEach((name, idx) => { if(stats[name]) { stats[name].played++; if (idx === actual.length - 1 && actual.length > 1) stats[name].ranks[4]++; else if (idx < 4) stats[name].ranks[idx]++; } });
+            const r = g.ranks.filter(n => n);
+            r.forEach((n, i) => { if(stats[n]) { stats[n].p++; if(i===0) stats[n].r[0]++; if(i===r.length-1) stats[n].r[4]++; } });
         });
-        const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
-        const maxCounts = { played: 0, r0: 0, r1: 0, r2: 0, r3: 0, r4: 0 };
-        players.forEach(p => {
-            maxCounts.played = Math.max(maxCounts.played, stats[p].played); maxCounts.r0 = Math.max(maxCounts.r0, stats[p].ranks[0]);
-            maxCounts.r1 = Math.max(maxCounts.r1, stats[p].ranks[1]); maxCounts.r2 = Math.max(maxCounts.r2, stats[p].ranks[2]);
-            maxCounts.r3 = Math.max(maxCounts.r3, stats[p].ranks[3]); maxCounts.r4 = Math.max(maxCounts.r4, stats[p].ranks[4]);
-        });
-        const bodyHtml = sortedByWin.map(p => {
-            let nameTdContent = p;
-            let nameStyle = "font-weight:900; letter-spacing:-0.5px; cursor:pointer; text-decoration: underline; text-underline-offset: 3px;"; 
-            const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
-            
-            if (stats[p].ranks[0] === maxCounts.r0 && stats[p].ranks[4] === maxCounts.r4 && maxCounts.r0 > 0) {
-                nameTdContent = p.length >= 2 ? `<span style="color:orange;">${p[0]}</span><span style="color:#ff69b4;">${p.substring(1)}</span>` : `<span style="color:orange;">${p}</span>`;
-            } else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
-            else if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`;
-            
-            const getVal = (val, total) => { if(isPercentMode) return total === 0 ? '0%' : ((val/total)*100).toFixed(0) + '%'; return val; };
-            const tdStyle = (val, max, colorVar) => `style="color:var(${colorVar}); ${(val === max && max > 0) ? 'font-weight:900;' : ''}" class="val-highlight"`;
-
-            return `<tr>
-                <td style="${nameStyle}" onclick="renderMemberHistory('${p}')">${nameTdContent}</td>
-                <td style="color:#888;">${stats[p].played}</td>
-                <td ${tdStyle(stats[p].ranks[0], maxCounts.r0, '--rank1')}>${getVal(stats[p].ranks[0], stats[p].played)}</td>
-                <td ${tdStyle(stats[p].ranks[1], maxCounts.r1, '--rank2')}>${getVal(stats[p].ranks[1], stats[p].played)}</td>
-                <td ${tdStyle(stats[p].ranks[2], maxCounts.r2, '--rank3')}>${getVal(stats[p].ranks[2], stats[p].played)}</td>
-                <td ${tdStyle(stats[p].ranks[3], maxCounts.r3, '--rank4')}>${getVal(stats[p].ranks[3], stats[p].played)}</td>
-                <td ${tdStyle(stats[p].ranks[4], maxCounts.r4, '--rankL')}>${getVal(stats[p].ranks[4], stats[p].played)}</td>
-                <td><span class="win-rate-pill">${winRate}%</span></td>
-            </tr>`;
+        const maxWin = Math.max(...players.map(p => stats[p].r[0]));
+        const sorted = [...players].sort((a,b) => stats[b].r[0] - stats[a].r[0]);
+        document.getElementById('statsBody').innerHTML = sorted.map(p => {
+            const winRate = stats[p].p > 0 ? ((stats[p].r[0]/stats[p].p)*100).toFixed(1) : "0.0";
+            const nameStyle = (stats[p].r[0] === maxWin && maxWin > 0) ? 'color:var(--rank1); font-weight:900;' : '';
+            return `<tr><td style="${nameStyle}">${p}</td><td>${stats[p].p}</td><td style="color:var(--rank1)">${stats[p].r[0]}</td><td style="color:var(--rankL)">${stats[p].r[4]}</td><td>${winRate}%</td></tr>`;
         }).join('');
-        document.getElementById('statsBody').innerHTML = bodyHtml || players.map(p => `<tr><td>${p}</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><span class="win-rate-pill">0.0%</span></td></tr>`).join('');
-        const richFriend = document.getElementById('richFriendArea');
-        if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')} (${maxCounts.r4}회)</span>`; } else richFriend.style.display = 'none';
-    }
-
-    function renderMemberHistory(name) {
-        const historyArea = document.getElementById('memberHistoryArea');
-        const personalGames = gameLogs
-            .filter(g => g.ranks.includes(name))
-            .sort((a, b) => new Date(b.date) - new Date(a.date))
-            .slice(0, 5);
-
-        if (personalGames.length === 0) {
-            const toast = document.getElementById('toast');
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 1500);
-            historyArea.style.display = 'none';
-            return;
-        }
-
-        let html = `<div style="font-size:14px; font-weight:900; color:#444; margin-bottom:12px; display:flex; justify-content:space-between;">
-                        <span>🏆 ${name}의 최근 5경기</span>
-                        <span style="color:#888; cursor:pointer;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span>
-                    </div>`;
         
-        personalGames.forEach(g => {
-            const actual = g.ranks.filter(n => n.trim() !== "");
-            const rankIndex = actual.indexOf(name);
-            const rankLabel = (rankIndex === actual.length - 1 && actual.length > 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
-            let rankColor = "var(--main)";
-            if(rankIndex === 0) rankColor = "var(--rank1)";
-            else if(rankIndex === actual.length - 1) rankColor = "var(--rankL)";
-
-            html += `<div class="history-item">
-                        <span class="history-date">${g.dateStr}</span>
-                        <span class="history-rank" style="color:${rankColor};">${rankLabel}</span>
-                    </div>`;
-        });
-
-        historyArea.innerHTML = html;
-        historyArea.style.display = 'block';
-        historyArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        const worst = [...players].sort((a,b) => stats[b].r[4] - stats[a].r[4])[0];
+        if(stats[worst].r[4] > 0) {
+            document.getElementById('richFriendArea').style.display = 'block';
+            document.getElementById('richFriendArea').innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="color:red;">${worst} (${stats[worst].r[4]}회)</span>`;
+        }
     }
-
-    function changeZoom(v) { currentZoom = v; document.body.style.zoom = v; }
 
     function renderGameList() {
-        const games = gameLogs.filter(g => g.dateStr === selectedDateStr); const listArea = document.getElementById('dayGameList');
-        if(games.length > 0) {
-            let html = `<div style="text-align:center; margin:28px 0 10px 0;"><span style="font-size:14px; color:#888; font-weight:800;">GAME RECORD</span></div>`;
-            games.forEach((g, idx) => { 
-                const names = g.ranks.filter(n => n && n.trim() !== ""); 
-                const styledNames = names.map((name, i) => {
-                    let style = "font-size: 15px;"; 
-                    if (i === 0) style += "color:var(--rank1);";
-                    if (i === names.length - 1 && names.length > 1) style += "color:var(--rankL);";
-                    return `<span style="${style}">${name}</span>`;
-                });
-                html += `
-                <div class="game-item" onclick="toggleActionOverlay(this)">
-                    <div class="game-info"><span>${idx+1}G</span> ${styledNames.join(' → ')}</div>
-                    <div class="action-overlay">
-                        <div class="overlay-btn btn-overlay-edit" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
-                        <div class="overlay-btn btn-overlay-del" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>
-                        <div class="overlay-btn btn-overlay-cancel" onclick="event.stopPropagation(); handleActionCancel()">취소</div>
-                    </div>
-                </div>`; 
-            });
-            listArea.innerHTML = html;
-        } else listArea.innerHTML = "";
+        const games = gameLogs.filter(g => g.date.split('T')[0] === selectedDateStr);
+        const area = document.getElementById('dayGameList'); area.innerHTML = "";
+        games.forEach(g => { area.innerHTML += `<div style="padding:15px; background:rgba(255,255,255,0.1); border-radius:15px; margin-top:10px; text-align:center; font-weight:800;">${g.ranks.join(' → ')}</div>`; });
     }
 
-    function toggleActionOverlay(el) {
-        const overlay = el.querySelector('.action-overlay');
-        const isActive = overlay.classList.contains('active');
-        hideActionOverlays();
-        if(!isActive) overlay.classList.add('active');
-    }
-
-    function hideActionOverlays() {
-        document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active'));
-    }
-
-    function handleActionCancel() {
-        hideActionOverlays();
-        if(editMode) cancelEdit();
-    }
-
-    function enterEditMode(round, rankStr) { 
-        editMode = true; editRound = round; 
-        updateInputFields(rankStr.split(',')); 
-        document.getElementById('editBadge').style.display = 'block'; 
-        document.getElementById('inputCard').classList.add('edit-active');
-        const btn = document.getElementById('mainBtn'); 
-        btn.innerText = "수정 완료"; btn.classList.add('edit-btn');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function cancelEdit() { 
-        editMode = false; editRound = null; 
-        document.getElementById('editBadge').style.display = 'none'; 
-        document.getElementById('inputCard').classList.remove('edit-active');
-        const btn = document.getElementById('mainBtn'); 
-        btn.innerText = "순위 저장"; btn.classList.remove('edit-btn'); 
-        document.getElementById('playerCount').value = "3"; 
-        updateInputFields(); 
-        document.querySelectorAll('#inputArea select').forEach(s => s.classList.remove('duplicate-error'));
-    }
-
-    async function deleteGame(round) { 
-        if(!confirm("정말 삭제할거야?")) return; 
-        showLoading(true, "삭제 중"); 
-        try { 
-            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) }); 
-            setTimeout(() => fetchData(), 1200); 
-        } catch (e) { showLoading(false); } 
-    }
-
-    function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
-    function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-    
-    function closeAppWindow() { 
-        window.open('', '_self', ''); 
-        window.close();
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if(isIOS) {
-            closeExitModal();
-            if (window.history.length > 1) window.history.back();
-            return;
+    function handleReset() {
+        if(confirm("1단계: 정말 초기화하시겠습니까?") && confirm("2단계: 모든 데이터가 영구 삭제됩니다.") && confirm("마지막: 정말로 실행할까요?")) {
+            document.getElementById('loading').style.display = 'flex';
+            fetch(GAS_URL, { method:'POST', body: JSON.stringify({action:'RESET'}) }).then(()=>location.reload());
         }
-        setTimeout(() => {
-            location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
-            setTimeout(() => { window.history.back(); }, 100);
-        }, 100);
     }
 
-    function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
-    function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
+    function selectDate(s) { selectedDateStr = s; document.getElementById('selectedDateTitle').innerText = `📅 ${s}`; renderCalendar(); renderGameList(); }
+    function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth()+v); renderCalendar(); }
+    function resetInputs() { updateInputFields(); }
 
-    window.onload = () => { 
-        // 테마 로드
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.getElementById('themeSwitch').checked = true;
-        }
-
-        setTimeout(() => { 
-            const ws = document.getElementById('welcome-screen');
-            if(ws) { 
-                ws.style.opacity = '0'; 
-                setTimeout(() => { ws.style.display = 'none'; }, 800); 
-            }
-        }, 3500);
-
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if(isIOS) {
-            document.getElementById('exitBtn').innerText = "📱 Return Home";
-            document.getElementById('exit-msg').innerHTML = "SWIPE UP<br>다음에 또 보자!";
-            document.getElementById('modalOkBtn').innerText = "확인";
-        }
-        updateInputFields(); 
-        renderStats(); 
-        fetchData(); 
+    window.onload = () => {
+        const theme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', theme);
+        document.getElementById('themeSwitch').checked = (theme === 'dark');
+        setTimeout(() => document.getElementById('welcome-screen').style.opacity = '0', 3500);
+        setTimeout(() => document.getElementById('welcome-screen').style.display = 'none', 4300);
+        updateInputFields();
+        fetchData();
     };
-    document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) hideActionOverlays(); });
 </script>
-<script src="share.js"></script>    
+<script src="share.js"></script>
 </body>
 </html>
