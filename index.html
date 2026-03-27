@@ -166,7 +166,8 @@
         }
 
         .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
-        .input-row label { width: 70px; font-size: 13px; font-weight: 800; color: var(--label-text); flex-shrink: 0; white-space: nowrap; }
+        /* 수정 부분: 줄바꿈 방지 및 너비 최적화 */
+        .input-row label { width: 75px; font-size: 13px; font-weight: 800; color: var(--label-text); flex-shrink: 0; white-space: nowrap; overflow: visible; }
         
         select { 
             flex: 1; padding: 12px; border-radius: 15px; border: 2px solid transparent; font-size: 14px; 
