@@ -45,14 +45,13 @@
             --edit-mode-bg: #e8f5e9;
             --edit-mode-border: #2d5a27; 
             
+            /* 추가: 텍스트 색상 변수 */
             --text-color: #444;
             --text-sub-color: #555;
             --text-light-color: #777;
-
-            --day-bg: linear-gradient(145deg, rgba(253, 253, 253, 0.8), rgba(226, 229, 234, 0.8));
-            --day-text: #555;
         }
 
+        /* 다크모드 설정: 색상만 수정 */
         [data-theme='dark'] {
             --main: #bdc3c7;
             --bg: rgba(30, 30, 30, 0.9);
@@ -69,17 +68,16 @@
             --dup-border: #ff5252;
             --dup-text: #ffccbc;
             
+            /* 다크모드 시 글자색 변경 */
             --text-color: #eeeeee;
             --text-sub-color: #dddddd;
             --text-light-color: #bbbbbb;
 
-            --day-bg: linear-gradient(145deg, #2c3e50, #1a252f);
-            --day-text: #ffffff;
-            
-            /* 수정: 다크모드 1위 이름 색상을 세련된 파란색으로 변경 */
-            --rank1: #5dade2; 
+            /* 다크모드 전용 순위 색상 (진한 네이비) */
+            --rank1: #1a237e;
         }
 
+        /* 다크모드에서 검정색 글자들 강제 수정 */
         [data-theme='dark'] body, 
         [data-theme='dark'] h2, 
         [data-theme='dark'] #monthDisplay, 
@@ -88,16 +86,9 @@
         [data-theme='dark'] .setup-row span,
         [data-theme='dark'] .history-item { color: var(--text-color) !important; }
 
-        [data-theme='dark'] .day { color: var(--day-text) !important; background: var(--day-bg) !important; }
-        [data-theme='dark'] .day.sat { color: #5dade2 !important; } 
-        [data-theme='dark'] .day.sun, [data-theme='dark'] .day.holiday { color: #ffab6b !important; } 
-        
+        [data-theme='dark'] .day { color: #ccc; }
         [data-theme='dark'] select { color: #fff; background: rgba(60, 60, 70, 0.8); }
         [data-theme='dark'] .stats-table td { color: #ccc; }
-        
-        /* 수정: 다크모드 통계 테이블 1위 이름 가독성 및 색상 보정 */
-        [data-theme='dark'] .stats-table td:first-child { color: var(--text-color); }
-        [data-theme='dark'] .stats-table td.winner-name { color: var(--rank1) !important; }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
@@ -152,10 +143,10 @@
         .day { 
             aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
             border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; position: relative; 
-            background: var(--day-bg); 
+            background: linear-gradient(145deg, rgba(253, 253, 253, 0.8), rgba(226, 229, 234, 0.8)); 
             box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.22), -2px -2px 6px rgba(255, 255, 255, 0.8); 
             transition: 0.3s all cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            color: var(--day-text); border: 1px solid rgba(255,255,255,0.4);
+            color: #555; border: 1px solid rgba(255,255,255,0.4);
         }
         .day.sat { color: #5dade2; } 
         .day.sun, .day.holiday { color: #e67e22; } 
@@ -204,18 +195,6 @@
             background: linear-gradient(145deg, #ffae24, #da8c10) !important; 
             border: none !important; 
         }
-
-        /* 수정: 스크린샷 버튼 스타일을 순위표 카드 폭에 맞춰 조정 */
-        button.capture-btn {
-            width: 100%; padding: 18px; 
-            background: linear-gradient(145deg, #4facfe, #00f2fe);
-            color: white; border: none;
-            border-radius: 18px; font-weight: 800; margin-bottom: 25px; cursor: pointer;
-            font-size: 16px;
-            box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.2), -2px -2px 8px rgba(255, 255, 255, 0.4);
-            transition: 0.2s all ease;
-        }
-        button.capture-btn:active { transform: scale(0.97); }
         
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .btn-group button { flex: 1; margin-top: 0 !important; }
@@ -412,6 +391,7 @@
         .color-purple { color: #9b59b6; }
         .color-pink { color: #ff69b4; }
 
+        /* 다크모드 토글 스위치 */
         .theme-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
         .theme-toggle { position: relative; width: 50px; height: 26px; }
         .theme-toggle input { opacity: 0; width: 0; height: 0; }
@@ -490,8 +470,6 @@
     <div id="dayGameList"></div>
 </div>
 
-<button id="captureBtn" class="capture-btn" onclick="captureAndShare()">📸 결과 이미지 저장 (카톡 공유)</button>
-
 <div class="card stats-card">
     <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적 (이름을 터치해 봐!)</h2>
     <table class="stats-table">
@@ -520,7 +498,8 @@
     <div id="resetSteps">
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
-    <button id="exitBtn" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button>
+    <button id="shareBtn" class="save-btn" style="width: 100%; margin-top: 10px; background: linear-gradient(145deg, #6c5ce7, #a29bfe);" onclick="shareScreenshot()">📸 전적 스크린샷 공유</button>
+    <button id="exitBtn" class="exit-btn" style="margin-top: 10px;" onclick="showExitModal()">🚪 앱 종료</button>
 </div>
 
 <script>
@@ -536,6 +515,7 @@
     let currentZoom = "1";
     let isPercentMode = false;
 
+    // 다크모드 전환 함수
     function toggleTheme() {
         const isDark = document.getElementById('themeSwitch').checked;
         document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
@@ -651,22 +631,18 @@
         const bodyHtml = sortedByWin.map(p => {
             let nameTdContent = p;
             let nameStyle = "font-weight:900; letter-spacing:-0.5px; cursor:pointer; text-decoration: underline; text-underline-offset: 3px;"; 
-            let nameClass = ""; // 수정: 다크모드 대응 클래스
             const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             
             if (stats[p].ranks[0] === maxCounts.r0 && stats[p].ranks[4] === maxCounts.r4 && maxCounts.r0 > 0) {
                 nameTdContent = p.length >= 2 ? `<span style="color:orange;">${p[0]}</span><span style="color:#ff69b4;">${p.substring(1)}</span>` : `<span style="color:orange;">${p}</span>`;
             } else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
-            else if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) {
-                nameStyle += `color:var(--rank1);`;
-                nameClass = "winner-name"; // 수정: 1위 클래스 추가
-            }
+            else if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`;
             
             const getVal = (val, total) => { if(isPercentMode) return total === 0 ? '0%' : ((val/total)*100).toFixed(0) + '%'; return val; };
             const tdStyle = (val, max, colorVar) => `style="color:var(${colorVar}); ${(val === max && max > 0) ? 'font-weight:900;' : ''}" class="val-highlight"`;
 
             return `<tr>
-                <td style="${nameStyle}" class="${nameClass}" onclick="renderMemberHistory('${p}')">${nameTdContent}</td>
+                <td style="${nameStyle}" onclick="renderMemberHistory('${p}')">${nameTdContent}</td>
                 <td style="color:#888;">${stats[p].played}</td>
                 <td ${tdStyle(stats[p].ranks[0], maxCounts.r0, '--rank1')}>${getVal(stats[p].ranks[0], stats[p].played)}</td>
                 <td ${tdStyle(stats[p].ranks[1], maxCounts.r1, '--rank2')}>${getVal(stats[p].ranks[1], stats[p].played)}</td>
@@ -816,6 +792,7 @@
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
     window.onload = () => { 
+        // 테마 로드
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
