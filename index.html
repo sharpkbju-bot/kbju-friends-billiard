@@ -471,19 +471,27 @@
         });
         const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
         const maxCounts = { played: 0, r0: 0, r1: 0, r2: 0, r3: 0, r4: 0 };
-        players.forEach(p => { maxCounts.r0 = Math.max(maxCounts.r0, stats[p].ranks[0]); maxCounts.r4 = Math.max(maxCounts.r4, stats[p].ranks[4]); });
+        players.forEach(p => { 
+            maxCounts.r0 = Math.max(maxCounts.r0, stats[p].ranks[0]); 
+            maxCounts.r4 = Math.max(maxCounts.r4, stats[p].ranks[4]); 
+        });
         
         const bodyHtml = sortedByWin.map(p => {
             const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             let nameStyle = "font-weight:900; cursor:pointer; text-decoration: underline;";
             
-            // 1위 횟수와 꼴찌 횟수가 동일한 경우 짙은 빨간색으로 수정
-            if (stats[p].ranks[0] > 0 && stats[p].ranks[0] === stats[p].ranks[4]) {
+            const isTopWinner = (stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0);
+            const isTopLoser = (stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0);
+
+            if (isTopLoser) {
+                // 꼴찌 횟수가 제일 많으면 무조건 짙은 빨간색
                 nameStyle += `color:darkred;`;
-            } else if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) {
-                nameStyle += `color:var(--rank1);`;
-            } else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) {
-                nameStyle += `color:var(--rankL);`;
+            } else if (isTopWinner) {
+                // 꼴찌가 제일 많지 않으면서 1위가 제일 많으면 짙은 파란색
+                nameStyle += `color:darkblue;`;
+            } else {
+                // 그 외 모든 순위는 퍼플 컬러
+                nameStyle += `color:#8e44ad;`;
             }
             
             const getVal = (val, total) => isPercentMode ? (total === 0 ? '0%' : ((val/total)*100).toFixed(0) + '%') : val;
@@ -526,7 +534,6 @@
             games.forEach((g, idx) => { 
                 const names = g.ranks.filter(n => n && n.trim() !== ""); 
                 const styledNames = names.map((name, i) => `<span style="color:${i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)')};">${name}</span>`);
-                // 액션 오버레이에 취소 버튼 복구
                 html += `<div class="game-item" onclick="toggleActionOverlay(this)"><div class="game-info"><span>${idx+1}G</span> ${styledNames.join(' → ')}</div><div class="action-overlay"><div class="overlay-btn" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div><div class="overlay-btn" style="color:red;" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div><div class="overlay-btn" onclick="event.stopPropagation(); closeAllOverlays()">취소</div></div></div>`; 
             });
             listArea.innerHTML = html;
