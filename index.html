@@ -69,7 +69,6 @@
             --sub-text: #cccccc;
             --label-text: #bbbbbb;
             --rank1: #4da3ff;
-            /* 배경색은 그대로 유지 */
             --edit-mode-bg: rgba(35, 35, 45, 0.9); 
             --edit-mode-border: #27ae60;
         }
@@ -183,7 +182,7 @@
         .edit-active select {
             background-color: var(--edit-mode-bg) !important;
             border: 2px solid var(--edit-mode-border) !important;
-            color: #27ae60 !important; /* 수정모드에서 글자색을 그린(Green)으로 변경 */
+            color: #27ae60 !important;
         }
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
@@ -565,7 +564,8 @@
         document.getElementById('editBadge').style.display = 'block'; 
         document.getElementById('inputCard').classList.add('edit-active');
         const btn = document.getElementById('mainBtn'); btn.innerText = "수정 완료"; btn.classList.add('edit-btn');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // 상단으로 이동하는 대신 수정 대상인 입력창 쪽으로 포커싱 이동
+        document.getElementById('inputArea').scrollIntoView({ behavior: 'smooth', block: 'center' });
         closeAllOverlays();
     }
 
@@ -590,8 +590,8 @@
             document.body.innerHTML = `
                 <div style="background:linear-gradient(135deg, #4a90e2, #9370db); height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-family:sans-serif;">
                     <div style="font-size:60px; margin-bottom:20px;">👋</div>
-                    <div style="font-size:20px; font-weight:900; line-height:1.6;">앱 종료<br>안녕!</div>
-                    <div style="font-size:14px; margin-top:30px; opacity:0.8;">브라우저 하단의 [완료] 버튼이나<br>[X] 버튼 터치</div>
+                    <div style="font-size:20px; font-weight:900; line-height:1.6;">앱이 종료되었습니다.<br>안녕히 가세요!</div>
+                    <div style="font-size:14px; margin-top:30px; opacity:0.8;">브라우저 하단의 [완료] 버튼이나<br>[X] 버튼을 눌러 창을 닫아주세요.</div>
                 </div>`;
             document.body.style.backgroundImage = 'none';
             document.body.style.padding = '0';
