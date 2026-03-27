@@ -438,7 +438,6 @@
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try { 
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); 
-            // 저장 완료 후 인원 선택을 3명으로 리셋
             cancelEdit(); 
             document.getElementById('playerCount').value = "3";
             updateInputFields();
@@ -477,8 +476,15 @@
         const bodyHtml = sortedByWin.map(p => {
             const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             let nameStyle = "font-weight:900; cursor:pointer; text-decoration: underline;";
-            if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`;
-            else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
+            
+            // 1위 횟수와 꼴찌 횟수가 동일한 경우 짙은 빨간색으로 수정
+            if (stats[p].ranks[0] > 0 && stats[p].ranks[0] === stats[p].ranks[4]) {
+                nameStyle += `color:darkred;`;
+            } else if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) {
+                nameStyle += `color:var(--rank1);`;
+            } else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) {
+                nameStyle += `color:var(--rankL);`;
+            }
             
             const getVal = (val, total) => isPercentMode ? (total === 0 ? '0%' : ((val/total)*100).toFixed(0) + '%') : val;
             return `<tr>
@@ -520,7 +526,8 @@
             games.forEach((g, idx) => { 
                 const names = g.ranks.filter(n => n && n.trim() !== ""); 
                 const styledNames = names.map((name, i) => `<span style="color:${i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)')};">${name}</span>`);
-                html += `<div class="game-item" onclick="toggleActionOverlay(this)"><div class="game-info"><span>${idx+1}G</span> ${styledNames.join(' → ')}</div><div class="action-overlay"><div class="overlay-btn" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div><div class="overlay-btn" style="color:red;" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div></div></div>`; 
+                // 액션 오버레이에 취소 버튼 복구
+                html += `<div class="game-item" onclick="toggleActionOverlay(this)"><div class="game-info"><span>${idx+1}G</span> ${styledNames.join(' → ')}</div><div class="action-overlay"><div class="overlay-btn" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div><div class="overlay-btn" style="color:red;" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div><div class="overlay-btn" onclick="event.stopPropagation(); closeAllOverlays()">취소</div></div></div>`; 
             });
             listArea.innerHTML = html;
         } else listArea.innerHTML = "";
@@ -533,6 +540,10 @@
         if(!isActive) overlay.classList.add('active');
     }
 
+    function closeAllOverlays() {
+        document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active'));
+    }
+
     function enterEditMode(round, rankStr) { 
         editMode = true; editRound = round; 
         updateInputFields(rankStr.split(',')); 
@@ -540,6 +551,7 @@
         document.getElementById('inputCard').classList.add('edit-active');
         const btn = document.getElementById('mainBtn'); btn.innerText = "수정 완료"; btn.classList.add('edit-btn');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        closeAllOverlays();
     }
 
     function cancelEdit() { 
@@ -547,7 +559,6 @@
         document.getElementById('editBadge').style.display = 'none'; 
         document.getElementById('inputCard').classList.remove('edit-active');
         const btn = document.getElementById('mainBtn'); btn.innerText = "순위 저장"; btn.classList.remove('edit-btn'); 
-        // 수정 취소 시에도 3명으로 리셋
         document.getElementById('playerCount').value = "3";
         updateInputFields(); 
     }
@@ -585,7 +596,7 @@
         updateInputFields(); 
         fetchData(); 
     };
-    document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active')); });
+    document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
 </script>
 <script src="share.js"></script>    
 </body>
