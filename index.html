@@ -428,12 +428,12 @@
     async function saveGame() {
         const realTodayStr = formatDate(new Date());
         if (selectedDateStr > realTodayStr) {
-            return alert("미래 날짜에는 기록을 저장할 수 없습니다!");
+            return alert("미래에서 온겨? 오늘이 며칠인지 확인해!");
         }
 
         const count = parseInt(document.getElementById('playerCount').value); const ranks = [];
-        for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("친구를 선택해줘!"); ranks.push(val); }
-        if(new Set(ranks).size !== ranks.length) return alert("중복된 친구가 있어!");
+        for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("친구를 선택해 줄래?"); ranks.push(val); }
+        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
         
         showLoading(true, "저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
@@ -444,11 +444,11 @@
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) {
-            el.innerHTML = `<button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">정말 초기화할까요? (1/3)</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button>`;
+            el.innerHTML = `<button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">[1단계] 정말 초기화할까요?</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button>`;
         } else if(step === 2) {
-            el.innerHTML = `<button class="reset-btn" style="background:var(--accent)" onclick="confirmReset(3)">데이터가 모두 삭제됩니다. (2/3)</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button>`;
+            el.innerHTML = `<button class="reset-btn" style="background:var(--accent)" onclick="confirmReset(3)">[2단계] 복구 불가! 계속할까요?</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button>`;
         } else if(step === 3) {
-            el.innerHTML = `<button class="reset-btn" style="background:#000; color:#fff;" onclick="executeReset()">마지막 경고: 복구 불가! (실행)</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button>`;
+            el.innerHTML = `<button class="reset-btn" style="background:#000; color:#fff;" onclick="executeReset()">[최종 확인] 🔥 마지막. 모두 삭제합니다.</button><button class="save-btn btn-cancel" onclick="cancelReset()">아냐, 경배한테 혼난다.(취소)</button>`;
         }
     }
     function cancelReset() { 
@@ -489,7 +489,7 @@
         }).join('');
         document.getElementById('statsBody').innerHTML = bodyHtml;
         const richFriend = document.getElementById('richFriendArea');
-        if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 오늘의 물주는 나야 나!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; } else richFriend.style.display = 'none';
+        if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 지금까지의 최고 물주는 나야 나!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; } else richFriend.style.display = 'none';
     }
 
     function renderMemberHistory(name) {
