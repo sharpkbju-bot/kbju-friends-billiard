@@ -103,7 +103,7 @@
             background-attachment: fixed;
             min-height: 100vh;
             color: var(--text-color);
-            scroll-behavior: smooth; /* 부드러운 스크롤 추가 */
+            scroll-behavior: smooth;
         }
         
         #welcome-screen {
@@ -450,9 +450,7 @@
     
     async function saveGame() {
         const realTodayStr = formatDate(new Date());
-        if (selectedDateStr > realTodayStr) {
-            return alert("미래에서 온거야? 날짜를 잘 확인혀!");
-        }
+        if (selectedDateStr > realTodayStr) { return alert("미래에서 온거야? 날짜를 잘 확인혀!"); }
         const count = parseInt(document.getElementById('playerCount').value); const ranks = [];
         for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("친구를 선택해줘!"); ranks.push(val); }
         if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
@@ -529,11 +527,7 @@
         });
         historyArea.innerHTML = html; 
         historyArea.style.display = 'block';
-        
-        // 포커스 이동 코드 추가 (최근 5경기 영역으로 스크롤)
-        setTimeout(() => {
-            historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
+        setTimeout(() => { historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
     }
 
     function changeZoom(v) { document.body.style.zoom = v; }
@@ -580,9 +574,30 @@
     }
 
     async function deleteGame(round) { if(!confirm("정말 삭제할거야?")) return; showLoading(true, "삭제 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) }); fetchData(); } catch (e) { showLoading(false); } }
+    
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-    function closeAppWindow() { window.close(); }
+    
+    // [수정 핵심] iOS 정책으로 인한 창 닫기 불가 해결책
+    function closeAppWindow() { 
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        
+        // 1. 창을 실제로 닫으려고 시도
+        window.close();
+        
+        // 2. 창이 닫히지 않는 경우(아이폰 등)를 위해 화면을 완전히 비우고 종료 안내 표시
+        setTimeout(() => {
+            document.body.innerHTML = `
+                <div style="background:linear-gradient(135deg, #4a90e2, #9370db); height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-family:sans-serif;">
+                    <div style="font-size:60px; margin-bottom:20px;">👋</div>
+                    <div style="font-size:20px; font-weight:900; line-height:1.6;">앱이 종료되었습니다.<br>안녕히 가세요!</div>
+                    <div style="font-size:14px; margin-top:30px; opacity:0.8;">브라우저 하단의 [완료] 버튼이나<br>[X] 버튼을 눌러 창을 닫아주세요.</div>
+                </div>`;
+            document.body.style.backgroundImage = 'none';
+            document.body.style.padding = '0';
+        }, 300);
+    }
+    
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
@@ -590,8 +605,13 @@
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('themeSwitch').checked = true; }
         setTimeout(() => { const ws = document.getElementById('welcome-screen'); if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); } }, 3000);
+        
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if(isIOS) { document.getElementById('exitBtn').innerText = "📱 Return Home"; document.getElementById('exit-msg').innerHTML = "SWIPE UP<br>다음에 또 보자!"; document.getElementById('modalOkBtn').innerText = "확인"; }
+        if(isIOS) { 
+            document.getElementById('exitBtn').innerText = "📱 Return Home"; 
+            document.getElementById('exit-msg').innerHTML = "SWIPE UP<br>다음에 또 보자!"; 
+            document.getElementById('modalOkBtn').innerText = "확인"; 
+        }
         updateInputFields(); 
         fetchData(); 
     };
