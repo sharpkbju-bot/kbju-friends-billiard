@@ -54,8 +54,17 @@
             border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; color: var(--cal-day); 
             background: rgba(127, 140, 141, 0.05); box-shadow: var(--inner-shadow); position: relative;
         }
-        .day.sat { color: #5dade2 !important; } .day.sun, .day.holiday { color: #e67e22 !important; } 
+        
+        /* [라이트모드] 날짜 색상 */
+        .day.sat { color: #5dade2 !important; } 
+        .day.sun, .day.holiday { color: #e67e22 !important; } 
         .day.selected { background: var(--select-bg) !important; color: var(--select-border) !important; border: 2px solid var(--select-border) !important; z-index: 5; }
+
+        /* [다크모드] 요청하신 색상 적용 - 선택되지 않은 날짜들에 한함 */
+        [data-theme="dark"] .day:not(.selected) { color: #ffffff !important; }
+        [data-theme="dark"] .day.sun:not(.selected), 
+        [data-theme="dark"] .day.holiday:not(.selected) { color: #ff4d4d !important; }
+
         .day.has-record::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--record-dot); border-radius: 50%; }
 
         .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
