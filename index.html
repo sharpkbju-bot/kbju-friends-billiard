@@ -88,7 +88,6 @@
         [data-theme='dark'] select { background: rgba(60, 60, 60, 0.5); color: #fff; }
         [data-theme='dark'] .game-item { background: linear-gradient(145deg, #2c2c2c, #333333); }
         [data-theme='dark'] .game-info { color: #eee; }
-        /* 다크모드 내비게이션 버튼 색상 수정 */
         [data-theme='dark'] .nav-btn { background: rgba(60, 60, 60, 0.6); color: #ffffff !important; box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5), -2px -2px 6px rgba(70, 70, 70, 0.3); }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
@@ -104,6 +103,7 @@
             background-attachment: fixed;
             min-height: 100vh;
             color: var(--text-color);
+            scroll-behavior: smooth; /* 부드러운 스크롤 추가 */
         }
         
         #welcome-screen {
@@ -250,14 +250,13 @@
         .zoom-options { display: flex; gap: 12px; }
         .zoom-options label { display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 14px; }
 
-        /* [핵심 수정] 초기화 확인 단계 버튼 간격을 위한 스타일 */
         #confirm-buttons-wrap {
             display: flex;
             flex-direction: column;
-            gap: 4px; /* 버튼 사이 세로 간격을 1mm(4px)로 고정 */
+            gap: 4px;
         }
         #confirm-buttons-wrap button {
-            margin: 0 !important; /* 기존 margin 초기화 */
+            margin: 0 !important;
             width: 100%;
         }
     </style>
@@ -454,11 +453,9 @@
         if (selectedDateStr > realTodayStr) {
             return alert("미래에서 온거야? 날짜를 잘 확인혀!");
         }
-
         const count = parseInt(document.getElementById('playerCount').value); const ranks = [];
         for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("친구를 선택해줘!"); ranks.push(val); }
         if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
-        
         showLoading(true, "저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try { 
@@ -473,36 +470,16 @@
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) {
-            el.innerHTML = `
-                <div style="color:#e67e22; font-weight:900; margin-bottom:10px;">[1단계] 정말 초기화할까요?</div>
-                <div id="confirm-buttons-wrap">
-                    <button class="save-btn" style="background:var(--edit); padding: 10px; font-size: 15px;" onclick="confirmReset(2)">OK</button>
-                    <button class="save-btn btn-cancel" style="padding: 10px; font-size: 13px;" onclick="cancelReset()">취소</button>
-                    <button id="exitBtnConfirm" class="exit-btn" style="padding: 10px; font-size: 13px;" onclick="showExitModal()">🚪 앱 종료</button>
-                </div>`;
-            // 평상시 종료 버튼 숨김
+            el.innerHTML = `<div style="color:#e67e22; font-weight:900; margin-bottom:10px;">[1단계] 정말 초기화할까요?</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:var(--edit); padding: 10px; font-size: 15px;" onclick="confirmReset(2)">OK</button><button class="save-btn btn-cancel" style="padding: 10px; font-size: 13px;" onclick="cancelReset()">취소</button><button id="exitBtnConfirm" class="exit-btn" style="padding: 10px; font-size: 13px;" onclick="showExitModal()">🚪 앱 종료</button></div>`;
             document.getElementById('exitBtn').style.display = 'none';
         } else if(step === 2) {
-            el.innerHTML = `
-                <div style="color:var(--accent); font-weight:900; margin-bottom:10px;">[2단계] 데이터가 모두 삭제됩니다.</div>
-                <div id="confirm-buttons-wrap">
-                    <button class="save-btn" style="background:var(--accent); padding: 10px; font-size: 15px;" onclick="confirmReset(3)">OK</button>
-                    <button class="save-btn btn-cancel" style="padding: 10px; font-size: 13px;" onclick="cancelReset()">취소</button>
-                    <button id="exitBtnConfirm" class="exit-btn" style="padding: 10px; font-size: 13px;" onclick="showExitModal()">🚪 앱 종료</button>
-                </div>`;
+            el.innerHTML = `<div style="color:var(--accent); font-weight:900; margin-bottom:10px;">[2단계] 데이터가 모두 삭제됩니다.</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:var(--accent); padding: 10px; font-size: 15px;" onclick="confirmReset(3)">OK</button><button class="save-btn btn-cancel" style="padding: 10px; font-size: 13px;" onclick="cancelReset()">취소</button><button id="exitBtnConfirm" class="exit-btn" style="padding: 10px; font-size: 13px;" onclick="showExitModal()">🚪 앱 종료</button></div>`;
         } else if(step === 3) {
-            el.innerHTML = `
-                <div style="color:#000; font-weight:900; margin-bottom:10px;">[최종 확인] 복구 불가! 삭제합니다.</div>
-                <div id="confirm-buttons-wrap">
-                    <button class="save-btn" style="background:#000; color:#fff; padding: 10px; font-size: 15px;" onclick="executeReset()">OK</button>
-                    <button class="save-btn btn-cancel" style="padding: 10px; font-size: 13px;" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>
-                    <button id="exitBtnConfirm" class="exit-btn" style="padding: 10px; font-size: 13px;" onclick="showExitModal()">🚪 앱 종료</button>
-                </div>`;
+            el.innerHTML = `<div style="color:#000; font-weight:900; margin-bottom:10px;">[최종 확인] 복구 불가! 삭제합니다.</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:#000; color:#fff; padding: 10px; font-size: 15px;" onclick="executeReset()">OK</button><button class="save-btn btn-cancel" style="padding: 10px; font-size: 13px;" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button><button id="exitBtnConfirm" class="exit-btn" style="padding: 10px; font-size: 13px;" onclick="showExitModal()">🚪 앱 종료</button></div>`;
         }
     }
     function cancelReset() { 
         document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; 
-        // 평상시 종료 버튼 다시 표시
         document.getElementById('exitBtn').style.display = 'block';
     }
 
@@ -518,30 +495,15 @@
         });
         const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
         const maxCounts = { played: 0, r0: 0, r1: 0, r2: 0, r3: 0, r4: 0 };
-        players.forEach(p => { 
-            maxCounts.r0 = Math.max(maxCounts.r0, stats[p].ranks[0]); 
-            maxCounts.r4 = Math.max(maxCounts.r4, stats[p].ranks[4]); 
-        });
-        
+        players.forEach(p => { maxCounts.r0 = Math.max(maxCounts.r0, stats[p].ranks[0]); maxCounts.r4 = Math.max(maxCounts.r4, stats[p].ranks[4]); });
         const bodyHtml = sortedByWin.map(p => {
             const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             let nameStyle = "font-weight:900; cursor:pointer; text-decoration: underline;";
             const isTopWinner = (stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0);
             const isTopLoser = (stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0);
-            if (isTopLoser) nameStyle += `color:darkred;`;
-            else if (isTopWinner) nameStyle += `color:darkblue;`;
-            else nameStyle += `color:#8e44ad;`;
+            if (isTopLoser) nameStyle += `color:darkred;`; else if (isTopWinner) nameStyle += `color:darkblue;`; else nameStyle += `color:#8e44ad;`;
             const getVal = (val, total) => isPercentMode ? (total === 0 ? '0%' : ((val/total)*100).toFixed(0) + '%') : val;
-            return `<tr>
-                <td style="${nameStyle}" onclick="renderMemberHistory('${p}')">${p}</td>
-                <td style="color:#5D4037;">${stats[p].played}</td>
-                <td style="color:var(--rank1);">${getVal(stats[p].ranks[0], stats[p].played)}</td>
-                <td style="color:var(--rank2);">${getVal(stats[p].ranks[1], stats[p].played)}</td>
-                <td style="color:var(--rank3);">${getVal(stats[p].ranks[2], stats[p].played)}</td>
-                <td style="color:var(--rank4);">${getVal(stats[p].ranks[3], stats[p].played)}</td>
-                <td style="color:var(--rankL);">${getVal(stats[p].ranks[4], stats[p].played)}</td>
-                <td><span class="win-rate-pill">${winRate}%</span></td>
-            </tr>`;
+            return `<tr><td style="${nameStyle}" onclick="renderMemberHistory('${p}')">${p}</td><td style="color:#5D4037;">${stats[p].played}</td><td style="color:var(--rank1);">${getVal(stats[p].ranks[0], stats[p].played)}</td><td style="color:var(--rank2);">${getVal(stats[p].ranks[1], stats[p].played)}</td><td style="color:var(--rank3);">${getVal(stats[p].ranks[2], stats[p].played)}</td><td style="color:var(--rank4);">${getVal(stats[p].ranks[3], stats[p].played)}</td><td style="color:var(--rankL);">${getVal(stats[p].ranks[4], stats[p].played)}</td><td><span class="win-rate-pill">${winRate}%</span></td></tr>`;
         }).join('');
         document.getElementById('statsBody').innerHTML = bodyHtml;
         const richFriend = document.getElementById('richFriendArea');
@@ -565,7 +527,13 @@
             const rankLabel = (rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
             html += `<div class="history-item"><span style="font-size:14px; color:#5D4037;">${g.dateStr}</span><span style="font-size:15px; color:${rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : '#5D4037')};">${rankLabel}</span></div>`;
         });
-        historyArea.innerHTML = html; historyArea.style.display = 'block';
+        historyArea.innerHTML = html; 
+        historyArea.style.display = 'block';
+        
+        // 포커스 이동 코드 추가 (최근 5경기 영역으로 스크롤)
+        setTimeout(() => {
+            historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
     }
 
     function changeZoom(v) { document.body.style.zoom = v; }
@@ -590,9 +558,7 @@
         if(!isActive) overlay.classList.add('active');
     }
 
-    function closeAllOverlays() {
-        document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active'));
-    }
+    function closeAllOverlays() { document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active')); }
 
     function enterEditMode(round, rankStr) { 
         editMode = true; editRound = round; 
@@ -613,12 +579,7 @@
         updateInputFields(); 
     }
 
-    async function deleteGame(round) { 
-        if(!confirm("정말 삭제할거야?")) return; 
-        showLoading(true, "삭제 중"); 
-        try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) }); fetchData(); } catch (e) { showLoading(false); } 
-    }
-
+    async function deleteGame(round) { if(!confirm("정말 삭제할거야?")) return; showLoading(true, "삭제 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) }); fetchData(); } catch (e) { showLoading(false); } }
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
     function closeAppWindow() { window.close(); }
@@ -627,21 +588,10 @@
 
     window.onload = () => { 
         const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.getElementById('themeSwitch').checked = true;
-        }
-        setTimeout(() => { 
-            const ws = document.getElementById('welcome-screen');
-            if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); }
-        }, 3000);
-
+        if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('themeSwitch').checked = true; }
+        setTimeout(() => { const ws = document.getElementById('welcome-screen'); if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); } }, 3000);
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if(isIOS) {
-            document.getElementById('exitBtn').innerText = "📱 Return Home";
-            document.getElementById('exit-msg').innerHTML = "SWIPE UP<br>다음에 또 보자!";
-            document.getElementById('modalOkBtn').innerText = "확인";
-        }
+        if(isIOS) { document.getElementById('exitBtn').innerText = "📱 Return Home"; document.getElementById('exit-msg').innerHTML = "SWIPE UP<br>다음에 또 보자!"; document.getElementById('modalOkBtn').innerText = "확인"; }
         updateInputFields(); 
         fetchData(); 
     };
