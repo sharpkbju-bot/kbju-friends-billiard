@@ -201,15 +201,14 @@
         .stats-table th { padding: 8px 0; color: #5D4037; font-weight: 900; text-transform: uppercase; font-size: 10px; border-bottom: 2px solid rgba(0,0,0,0.05); white-space: nowrap; }
         .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
         
-        /* 테이블 열 너비 조정 (여백 활용) */
-        .stats-table th:nth-child(1) { width: 16%; border-radius: 12px 0 0 12px; } /* 이름 */
-        .stats-table th:nth-child(2) { width: 11%; } /* 참여 */
-        .stats-table th:nth-child(3) { width: 11%; } /* 1위 */
-        .stats-table th:nth-child(4) { width: 11%; } /* 2위 */
-        .stats-table th:nth-child(5) { width: 11%; } /* 3위 */
-        .stats-table th:nth-child(6) { width: 11%; } /* 4위 */
-        .stats-table th:nth-child(7) { width: 11%; } /* 꼴찌 */
-        .stats-table th:nth-child(8) { width: 18%; border-radius: 0 12px 12px 0; } /* 승률 */
+        .stats-table th:nth-child(1) { width: 16%; border-radius: 12px 0 0 12px; } 
+        .stats-table th:nth-child(2) { width: 11%; } 
+        .stats-table th:nth-child(3) { width: 11%; } 
+        .stats-table th:nth-child(4) { width: 11%; } 
+        .stats-table th:nth-child(5) { width: 11%; } 
+        .stats-table th:nth-child(6) { width: 11%; } 
+        .stats-table th:nth-child(7) { width: 11%; } 
+        .stats-table th:nth-child(8) { width: 18%; border-radius: 0 12px 12px 0; } 
 
         .stats-table tr { background: rgba(255, 255, 255, 0.4); }
         .stats-table td { padding: 12px 0; text-align: center; font-weight: 800; color: var(--text-color); white-space: nowrap; } 
@@ -537,7 +536,13 @@
             const rankLabel = (rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
             html += `<div class="history-item"><span style="font-size:14px; color:#5D4037;">${g.dateStr}</span><span style="font-size:15px; color:${rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : '#5D4037')};">${rankLabel}</span></div>`;
         });
-        historyArea.innerHTML = html; historyArea.style.display = 'block';
+        historyArea.innerHTML = html; 
+        historyArea.style.display = 'block';
+        
+        // [수정 포인트 1] 멤버 전적 이동 기능
+        setTimeout(() => {
+            historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
     }
 
     function changeZoom(v) { document.body.style.zoom = v; }
@@ -572,7 +577,10 @@
         document.getElementById('editBadge').style.display = 'block'; 
         document.getElementById('inputCard').classList.add('edit-active');
         const btn = document.getElementById('mainBtn'); btn.innerText = "수정 완료"; btn.classList.add('edit-btn');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // [수정 포인트 2] 수정 모드 진입 시 입력창으로 스크롤 이동
+        document.getElementById('inputCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
         closeAllOverlays();
     }
 
@@ -594,13 +602,9 @@
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
     
-    // 종료 함수
     function closeAppWindow() { 
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if (isIOS) {
-            // 아이폰은 창을 닫을 수 없으므로 모달 메시지를 변경한 상태로 둠
-            return;
-        }
+        if (isIOS) return;
         window.close(); 
     }
     
@@ -618,7 +622,6 @@
             if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); }
         }, 3000);
 
-        // 아이폰/iOS 여부 체크 및 UI 변경
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if(isIOS) {
             document.getElementById('exitBtn').innerText = "📱 Return Home";
