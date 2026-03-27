@@ -464,7 +464,7 @@
         } else if(step === 2) {
             el.innerHTML = `<button class="reset-btn" style="background:var(--accent)" onclick="confirmReset(3)">[2단계] 데이터가 모두 삭제됩니다.</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button>`;
         } else if(step === 3) {
-            el.innerHTML = `<button class="reset-btn" style="background:#000; color:#fff;" onclick="executeReset()">[최종 확인] 복구 불가! 모두 삭제합니다.</button><button class="save-btn btn-cancel" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
+            el.innerHTML = `<button class="reset-btn" style="background:#000; color:#fff;" onclick="executeReset()">[최종 확인] 복구 불가! 삭제합니다.</button><button class="save-btn btn-cancel" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
         }
     }
     function cancelReset() { 
