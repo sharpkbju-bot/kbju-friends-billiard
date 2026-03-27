@@ -52,21 +52,32 @@
         .day { 
             aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
             border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; color: var(--cal-day); 
-            background: rgba(127, 140, 141, 0.05); box-shadow: var(--inner-shadow);
+            background: rgba(127, 140, 141, 0.05); box-shadow: var(--inner-shadow); position: relative;
         }
         .day.sat { color: #5dade2 !important; } .day.sun, .day.holiday { color: #e67e22 !important; } 
-        .day.selected { background: var(--select-bg) !important; color: var(--select-border) !important; border: 2px solid var(--select-border) !important; }
+        .day.selected { background: var(--select-bg) !important; color: var(--select-border) !important; border: 2px solid var(--select-border) !important; z-index: 5; }
+        .day.has-record::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--record-dot); border-radius: 50%; }
 
-        .save-btn { width: 100%; padding: 18px; border-radius: 18px; font-weight: 800; border: none; font-size: 16px; box-shadow: 0 8px 15px rgba(0,0,0,0.2); cursor: pointer; }
-        .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        .stats-table td { padding: 12px 2px; text-align: center; font-weight: 800; }
+        .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .input-row label { width: 70px; font-size: 13px; font-weight: 800; color: var(--text-sub); }
+        select { flex: 1; padding: 12px; border-radius: 15px; border: none; background: rgba(127, 140, 141, 0.1); color: var(--text-main); font-weight: 600; text-align: center; -webkit-appearance: none; }
+
+        .save-btn { width: 100%; padding: 18px; border-radius: 18px; font-weight: 800; border: none; font-size: 16px; box-shadow: 0 8px 15px rgba(0,0,0,0.2); cursor: pointer; transition: 0.2s; }
+        .save-btn:active { transform: scale(0.98); }
         
+        .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; }
+        .stats-table td { padding: 12px 2px; text-align: center; font-weight: 800; color: var(--text-main); }
+        .stats-table td:first-child { text-align: left; padding-left: 10px; text-decoration: underline; cursor: pointer; }
+
         .theme-toggle { position: relative; width: 50px; height: 26px; }
-        .theme-toggle input { opacity: 0; width: 0; }
-        .slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; border-radius: 34px; transition: .4s; }
+        .theme-toggle input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; border-radius: 34px; transition: .4s; }
         .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 4px; bottom: 4px; background: white; border-radius: 50%; transition: .4s; }
         input:checked + .slider { background: #2196f3; }
         input:checked + .slider:before { transform: translateX(24px); }
+
+        #loading { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:9999; flex-direction:column; color:white; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body id="app-body">
@@ -78,24 +89,31 @@
     </div>
 </div>
 
+<div id="loading"><div style="border:5px solid #fff; border-top:5px solid #2196f3; border-radius:50%; width:50px; height:50px; animation:spin 1s linear infinite;"></div><p>데이터 동기화 중...</p></div>
+
 <div class="calendar-card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <button onclick="changeMonth(-1)" style="border:none; background:none; font-size:20px;">◀</button>
+        <button onclick="changeMonth(-1)" style="border:none; background:none; font-size:20px; color:var(--text-main);">◀</button>
         <span id="monthDisplay" style="font-size:20px; font-weight:900;"></span>
-        <button onclick="changeMonth(1)" style="border:none; background:none; font-size:20px;">▶</button>
+        <button onclick="changeMonth(1)" style="border:none; background:none; font-size:20px; color:var(--text-main);">▶</button>
     </div>
     <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
 <div class="card">
-    <h2 id="selectedDateTitle" style="font-size:17px; margin-bottom:15px;">📅 날짜 확인 중</h2>
+    <h2 id="selectedDateTitle" style="font-size:17px; margin-bottom:15px; font-weight:800;">📅 날짜 확인 중</h2>
     <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
         <span style="font-weight:800; color:var(--text-sub);">다크 모드</span>
         <label class="theme-toggle"><input type="checkbox" id="themeSwitch" onchange="toggleTheme()"><span class="slider"></span></label>
     </div>
     <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-        <span style="font-weight:800; color:var(--text-sub);">화면 크기</span>
-        <div>기본 <input type="radio" name="z" value="1" onclick="document.body.style.zoom='1'" checked> 확대 <input type="radio" name="z" value="1.2" onclick="document.body.style.zoom='1.2'"></div>
+        <span style="font-weight:800; color:var(--text-sub);">게임 인원</span>
+        <select id="playerCount" onchange="updateInputFields()" style="width:80px; flex:none;">
+            <option value="2">2명</option>
+            <option value="3" selected>3명</option>
+            <option value="4">4명</option>
+            <option value="5">5명</option>
+        </select>
     </div>
     <div id="inputArea"></div>
     <div style="display:flex; gap:10px;">
@@ -109,7 +127,7 @@
     <button id="captureBtn" class="save-btn" style="background:linear-gradient(135deg, #6e8efb, #a777e3); color:white; margin-bottom:20px;">📸 전적 스크린샷 공유</button>
     <h2 style="font-size:16px;">📊 멤버별 누적 전적 (이름을 터치해 봐!)</h2>
     <table class="stats-table">
-        <thead><tr style="font-size:10px; color:var(--text-sub);"><th>이름</th><th>참여</th><th style="color:var(--rank1)">1위🥇</th><th>2위</th><th>3위</th><th>4위</th><th style="color:var(--rankL)">꼴찌💀</th><th>승률</th></tr></thead>
+        <thead><tr style="font-size:10px; color:var(--text-sub);"><th>이름</th><th>참여</th><th style="color:var(--rank1)">1위🥇</th><th style="color:var(--rankL)">꼴찌💀</th><th>승률</th></tr></thead>
         <tbody id="statsBody"></tbody>
     </table>
     <div id="richFriendArea" style="display:none; padding:15px; background:rgba(0,0,0,0.1); border-radius:15px; text-align:center; font-weight:800; margin-top:15px;"></div>
@@ -124,7 +142,7 @@
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec";
     const players = ["경배", "진웅", "창한", "원석", "정석", "경석"];
-    const holidays = ["2026-01-01", "2026-02-16", "2026-02-17", "2026-02-18", "2026-03-01", "2026-05-01", "2026-05-05", "2026-05-24", "2026-06-06", "2026-07-17", "2026-08-15", "2026-09-24", "2026-09-25", "2026-09-26", "2026-10-03", "2026-10-09", "2026-12-25"];
+    const holidays = ["2026-01-01", "2026-02-16", "2026-02-17", "2026-02-18", "2026-03-01", "2026-05-05", "2026-05-24", "2026-06-06", "2026-08-15", "2026-09-24", "2026-09-25", "2026-09-26", "2026-10-03", "2026-10-09", "2026-12-25"];
     let gameLogs = []; let currentViewDate = new Date(); let selectedDateStr = new Date().toLocaleDateString('sv-SE');
 
     function toggleTheme() {
@@ -134,7 +152,10 @@
     }
 
     async function fetchData() {
-        try { const res = await fetch(GAS_URL); gameLogs = await res.json(); renderAll(); } catch(e) {}
+        document.getElementById('loading').style.display = 'flex';
+        try { const res = await fetch(`${GAS_URL}?t=${Date.now()}`); gameLogs = await res.json(); renderAll(); } 
+        catch(e) { console.error(e); }
+        finally { document.getElementById('loading').style.display = 'none'; }
     }
 
     function renderAll() { renderCalendar(); renderStats(); renderGameList(); }
@@ -151,42 +172,77 @@
             const dStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
             const isHol = holidays.includes(dStr) ? 'holiday' : '';
             const isSel = dStr === selectedDateStr ? 'selected' : '';
-            grid.innerHTML += `<div class="day ${new Date(dStr).getDay()===0?'sun':''} ${new Date(dStr).getDay()===6?'sat':''} ${isHol} ${isSel}" onclick="selectDate('${dStr}')">${d}</div>`;
+            const hasRec = gameLogs.some(g => g.date.split('T')[0] === dStr) ? 'has-record' : '';
+            grid.innerHTML += `<div class="day ${new Date(dStr).getDay()===0?'sun':''} ${new Date(dStr).getDay()===6?'sat':''} ${isHol} ${isSel} ${hasRec}" onclick="selectDate('${dStr}')">${d}</div>`;
         }
+    }
+
+    function updateInputFields() {
+        const count = document.getElementById('playerCount').value;
+        const area = document.getElementById('inputArea'); area.innerHTML = "";
+        for(let i=1; i<=count; i++) {
+            area.innerHTML += `<div class="input-row"><label>${i==count?'꼴찌💀':i+'위'}</label><select id="r${i}"><option value="">선택</option>${players.map(p=>`<option value="${p}">${p}</option>`).join('')}</select></div>`;
+        }
+    }
+
+    async function saveGame() {
+        const ranks = [];
+        for(let i=1; i<=document.getElementById('playerCount').value; i++) {
+            const v = document.getElementById('r'+i).value;
+            if(!v) return alert("친구를 모두 선택해주세요!");
+            ranks.push(v);
+        }
+        if(new Set(ranks).size !== ranks.length) return alert("중복된 친구가 있습니다!");
+        document.getElementById('loading').style.display = 'flex';
+        await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "SAVE", date: selectedDateStr, ranks: ranks }) });
+        fetchData();
     }
 
     function renderStats() {
         let stats = {}; players.forEach(p => stats[p] = { p:0, r:[0,0,0,0,0] });
         gameLogs.forEach(g => {
-            g.ranks.forEach((n, i) => { if(stats[n]) { stats[n].p++; if(i===0) stats[n].r[0]++; if(i===g.ranks.length-1) stats[n].r[4]++; } });
+            const r = g.ranks.filter(n => n);
+            r.forEach((n, i) => { if(stats[n]) { stats[n].p++; if(i===0) stats[n].r[0]++; if(i===r.length-1) stats[n].r[4]++; } });
         });
         const maxWin = Math.max(...players.map(p => stats[p].r[0]));
-        const worst = [...players].sort((a,b) => stats[b].r[4] - stats[a].r[4])[0];
-        document.getElementById('statsBody').innerHTML = players.map(p => {
+        const sorted = [...players].sort((a,b) => stats[b].r[0] - stats[a].r[0]);
+        document.getElementById('statsBody').innerHTML = sorted.map(p => {
+            const winRate = stats[p].p > 0 ? ((stats[p].r[0]/stats[p].p)*100).toFixed(1) : "0.0";
             const nameStyle = (stats[p].r[0] === maxWin && maxWin > 0) ? 'color:var(--rank1); font-weight:900;' : '';
-            return `<tr><td style="${nameStyle}">${p}</td><td>${stats[p].p}</td><td style="color:var(--rank1)">${stats[p].r[0]}</td><td>-</td><td>-</td><td>-</td><td style="color:var(--rankL)">${stats[p].r[4]}</td><td>${stats[p].p?((stats[p].r[0]/stats[p].p)*100).toFixed(1):0}%</td></tr>`;
+            return `<tr><td style="${nameStyle}">${p}</td><td>${stats[p].p}</td><td style="color:var(--rank1)">${stats[p].r[0]}</td><td style="color:var(--rankL)">${stats[p].r[4]}</td><td>${winRate}%</td></tr>`;
         }).join('');
         
+        const worst = [...players].sort((a,b) => stats[b].r[4] - stats[a].r[4])[0];
         if(stats[worst].r[4] > 0) {
             document.getElementById('richFriendArea').style.display = 'block';
             document.getElementById('richFriendArea').innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="color:red;">${worst} (${stats[worst].r[4]}회)</span>`;
         }
     }
 
+    function renderGameList() {
+        const games = gameLogs.filter(g => g.date.split('T')[0] === selectedDateStr);
+        const area = document.getElementById('dayGameList'); area.innerHTML = "";
+        games.forEach(g => { area.innerHTML += `<div style="padding:15px; background:rgba(255,255,255,0.1); border-radius:15px; margin-top:10px; text-align:center; font-weight:800;">${g.ranks.join(' → ')}</div>`; });
+    }
+
     function handleReset() {
-        if(confirm("1단계: 정말 초기화하시겠습니까?") && confirm("2단계: 데이터가 영구 삭제됩니다.") && confirm("마지막: 정말 실행할까요?")) {
+        if(confirm("1단계: 정말 초기화하시겠습니까?") && confirm("2단계: 모든 데이터가 영구 삭제됩니다.") && confirm("마지막: 정말로 실행할까요?")) {
+            document.getElementById('loading').style.display = 'flex';
             fetch(GAS_URL, { method:'POST', body: JSON.stringify({action:'RESET'}) }).then(()=>location.reload());
         }
     }
 
-    function selectDate(s) { selectedDateStr = s; document.getElementById('selectedDateTitle').innerText = `📅 ${s}`; renderCalendar(); }
+    function selectDate(s) { selectedDateStr = s; document.getElementById('selectedDateTitle').innerText = `📅 ${s}`; renderCalendar(); renderGameList(); }
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth()+v); renderCalendar(); }
+    function resetInputs() { updateInputFields(); }
 
     window.onload = () => {
         const theme = localStorage.getItem('theme') || 'light';
         document.body.setAttribute('data-theme', theme);
         document.getElementById('themeSwitch').checked = (theme === 'dark');
         setTimeout(() => document.getElementById('welcome-screen').style.opacity = '0', 3500);
+        setTimeout(() => document.getElementById('welcome-screen').style.display = 'none', 4300);
+        updateInputFields();
         fetchData();
     };
 </script>
