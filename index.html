@@ -176,8 +176,12 @@
         .btn-cancel { background: #bdc3c7 !important; }
 
         .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; table-layout: fixed; }
-        /* 헤더 모드 너비 수정 */
+        /* 헤더 스타일 및 모서리 둥글게 처리 */
         .stats-table th { padding: 8px 1px; color: #999; font-weight: 900; text-transform: uppercase; font-size: 10px; border-bottom: 2px solid rgba(0,0,0,0.05); }
+        .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
+        .stats-table th:first-child { border-radius: 12px 0 0 12px; }
+        .stats-table th:last-child { border-radius: 0 12px 12px 0; }
+
         .stats-table tr { background: rgba(255, 255, 255, 0.4); }
         .stats-table td { padding: 12px 1px; text-align: center; font-weight: 800; color: #555; }
         .stats-table td:first-child { border-radius: 12px 0 0 12px; text-align: left; padding-left: 10px; width: 17%; }
@@ -193,7 +197,6 @@
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; }
         
-        /* 전적 스크린샷 공유 버튼 사이즈 수정 (테이블과 동일 사이즈) */
         #shareBtn { 
             width: 100% !important; 
             margin: 10px 0 20px 0 !important; 
@@ -306,15 +309,15 @@
     
     <table class="stats-table">
         <thead>
-            <tr style="background: rgba(232, 245, 233, 0.8); border-radius: 12px; display: table-row;">
-                <th style="text-align:left; padding-left:10px; border-radius: 12px 0 0 12px;">이름</th>
+            <tr>
+                <th style="text-align:left; padding-left:10px;">이름</th>
                 <th>참여</th>
                 <th style="color:var(--rank1);" onclick="toggleAllMode()">1위🥇</th>
                 <th style="color:var(--rank2);" onclick="toggleAllMode()">2위</th>
                 <th style="color:var(--rank3);" onclick="toggleAllMode()">3위</th>
                 <th style="color:var(--rank4);" onclick="toggleAllMode()">4위</th>
                 <th style="color:var(--rankL);" onclick="toggleAllMode()">꼴찌💀</th>
-                <th style="text-align:right; padding-right:18px; border-radius: 0 12px 12px 0;">승률</th>
+                <th style="text-align:right; padding-right:18px;">승률</th>
             </tr>
         </thead>
         <tbody id="statsBody"></tbody>
@@ -471,7 +474,7 @@
         }).join('');
         document.getElementById('statsBody').innerHTML = bodyHtml;
         const richFriend = document.getElementById('richFriendArea');
-        if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 이판도 나냐? 다들 카드카봐!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; } else richFriend.style.display = 'none';
+        if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 오늘의 물주는 나야 나!<br><span style="font-size:17px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; } else richFriend.style.display = 'none';
     }
 
     function renderMemberHistory(name) {
