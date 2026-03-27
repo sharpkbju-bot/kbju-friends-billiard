@@ -69,8 +69,8 @@
             --sub-text: #cccccc;
             --label-text: #bbbbbb;
             --rank1: #4da3ff;
-            /* 다크모드 수정 시 배경(그레이) 및 글자색(그린) */
-            --edit-mode-bg: rgba(60, 60, 60, 0.5);
+            /* 다크모드 수정 시 배경(그레이) 및 글자색(그린) 설정 */
+            --edit-mode-bg: rgba(60, 60, 60, 0.8);
             --edit-mode-text: #27ae60;
         }
 
@@ -180,7 +180,7 @@
         .edit-active select {
             background-color: var(--edit-mode-bg) !important;
             border: 2px solid var(--edit-mode-border) !important;
-            color: var(--edit-mode-text, #27ae60) !important; 
+            color: var(--edit-mode-text, #27ae60) !important;
         }
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
@@ -202,22 +202,15 @@
         .btn-cancel { background: #bdc3c7 !important; }
 
         .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; table-layout: fixed; }
-        .stats-table th { padding: 8px 0; color: #5D4037; font-weight: 900; text-transform: uppercase; font-size: 10px; border-bottom: 2px solid rgba(0,0,0,0.05); white-space: nowrap; }
+        .stats-table th { padding: 8px 1px; color: #5D4037; font-weight: 900; text-transform: uppercase; font-size: 10px; border-bottom: 2px solid rgba(0,0,0,0.05); white-space: nowrap; }
         .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
-        
-        .stats-table th:nth-child(1) { width: 16%; border-radius: 12px 0 0 12px; } 
-        .stats-table th:nth-child(2) { width: 11%; } 
-        .stats-table th:nth-child(3) { width: 11%; } 
-        .stats-table th:nth-child(4) { width: 11%; } 
-        .stats-table th:nth-child(5) { width: 11%; } 
-        .stats-table th:nth-child(6) { width: 11%; } 
-        .stats-table th:nth-child(7) { width: 11%; } 
-        .stats-table th:nth-child(8) { width: 18%; border-radius: 0 12px 12px 0; } 
+        .stats-table th:first-child { border-radius: 12px 0 0 12px; width: 22%; } 
+        .stats-table th:last-child { border-radius: 0 12px 12px 0; width: 25%; } 
 
         .stats-table tr { background: rgba(255, 255, 255, 0.4); }
-        .stats-table td { padding: 12px 0; text-align: center; font-weight: 800; color: var(--text-color); white-space: nowrap; } 
-        .stats-table td:first-child { border-radius: 12px 0 0 12px; text-align: left; padding-left: 10px; } 
-        .stats-table td:last-child { border-radius: 0 12px 12px 0; padding-right: 10px; text-align: right; } 
+        .stats-table td { padding: 12px 1px; text-align: center; font-weight: 800; color: var(--text-color); white-space: nowrap; } 
+        .stats-table td:first-child { border-radius: 12px 0 0 12px; text-align: left; padding-left: 12px; width: 22%; } 
+        .stats-table td:last-child { border-radius: 0 12px 12px 0; padding-right: 12px; width: 25%; text-align: right; } 
         .val-highlight { font-size: 13px; }
         .win-rate-pill { color: #27ae60; font-size: 11px; display: inline-block; text-align: right; width: 100%; font-weight: 800; }
 
@@ -228,10 +221,9 @@
 
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 16px; margin-bottom: 1.0mm; cursor: pointer; }
+        
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 16px; cursor: pointer; }
         
-        #resetSteps { display: flex; flex-direction: column; gap: 1.0mm; }
-
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
         .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
@@ -259,6 +251,8 @@
         .zoom-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
         .zoom-options { display: flex; gap: 12px; }
         .zoom-options label { display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 14px; }
+        
+        #resetSteps { display: flex; flex-direction: column; gap: 1.0mm; }
     </style>
 </head>
 <body id="app-body">
@@ -336,14 +330,14 @@
     <table class="stats-table">
         <thead>
             <tr>
-                <th onclick="toggleAllMode()">이름</th>
-                <th onclick="toggleAllMode()">참여</th>
+                <th style="text-align:left; padding-left:12px;">이름</th>
+                <th>참여</th>
                 <th style="color:var(--rank1);" onclick="toggleAllMode()">1위🥇</th>
                 <th style="color:var(--rank2);" onclick="toggleAllMode()">2위</th>
                 <th style="color:var(--rank3);" onclick="toggleAllMode()">3위</th>
                 <th style="color:var(--rank4);" onclick="toggleAllMode()">4위</th>
                 <th style="color:var(--rankL);" onclick="toggleAllMode()">꼴찌💀</th>
-                <th onclick="toggleAllMode()">승률</th>
+                <th style="text-align:right; padding-right:12px;">승률</th>
             </tr>
         </thead>
         <tbody id="statsBody"></tbody>
@@ -453,6 +447,7 @@
         if (selectedDateStr > realTodayStr) {
             return alert("미래에서 온거야? 날짜를 잘 확인혀!");
         }
+
         const count = parseInt(document.getElementById('playerCount').value); const ranks = [];
         for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("친구를 선택해줘!"); ranks.push(val); }
         if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
@@ -471,13 +466,23 @@
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) {
-            el.innerHTML = `<button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">[1단계] 정말 초기화할까요?</button><button class="reset-btn btn-cancel" style="background:#bdc3c7" onclick="cancelReset()">취소</button>`;
+            el.innerHTML = `
+                <button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">[1단계] 정말 초기화할까요?</button>
+                <button class="save-btn btn-cancel" style="background:#bdc3c7; margin:0;" onclick="cancelReset()">취소</button>
+            `;
         } else if(step === 2) {
-            el.innerHTML = `<button class="reset-btn" style="background:var(--accent)" onclick="confirmReset(3)">[2단계] 데이터가 모두 삭제됩니다.</button><button class="reset-btn btn-cancel" style="background:#bdc3c7" onclick="cancelReset()">취소</button>`;
+            el.innerHTML = `
+                <button class="reset-btn" style="background:var(--accent)" onclick="confirmReset(3)">[2단계] 데이터가 모두 삭제됩니다.</button>
+                <button class="save-btn btn-cancel" style="background:#bdc3c7; margin:0;" onclick="cancelReset()">취소</button>
+            `;
         } else if(step === 3) {
-            el.innerHTML = `<button class="reset-btn" style="background:#000; color:#fff;" onclick="executeReset()">[최종 확인] 복구 불가! OK</button><button class="reset-btn btn-cancel" style="background:#bdc3c7" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
+            el.innerHTML = `
+                <button class="reset-btn" style="background:#000; color:#fff;" onclick="executeReset()">[최종 확인] 복구 불가! OK</button>
+                <button class="save-btn btn-cancel" style="background:#bdc3c7; margin:0;" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>
+            `;
         }
     }
+
     function cancelReset() { 
         document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; 
     }
@@ -543,10 +548,7 @@
         });
         historyArea.innerHTML = html; 
         historyArea.style.display = 'block';
-        
-        setTimeout(() => {
-            historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
+        setTimeout(() => { historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
     }
 
     function changeZoom(v) { document.body.style.zoom = v; }
@@ -629,7 +631,6 @@
             document.getElementById('exit-msg').innerHTML = "SWIPE UP<br>다음에 또 보자!";
             document.getElementById('modalOkBtn').innerText = "확인";
         }
-        
         updateInputFields(); 
         fetchData(); 
     };
