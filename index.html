@@ -45,13 +45,15 @@
             --edit-mode-bg: #e8f5e9;
             --edit-mode-border: #2d5a27; 
             
-            /* 추가: 텍스트 색상 변수 */
             --text-color: #444;
             --text-sub-color: #555;
             --text-light-color: #777;
+
+            /* 추가: 다크모드 전용 변수 초기화 (라이트모드 기준) */
+            --day-bg: linear-gradient(145deg, rgba(253, 253, 253, 0.8), rgba(226, 229, 234, 0.8));
+            --day-text: #555;
         }
 
-        /* 다크모드 설정: 색상만 수정 */
         [data-theme='dark'] {
             --main: #bdc3c7;
             --bg: rgba(30, 30, 30, 0.9);
@@ -68,13 +70,15 @@
             --dup-border: #ff5252;
             --dup-text: #ffccbc;
             
-            /* 다크모드 시 글자색 변경 */
             --text-color: #eeeeee;
             --text-sub-color: #dddddd;
             --text-light-color: #bbbbbb;
+
+            /* 다크모드 달력 날짜 배경 및 글자색 수정 */
+            --day-bg: linear-gradient(145deg, #2c3e50, #1a252f);
+            --day-text: #ffffff;
         }
 
-        /* 다크모드에서 검정색 글자들 강제 수정 */
         [data-theme='dark'] body, 
         [data-theme='dark'] h2, 
         [data-theme='dark'] #monthDisplay, 
@@ -83,13 +87,14 @@
         [data-theme='dark'] .setup-row span,
         [data-theme='dark'] .history-item { color: var(--text-color) !important; }
 
-        /* 다크모드 날짜 색상 최적화 */
-        [data-theme='dark'] .day { color: #bbbbbb; } /* 평일: 밝은 그레이 */
-        [data-theme='dark'] .day.sun, [data-theme='dark'] .day.holiday { color: #ff5252 !important; } /* 공휴일: 선명한 레드 */
-        [data-theme='dark'] .day.has-record { color: #81c784 !important; } /* 기록 날짜: 그린 */
-
+        [data-theme='dark'] .day { color: var(--day-text) !important; background: var(--day-bg) !important; }
+        [data-theme='dark'] .day.sat { color: #5dade2 !important; } 
+        [data-theme='dark'] .day.sun, [data-theme='dark'] .day.holiday { color: #ffab6b !important; } 
+        
         [data-theme='dark'] select { color: #fff; background: rgba(60, 60, 70, 0.8); }
         [data-theme='dark'] .stats-table td { color: #ccc; }
+        /* 다크모드 통계 테이블 이름 가독성 수정 */
+        [data-theme='dark'] .stats-table td:first-child { color: var(--text-color) !important; }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
@@ -144,10 +149,10 @@
         .day { 
             aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
             border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; position: relative; 
-            background: linear-gradient(145deg, rgba(253, 253, 253, 0.8), rgba(226, 229, 234, 0.8)); 
+            background: var(--day-bg); 
             box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.22), -2px -2px 6px rgba(255, 255, 255, 0.8); 
             transition: 0.3s all cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            color: #555; border: 1px solid rgba(255,255,255,0.4);
+            color: var(--day-text); border: 1px solid rgba(255,255,255,0.4);
         }
         .day.sat { color: #5dade2; } 
         .day.sun, .day.holiday { color: #e67e22; } 
@@ -392,7 +397,6 @@
         .color-purple { color: #9b59b6; }
         .color-pink { color: #ff69b4; }
 
-        /* 다크모드 토글 스위치 */
         .theme-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
         .theme-toggle { position: relative; width: 50px; height: 26px; }
         .theme-toggle input { opacity: 0; width: 0; height: 0; }
@@ -515,7 +519,6 @@
     let currentZoom = "1";
     let isPercentMode = false;
 
-    // 다크모드 전환 함수
     function toggleTheme() {
         const isDark = document.getElementById('themeSwitch').checked;
         document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
@@ -792,7 +795,6 @@
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
     window.onload = () => { 
-        // 테마 로드
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
