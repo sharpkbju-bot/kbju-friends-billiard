@@ -198,7 +198,7 @@
         .btn-cancel { background: #bdc3c7 !important; }
 
         .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; table-layout: fixed; }
-        .stats-table th { padding: 8px 1px; color: #999; font-weight: 900; text-transform: uppercase; font-size: 10px; border-bottom: 2px solid rgba(0,0,0,0.05); white-space: nowrap; }
+        .stats-table th { padding: 8px 1px; color: #5D4037; font-weight: 900; text-transform: uppercase; font-size: 10px; border-bottom: 2px solid rgba(0,0,0,0.05); white-space: nowrap; }
         .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
         .stats-table th:first-child { border-radius: 12px 0 0 12px; width: 22%; } 
         .stats-table th:last-child { border-radius: 0 12px 12px 0; width: 25%; } 
@@ -499,7 +499,7 @@
             const getVal = (val, total) => isPercentMode ? (total === 0 ? '0%' : ((val/total)*100).toFixed(0) + '%') : val;
             return `<tr>
                 <td style="${nameStyle}" onclick="renderMemberHistory('${p}')">${p}</td>
-                <td style="color:#888;">${stats[p].played}</td>
+                <td style="color:#5D4037;">${stats[p].played}</td>
                 <td style="color:var(--rank1);">${getVal(stats[p].ranks[0], stats[p].played)}</td>
                 <td style="color:var(--rank2);">${getVal(stats[p].ranks[1], stats[p].played)}</td>
                 <td style="color:var(--rank3);">${getVal(stats[p].ranks[2], stats[p].played)}</td>
@@ -510,7 +510,7 @@
         }).join('');
         document.getElementById('statsBody').innerHTML = bodyHtml;
         const richFriend = document.getElementById('richFriendArea');
-        if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:15px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; } else richFriend.style.display = 'none';
+        if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:16px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; } else richFriend.style.display = 'none';
     }
 
     function renderMemberHistory(name) {
@@ -523,12 +523,12 @@
             setTimeout(() => { toast.style.display = 'none'; }, 2000);
             return;
         }
-        let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#888;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span></div>`;
+        let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#5D4037;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span></div>`;
         personalGames.forEach(g => {
             const actual = g.ranks.filter(n => n.trim() !== "");
             const rankIndex = actual.indexOf(name);
             const rankLabel = (rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
-            html += `<div class="history-item"><span style="font-size:14px; color:#666;">${g.dateStr}</span><span style="font-size:15px; color:${rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : 'var(--main)')};">${rankLabel}</span></div>`;
+            html += `<div class="history-item"><span style="font-size:14px; color:#5D4037;">${g.dateStr}</span><span style="font-size:15px; color:${rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : '#5D4037')};">${rankLabel}</span></div>`;
         });
         historyArea.innerHTML = html; historyArea.style.display = 'block';
     }
