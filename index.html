@@ -46,6 +46,8 @@
             --edit-mode-border: #2d5a27; 
             
             --text-color: #444;
+            --sub-text: #666;
+            --label-text: #777;
         }
 
         [data-theme='dark'] {
@@ -64,14 +66,28 @@
             --dup-border: #ff5252;
             --dup-text: #ffccbc;
             --text-color: #eeeeee;
-            --rank1: #1a237e;
+            --sub-text: #cccccc;
+            --label-text: #bbbbbb;
+            --rank1: #4da3ff;
         }
 
-        [data-theme='dark'] #monthDisplay { color: #ffffff !important; }
+        [data-theme='dark'] #monthDisplay, 
+        [data-theme='dark'] #selectedDateTitle,
+        [data-theme='dark'] .stats-card h2 { color: #ffffff !important; }
+        
         [data-theme='dark'] .day { color: #ffffff !important; background: linear-gradient(145deg, #2c2c2c, #252525); }
         [data-theme='dark'] .day.sat { color: #5dade2 !important; }
         [data-theme='dark'] .day.sun, [data-theme='dark'] .day.holiday { color: #e67e22 !important; }
         [data-theme='dark'] .weekday { color: #95a5a6 !important; }
+        
+        [data-theme='dark'] .setup-row span,
+        [data-theme='dark'] .theme-wrap span,
+        [data-theme='dark'] .zoom-wrap span,
+        [data-theme='dark'] .input-row label { color: var(--label-text) !important; }
+        
+        [data-theme='dark'] select { background: rgba(60, 60, 60, 0.5); color: #fff; }
+        [data-theme='dark'] .game-item { background: linear-gradient(145deg, #2c2c2c, #333333); }
+        [data-theme='dark'] .game-info { color: #eee; }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
@@ -150,11 +166,11 @@
         }
 
         .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
-        .input-row label { width: 70px; font-size: 13px; font-weight: 800; color: #777; flex-shrink: 0; white-space: nowrap; }
+        .input-row label { width: 70px; font-size: 13px; font-weight: 800; color: var(--label-text); flex-shrink: 0; white-space: nowrap; }
         
         select { 
             flex: 1; padding: 12px; border-radius: 15px; border: 2px solid transparent; font-size: 14px; 
-            background: rgba(236, 238, 241, 0.4); box-shadow: var(--inner-shadow); color: #444; font-weight: 600; 
+            background: rgba(236, 238, 241, 0.4); box-shadow: var(--inner-shadow); color: var(--text-color); font-weight: 600; 
             -webkit-appearance: none; text-align: center; text-align-last: center; 
         }
 
@@ -188,7 +204,7 @@
         .stats-table th:last-child { border-radius: 0 12px 12px 0; }
 
         .stats-table tr { background: rgba(255, 255, 255, 0.4); }
-        .stats-table td { padding: 12px 1px; text-align: center; font-weight: 800; color: #555; }
+        .stats-table td { padding: 12px 1px; text-align: center; font-weight: 800; color: var(--text-color); }
         .stats-table td:first-child { border-radius: 12px 0 0 12px; text-align: left; padding-left: 10px; width: 17%; }
         .stats-table td:last-child { border-radius: 0 12px 12px 0; padding-right: 18px; width: 23%; text-align: right; }
         .val-highlight { font-size: 13px; }
@@ -212,7 +228,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .game-item { position: relative; padding: 18px 8px; border-radius: 22px; background: linear-gradient(145deg, #f0f0f0, #ffffff); margin-top: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8); cursor: pointer; transition: transform 0.2s ease; }
-        .game-info { font-size: 15px; font-weight: 900; color: #444; width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; }
+        .game-info { font-size: 15px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; }
         .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
 
         .action-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); display: none; justify-content: center; align-items: center; gap: 12px; z-index: 10; }
@@ -271,7 +287,7 @@
     <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:15px; background: var(--edit); padding: 12px; border-radius: 12px; text-align: center;">✏️ 기록 수정 중</div>
 
     <div class="theme-wrap">
-        <span style="font-size:14px; font-weight:800; color:#666;">다크 모드</span>
+        <span style="font-size:14px; font-weight:800; color:var(--sub-text);">다크 모드</span>
         <label class="theme-toggle">
             <input type="checkbox" id="themeSwitch" onchange="toggleTheme()">
             <span class="slider"></span>
@@ -279,7 +295,7 @@
     </div>
 
     <div class="zoom-wrap">
-        <span style="font-size:14px; font-weight:800; color:#666;">화면 크기</span>
+        <span style="font-size:14px; font-weight:800; color:var(--sub-text);">화면 크기</span>
         <div class="zoom-options">
             <label style="color:#9b59b6;">기본 <input type="radio" name="z" value="1" onclick="changeZoom('1')" checked></label>
             <label style="color:#ff69b4;">확대 <input type="radio" name="z" value="1.2" onclick="changeZoom('1.2')"></label>
@@ -484,13 +500,10 @@
             const isTopLoser = (stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0);
 
             if (isTopLoser) {
-                // 꼴찌 횟수가 제일 많으면 무조건 짙은 빨간색
                 nameStyle += `color:darkred;`;
             } else if (isTopWinner) {
-                // 꼴찌가 제일 많지 않으면서 1위가 제일 많으면 짙은 파란색
                 nameStyle += `color:darkblue;`;
             } else {
-                // 그 외 모든 순위는 퍼플 컬러
                 nameStyle += `color:#8e44ad;`;
             }
             
@@ -515,7 +528,7 @@
         const historyArea = document.getElementById('memberHistoryArea');
         const personalGames = gameLogs.filter(g => g.ranks.includes(name)).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
         if (personalGames.length === 0) return;
-        let html = `<div style="font-size:14px; font-weight:900; color:#444; margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#888;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span></div>`;
+        let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#888;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span></div>`;
         personalGames.forEach(g => {
             const actual = g.ranks.filter(n => n.trim() !== "");
             const rankIndex = actual.indexOf(name);
