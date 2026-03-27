@@ -1,4 +1,3 @@
-// share.js - 중복 버튼 생성 방지 및 기존 버튼 연결 버전
 (function() {
     const script = document.createElement('script');
     script.src = "https://html2canvas.hertzen.com/dist/html2canvas.min.js";
@@ -6,19 +5,19 @@
 
     script.onload = () => {
         const interval = setInterval(() => {
-            // HTML에 이미 존재하는 버튼을 찾습니다.
+            // 1. index.html에 이미 작성되어 있는 버튼을 찾습니다.
             const existingBtn = document.getElementById('shareBtn');
             const statsCard = document.querySelector('.stats-card');
 
             if (existingBtn && statsCard) {
                 clearInterval(interval);
 
-                // 새로 버튼을 만들지 않고, HTML에 있는 기존 버튼(shareBtn)에 기능을 연결합니다.
+                // 2. 새 버튼(custom-share-btn)을 만드는 코드를 모두 삭제하고, 
+                // 기존 버튼(existingBtn)에 클릭 이벤트만 연결합니다.
                 existingBtn.onclick = async () => {
                     const richArea = document.getElementById('richFriendArea');
                     const originalShadow = richArea ? richArea.style.boxShadow : '';
 
-                    // 캡처 시 스타일 보정
                     if(richArea) richArea.style.boxShadow = 'none';
 
                     html2canvas(statsCard, {
@@ -35,7 +34,6 @@
                             }
                         }
                     }).then(canvas => {
-                        // 원래 스타일 복구
                         if(richArea) richArea.style.boxShadow = originalShadow;
 
                         canvas.toBlob(async (blob) => {
