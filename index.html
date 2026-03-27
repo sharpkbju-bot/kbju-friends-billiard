@@ -307,6 +307,8 @@
 <div class="card stats-card">
     <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적 (이름을 터치해 봐!)</h2>
     
+    <button id="shareBtn" class="save-btn" onclick="shareScreenshot()">📸 전적 스크린샷 공유</button>
+
     <table class="stats-table">
         <thead>
             <tr>
@@ -331,8 +333,6 @@
     <div id="resetSteps">
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
-    
-    <button id="shareBtn" class="save-btn" onclick="shareScreenshot()">📸 전적 스크린샷 공유</button>
     
     <button id="exitBtn" class="exit-btn" style="margin-top: 10px;" onclick="showExitModal()">🚪 앱 종료</button>
 </div>
