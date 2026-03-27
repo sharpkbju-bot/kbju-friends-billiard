@@ -235,9 +235,31 @@
         .game-info { font-size: 15px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; }
         .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
 
-        .action-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; display: none; justify-content: center; align-items: center; gap: 12px; z-index: 10; }
+        /* 수정, 삭제, 취소 오버레이 스타일 개선 */
+        .action-overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255, 255, 255, 0.6); 
+            backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; gap: 10px; z-index: 10; 
+            border-radius: 22px;
+        }
+        [data-theme='dark'] .action-overlay { background: rgba(0, 0, 0, 0.7); }
         .action-overlay.active { display: flex; }
-        .overlay-btn { padding: 6px 16px; border-radius: 10px; font-weight: 900; font-size: 12px; color: #1a237e; }
+
+        .overlay-btn { 
+            padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 13px; 
+            box-shadow: 2px 4px 8px rgba(0,0,0,0.15); transition: 0.2s;
+        }
+        .overlay-btn:active { transform: scale(0.95); }
+
+        /* 파스텔톤 버튼 색상 */
+        .btn-edit-p { background: #d1e9ff; color: #0056b3; } /* 파스텔 블루 */
+        .btn-del-p { background: #ffdada; color: #d63031; }  /* 파스텔 레드 */
+        .btn-cancel-p { background: #f0f0f0; color: #636e72; } /* 파스텔 그레이 */
+
+        [data-theme='dark'] .btn-edit-p { background: #2c3e50; color: #3498db; }
+        [data-theme='dark'] .btn-del-p { background: #4b2323; color: #ff7675; }
+        [data-theme='dark'] .btn-cancel-p { background: #3d3d3d; color: #b2bec3; }
 
         #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
         .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 30px; text-align: center; width: 80%; max-width: 320px; }
@@ -543,7 +565,7 @@
             games.forEach((g, idx) => { 
                 const names = g.ranks.filter(n => n && n.trim() !== ""); 
                 const styledNames = names.map((name, i) => `<span style="color:${i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)')};">${name}</span>`);
-                html += `<div class="game-item" onclick="toggleActionOverlay(this)"><div class="game-info"><span>${idx+1}G</span> ${styledNames.join(' → ')}</div><div class="action-overlay"><div class="overlay-btn" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div><div class="overlay-btn" style="color:red;" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div><div class="overlay-btn" onclick="event.stopPropagation(); closeAllOverlays()">취소</div></div></div>`; 
+                html += `<div class="game-item" onclick="toggleActionOverlay(this)"><div class="game-info"><span>${idx+1}G</span> ${styledNames.join(' → ')}</div><div class="action-overlay"><div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div><div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div><div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div></div></div>`; 
             });
             listArea.innerHTML = html;
         } else listArea.innerHTML = "";
@@ -590,7 +612,7 @@
                 <div style="background:linear-gradient(135deg, #4a90e2, #9370db); height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-family:sans-serif;">
                     <div style="font-size:60px; margin-bottom:20px;">👋</div>
                     <div style="font-size:20px; font-weight:900; line-height:1.6;">앱 종료<br>안녕</div>
-                    <div style="font-size:14px; margin-top:30px; opacity:0.8;">브라우저 하단 [완료] 버튼이나<br>[X] 버튼 터치</div>
+                    <div style="font-size:14px; margin-top:30px; opacity:0.8;">브라우저 하단의 [완료] 버튼<br>[X] 버튼 터치</div>
                 </div>`;
             document.body.style.backgroundImage = 'none';
             document.body.style.padding = '0';
