@@ -44,48 +44,67 @@
 
             --edit-mode-bg: #e8f5e9;
             --edit-mode-border: #2d5a27; 
-            
-            /* 추가: 텍스트 색상 변수 */
-            --text-color: #444;
-            --text-sub-color: #555;
-            --text-light-color: #777;
         }
 
-        /* 다크모드 설정: 색상만 수정 */
-        [data-theme='dark'] {
-            --main: #bdc3c7;
-            --bg: rgba(30, 30, 30, 0.9);
-            --today-bg: #1a237e;
-            --today-border: #448aff;
-            --select-bg: #4a148c;
-            --select-border: #e91e63;
-            --record-bg: #1b5e20;
-            --record-border: #81c784;
-            --shadow: 8px 8px 16px rgba(0, 0, 0, 0.6), -4px -4px 10px rgba(60, 60, 60, 0.2);
-            --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.7), inset -2px -2px 5px rgba(60, 60, 60, 0.2);
-            --card-bg: rgba(35, 35, 45, 0.9);
-            --dup-bg: #3e2723;
-            --dup-border: #ff5252;
-            --dup-text: #ffccbc;
+        /* 다크모드 대응 (기존 코드를 건드리지 않기 위해 하단에 추가) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* 배경색, 카드 배경색, 그림자 수정 */
+                --bg: rgba(30, 30, 30, 0.8);
+                --card-bg: rgba(45, 45, 50, 0.9);
+                --shadow: 8px 8px 16px rgba(0, 0, 0, 0.5), -8px -8px 16px rgba(60, 60, 60, 0.2);
+                --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.6), inset -3px -3px 7px rgba(60, 60, 60, 0.2);
+
+                /* 다크모드 전용 텍스트 색상 정의 (식별성 강화) */
+                --text-main: #eeeeee;
+                --text-sub: #bbbbbb;
+                --text-muted: #999999;
+                
+                /* 순위 색상 보완 */
+                --rank1: #4dabf7; 
+                --rank2: #81c784; 
+                --rank3: #ba68c8; 
+                --rank4: #ffd54f; 
+                --rankL: #ff8a80;
+                
+                --dup-bg: #3e2723;    
+                --dup-border: #ff5252; 
+                --dup-text: #ffccbc;
+            }
+
+            /* 다크모드 전용 스타일 강제 적용 */
+            body { color: var(--text-main); }
+            .setup-row span { color: var(--text-sub) !important; }
+            #playerCount { color: #fff; background: rgba(50, 50, 60, 0.6); }
             
-            /* 다크모드 시 글자색 변경 */
-            --text-color: #eeeeee;
-            --text-sub-color: #dddddd;
-            --text-light-color: #bbbbbb;
+            /* 달력 날짜 식별성 강화 (기본 날짜 회색 -> 밝은 회색) */
+            .day { background: linear-gradient(145deg, #333, #222); color: #ccc; }
+            .day:not(.sat):not(.sun):not(.holiday) { color: #ccc; } /* 평일 날짜 */
+            
+            /* 전적 테이블 친구 이름 (밑줄 포함) 강제 밝게 수정 */
+            .stats-table td:first-child { color: var(--text-main) !important; }
+            
+            /* 테이블 헤더 및 데이터 색상 조정 */
+            .stats-table th { color: #aaa; background: #2e7d32; }
+            .stats-table td { color: #ddd; }
+            .stats-table td.played-cell { color: #999 !important; } /* 참여 횟수 무채색으로 유지 */
+            .stats-table tr { background: rgba(50, 50, 60, 0.4); }
+            .stats-table td:last-child { color: var(--rank2); } /* 승률 색상 */
+
+            /* 상세 기록 영역 조정 */
+            .history-area { background: rgba(0, 0, 0, 0.4); }
+            .history-item { background: rgba(50, 50, 60, 0.6); color: #eee; }
+            .history-item .history-date { color: #aaa; }
+            
+            /* 게임 기록 영역 */
+            .game-item { background: linear-gradient(145deg, #333, #222); color: #eee; }
+            .game-info { color: #eee; }
+            .game-info span { color: #999; } /* 예: "1G" */
+            
+            /* 위험 영역 텍스트 색상 조정 */
+            .danger-zone h3 { color: var(--text-main); }
+            .danger-zone p { color: #ff5252; } /* 삭제 경고 */
         }
-
-        /* 다크모드에서 검정색 글자들 강제 수정 */
-        [data-theme='dark'] body, 
-        [data-theme='dark'] h2, 
-        [data-theme='dark'] #monthDisplay, 
-        [data-theme='dark'] #selectedDateTitle,
-        [data-theme='dark'] .game-info,
-        [data-theme='dark'] .setup-row span,
-        [data-theme='dark'] .history-item { color: var(--text-color) !important; }
-
-        [data-theme='dark'] .day { color: #ccc; }
-        [data-theme='dark'] select { color: #fff; background: rgba(60, 60, 70, 0.8); }
-        [data-theme='dark'] .stats-table td { color: #ccc; }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
@@ -99,7 +118,8 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             min-height: 100vh;
-            color: var(--text-color);
+            color: #444;
+            transition: zoom 0.3s ease, background-color 0.3s ease, color 0.3s ease;
         }
         
         #welcome-screen {
@@ -388,7 +408,6 @@
         .color-purple { color: #9b59b6; }
         .color-pink { color: #ff69b4; }
 
-        /* 다크모드 토글 스위치 */
         .theme-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
         .theme-toggle { position: relative; width: 50px; height: 26px; }
         .theme-toggle input { opacity: 0; width: 0; height: 0; }
@@ -423,14 +442,14 @@
 <div class="calendar-card">
     <div class="calendar-header">
         <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
-        <span id="monthDisplay" style="font-size:20px; font-weight:900; color:#444; letter-spacing:-1px;"></span>
+        <span id="monthDisplay" style="font-size:20px; font-weight:900; color:var(--text-main); letter-spacing:-1px;"></span>
         <button class="nav-btn" onclick="changeMonth(1)">▶</button>
     </div>
     <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
 <div class="card" id="inputCard">
-    <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 20px 0; color:#444; font-weight:800;">📅 날짜 확인 중</h2>
+    <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 20px 0; color:var(--text-main); font-weight:800;">📅 날짜 확인 중</h2>
     <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:15px; background: var(--edit); padding: 12px; border-radius: 12px; text-align: center;">✏️ 기록 수정 중</div>
 
     <div class="theme-wrap">
@@ -450,7 +469,7 @@
     </div>
 
     <div class="setup-row">
-        <span style="font-size:14px; font-weight:800; color:#555;">게임 인원</span>
+        <span style="font-size:14px; font-weight:800; color:var(--text-sub);">게임 인원</span>
         <select id="playerCount" onchange="updateInputFields()">
             <option value="2">2명</option>
             <option value="3" selected>3명</option>
@@ -468,7 +487,7 @@
 </div>
 
 <div class="card stats-card">
-    <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적 (이름을 터치해 봐!)</h2>
+    <h2 style="font-size:16px; margin:5px 0 14px 10px; color:var(--text-main); font-weight:800;">📊 멤버별 누적 전적 (이름 클릭시 상세)</h2>
     <table class="stats-table">
         <thead>
             <tr>
@@ -639,7 +658,7 @@
 
             return `<tr>
                 <td style="${nameStyle}" onclick="renderMemberHistory('${p}')">${nameTdContent}</td>
-                <td style="color:#888;">${stats[p].played}</td>
+                <td class="played-cell" style="color:#888;">${stats[p].played}</td>
                 <td ${tdStyle(stats[p].ranks[0], maxCounts.r0, '--rank1')}>${getVal(stats[p].ranks[0], stats[p].played)}</td>
                 <td ${tdStyle(stats[p].ranks[1], maxCounts.r1, '--rank2')}>${getVal(stats[p].ranks[1], stats[p].played)}</td>
                 <td ${tdStyle(stats[p].ranks[2], maxCounts.r2, '--rank3')}>${getVal(stats[p].ranks[2], stats[p].played)}</td>
@@ -794,15 +813,10 @@
             document.documentElement.setAttribute('data-theme', 'dark');
             document.getElementById('themeSwitch').checked = true;
         }
-
         setTimeout(() => { 
             const ws = document.getElementById('welcome-screen');
-            if(ws) { 
-                ws.style.opacity = '0'; 
-                setTimeout(() => { ws.style.display = 'none'; }, 800); 
-            }
+            if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); }
         }, 3500);
-
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if(isIOS) {
             document.getElementById('exitBtn').innerText = "📱 Return Home";
@@ -815,6 +829,5 @@
     };
     document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) hideActionOverlays(); });
 </script>
-<script src="share.js"></script>    
 </body>
 </html>
