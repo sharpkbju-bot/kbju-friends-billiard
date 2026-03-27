@@ -83,7 +83,11 @@
         [data-theme='dark'] .setup-row span,
         [data-theme='dark'] .history-item { color: var(--text-color) !important; }
 
-        [data-theme='dark'] .day { color: #ccc; }
+        /* 다크모드 날짜 색상 최적화 */
+        [data-theme='dark'] .day { color: #bbbbbb; } /* 평일: 밝은 그레이 */
+        [data-theme='dark'] .day.sun, [data-theme='dark'] .day.holiday { color: #ff5252 !important; } /* 공휴일: 선명한 레드 */
+        [data-theme='dark'] .day.has-record { color: #81c784 !important; } /* 기록 날짜: 그린 */
+
         [data-theme='dark'] select { color: #fff; background: rgba(60, 60, 70, 0.8); }
         [data-theme='dark'] .stats-table td { color: #ccc; }
 
