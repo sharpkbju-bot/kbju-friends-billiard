@@ -69,6 +69,9 @@
             --sub-text: #cccccc;
             --label-text: #bbbbbb;
             --rank1: #4da3ff;
+            /* 수정 시 이름 식별을 위해 다크모드 전용 편집 배경색 조정 */
+            --edit-mode-bg: #1b5e20;
+            --edit-mode-border: #81c784;
         }
 
         [data-theme='dark'] #monthDisplay, 
@@ -85,7 +88,9 @@
         [data-theme='dark'] .zoom-wrap span,
         [data-theme='dark'] .input-row label { color: var(--label-text) !important; }
         
-        [data-theme='dark'] select { background: rgba(60, 60, 60, 0.5); color: #fff; }
+        /* 다크모드에서 select 글자색을 흰색으로 고정하여 수정 모드에서도 잘 보이게 함 */
+        [data-theme='dark'] select { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; }
+        
         [data-theme='dark'] .game-item { background: linear-gradient(145deg, #2c2c2c, #333333); }
         [data-theme='dark'] .game-info { color: #eee; }
         [data-theme='dark'] .nav-btn { background: rgba(60, 60, 60, 0.6); color: #ffffff !important; box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5), -2px -2px 6px rgba(70, 70, 70, 0.3); }
@@ -179,6 +184,7 @@
         .edit-active select {
             background-color: var(--edit-mode-bg) !important;
             border: 2px solid var(--edit-mode-border) !important;
+            color: var(--success) !important; /* 수정모드에서 텍스트 색상을 강조 */
         }
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
@@ -578,14 +584,9 @@
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
     
-    // [수정 핵심] iOS 정책으로 인한 창 닫기 불가 해결책
     function closeAppWindow() { 
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        
-        // 1. 창을 실제로 닫으려고 시도
         window.close();
-        
-        // 2. 창이 닫히지 않는 경우(아이폰 등)를 위해 화면을 완전히 비우고 종료 안내 표시
         setTimeout(() => {
             document.body.innerHTML = `
                 <div style="background:linear-gradient(135deg, #4a90e2, #9370db); height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-family:sans-serif;">
