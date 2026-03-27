@@ -8,218 +8,124 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
-    
     <link rel="apple-touch-icon" href="image_0.png">
     
     <title>우리들의 Billiard World</title>
     
     <style>
         :root { 
-            --main: #7f8c8d; 
-            --bg: rgba(236, 238, 241, 0.4); 
-            --accent: #ff4757; 
-            --success: #27ae60; 
-            --edit: #f39c12; 
-            --today-bg: #e3f2fd; 
-            --today-border: #2196f3; 
-            --select-bg: #fff0f3; 
-            --select-border: #ff4d6d; 
-            --record-bg: #e8f5e9; 
-            --record-border: #4caf50; 
-            --record-dot: #e67e22; 
+            --main: #7f8c8d; --bg: rgba(236, 238, 241, 0.4); --accent: #ff4757; 
+            --success: #27ae60; --edit: #f39c12; --today-bg: #e3f2fd; 
+            --today-border: #2196f3; --select-bg: #fff0f3; --select-border: #ff4d6d; 
+            --record-bg: #e8f5e9; --record-border: #4caf50; --record-dot: #e67e22; 
             --shadow: 8px 8px 16px rgba(180, 180, 180, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8);
             --inner-shadow: inset 3px 3px 7px rgba(180, 180, 180, 0.4), inset -3px -3px 7px rgba(255, 255, 255, 0.8);
-            
-            --rank1: #0047AB; /* 요청하신 진한 파랑 */
-            --rank2: #27ae60; 
-            --rank3: #8e44ad; 
-            --rank4: #f39c12; 
-            --rankL: #ff4757; 
-            
-            --dup-bg: #fffde7;    
-            --dup-border: #ff80ab; 
-            --dup-text: #7b1fa2;
-            --card-bg: rgba(243, 230, 255, 0.7); 
-
-            --text-main: #444;
-            --text-sub: #777;
-            --cal-day: #555;
+            --rank1: #0047AB; --rankL: #ff4757; --card-bg: rgba(243, 230, 255, 0.7); 
+            --text-main: #444; --text-sub: #777; --cal-day: #555;
         }
 
-        /* 다크모드 대응 스타일 */
         [data-theme="dark"] {
-            --bg: rgba(30, 30, 35, 0.85);
-            --card-bg: rgba(45, 45, 52, 0.95);
+            --bg: rgba(30, 30, 35, 0.85); --card-bg: rgba(45, 45, 52, 0.95);
             --shadow: 8px 8px 20px rgba(0, 0, 0, 0.6), -4px -4px 12px rgba(255, 255, 255, 0.05);
             --inner-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -2px -2px 6px rgba(255, 255, 255, 0.05);
-            --text-main: #eeeeee;
-            --text-sub: #bbbbbb;
-            --cal-day: #ffffff; /* 날짜 숫자 흰색 고정 */
-            --rank1: #4dabf7; 
-            --rankL: #ff8a80;
+            --text-main: #eeeeee; --text-sub: #bbbbbb; --cal-day: #ffffff; 
+            --rank1: #4dabf7; --rankL: #ff8a80;
         }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
-
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            margin: 0; 
-            padding: env(safe-area-inset-top) 15px 100px 15px;
-            background-image: url('image_1.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            min-height: 100vh;
-            color: var(--text-main);
-            transition: 0.3s ease;
+            font-family: -apple-system, sans-serif; margin: 0; padding: env(safe-area-inset-top) 15px 100px 15px;
+            background: url('image_1.png') center/cover no-repeat fixed; min-height: 100vh; color: var(--text-main); transition: 0.3s;
         }
-        
-        /* 웰컴 화면 */
+
         #welcome-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #4a90e2, #9370db);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 10000; transition: opacity 0.8s ease-out; color: white; text-align: center;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #4a90e2, #9370db);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.8s; color: white;
         }
-        .welcome-content { animation: fadeInUp 1s ease-out; }
-        .welcome-logo { width: 60px; height: auto; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
-        .welcome-text { font-size: 14px; font-weight: 300; line-height: 1.6; font-family: cursive; }
-        
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 카드 및 레이아웃 */
         .card, .calendar-card {
-            background: var(--card-bg); backdrop-filter: blur(8px);
-            border-radius: 28px; padding: 22px; box-shadow: var(--shadow);
-            margin-bottom: 25px; border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--card-bg); backdrop-filter: blur(8px); border-radius: 28px; padding: 22px; 
+            box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .nav-btn { border: none; background: rgba(127, 140, 141, 0.15); width: 44px; height: 44px; border-radius: 14px; color: var(--text-main); cursor: pointer; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
-        .weekday { font-size: 11px; font-weight: 900; color: #95a5a6; padding-bottom: 10px; }
-
         .day { 
             aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; position: relative; 
-            color: var(--cal-day); background: rgba(127, 140, 141, 0.05); box-shadow: var(--inner-shadow);
+            border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; color: var(--cal-day); 
+            background: rgba(127, 140, 141, 0.05); box-shadow: var(--inner-shadow);
         }
         .day.sat { color: #5dade2 !important; } .day.sun, .day.holiday { color: #e67e22 !important; } 
-        .day.today { background: var(--today-bg) !important; color: var(--today-border) !important; border: 2px solid var(--today-border) !important; }
-        .day.selected { background: var(--select-bg) !important; color: var(--select-border) !important; transform: scale(1.1); border: 2px solid var(--select-border) !important; z-index: 5; }
-        .day.has-record { border: 2px solid var(--record-border); }
-        .day.has-record::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--record-dot); border-radius: 50%; }
+        .day.selected { background: var(--select-bg) !important; color: var(--select-border) !important; border: 2px solid var(--select-border) !important; }
 
-        /* 입력 및 버튼 */
-        .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
-        .input-row label { width: 70px; font-size: 13px; font-weight: 800; color: var(--text-sub); }
-        select { flex: 1; padding: 12px; border-radius: 15px; border: none; background: rgba(127, 140, 141, 0.1); color: var(--text-main); font-weight: 600; -webkit-appearance: none; text-align: center; }
-        .save-btn { width: 100%; padding: 18px; background: linear-gradient(145deg, #abb2b9, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; margin-top: 15px; font-size: 16px; box-shadow: 0 8px 15px rgba(0,0,0,0.2); }
-        .edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
+        .save-btn { width: 100%; padding: 18px; border-radius: 18px; font-weight: 800; border: none; font-size: 16px; box-shadow: 0 8px 15px rgba(0,0,0,0.2); cursor: pointer; }
+        .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+        .stats-table td { padding: 12px 2px; text-align: center; font-weight: 800; }
         
-        /* 전적 테이블 */
-        .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; }
-        .stats-table th { padding: 8px 2px; color: var(--text-sub); font-size: 10px; }
-        .stats-table tr { background: rgba(255, 255, 255, 0.05); }
-        .stats-table td { padding: 12px 2px; text-align: center; font-weight: 800; color: var(--text-main); }
-        .stats-table td:first-child { text-align: left; padding-left: 10px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-
-        /* 오버레이 수정/삭제 */
-        .game-item { position: relative; padding: 18px; border-radius: 20px; background: rgba(255,255,255,0.05); margin-top: 10px; cursor: pointer; text-align: center; font-weight: 900; }
-        .action-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); border-radius: 20px; display: none; justify-content: center; align-items: center; gap: 15px; z-index: 10; }
-        .action-overlay.active { display: flex; }
-        .overlay-btn { padding: 8px 15px; border-radius: 10px; font-size: 12px; color: white; font-weight: 800; }
-        
-        /* 토글 스위치 */
         .theme-toggle { position: relative; width: 50px; height: 26px; }
-        .theme-toggle input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #2196f3; }
+        .theme-toggle input { opacity: 0; width: 0; }
+        .slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; border-radius: 34px; transition: .4s; }
+        .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 4px; bottom: 4px; background: white; border-radius: 50%; transition: .4s; }
+        input:checked + .slider { background: #2196f3; }
         input:checked + .slider:before { transform: translateX(24px); }
-
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
     </style>
 </head>
 <body id="app-body">
 
 <div id="welcome-screen">
-    <div class="welcome-content">
-        <img src="image_0.png" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br>Created by Ju Kyung Bae</div>
+    <div style="text-align:center;">
+        <img src="image_0.png" style="width:60px; margin-bottom:15px;">
+        <div style="font-size:14px; line-height:1.6;">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br>Created by Ju Kyung Bae</div>
     </div>
 </div>
 
-<div id="loading"><div style="border:5px solid #fff; border-top:5px solid #2196f3; border-radius:50%; width:50px; height:50px; animation:spin 1s linear infinite;"></div><p id="loadingText">데이터 동기화 중...</p></div>
-
 <div class="calendar-card">
-    <div class="calendar-header">
-        <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <button onclick="changeMonth(-1)" style="border:none; background:none; font-size:20px;">◀</button>
         <span id="monthDisplay" style="font-size:20px; font-weight:900;"></span>
-        <button class="nav-btn" onclick="changeMonth(1)">▶</button>
+        <button onclick="changeMonth(1)" style="border:none; background:none; font-size:20px;">▶</button>
     </div>
     <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
-<div class="card" id="inputCard">
-    <h2 id="selectedDateTitle" style="font-size:17px; margin-bottom:20px;">📅 날짜 확인 중</h2>
-    
+<div class="card">
+    <h2 id="selectedDateTitle" style="font-size:17px; margin-bottom:15px;">📅 날짜 확인 중</h2>
     <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
         <span style="font-weight:800; color:var(--text-sub);">다크 모드</span>
-        <label class="theme-toggle">
-            <input type="checkbox" id="themeSwitch" onchange="toggleTheme()">
-            <span class="slider"></span>
-        </label>
+        <label class="theme-toggle"><input type="checkbox" id="themeSwitch" onchange="toggleTheme()"><span class="slider"></span></label>
     </div>
-
     <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-        <span style="font-weight:800; color:var(--text-sub);">게임 인원</span>
-        <select id="playerCount" onchange="updateInputFields()" style="flex:none; width:80px;">
-            <option value="2">2명</option>
-            <option value="3" selected>3명</option>
-            <option value="4">4명</option>
-            <option value="5">5명</option>
-        </select>
+        <span style="font-weight:800; color:var(--text-sub);">화면 크기</span>
+        <div>기본 <input type="radio" name="z" value="1" onclick="document.body.style.zoom='1'" checked> 확대 <input type="radio" name="z" value="1.2" onclick="document.body.style.zoom='1.2'"></div>
     </div>
-
     <div id="inputArea"></div>
-    <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
+    <div style="display:flex; gap:10px;">
+        <button id="mainBtn" class="save-btn" style="background:#7f8c8d; color:white;" onclick="saveGame()">순위 저장</button>
+        <button class="save-btn" style="background:#bdc3c7; color:white;" onclick="resetInputs()">취소</button>
+    </div>
     <div id="dayGameList"></div>
 </div>
 
-<div class="card stats-card">
-    <button id="captureBtn" class="save-btn" style="background: linear-gradient(135deg, #6e8efb, #a777e3); margin-top:0; margin-bottom:20px;">📸 전적 스크린샷 공유</button>
-    
-    <h2 style="font-size:16px; margin-bottom:15px;">📊 멤버별 누적 전적 (이름 클릭시 상세)</h2>
+<div class="card">
+    <button id="captureBtn" class="save-btn" style="background:linear-gradient(135deg, #6e8efb, #a777e3); color:white; margin-bottom:20px;">📸 전적 스크린샷 공유</button>
+    <h2 style="font-size:16px;">📊 멤버별 누적 전적 (이름을 터치해 봐!)</h2>
     <table class="stats-table">
-        <thead>
-            <tr>
-                <th style="text-align:left; padding-left:10px;">이름</th>
-                <th>참여</th>
-                <th style="color:var(--rank1)">1위🥇</th>
-                <th style="color:var(--rankL)">꼴찌💀</th>
-                <th style="text-align:right; padding-right:15px;">승률</th>
-            </tr>
-        </thead>
+        <thead><tr style="font-size:10px; color:var(--text-sub);"><th>이름</th><th>참여</th><th style="color:var(--rank1)">1위🥇</th><th>2위</th><th>3위</th><th>4위</th><th style="color:var(--rankL)">꼴찌💀</th><th>승률</th></tr></thead>
         <tbody id="statsBody"></tbody>
     </table>
-    <div id="memberHistoryArea" style="display:none; margin-top:15px; padding:15px; background:rgba(0,0,0,0.1); border-radius:15px;"></div>
+    <div id="richFriendArea" style="display:none; padding:15px; background:rgba(0,0,0,0.1); border-radius:15px; text-align:center; font-weight:800; margin-top:15px;"></div>
 </div>
 
-<div class="danger-zone">
-    <button class="save-btn" style="background:#7f8c8d;" onclick="location.reload()">🔄 앱 새로고침</button>
+<div style="text-align:center; padding:20px;">
+    <p style="color:var(--accent); font-size:11px; font-weight:800;">조작 버튼은 함부로 터치하지 마세요.</p>
+    <button class="save-btn" style="background:#e67e22; color:white; margin-bottom:10px;" onclick="handleReset()">⚠️ 모든 데이터 초기화 (복구 불가)</button>
+    <button class="save-btn" style="background:#7f8c8d; color:white;" onclick="location.reload()">🚪 앱 종료</button>
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec"; 
-    const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
-    let gameLogs = [];
-    let currentViewDate = new Date();
-    let selectedDateStr = new Date().toLocaleDateString('sv-SE');
-    let editMode = false;
-    let editRound = null;
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec";
+    const players = ["경배", "진웅", "창한", "원석", "정석", "경석"];
+    const holidays = ["2026-01-01", "2026-02-16", "2026-02-17", "2026-02-18", "2026-03-01", "2026-05-01", "2026-05-05", "2026-05-24", "2026-06-06", "2026-07-17", "2026-08-15", "2026-09-24", "2026-09-25", "2026-09-26", "2026-10-03", "2026-10-09", "2026-12-25"];
+    let gameLogs = []; let currentViewDate = new Date(); let selectedDateStr = new Date().toLocaleDateString('sv-SE');
 
     function toggleTheme() {
         const isDark = document.getElementById('themeSwitch').checked;
@@ -228,13 +134,7 @@
     }
 
     async function fetchData() {
-        document.getElementById('loading').style.display = 'flex';
-        try {
-            const res = await fetch(`${GAS_URL}?t=${Date.now()}`);
-            gameLogs = await res.json();
-            renderAll();
-        } catch (e) { console.error("Load Fail"); }
-        finally { document.getElementById('loading').style.display = 'none'; }
+        try { const res = await fetch(GAS_URL); gameLogs = await res.json(); renderAll(); } catch(e) {}
     }
 
     function renderAll() { renderCalendar(); renderStats(); renderGameList(); }
@@ -243,120 +143,53 @@
         const grid = document.getElementById('calendarGrid'); grid.innerHTML = "";
         const year = currentViewDate.getFullYear(); const month = currentViewDate.getMonth();
         document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
-        ["일","월","화","수","목","금","토"].forEach(d => grid.innerHTML += `<div class="weekday">${d}</div>`);
-        
+        ["일","월","화","수","목","금","토"].forEach(d => grid.innerHTML += `<div style="font-size:11px; font-weight:900; color:#95a5a6;">${d}</div>`);
         const firstDay = new Date(year, month, 1).getDay();
         const lastDate = new Date(year, month + 1, 0).getDate();
         for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
         for (let d = 1; d <= lastDate; d++) {
             const dStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const isHol = holidays.includes(dStr) ? 'holiday' : '';
             const isSel = dStr === selectedDateStr ? 'selected' : '';
-            const hasRec = gameLogs.some(g => g.date.split('T')[0] === dStr) ? 'has-record' : '';
-            grid.innerHTML += `<div class="day ${isSel} ${hasRec}" onclick="selectDate('${dStr}')">${d}</div>`;
+            grid.innerHTML += `<div class="day ${new Date(dStr).getDay()===0?'sun':''} ${new Date(dStr).getDay()===6?'sat':''} ${isHol} ${isSel}" onclick="selectDate('${dStr}')">${d}</div>`;
         }
-    }
-
-    function selectDate(s) { selectedDateStr = s; document.getElementById('selectedDateTitle').innerText = `📅 ${s}`; renderCalendar(); renderGameList(); }
-
-    function updateInputFields(preFill = null) {
-        const count = document.getElementById('playerCount').value;
-        const area = document.getElementById('inputArea'); area.innerHTML = "";
-        for(let i=1; i<=count; i++) {
-            area.innerHTML += `<div class="input-row"><label>${i==count?'꼴찌💀':i+'위'}</label><select id="r${i}"><option value="">선택</option>${players.map(p=>`<option value="${p}" ${preFill && preFill[i-1]===p?'selected':''}>${p}</option>`).join('')}</select></div>`;
-        }
-    }
-
-    async function saveGame() {
-        const ranks = [];
-        for(let i=1; i<=document.getElementById('playerCount').value; i++) {
-            const v = document.getElementById('r'+i).value;
-            if(!v) return alert("친구를 모두 선택해주세요!");
-            ranks.push(v);
-        }
-        document.getElementById('loading').style.display = 'flex';
-        const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: ranks, round: editRound };
-        await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-        editMode = false; editRound = null;
-        document.getElementById('mainBtn').innerText = "순위 저장";
-        document.getElementById('mainBtn').classList.remove('edit-btn');
-        fetchData();
     }
 
     function renderStats() {
         let stats = {}; players.forEach(p => stats[p] = { p:0, r:[0,0,0,0,0] });
         gameLogs.forEach(g => {
-            const r = g.ranks.filter(n => n);
-            r.forEach((n, i) => { if(stats[n]) { stats[n].p++; if(i===0) stats[n].r[0]++; if(i===r.length-1) stats[n].r[4]++; } });
+            g.ranks.forEach((n, i) => { if(stats[n]) { stats[n].p++; if(i===0) stats[n].r[0]++; if(i===g.ranks.length-1) stats[n].r[4]++; } });
         });
         const maxWin = Math.max(...players.map(p => stats[p].r[0]));
-        const sorted = [...players].sort((a,b) => stats[b].r[0] - stats[a].r[0]);
-        document.getElementById('statsBody').innerHTML = sorted.map(p => {
-            const winRate = stats[p].p > 0 ? ((stats[p].r[0]/stats[p].p)*100).toFixed(1) : "0.0";
+        const worst = [...players].sort((a,b) => stats[b].r[4] - stats[a].r[4])[0];
+        document.getElementById('statsBody').innerHTML = players.map(p => {
             const nameStyle = (stats[p].r[0] === maxWin && maxWin > 0) ? 'color:var(--rank1); font-weight:900;' : '';
-            return `<tr><td style="${nameStyle}" onclick="showDetail('${p}')">${p}</td><td>${stats[p].p}</td><td style="color:var(--rank1)">${stats[p].r[0]}</td><td style="color:var(--rankL)">${stats[p].r[4]}</td><td style="text-align:right; padding-right:15px;">${winRate}%</td></tr>`;
+            return `<tr><td style="${nameStyle}">${p}</td><td>${stats[p].p}</td><td style="color:var(--rank1)">${stats[p].r[0]}</td><td>-</td><td>-</td><td>-</td><td style="color:var(--rankL)">${stats[p].r[4]}</td><td>${stats[p].p?((stats[p].r[0]/stats[p].p)*100).toFixed(1):0}%</td></tr>`;
         }).join('');
+        
+        if(stats[worst].r[4] > 0) {
+            document.getElementById('richFriendArea').style.display = 'block';
+            document.getElementById('richFriendArea').innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="color:red;">${worst} (${stats[worst].r[4]}회)</span>`;
+        }
     }
 
-    function renderGameList() {
-        const games = gameLogs.filter(g => g.date.split('T')[0] === selectedDateStr);
-        const area = document.getElementById('dayGameList'); area.innerHTML = "";
-        games.forEach(g => {
-            const names = g.ranks.filter(n => n);
-            area.innerHTML += `
-                <div class="game-item" onclick="this.querySelector('.action-overlay').style.display='flex'">
-                    ${names.join(' → ')}
-                    <div class="action-overlay">
-                        <div class="overlay-btn" style="background:#f39c12" onclick="event.stopPropagation(); startEdit(${g.round}, '${names.join(',')}')">수정</div>
-                        <div class="overlay-btn" style="background:#ff4757" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>
-                        <div class="overlay-btn" style="background:#7f8c8d" onclick="event.stopPropagation(); this.parentElement.style.display='none'">취소</div>
-                    </div>
-                </div>`;
-        });
+    function handleReset() {
+        if(confirm("1단계: 정말 초기화하시겠습니까?") && confirm("2단계: 데이터가 영구 삭제됩니다.") && confirm("마지막: 정말 실행할까요?")) {
+            fetch(GAS_URL, { method:'POST', body: JSON.stringify({action:'RESET'}) }).then(()=>location.reload());
+        }
     }
 
-    function startEdit(round, rankStr) {
-        editMode = true; editRound = round;
-        const ranks = rankStr.split(',');
-        document.getElementById('playerCount').value = ranks.length;
-        updateInputFields(ranks);
-        document.getElementById('mainBtn').innerText = "수정 완료";
-        document.getElementById('mainBtn').classList.add('edit-btn');
-        window.scrollTo(0,0);
-    }
-
-    async function deleteGame(round) {
-        if(!confirm("정말 삭제하시겠습니까?")) return;
-        document.getElementById('loading').style.display = 'flex';
-        await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) });
-        fetchData();
-    }
-
-    function showDetail(name) {
-        const area = document.getElementById('memberHistoryArea');
-        const personal = gameLogs.filter(g => g.ranks.includes(name)).reverse().slice(0,5);
-        if(personal.length === 0) return;
-        let html = `<strong>🏆 ${name}의 최근 5경기</strong><br>`;
-        personal.forEach(g => {
-            const r = g.ranks.indexOf(name) + 1;
-            html += `<small>${g.date.split('T')[0]} : ${r === g.ranks.filter(n=>n).length ? '꼴찌💀' : r+'위'}</small><br>`;
-        });
-        area.innerHTML = html + `<button onclick="this.parentElement.style.display='none'" style="margin-top:10px; border:none; background:none; color:red;">닫기</button>`;
-        area.style.display = 'block';
-    }
-
-    function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
+    function selectDate(s) { selectedDateStr = s; document.getElementById('selectedDateTitle').innerText = `📅 ${s}`; renderCalendar(); }
+    function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth()+v); renderCalendar(); }
 
     window.onload = () => {
         const theme = localStorage.getItem('theme') || 'light';
         document.body.setAttribute('data-theme', theme);
         document.getElementById('themeSwitch').checked = (theme === 'dark');
-        setTimeout(() => { document.getElementById('welcome-screen').style.opacity = '0'; setTimeout(()=>document.getElementById('welcome-screen').style.display='none', 800); }, 3500);
-        updateInputFields();
+        setTimeout(() => document.getElementById('welcome-screen').style.opacity = '0', 3500);
         fetchData();
     };
 </script>
-
 <script src="share.js"></script>
-
 </body>
 </html>
