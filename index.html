@@ -49,7 +49,6 @@
             --text-sub-color: #555;
             --text-light-color: #777;
 
-            /* 추가: 다크모드 전용 변수 초기화 (라이트모드 기준) */
             --day-bg: linear-gradient(145deg, rgba(253, 253, 253, 0.8), rgba(226, 229, 234, 0.8));
             --day-text: #555;
         }
@@ -74,9 +73,11 @@
             --text-sub-color: #dddddd;
             --text-light-color: #bbbbbb;
 
-            /* 다크모드 달력 날짜 배경 및 글자색 수정 */
             --day-bg: linear-gradient(145deg, #2c3e50, #1a252f);
             --day-text: #ffffff;
+            
+            /* 수정: 다크모드 1위 이름 색상을 세련된 파란색으로 변경 */
+            --rank1: #5dade2; 
         }
 
         [data-theme='dark'] body, 
@@ -93,8 +94,10 @@
         
         [data-theme='dark'] select { color: #fff; background: rgba(60, 60, 70, 0.8); }
         [data-theme='dark'] .stats-table td { color: #ccc; }
-        /* 다크모드 통계 테이블 이름 가독성 수정 */
-        [data-theme='dark'] .stats-table td:first-child { color: var(--text-color) !important; }
+        
+        /* 수정: 다크모드 통계 테이블 1위 이름 가독성 및 색상 보정 */
+        [data-theme='dark'] .stats-table td:first-child { color: var(--text-color); }
+        [data-theme='dark'] .stats-table td.winner-name { color: var(--rank1) !important; }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
@@ -201,6 +204,18 @@
             background: linear-gradient(145deg, #ffae24, #da8c10) !important; 
             border: none !important; 
         }
+
+        /* 수정: 스크린샷 버튼 스타일을 순위표 카드 폭에 맞춰 조정 */
+        button.capture-btn {
+            width: 100%; padding: 18px; 
+            background: linear-gradient(145deg, #4facfe, #00f2fe);
+            color: white; border: none;
+            border-radius: 18px; font-weight: 800; margin-bottom: 25px; cursor: pointer;
+            font-size: 16px;
+            box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.2), -2px -2px 8px rgba(255, 255, 255, 0.4);
+            transition: 0.2s all ease;
+        }
+        button.capture-btn:active { transform: scale(0.97); }
         
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .btn-group button { flex: 1; margin-top: 0 !important; }
@@ -475,6 +490,8 @@
     <div id="dayGameList"></div>
 </div>
 
+<button id="captureBtn" class="capture-btn" onclick="captureAndShare()">📸 결과 이미지 저장 (카톡 공유)</button>
+
 <div class="card stats-card">
     <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적 (이름을 터치해 봐!)</h2>
     <table class="stats-table">
@@ -634,18 +651,22 @@
         const bodyHtml = sortedByWin.map(p => {
             let nameTdContent = p;
             let nameStyle = "font-weight:900; letter-spacing:-0.5px; cursor:pointer; text-decoration: underline; text-underline-offset: 3px;"; 
+            let nameClass = ""; // 수정: 다크모드 대응 클래스
             const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             
             if (stats[p].ranks[0] === maxCounts.r0 && stats[p].ranks[4] === maxCounts.r4 && maxCounts.r0 > 0) {
                 nameTdContent = p.length >= 2 ? `<span style="color:orange;">${p[0]}</span><span style="color:#ff69b4;">${p.substring(1)}</span>` : `<span style="color:orange;">${p}</span>`;
             } else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
-            else if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`;
+            else if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) {
+                nameStyle += `color:var(--rank1);`;
+                nameClass = "winner-name"; // 수정: 1위 클래스 추가
+            }
             
             const getVal = (val, total) => { if(isPercentMode) return total === 0 ? '0%' : ((val/total)*100).toFixed(0) + '%'; return val; };
             const tdStyle = (val, max, colorVar) => `style="color:var(${colorVar}); ${(val === max && max > 0) ? 'font-weight:900;' : ''}" class="val-highlight"`;
 
             return `<tr>
-                <td style="${nameStyle}" onclick="renderMemberHistory('${p}')">${nameTdContent}</td>
+                <td style="${nameStyle}" class="${nameClass}" onclick="renderMemberHistory('${p}')">${nameTdContent}</td>
                 <td style="color:#888;">${stats[p].played}</td>
                 <td ${tdStyle(stats[p].ranks[0], maxCounts.r0, '--rank1')}>${getVal(stats[p].ranks[0], stats[p].played)}</td>
                 <td ${tdStyle(stats[p].ranks[1], maxCounts.r1, '--rank2')}>${getVal(stats[p].ranks[1], stats[p].played)}</td>
