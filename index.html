@@ -64,12 +64,11 @@
             --dup-border: #ff5252;
             --dup-text: #ffccbc;
             --text-color: #eeeeee;
-            
-            /* 다크모드 전용 1위 이름 색상 (진한 네이비) */
             --rank1: #1a237e;
         }
 
-        /* 다크모드 달력 텍스트 가시성 복구 */
+        /* 다크모드 달력 텍스트 가시성 수정 */
+        [data-theme='dark'] #monthDisplay { color: #ffffff !important; }
         [data-theme='dark'] .day { color: #ffffff !important; background: linear-gradient(145deg, #2c2c2c, #252525); }
         [data-theme='dark'] .day.sat { color: #5dade2 !important; }
         [data-theme='dark'] .day.sun, [data-theme='dark'] .day.holiday { color: #e67e22 !important; }
@@ -193,8 +192,13 @@
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; }
         
-        /* 전적 스크린샷 공유 버튼 가로 사이즈 수정 */
-        #shareBtn { width: 85%; margin: 10px auto; background: linear-gradient(145deg, #6c5ce7, #a29bfe); display: block; }
+        /* 전적 스크린샷 공유 버튼 사이즈 수정 (테이블과 동일 사이즈) */
+        #shareBtn { 
+            width: 100% !important; 
+            margin: 10px 0 20px 0 !important; 
+            background: linear-gradient(145deg, #6c5ce7, #a29bfe); 
+            display: block; 
+        }
         
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; }
         
@@ -298,6 +302,9 @@
 
 <div class="card stats-card">
     <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적 (이름을 터치해 봐!)</h2>
+    
+    <button id="shareBtn" class="save-btn" onclick="shareScreenshot()">📸 전적 스크린샷 공유</button>
+
     <table class="stats-table">
         <thead>
             <tr>
@@ -322,7 +329,6 @@
     <div id="resetSteps">
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
-    <button id="shareBtn" class="save-btn" onclick="shareScreenshot()">📸 전적 스크린샷 공유</button>
     <button id="exitBtn" class="exit-btn" style="margin-top: 10px;" onclick="showExitModal()">🚪 앱 종료</button>
 </div>
 
@@ -340,7 +346,7 @@
         const isDark = document.getElementById('themeSwitch').checked;
         document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        renderStats(); // 1위 이름 색상 갱신을 위해 다시 렌더링
+        renderStats();
     }
 
     function formatDate(dateInput) {
@@ -446,8 +452,6 @@
         const bodyHtml = sortedByWin.map(p => {
             const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
             let nameStyle = "font-weight:900; cursor:pointer; text-decoration: underline;";
-            
-            // 다크모드 시 1위 이름 색상 변경 반영
             if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0) nameStyle += `color:var(--rank1);`;
             else if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0) nameStyle += `color:var(--rankL);`;
             
