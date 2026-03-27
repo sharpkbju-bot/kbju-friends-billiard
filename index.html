@@ -69,9 +69,9 @@
             --sub-text: #cccccc;
             --label-text: #bbbbbb;
             --rank1: #4da3ff;
-            /* 수정 시 이름 식별을 위해 다크모드 전용 편집 배경색 조정 */
-            --edit-mode-bg: #1b5e20;
-            --edit-mode-border: #81c784;
+            /* 배경색은 그대로 유지 */
+            --edit-mode-bg: rgba(35, 35, 45, 0.9); 
+            --edit-mode-border: #27ae60;
         }
 
         [data-theme='dark'] #monthDisplay, 
@@ -88,7 +88,6 @@
         [data-theme='dark'] .zoom-wrap span,
         [data-theme='dark'] .input-row label { color: var(--label-text) !important; }
         
-        /* 다크모드에서 select 글자색을 흰색으로 고정하여 수정 모드에서도 잘 보이게 함 */
         [data-theme='dark'] select { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; }
         
         [data-theme='dark'] .game-item { background: linear-gradient(145deg, #2c2c2c, #333333); }
@@ -184,7 +183,7 @@
         .edit-active select {
             background-color: var(--edit-mode-bg) !important;
             border: 2px solid var(--edit-mode-border) !important;
-            color: var(--success) !important; /* 수정모드에서 텍스트 색상을 강조 */
+            color: #27ae60 !important; /* 수정모드에서 글자색을 그린(Green)으로 변경 */
         }
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
@@ -591,8 +590,8 @@
             document.body.innerHTML = `
                 <div style="background:linear-gradient(135deg, #4a90e2, #9370db); height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-family:sans-serif;">
                     <div style="font-size:60px; margin-bottom:20px;">👋</div>
-                    <div style="font-size:20px; font-weight:900; line-height:1.6;">앱이 종료되었습니다.<br>안녕히 가세요!</div>
-                    <div style="font-size:14px; margin-top:30px; opacity:0.8;">브라우저 하단의 [완료] 버튼이나<br>[X] 버튼을 눌러 창을 닫아주세요.</div>
+                    <div style="font-size:20px; font-weight:900; line-height:1.6;">앱 종료<br>안녕!</div>
+                    <div style="font-size:14px; margin-top:30px; opacity:0.8;">브라우저 하단의 [완료] 버튼이나<br>[X] 버튼 터치</div>
                 </div>`;
             document.body.style.backgroundImage = 'none';
             document.body.style.padding = '0';
