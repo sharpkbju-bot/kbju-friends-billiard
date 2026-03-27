@@ -418,21 +418,36 @@
     function resetInputs() { if(editMode) cancelEdit(); else { document.getElementById('playerCount').value = "3"; updateInputFields(); } }
     
     async function saveGame() {
+        // [검토 1] 미래 날짜 입력 방지 로직 (복구)
+        const realTodayStr = formatDate(new Date());
+        if (selectedDateStr > realTodayStr) {
+            return alert("미래 날짜에는 기록을 저장할 수 없습니다!");
+        }
+
         const count = parseInt(document.getElementById('playerCount').value); const ranks = [];
         for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("친구를 선택해줘!"); ranks.push(val); }
         if(new Set(ranks).size !== ranks.length) return alert("중복된 친구가 있어!");
+        
         showLoading(true, "저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); fetchData(); cancelEdit(); } catch (e) { alert("오류 발생!"); showLoading(false); }
     }
 
-     function confirmReset(step) {
+    // [검토 2] 초기화 확인 로직 3단계 (복구)
+    function confirmReset(step) {
         const el = document.getElementById('resetSteps');
-        if(step === 1) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[1단계] 데이터를 지울까요?</div><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
-        else if(step === 2) el.innerHTML = `<div style="font-weight:bold; color:var(--accent); margin-bottom:10px;">[2단계] 복구 불가! 계속할까요?</div><button class="reset-btn" style="background:#e67e22" onclick="confirmReset(3)">OK</button><button class="cancel-btn" onclick="cancelReset()">NO</button>`;
-        else if(step === 3) el.innerHTML = `<button class="reset-btn" style="background:var(--accent); font-size:16px;" onclick="executeReset()">[최종 확인] 🔥 마지막.<br class="zoom-br"> 모두 삭제합니다.</button><button class="cancel-btn" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
+        if(step === 1) {
+            el.innerHTML = `<button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">정말 초기화할까요? (1/2)</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button>`;
+        } else if(step === 2) {
+            el.innerHTML = `<button class="reset-btn" style="background:var(--accent)" onclick="confirmReset(3)">데이터가 모두 삭제됩니다. (최종 확인)</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button>`;
+        } else if(step === 3) {
+            executeReset();
+        }
     }
-    function cancelReset() { document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; }
+    function cancelReset() { 
+        document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; 
+    }
+
     async function executeReset() { showLoading(true, "초기화 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); } catch(e) { showLoading(false); } }
 
     function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
@@ -546,14 +561,12 @@
             if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); }
         }, 3000);
 
-        // --- 아이폰(iOS) 전용 종료 로직 ---
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if(isIOS) {
             document.getElementById('exitBtn').innerText = "📱 Return Home";
             document.getElementById('exit-msg').innerHTML = "SWIPE UP<br>다음에 또 보자!";
             document.getElementById('modalOkBtn').innerText = "확인";
         }
-        // ------------------------------
 
         updateInputFields(); 
         fetchData(); 
