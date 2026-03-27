@@ -22,10 +22,10 @@
                 shareBtn.id = 'custom-share-btn';
                 shareBtn.innerHTML = "📸 전적 스크린샷 공유";
                 shareBtn.style.cssText = `
-                    width: 95%; padding: 14px; background: linear-gradient(145deg, #6a11cb, #2575fc);
+                    width: 100%; padding: 16px; background: linear-gradient(145deg, #6a11cb, #2575fc);
                     color: white; border: none; border-radius: 18px; font-weight: 800;
-                    margin: 0 auto 20px auto; display: block; box-shadow: 4px 4px 15px rgba(0,0,0,0.15);
-                    cursor: pointer; font-size: 14px;
+                    margin: 10 auto 20px 0; display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+                    cursor: pointer; font-size: 15px;
                 `;
 
                 shareBtn.onclick = async () => {
