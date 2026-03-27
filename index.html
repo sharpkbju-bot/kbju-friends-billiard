@@ -510,7 +510,7 @@
         }).join('');
         document.getElementById('statsBody').innerHTML = bodyHtml;
         const richFriend = document.getElementById('richFriendArea');
-        if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:14px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; } else richFriend.style.display = 'none';
+        if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:15px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; } else richFriend.style.display = 'none';
     }
 
     function renderMemberHistory(name) {
