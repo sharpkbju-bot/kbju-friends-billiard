@@ -69,6 +69,9 @@
             --sub-text: #cccccc;
             --label-text: #bbbbbb;
             --rank1: #4da3ff;
+            /* 다크모드 수정 시 배경과 글자색(그린) */
+            --edit-mode-bg: #1b5e20;
+            --edit-mode-text: #27ae60;
         }
 
         [data-theme='dark'] #monthDisplay, 
@@ -174,9 +177,11 @@
             -webkit-appearance: none; text-align: center; text-align-last: center; 
         }
 
+        /* 수정 모드 활성화 시 스타일 - 다크모드 가독성 확보 */
         .edit-active select {
             background-color: var(--edit-mode-bg) !important;
             border: 2px solid var(--edit-mode-border) !important;
+            color: var(--edit-mode-text, #27ae60) !important; 
         }
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
@@ -222,11 +227,14 @@
 
         .toast-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.7); color: white; padding: 12px 25px; border-radius: 20px; font-weight: 800; font-size: 14px; z-index: 10002; display: none; }
 
+        /* 하단 버튼 및 초기화 영역 스타일 수정 */
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
-        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; }
+        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 16px; margin-bottom: 1.0mm; cursor: pointer; }
+        .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 16px; cursor: pointer; }
         
-        .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 16px; }
-        
+        /* 초기화 확인 단계에서의 버튼 간격 1mm 유지 */
+        #resetSteps { display: flex; flex-direction: column; gap: 1.0mm; }
+
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
         .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
@@ -352,7 +360,7 @@
     <div id="resetSteps">
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
-    <button id="exitBtn" class="exit-btn" style="margin-top: 10px;" onclick="showExitModal()">🚪 앱 종료</button>
+    <button id="exitBtn" class="exit-btn" style="margin-top: 1.0mm;" onclick="showExitModal()">🚪 앱 종료</button>
 </div>
 
 <script>
@@ -466,11 +474,11 @@
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) {
-            el.innerHTML = `<button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">[1단계] 정말 초기화할까요?</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button>`;
+            el.innerHTML = `<button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">[1단계] 정말 초기화할까요?</button><button class="reset-btn btn-cancel" style="background:#bdc3c7" onclick="cancelReset()">취소</button>`;
         } else if(step === 2) {
-            el.innerHTML = `<button class="reset-btn" style="background:var(--accent)" onclick="confirmReset(3)">[2단계] 데이터가 모두 삭제됩니다.</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button>`;
+            el.innerHTML = `<button class="reset-btn" style="background:var(--accent)" onclick="confirmReset(3)">[2단계] 데이터가 모두 삭제됩니다.</button><button class="reset-btn btn-cancel" style="background:#bdc3c7" onclick="cancelReset()">취소</button>`;
         } else if(step === 3) {
-            el.innerHTML = `<button class="reset-btn" style="background:#000; color:#fff;" onclick="executeReset()">[최종 확인] 복구 불가! 삭제합니다.</button><button class="save-btn btn-cancel" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
+            el.innerHTML = `<button class="reset-btn" style="background:#000; color:#fff;" onclick="executeReset()">[최종 확인] 복구 불가! OK</button><button class="reset-btn btn-cancel" style="background:#bdc3c7" onclick="cancelReset()">아냐. 경배한테 혼난다.(취소)</button>`;
         }
     }
     function cancelReset() { 
@@ -539,7 +547,6 @@
         historyArea.innerHTML = html; 
         historyArea.style.display = 'block';
         
-        // [수정 포인트 1] 멤버 전적 이동 기능
         setTimeout(() => {
             historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
@@ -577,10 +584,7 @@
         document.getElementById('editBadge').style.display = 'block'; 
         document.getElementById('inputCard').classList.add('edit-active');
         const btn = document.getElementById('mainBtn'); btn.innerText = "수정 완료"; btn.classList.add('edit-btn');
-        
-        // [수정 포인트 2] 수정 모드 진입 시 입력창으로 스크롤 이동
         document.getElementById('inputCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        
         closeAllOverlays();
     }
 
