@@ -12,6 +12,8 @@
     <link rel="apple-touch-icon" href="image_0.png">
     
     <title>우리들의 Billiard World</title>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
     <style>
         :root { 
@@ -363,7 +365,7 @@
         <div style="font-size: 24px; margin-bottom: 10px;">🏆</div>
         <div style="font-size: 18px; font-weight: 900; color: var(--text-color); margin-bottom: 20px;">오늘의 경기 결과</div>
         <div id="card-list"></div>
-        <button class="save-btn" style="background: linear-gradient(145deg, #4a90e2, #357abd); margin-top: 20px;" onclick="shareResultText()">💬 결과 복사해서 공유</button>
+        <button class="save-btn" style="background: linear-gradient(145deg, #4a90e2, #357abd); margin-top: 20px;" onclick="shareResultImage()">📸 결과 이미지로 공유</button>
         <button class="save-btn btn-cancel" style="margin-top: 10px;" onclick="closeResultCard()">닫기</button>
     </div>
 </div>
@@ -778,21 +780,72 @@ function closeResultCard() {
     document.getElementById('result-card-modal').style.display = 'none';
 }
 
-function shareResultText() {
-    const rows = document.querySelectorAll('.result-row');
-    let text = `[🏆 오늘의 당구 결과]\n날짜: ${selectedDateStr}\n\n`;
-    rows.forEach(row => {
-        const label = row.children[0].innerText;
-        const name = row.children[1].innerText;
-        text += `${label}: ${name}\n`;
-    });
-    text += `\n모두 고생했어! 🔥`;
+// 팝업 화면을 이미지로 캡처하여 공유 (카톡 호환)
+async function shareResultImage() {
+    if (typeof html2canvas === 'undefined') {
+        alert("이미지 캡처 기능을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
+        return;
+    }
 
-    navigator.clipboard.writeText(text).then(() => {
-        alert("결과가 복사되었습니다! 카톡방에 붙여넣으세요.");
-    }).catch(err => {
-        alert("복사 실패. 브라우저 설정 확인이 필요합니다.");
-    });
+    const card = document.querySelector('#result-card-modal .card-content');
+    const btns = card.querySelectorAll('button');
+    const originalText = btns[0].innerText;
+
+    btns[0].innerText = "⏳ 캡처 중...";
+    btns[1].style.display = 'none';
+
+    try {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const bgColor = isDark ? '#3c3c41' : '#fcfaff'; 
+
+        await new Promise(res => setTimeout(res, 50));
+        btns[0].style.display = 'none';
+
+        const canvas = await html2canvas(card, {
+            scale: 2, 
+            backgroundColor: bgColor,
+            windowWidth: card.scrollWidth,
+            windowHeight: card.scrollHeight
+        });
+
+        btns[0].style.display = '';
+        btns[1].style.display = '';
+        btns[0].innerText = originalText;
+
+        canvas.toBlob(async (blob) => {
+            if (!blob) return alert("이미지 생성 실패");
+            const file = new File([blob], 'billiard_result.png', { type: 'image/png' });
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        title: '🏆 오늘의 당구 결과',
+                        files: [file]
+                    });
+                } catch (err) {
+                    console.log("공유 취소 또는 미지원");
+                }
+            } else {
+                try {
+                    const item = new window.ClipboardItem({ "image/png": blob });
+                    await navigator.clipboard.write([item]);
+                    alert("📸 이미지가 클립보드에 복사되었습니다! 카톡 창에 붙여넣기(Ctrl+V) 하세요.");
+                } catch (err) {
+                    const link = document.createElement('a');
+                    link.download = '오늘의_당구결과.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    alert("이미지가 다운로드 되었습니다.");
+                }
+            }
+        }, 'image/png');
+
+    } catch (error) {
+        btns[0].style.display = '';
+        btns[1].style.display = '';
+        btns[0].innerText = originalText;
+        alert("이미지 캡처 중 오류 발생");
+    }
 }
 // --- 추가 끝 ---
     
