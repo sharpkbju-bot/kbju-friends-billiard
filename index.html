@@ -68,7 +68,12 @@
             --text-color: #eeeeee;
             --sub-text: #cccccc;
             --label-text: #bbbbbb;
-            --rank1: #4da3ff;
+            /* 다크모드 순위별 숫자 색상 보정: 더 밝고 진하게 수정 */
+            --rank1: #64b5f6; 
+            --rank2: #81c784; 
+            --rank3: #ba68c8; 
+            --rank4: #ffb74d; 
+            --rankL: #ff8a80; 
             --edit-mode-bg: rgba(35, 35, 45, 0.9); 
             --edit-mode-border: #27ae60;
         }
@@ -233,13 +238,11 @@
         
         .game-item { position: relative; padding: 18px 8px; border-radius: 22px; background: linear-gradient(145deg, #f0f0f0, #ffffff); margin-top: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8); cursor: pointer; transition: transform 0.2s ease; }
         
-        /* [수정 부분] 기본 20px 유지 및 줌 1.2배 대응 클래스 추가 */
         .game-info { font-size: 20px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; transition: font-size 0.2s; }
         .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
 
-        /* 줌 1.2배 상태일 때 글자가 카드를 벗어나지 않도록 강제 축소 */
         .zoom-active .game-info { font-size: 16px !important; }
-        .zoom-active .game-info span { font-size: 11px !important; } /* 1G, 2G 글자 크기만 더 축소 */
+        .zoom-active .game-info span { font-size: 10px !important; } 
         
         .action-overlay { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
@@ -560,7 +563,6 @@
         setTimeout(() => { historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
     }
 
-    /* [수정 부분] 줌 상태에 따라 body에 클래스 추가/제거 로직 삽입 */
     function changeZoom(v) { 
         document.body.style.zoom = v; 
         if(v === '1.2') document.body.classList.add('zoom-active');
