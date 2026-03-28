@@ -69,7 +69,14 @@
             --sub-text: #cccccc;
             --label-text: #bbbbbb;
             --rank1: #4da3ff;
+            /* 다크모드 수정 상태 전용 컬러 */
+            --edit-mode-bg: rgba(46, 204, 113, 0.15);
+            --edit-mode-border: #2ecc71;
+            --edit-mode-text: #2ecc71;
         }
+
+        /* [추가] 다크모드 내비게이션 버튼 가독성 */
+        [data-theme='dark'] .nav-btn { color: #ffffff !important; background: rgba(255, 255, 255, 0.1) !important; }
 
         [data-theme='dark'] #monthDisplay, 
         [data-theme='dark'] #selectedDateTitle,
@@ -88,6 +95,11 @@
         [data-theme='dark'] select { background: rgba(60, 60, 60, 0.5); color: #fff; }
         [data-theme='dark'] .game-item { background: linear-gradient(145deg, #2c2c2c, #333333); }
         [data-theme='dark'] .game-info { color: #eee; }
+
+        /* [수정] 다크모드 수정 모드 컬러 적용 */
+        [data-theme='dark'] .edit-active { border: 3px solid var(--edit-mode-border) !important; }
+        [data-theme='dark'] .edit-active #selectedDateTitle { color: var(--edit-mode-text) !important; }
+        [data-theme='dark'] .edit-active label { color: var(--edit-mode-text) !important; }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
@@ -154,7 +166,7 @@
         .day.has-record { background: var(--record-bg); border: 2px solid var(--record-border); color: #2e7d32; }
         .day.has-record::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--record-dot); border-radius: 50%; }
         
-        .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
+        .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); transition: border 0.3s ease; }
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; }
         
         select#playerCount { 
@@ -174,9 +186,10 @@
             -webkit-appearance: none; text-align: center; text-align-last: center; 
         }
 
-        .edit-active select {
+        /* 수정 모드 활성화 시 전체 카드 스타일 */
+        .edit-active {
+            border: 3px solid var(--edit-mode-border) !important;
             background-color: var(--edit-mode-bg) !important;
-            border: 2px solid var(--edit-mode-border) !important;
         }
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
@@ -191,7 +204,7 @@
             transition: 0.2s all ease;
         }
         button.save-btn:active { transform: scale(0.97); }
-        button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
+        button.edit-btn { background: linear-gradient(145deg, #2ecc71, #27ae60) !important; }
         
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .btn-group button { flex: 1; margin-top: 0 !important; }
@@ -211,19 +224,17 @@
 
         .toast-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.7); color: white; padding: 12px 25px; border-radius: 20px; font-weight: 800; font-size: 14px; z-index: 10002; display: none; }
 
-        /* [수정] 위험 구역 및 버튼 1mm 수직 스택 디자인 */
         .danger-zone { 
             margin-top: 50px; padding: 25px; border-radius: 28px; 
             background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); 
             text-align: center; 
-            display: flex; flex-direction: column; align-items: center; gap: 1mm; /* 1mm 간격 */
+            display: flex; flex-direction: column; align-items: center; gap: 1mm;
         }
         
         #resetArea { 
             width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1mm; 
         }
 
-        /* 공통 슬림 버튼 스타일 */
         .slim-btn {
             width: 100%; max-width: 280px; border: none; padding: 10px; border-radius: 14px; 
             font-weight: 800; font-size: 14px; box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
@@ -463,31 +474,18 @@
         try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); cancelEdit(); fetchData(); } catch (e) { alert("오류 발생!"); showLoading(false); }
     }
 
-    // [수정] 단계별 OK -> 취소 -> 앱 종료 수직 정렬 로직
     function confirmReset(step) {
         const el = document.getElementById('resetArea');
         let confirmBtnHtml = '';
-        
-        if(step === 1) {
-            confirmBtnHtml = `<button class="slim-btn step-confirm-btn" onclick="confirmReset(2)">OK (계속 진행)</button>`;
-        } else if(step === 2) {
-            confirmBtnHtml = `<button class="slim-btn final-confirm-btn" onclick="confirmReset(3)">OK (진짜 삭제할까요?)</button>`;
-        } else if(step === 3) {
-            confirmBtnHtml = `<button class="slim-btn ok-confirm-btn" onclick="executeReset()">OK (확정)</button>`;
-        }
+        if(step === 1) confirmBtnHtml = `<button class="slim-btn step-confirm-btn" onclick="confirmReset(2)">OK (계속 진행)</button>`;
+        else if(step === 2) confirmBtnHtml = `<button class="slim-btn final-confirm-btn" onclick="confirmReset(3)">OK (진짜 삭제할까요?)</button>`;
+        else if(step === 3) confirmBtnHtml = `<button class="slim-btn ok-confirm-btn" onclick="executeReset()">OK (확정)</button>`;
 
-        el.innerHTML = `
-            ${confirmBtnHtml}
-            <button class="slim-btn cancel-btn" onclick="cancelReset()">취소</button>
-            <button class="slim-btn exit-btn" onclick="showExitModal()">🚪 앱 종료</button>
-        `;
+        el.innerHTML = `${confirmBtnHtml}<button class="slim-btn cancel-btn" onclick="cancelReset()">취소</button><button class="slim-btn exit-btn" onclick="showExitModal()">🚪 앱 종료</button>`;
     }
 
     function cancelReset() { 
-        document.getElementById('resetArea').innerHTML = `
-            <button class="slim-btn reset-btn" id="startResetBtn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화</button>
-            <button class="slim-btn exit-btn" id="mainExitBtn" onclick="showExitModal()">🚪 앱 종료</button>
-        `; 
+        document.getElementById('resetArea').innerHTML = `<button class="slim-btn reset-btn" id="startResetBtn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화</button><button class="slim-btn exit-btn" id="mainExitBtn" onclick="showExitModal()">🚪 앱 종료</button>`; 
     }
 
     async function executeReset() { showLoading(true, "초기화 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); } catch(e) { showLoading(false); } }
@@ -518,6 +516,7 @@
         if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:16px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; } else richFriend.style.display = 'none';
     }
 
+    // [복구] 최근 5경기 영역으로 포커싱
     function renderMemberHistory(name) {
         const historyArea = document.getElementById('memberHistoryArea');
         const personalGames = gameLogs.filter(g => g.ranks.includes(name)).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
@@ -532,7 +531,10 @@
             const rankLabel = (rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
             html += `<div class="history-item"><span style="font-size:14px; color:#5D4037;">${g.dateStr}</span><span style="font-size:15px; color:${rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : '#5D4037')};">${rankLabel}</span></div>`;
         });
-        historyArea.innerHTML = html; historyArea.style.display = 'block';
+        historyArea.innerHTML = html; 
+        historyArea.style.display = 'block';
+        // 부드럽게 화면 이동
+        historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     function changeZoom(v) { document.body.style.zoom = v; }
@@ -559,12 +561,20 @@
 
     function closeAllOverlays() { document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active')); }
 
+    // [복구] 수정 시 상단 입력 카드로 포커싱 및 그린 테마 적용
     function enterEditMode(round, rankStr) { 
-        editMode = true; editRound = round; updateInputFields(rankStr.split(',')); 
+        editMode = true; 
+        editRound = round; 
+        updateInputFields(rankStr.split(',')); 
+        const inputCard = document.getElementById('inputCard');
         document.getElementById('editBadge').style.display = 'block'; 
-        document.getElementById('inputCard').classList.add('edit-active');
-        const btn = document.getElementById('mainBtn'); btn.innerText = "수정 완료"; btn.classList.add('edit-btn');
-        window.scrollTo({ top: 0, behavior: 'smooth' }); closeAllOverlays();
+        inputCard.classList.add('edit-active');
+        const btn = document.getElementById('mainBtn'); 
+        btn.innerText = "수정 완료"; 
+        btn.classList.add('edit-btn');
+        // 부드럽게 화면 이동
+        inputCard.scrollIntoView({ behavior: 'smooth' }); 
+        closeAllOverlays();
     }
 
     function cancelEdit() { 
