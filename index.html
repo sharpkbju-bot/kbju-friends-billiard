@@ -232,10 +232,14 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .game-item { position: relative; padding: 18px 8px; border-radius: 22px; background: linear-gradient(145deg, #f0f0f0, #ffffff); margin-top: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8); cursor: pointer; transition: transform 0.2s ease; }
-        .game-info { font-size: 20px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; }
+        
+        /* [수정 부분] 기본 20px 유지 및 줌 1.2배 대응 클래스 추가 */
+        .game-info { font-size: 20px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; transition: font-size 0.2s; }
         .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
 
-        /* 수정, 삭제, 취소 오버레이 스타일 개선 */
+        /* 줌 1.2배 상태일 때 글자가 카드를 벗어나지 않도록 강제 축소 */
+        .zoom-active .game-info { font-size: 16px !important; }
+
         .action-overlay { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(255, 255, 255, 0.6); 
@@ -252,10 +256,9 @@
         }
         .overlay-btn:active { transform: scale(0.95); }
 
-        /* 파스텔톤 버튼 색상 */
-        .btn-edit-p { background: #d1e9ff; color: #0056b3; } /* 파스텔 블루 */
-        .btn-del-p { background: #ffdada; color: #d63031; }  /* 파스텔 레드 */
-        .btn-cancel-p { background: #f0f0f0; color: #636e72; } /* 파스텔 그레이 */
+        .btn-edit-p { background: #d1e9ff; color: #0056b3; } 
+        .btn-del-p { background: #ffdada; color: #d63031; }  
+        .btn-cancel-p { background: #f0f0f0; color: #636e72; } 
 
         [data-theme='dark'] .btn-edit-p { background: #2c3e50; color: #3498db; }
         [data-theme='dark'] .btn-del-p { background: #4b2323; color: #ff7675; }
@@ -556,7 +559,12 @@
         setTimeout(() => { historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
     }
 
-    function changeZoom(v) { document.body.style.zoom = v; }
+    /* [수정 부분] 줌 상태에 따라 body에 클래스 추가/제거 로직 삽입 */
+    function changeZoom(v) { 
+        document.body.style.zoom = v; 
+        if(v === '1.2') document.body.classList.add('zoom-active');
+        else document.body.classList.remove('zoom-active');
+    }
 
     function renderGameList() {
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr); const listArea = document.getElementById('dayGameList');
