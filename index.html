@@ -197,14 +197,11 @@
         .btn-group button { flex: 1; margin-top: 0 !important; }
         .btn-cancel { background: #bdc3c7 !important; padding: 10px 16px !important; border-radius: 14px !important; font-size: 14px !important; }
 
-        /* 테이블 레이아웃 최적화 */
         .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; table-layout: fixed; }
         .stats-table th { padding: 10px 2px; color: #5D4037; font-weight: 900; text-transform: uppercase; font-size: 10px; border-bottom: 2px solid rgba(0,0,0,0.05); white-space: nowrap; }
         .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
-        
         .stats-table th:first-child, .stats-table td:first-child { width: 18%; text-align: left; padding-left: 10px; border-radius: 12px 0 0 12px; }
         .stats-table th:last-child, .stats-table td:last-child { width: 18%; text-align: right; padding-right: 10px; border-radius: 0 12px 12px 0; }
-        
         .stats-table td { padding: 14px 2px; text-align: center; font-weight: 800; color: var(--text-color); white-space: nowrap; } 
         .val-highlight { font-size: 13px; }
         .win-rate-pill { color: #27ae60; font-size: 11px; display: inline-block; text-align: right; width: 100%; font-weight: 800; }
@@ -214,29 +211,31 @@
 
         .toast-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.7); color: white; padding: 12px 25px; border-radius: 20px; font-weight: 800; font-size: 14px; z-index: 10002; display: none; }
 
-        /* [수정] 위험 구역 및 버튼 슬림 디자인 & 1mm 간격 */
+        /* [수정] 위험 구역 및 버튼 1mm 수직 스택 디자인 */
         .danger-zone { 
             margin-top: 50px; padding: 25px; border-radius: 28px; 
             background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); 
             text-align: center; 
-            display: flex; flex-direction: column; align-items: center; gap: 1mm; /* 버튼 간 1mm 간격 */
+            display: flex; flex-direction: column; align-items: center; gap: 1mm; /* 1mm 간격 */
         }
         
-        #resetSteps { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1mm; }
-        .reset-confirm-wrap { display: flex; gap: 1mm; width: 100%; justify-content: center; }
+        #resetArea { 
+            width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1mm; 
+        }
 
-        .reset-btn { 
-            width: 100%; max-width: 280px; background: linear-gradient(145deg, #e67e22, #d35400); 
-            color: white; border: none; padding: 11px 20px; border-radius: 14px; 
+        /* 공통 슬림 버튼 스타일 */
+        .slim-btn {
+            width: 100%; max-width: 280px; border: none; padding: 10px; border-radius: 14px; 
             font-weight: 800; font-size: 14px; box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
-            transition: 0.2s;
+            transition: 0.2s; cursor: pointer;
         }
-        
-        .exit-btn { 
-            width: 100%; max-width: 280px; background: linear-gradient(145deg, #7f8c8d, #626e6e); 
-            color: white; border: none; padding: 11px 20px; border-radius: 14px; 
-            font-weight: 800; font-size: 14px; box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
-        }
+
+        .reset-btn { background: linear-gradient(145deg, #e67e22, #d35400); color: white; }
+        .cancel-btn { background: #bdc3c7 !important; color: white; }
+        .exit-btn { background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; }
+        .ok-confirm-btn { background: #000 !important; color: white; }
+        .step-confirm-btn { background: var(--edit) !important; color: white; }
+        .final-confirm-btn { background: var(--accent) !important; color: white; }
         
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
@@ -338,7 +337,6 @@
 
 <div class="card stats-card">
     <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적 (이름 터치)</h2>
-    
     <table class="stats-table">
         <thead>
             <tr>
@@ -360,10 +358,10 @@
 
 <div class="danger-zone">
     <div style="color:#7b1fa2; font-weight:900; margin-bottom:5px; font-size:11px;">초기화 버튼은 함부로 터치하지 마세요.</div>
-    <div id="resetSteps">
-        <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화</button>
+    <div id="resetArea">
+        <button class="slim-btn reset-btn" id="startResetBtn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화</button>
+        <button class="slim-btn exit-btn" id="mainExitBtn" onclick="showExitModal()">🚪 앱 종료</button>
     </div>
-    <button id="exitBtn" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button>
 </div>
 
 <script>
@@ -465,19 +463,31 @@
         try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); cancelEdit(); fetchData(); } catch (e) { alert("오류 발생!"); showLoading(false); }
     }
 
-    // [수정] 초기화 단계에서 버튼 레이아웃 및 'OK' 버튼 노출 로직 수정
+    // [수정] 단계별 OK -> 취소 -> 앱 종료 수직 정렬 로직
     function confirmReset(step) {
-        const el = document.getElementById('resetSteps');
+        const el = document.getElementById('resetArea');
+        let confirmBtnHtml = '';
+        
         if(step === 1) {
-            el.innerHTML = `<div class="reset-confirm-wrap"><button class="reset-btn" style="background:var(--edit)" onclick="confirmReset(2)">정말 초기화할까요?</button><button class="btn-cancel" onclick="cancelReset()">취소</button></div>`;
+            confirmBtnHtml = `<button class="slim-btn step-confirm-btn" onclick="confirmReset(2)">OK (계속 진행)</button>`;
         } else if(step === 2) {
-            el.innerHTML = `<div class="reset-confirm-wrap"><button class="reset-btn" style="background:var(--accent)" onclick="confirmReset(3)">진짜 지워요?</button><button class="btn-cancel" onclick="cancelReset()">취소</button></div>`;
+            confirmBtnHtml = `<button class="slim-btn final-confirm-btn" onclick="confirmReset(3)">OK (진짜 삭제할까요?)</button>`;
         } else if(step === 3) {
-            el.innerHTML = `<div class="reset-confirm-wrap"><button class="reset-btn" style="background:#000;" onclick="executeReset()">OK (삭제확정)</button><button class="btn-cancel" onclick="cancelReset()">취소</button></div>`;
+            confirmBtnHtml = `<button class="slim-btn ok-confirm-btn" onclick="executeReset()">OK (확정)</button>`;
         }
+
+        el.innerHTML = `
+            ${confirmBtnHtml}
+            <button class="slim-btn cancel-btn" onclick="cancelReset()">취소</button>
+            <button class="slim-btn exit-btn" onclick="showExitModal()">🚪 앱 종료</button>
+        `;
     }
+
     function cancelReset() { 
-        document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화</button>`; 
+        document.getElementById('resetArea').innerHTML = `
+            <button class="slim-btn reset-btn" id="startResetBtn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화</button>
+            <button class="slim-btn exit-btn" id="mainExitBtn" onclick="showExitModal()">🚪 앱 종료</button>
+        `; 
     }
 
     async function executeReset() { showLoading(true, "초기화 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); } catch(e) { showLoading(false); } }
@@ -578,7 +588,7 @@
         setTimeout(() => { const ws = document.getElementById('welcome-screen'); if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); } }, 3000);
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if(isIOS) {
-            document.getElementById('exitBtn').innerText = "📱 Return Home";
+            document.getElementById('mainExitBtn').innerText = "📱 Return Home";
             document.getElementById('exit-msg').innerHTML = "SWIPE UP<br>다음에 또 보자!";
             document.getElementById('modalOkBtn').innerText = "확인";
         }
