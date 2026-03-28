@@ -102,6 +102,42 @@
         [data-theme='dark'] .game-info { color: #eee; }
         [data-theme='dark'] .nav-btn { background: rgba(60, 60, 60, 0.6); color: #ffffff !important; box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5), -2px -2px 6px rgba(70, 70, 70, 0.3); }
 
+        /* --- 추가: 결과 카드 모달 스타일 --- */
+        #result-card-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 20000;
+            justify-content: center; align-items: center;
+        }
+        .card-content {
+            background: var(--card-bg);
+            width: 85%; max-width: 340px;
+            border-radius: 30px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            animation: fadeInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .result-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-radius: 18px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: var(--inner-shadow);
+        }
+        [data-theme='dark'] .result-row {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        /* --- 추가 끝 --- */
+
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
         body { 
@@ -322,6 +358,15 @@
     </div>
 </div>
 
+<div id="result-card-modal">
+    <div class="card-content">
+        <div style="font-size: 24px; margin-bottom: 10px;">🏆</div>
+        <div style="font-size: 18px; font-weight: 900; color: var(--text-color); margin-bottom: 20px;">오늘의 경기 결과</div>
+        <div id="card-list"></div>
+        <button class="save-btn" style="background: linear-gradient(145deg, #4a90e2, #357abd); margin-top: 20px;" onclick="shareResultText()">💬 결과 복사해서 공유</button>
+        <button class="save-btn btn-cancel" style="margin-top: 10px;" onclick="closeResultCard()">닫기</button>
+    </div>
+</div>
 <div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">순위 데이터 동기화 중</div></div>
 
 <div class="calendar-card">
@@ -505,6 +550,10 @@
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
         try { 
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); 
+            
+            // --- 추가: 수정 모드가 아닐 때만 결과 카드 띄우기 ---
+            if(!editMode) showResultCard(ranks); 
+            
             cancelEdit(); 
             document.getElementById('playerCount').value = "3";
             updateInputFields();
@@ -703,6 +752,49 @@ async function importData(event) {
     reader.readAsText(file);
 }
 // --- 데이터 백업 및 복구 로직 끝 ---
+
+// --- 추가: 오늘의 결과 카드 기능 시작 ---
+function showResultCard(ranks) {
+    const list = document.getElementById('card-list');
+    list.innerHTML = "";
+    
+    ranks.forEach((name, i) => {
+        const isFirst = (i === 0);
+        const isLast = (i === ranks.length - 1);
+        const label = isFirst ? "🥇 1위" : (isLast ? "💀 꼴찌" : `${i+1}위`);
+        const color = isFirst ? "var(--rank1)" : (isLast ? "var(--rankL)" : "var(--text-color)");
+        
+        list.innerHTML += `
+            <div class="result-row">
+                <span style="font-weight: 800; font-size: 13px; color: #888;">${label}</span>
+                <span style="font-weight: 900; font-size: 18px; color: ${color};">${name}</span>
+            </div>
+        `;
+    });
+    document.getElementById('result-card-modal').style.display = 'flex';
+}
+
+function closeResultCard() {
+    document.getElementById('result-card-modal').style.display = 'none';
+}
+
+function shareResultText() {
+    const rows = document.querySelectorAll('.result-row');
+    let text = `[🏆 오늘의 당구 결과]\n날짜: ${selectedDateStr}\n\n`;
+    rows.forEach(row => {
+        const label = row.children[0].innerText;
+        const name = row.children[1].innerText;
+        text += `${label}: ${name}\n`;
+    });
+    text += `\n모두 고생했어! 🔥`;
+
+    navigator.clipboard.writeText(text).then(() => {
+        alert("결과가 복사되었습니다! 카톡방에 붙여넣으세요.");
+    }).catch(err => {
+        alert("복사 실패. 브라우저 설정 확인이 필요합니다.");
+    });
+}
+// --- 추가 끝 ---
     
     window.onload = () => { 
         const savedTheme = localStorage.getItem('theme');
