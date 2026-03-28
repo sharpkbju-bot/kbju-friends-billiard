@@ -1,5 +1,6 @@
 // share.js - 그리드 현상 해결 및 렌더링 최적화 버전
 (function() {
+    // html2canvas 라이브러리 로드 (기존 로직 유지)
     const script = document.createElement('script');
     script.src = "https://html2canvas.hertzen.com/dist/html2canvas.min.js";
     document.head.appendChild(script);
@@ -19,6 +20,7 @@
                 const shareBtn = document.createElement('button');
                 shareBtn.id = 'custom-share-btn';
                 shareBtn.innerHTML = "📸 전적 스크린샷 공유";
+                // 사용자님의 기존 버튼 스타일 유지
                 shareBtn.style.cssText = `
                     width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc);
                     color: white; border: none; border-radius: 18px; font-weight: 800;
@@ -27,13 +29,14 @@
                 `;
 
                 shareBtn.onclick = async () => {
+                    // 다크모드 여부 확인 로직 유지
                     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
                     const targetColor = isDark ? '#1e1e1e' : '#ffffff';
                     
-                    // 캡처 옵션 최적화
+                    // 그리드 현상을 방지하기 위한 핵심 수정 사항
                     const canvas = await html2canvas(statsCard, {
-                        backgroundColor: targetColor, // null 대신 배경색 명시 (그리드 방지 핵심)
-                        scale: 3, // 해상도를 더 높여 경계선 노이즈 제거
+                        backgroundColor: targetColor, // 배경색을 명시하여 회색 그리드 방지
+                        scale: 3, // 해상도를 높여 선명도 확보
                         useCORS: true,
                         allowTaint: true,
                         scrollX: 0,
@@ -41,35 +44,32 @@
                         onclone: (clonedDoc) => {
                             const clonedCard = clonedDoc.querySelector('.stats-card');
                             if (clonedCard) {
-                                // 테두리 잔상 방지를 위해 overflow와 배경색 강제 적용
                                 clonedCard.style.backgroundColor = targetColor;
                                 clonedCard.style.borderRadius = '28px';
                                 clonedCard.style.overflow = 'hidden';
-                                clonedCard.style.border = 'none'; // 미세한 테두리 선 제거
+                                clonedCard.style.border = 'none'; // 미세한 잔상 제거
                                 
                                 const clonedBtn = clonedDoc.getElementById('custom-share-btn');
                                 if(clonedBtn) clonedBtn.style.display = 'none';
                             }
-
-                            // 내부 리스트 요소들의 스타일 정밀 조정
+                            // 기존 테이블 행 배경 설정 유지
                             const rows = clonedDoc.querySelectorAll('.stats-table tr');
                             rows.forEach(row => {
-                                row.style.border = 'none';
                                 row.style.backgroundColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)';
                             });
                         }
                     });
 
                     canvas.toBlob(async (blob) => {
-                        const file = new File([blob], 'billiard_result.png', { type: 'image/png' });
+                        const file = new File([blob], 'billiard_rank.png', { type: 'image/png' });
                         if (navigator.share) {
                             try {
-                                await navigator.share({ files: [file], title: '당구 전적', text: '오늘의 경기 결과입니다!' });
-                            } catch (e) { console.error("공유 실패:", e); }
+                                await navigator.share({ files: [file], title: '당구 전적', text: '오늘의 결과입니다!' });
+                            } catch (e) { }
                         } else {
                             const link = document.createElement('a');
                             link.href = URL.createObjectURL(blob);
-                            link.download = 'billiard_result.png';
+                            link.download = 'billiard_rank.png';
                             link.click();
                         }
                     }, 'image/png');
