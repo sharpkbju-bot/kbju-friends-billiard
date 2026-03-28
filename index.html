@@ -213,13 +213,17 @@
         .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; table-layout: fixed; }
         .stats-table th { padding: 8px 1px; color: #5D4037; font-weight: 900; text-transform: uppercase; font-size: 10px; border-bottom: 2px solid rgba(0,0,0,0.05); white-space: nowrap; }
         .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
-        .stats-table th:first-child { border-radius: 12px 0 0 12px; width: 22%; } 
-        .stats-table th:last-child { border-radius: 0 12px 12px 0; width: 25%; } 
+        
+        /* 수정 후 (이름 18%, 승률 18%로 축소하여 중간에 11%의 추가 공간 확보) */
+        .stats-table th:first-child { border-radius: 12px 0 0 12px; width: 18%; } 
+        .stats-table th:last-child { border-radius: 0 12px 12px 0; width: 18%; } 
 
         .stats-table tr { background: rgba(255, 255, 255, 0.4); }
         .stats-table td { padding: 12px 1px; text-align: center; font-weight: 800; color: var(--text-color); white-space: nowrap; } 
-        .stats-table td:first-child { border-radius: 12px 0 0 12px; text-align: left; padding-left: 12px; width: 22%; } 
-        .stats-table td:last-child { border-radius: 0 12px 12px 0; padding-right: 12px; width: 25%; text-align: right; } 
+
+        /* 수정 후 (여백을 12px -> 5px로 줄이고 너비 동기화) */
+        .stats-table td:first-child { border-radius: 12px 0 0 12px; text-align: left; padding-left: 5px; width: 18%; } 
+        .stats-table td:last-child { border-radius: 0 12px 12px 0; padding-right: 5px; width: 18%; text-align: right; } 
         .val-highlight { font-size: 13px; }
         .win-rate-pill { color: #27ae60; font-size: 11px; display: inline-block; text-align: right; width: 100%; font-weight: 800; }
 
