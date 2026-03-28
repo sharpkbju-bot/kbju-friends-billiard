@@ -1,4 +1,4 @@
-// share.js - 버튼 중복 생성 방지 및 위치 최적화 버전
+// share.js - 그리드 현상 해결 및 렌더링 최적화 버전
 (function() {
     const script = document.createElement('script');
     script.src = "https://html2canvas.hertzen.com/dist/html2canvas.min.js";
@@ -10,12 +10,10 @@
             const title = statsCard ? statsCard.querySelector('h2') : null;
 
             if (statsCard && title) {
-                // 중복 체크: 이미 커스텀 버튼이 있다면 중단
                 if (document.getElementById('custom-share-btn')) {
                     clearInterval(interval);
                     return;
                 }
-
                 clearInterval(interval);
 
                 const shareBtn = document.createElement('button');
@@ -24,17 +22,18 @@
                 shareBtn.style.cssText = `
                     width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc);
                     color: white; border: none; border-radius: 18px; font-weight: 800;
-                    margin: 10 auto 20px 0; display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+                    margin: 10px 0 20px 0; display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
                     cursor: pointer; font-size: 12px;
                 `;
 
                 shareBtn.onclick = async () => {
                     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-                    const richArea = document.getElementById('richFriendArea');
+                    const targetColor = isDark ? '#1e1e1e' : '#ffffff';
                     
+                    // 캡처 옵션 최적화
                     const canvas = await html2canvas(statsCard, {
-                        backgroundColor: null, 
-                        scale: 2,
+                        backgroundColor: targetColor, // null 대신 배경색 명시 (그리드 방지 핵심)
+                        scale: 3, // 해상도를 더 높여 경계선 노이즈 제거
                         useCORS: true,
                         allowTaint: true,
                         scrollX: 0,
@@ -42,46 +41,40 @@
                         onclone: (clonedDoc) => {
                             const clonedCard = clonedDoc.querySelector('.stats-card');
                             if (clonedCard) {
-                                clonedCard.style.backgroundColor = isDark ? '#1e1e1e' : '#ffffff';
+                                // 테두리 잔상 방지를 위해 overflow와 배경색 강제 적용
+                                clonedCard.style.backgroundColor = targetColor;
                                 clonedCard.style.borderRadius = '28px';
                                 clonedCard.style.overflow = 'hidden';
-                                // 캡처본에서는 버튼 숨기기
+                                clonedCard.style.border = 'none'; // 미세한 테두리 선 제거
+                                
                                 const clonedBtn = clonedDoc.getElementById('custom-share-btn');
                                 if(clonedBtn) clonedBtn.style.display = 'none';
                             }
 
-                            const clonedRichArea = clonedDoc.getElementById('richFriendArea');
-                            if(clonedRichArea) {
-                                clonedRichArea.style.boxShadow = 'none';
-                                clonedRichArea.style.border = 'none';
-                                clonedRichArea.style.width = '100%';
-                                clonedRichArea.style.margin = '20px 0 0 0';
-                                if(isDark) clonedRichArea.style.backgroundColor = 'rgba(50, 50, 50, 0.8)';
-                            }
-                            
+                            // 내부 리스트 요소들의 스타일 정밀 조정
                             const rows = clonedDoc.querySelectorAll('.stats-table tr');
                             rows.forEach(row => {
+                                row.style.border = 'none';
                                 row.style.backgroundColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)';
                             });
                         }
                     });
 
                     canvas.toBlob(async (blob) => {
-                        const file = new File([blob], 'billiard_rank.png', { type: 'image/png' });
+                        const file = new File([blob], 'billiard_result.png', { type: 'image/png' });
                         if (navigator.share) {
                             try {
-                                await navigator.share({ files: [file], title: '당구 전적', text: '오늘의 결과입니다!' });
-                            } catch (e) { }
+                                await navigator.share({ files: [file], title: '당구 전적', text: '오늘의 경기 결과입니다!' });
+                            } catch (e) { console.error("공유 실패:", e); }
                         } else {
                             const link = document.createElement('a');
                             link.href = URL.createObjectURL(blob);
-                            link.download = 'billiard_rank.png';
+                            link.download = 'billiard_result.png';
                             link.click();
                         }
                     }, 'image/png');
                 };
 
-                // 전적 카드 제목(h2) 바로 아래에 버튼 삽입
                 title.parentNode.insertBefore(shareBtn, title.nextSibling);
             }
         }, 500);
