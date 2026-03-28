@@ -671,8 +671,8 @@ async function importData(event) {
         try {
             const importedData = JSON.parse(e.target.result);
             if (!Array.isArray(importedData)) throw new Error();
-            if (confirm(`총 ${importedData.length}개의 기록을 클라우드에 복구할까요?\n기존 데이터는 모두 삭제되고 백업 파일 내용으로 대체됩니다.`)) {
-                showLoading(true, "데이터 복구 중 (잠시만 기다려주세요)");
+            if (confirm(`총 ${importedData.length}개의 기록. Cloud에 복구 진행.\n기존 데이터는 모두 삭제되고 백업 파일로 대체됨.`)) {
+                showLoading(true, "데이터 복구 중)");
                 // 1. 기존 데이터 초기화
                 await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
                 // 2. 데이터 순차 업로드
@@ -694,7 +694,7 @@ async function importData(event) {
                 location.reload();
             }
         } catch (err) {
-            alert("올바른 백업 파일(.json)이 아니거나 오류가 발생했습니다.");
+            alert("올바른 백업 파일(.json)이 아니거나 오류 발생");
         } finally {
             showLoading(false);
             event.target.value = ''; // 파일 선택 초기화
