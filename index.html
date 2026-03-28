@@ -672,7 +672,7 @@ async function importData(event) {
             const importedData = JSON.parse(e.target.result);
             if (!Array.isArray(importedData)) throw new Error();
             if (confirm(`총 ${importedData.length}개의 기록. Cloud에 복구 진행.\n기존 데이터는 모두 삭제되고 백업 파일로 대체됨.`)) {
-                showLoading(true, "데이터 복구 중)");
+                showLoading(true, "데이터 복구 중");
                 // 1. 기존 데이터 초기화
                 await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
                 // 2. 데이터 순차 업로드
