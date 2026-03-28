@@ -70,12 +70,14 @@
             --label-text: #bbbbbb;
             /* 다크모드 순위별 숫자 색상 보정: 더 밝고 진하게 수정 */
             --rank1: #64b5f6; 
-            --rank2: #81c784; 
+            --rank2: #2ecc71;   /* 수정 후(더 진하고 선명한 그린) */
             --rank3: #ba68c8; 
             --rank4: #ffb74d; 
             --rankL: #ff8a80; 
             --edit-mode-bg: rgba(35, 35, 45, 0.9); 
             --edit-mode-border: #27ae60;
+            /* 승률 열을 위해 아래 줄을 다크모드 스타일 구역에 추가 */
+            [data-theme='dark'] .win-rate-pill { color: #2ecc71 !important; }
         }
 
         [data-theme='dark'] #monthDisplay, 
