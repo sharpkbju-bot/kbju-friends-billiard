@@ -48,6 +48,7 @@
             --text-color: #444;
             --sub-text: #666;
             --label-text: #777;
+            --danger-text: #7b1fa2; /* 추가: 위험구역 텍스트 컬러 기본값 */
         }
 
         [data-theme='dark'] {
@@ -68,6 +69,7 @@
             --text-color: #eeeeee;
             --sub-text: #cccccc;
             --label-text: #bbbbbb;
+            --danger-text: #ffffff; /* 추가: 다크모드 시 위험구역 텍스트 흰색 */
             /* 다크모드 순위별 숫자 색상 보정: 더 밝고 진하게 수정 */
             --rank1: #64b5f6; 
             --rank2: #2ecc71;   /* 수정 후(더 진하고 선명한 그린) */
@@ -392,13 +394,13 @@
 </div>
 
 <div class="danger-zone">
-    <div style="color:#7b1fa2; font-weight:900; margin-bottom:15px; font-size:12px;">데이터 관리 및 백업</div>
+    <div style="color: var(--danger-text); font-weight:900; margin-bottom:15px; font-size:12px;">데이터 관리 및 백업</div>
     <div style="display: flex; gap: 10px; margin-bottom: 15px; justify-content: center;">
-        <button class="save-btn" style="background: linear-gradient(145deg, #ffae24, #da8c10); margin-top:0; flex:1; padding: 8px; font-size: 12px;" onclick="exportData()">📥 데이터 백업</button>
+        <button class="save-btn" style="background: linear-gradient(145deg, #4a90e2, #357abd); margin-top:0; flex:1; padding: 8px; font-size: 12px;" onclick="exportData()">📥 데이터 백업</button>
         <button class="save-btn" style="background:#3498db; margin-top:0; flex:1; padding: 8px; font-size: 12px;" onclick="triggerImport()">📤 데이터 복구</button>
     </div>
     <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importData(event)">
-    <div style="color:#7b1fa2; font-weight:900; margin-bottom:15px; font-size:12px;">초기화 버튼은 함부로 터치하지 마세요.</div>
+    <div style="color: var(--danger-text); font-weight:900; margin-bottom:15px; font-size:12px;">초기화 버튼은 함부로 터치하지 마세요.</div>
     <div id="resetSteps">
         <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
