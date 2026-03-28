@@ -499,7 +499,7 @@
         const realTodayStr = formatDate(new Date());
         if (selectedDateStr > realTodayStr) { return alert("미래에서 온거야? 날짜를 잘 확인혀!"); }
         const count = parseInt(document.getElementById('playerCount').value); const ranks = [];
-        for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("친구를 선택해줘!"); ranks.push(val); }
+        for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("친구를 선택해!"); ranks.push(val); }
         if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
         showLoading(true, "저장 중");
         const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
@@ -515,12 +515,12 @@
     function confirmReset(step) {
         const el = document.getElementById('resetSteps');
         if(step === 1) {
-            el.innerHTML = `<div style="color:#e67e22; font-weight:900; margin-bottom:10px;">[1단계] 정말 초기화할까요?</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:var(--edit);" onclick="confirmReset(2)">OK</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button><button id="exitBtnConfirm" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button></div>`;
+            el.innerHTML = `<div style="color:#e67e22; font-weight:900; margin-bottom:10px;">[1단계] 정말 삭제할거야?</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:var(--edit);" onclick="confirmReset(2)">OK</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button><button id="exitBtnConfirm" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button></div>`;
             document.getElementById('exitBtn').style.display = 'none';
         } else if(step === 2) {
-            el.innerHTML = `<div style="color:var(--accent); font-weight:900; margin-bottom:10px;">[2단계] 데이터가 모두 삭제됩니다.</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:var(--accent);" onclick="confirmReset(3)">OK</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button><button id="exitBtnConfirm" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button></div>`;
+            el.innerHTML = `<div style="color:var(--accent); font-weight:900; margin-bottom:10px;">[2단계] 데이터가 모두 삭제돼!</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:var(--accent);" onclick="confirmReset(3)">OK</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button><button id="exitBtnConfirm" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button></div>`;
         } else if(step === 3) {
-            el.innerHTML = `<div style="color:#000; font-weight:900; margin-bottom:10px;">[최종 확인] 복구 불가! 삭제합니다.</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:#000; color:#fff;" onclick="executeReset()">OK</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button><button id="exitBtnConfirm" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button></div>`;
+            el.innerHTML = `<div style="color:#000; font-weight:900; margin-bottom:10px;">[최종 확인] 복구 불가! 진짜 삭제!</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:#000; color:#fff;" onclick="executeReset()">OK</button><button class="save-btn btn-cancel" onclick="cancelReset()">아냐. 경배한테 혼나.(취소)</button><button id="exitBtnConfirm" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button></div>`;
         }
     }
     function cancelReset() { 
