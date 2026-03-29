@@ -48,7 +48,7 @@
             --text-color: #444;
             --sub-text: #666;
             --label-text: #777;
-            --danger-text: #7b1fa2; /* 추가: 위험구역 텍스트 컬러 기본값 */
+            --danger-text: #7b1fa2; 
         }
 
         [data-theme='dark'] {
@@ -62,23 +62,21 @@
             --record-border: #81c784;
             --shadow: 8px 8px 16px rgba(0, 0, 0, 0.6), -4px -4px 10px rgba(60, 60, 60, 0.2);
             --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.7), inset -2px -2px 5px rgba(60, 60, 60, 0.2);
-            --card-bg: rgba(60, 60, 65, 0.9);  /* 부드러운 짙은 그레이로 변경 */
+            --card-bg: rgba(60, 60, 65, 0.9);  
             --dup-bg: #3e2723;
             --dup-border: #ff5252;
             --dup-text: #ffccbc;
             --text-color: #eeeeee;
             --sub-text: #cccccc;
             --label-text: #bbbbbb;
-            --danger-text: #ffffff; /* 추가: 다크모드 시 위험구역 텍스트 흰색 */
-            /* 다크모드 순위별 숫자 색상 보정: 더 밝고 진하게 수정 */
+            --danger-text: #ffffff; 
             --rank1: #64b5f6; 
-            --rank2: #2ecc71;   /* 수정 후(더 진하고 선명한 그린) */
+            --rank2: #2ecc71;   
             --rank3: #ba68c8; 
             --rank4: #ffb74d; 
             --rankL: #ff8a80; 
             --edit-mode-bg: rgba(35, 35, 45, 0.9); 
             --edit-mode-border: #27ae60;
-            /* 승률 열을 위해 아래 줄을 다크모드 스타일 구역에 추가 */
             [data-theme='dark'] .win-rate-pill { color: #2ecc71 !important; }
         }
 
@@ -213,21 +211,42 @@
         .btn-cancel { background: #bdc3c7 !important; }
 
         .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; table-layout: fixed; }
-        .stats-table th { padding: 8px 0px; color: #5D4037; font-weight: 900; text-transform: uppercase; font-size: 12px; border-bottom: 2px solid rgba(0,0,0,0.05); white-space: nowrap; }
+        .stats-table th { 
+            padding: 8px 0px; 
+            color: #5D4037; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            font-size: 12px; 
+            border-bottom: 2px solid rgba(0,0,0,0.05); 
+            white-space: nowrap; 
+        }
         .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
         
-        /* 수정 후 (이름 20%, 승률 20%로 축소하 공간 확보) */
         .stats-table th:first-child { border-radius: 12px 0 0 12px; width: 15%; padding-left: 5px; } 
         .stats-table th:last-child { border-radius: 0 12px 12px 0; width: 15%; } 
 
         .stats-table tr { background: rgba(255, 255, 255, 0.4); }
-        .stats-table td { padding: 12px 0px; text-align: center; font-weight: 800; color: var(--text-color); white-space: nowrap; font-size: 14px;}  /* <--- 이 부분을 원하는 크기로 수정하세요 */ 
+        .stats-table td { 
+            padding: 12px 0px; 
+            text-align: center; 
+            font-weight: 800; 
+            color: var(--text-color); 
+            white-space: nowrap; 
+            font-size: 14px; 
+        }
 
-        /* 수정 후 (여백을 12px -> 10px로 줄이고 너비 동기화) */
         .stats-table td:first-child { border-radius: 12px 0 0 12px; text-align: left; padding-left: 5px; width: 15%; } 
         .stats-table td:last-child { border-radius: 0 12px 12px 0; padding-right: 5px; width: 15%; text-align: right; } 
+        
         .val-highlight { font-size: 13px; }
-        .win-rate-pill { color: #27ae60; font-size: 13px; display: inline-block; text-align: right; width: 100%; font-weight: 800; }
+        .win-rate-pill { 
+            color: #27ae60; 
+            font-size: 13px; 
+            display: inline-block; 
+            text-align: right; 
+            width: 100%; 
+            font-weight: 800; 
+        }
 
         .history-area { margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; display: none; animation: fadeIn 0.3s ease; }
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255, 252, 212, 0.85); border-radius: 12px; margin-bottom: 8px; font-weight: 800; color: #555; border: 2.5px solid #ff69b4; }
@@ -300,6 +319,15 @@
             margin: 0 !important;
             width: 100%;
         }
+
+        /* 공유 버튼 스타일 정의 */
+        .share-btn-common {
+            width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc);
+            color: white; border: none; border-radius: 18px; font-weight: 800;
+            display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer; font-size: 12px; transition: transform 0.2s;
+        }
+        .share-btn-common:active { transform: scale(0.98); }
     </style>
 </head>
 <body id="app-body">
@@ -586,7 +614,11 @@
     function renderGameList() {
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr); const listArea = document.getElementById('dayGameList');
         if(games.length > 0) {
-            let html = `<div style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">RECORD</span></div>`;
+            let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">RECORD</span></div>`;
+            
+            // --- 오늘의 전적 공유 버튼 추가 ---
+            html += `<button id="today-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareTodayResult()">📸 오늘의 전적 스크린샷 공유</button>`;
+            
             games.forEach((g, idx) => { 
                 const names = g.ranks.filter(n => n && n.trim() !== ""); 
                 const styledNames = names.map((name, i) => `<span style="color:${i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)')};">${name}</span>`);
@@ -594,6 +626,51 @@
             });
             listArea.innerHTML = html;
         } else listArea.innerHTML = "";
+    }
+
+    /* --- 오늘의 전적 공유 기능 구현 --- */
+    async function shareTodayResult() {
+        const target = document.getElementById('inputCard'); // RECORD 영역을 포함한 입력 카드 캡처
+        if (!target || typeof html2canvas === 'undefined') return alert("캡처 도구를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
+
+        // 스크린샷 캡처 시 버튼 숨기기
+        const shareBtn = document.getElementById('today-share-btn');
+        const mainBtns = document.querySelector('.btn-group');
+        shareBtn.style.display = 'none';
+        mainBtns.style.display = 'none';
+
+        try {
+            const canvas = await html2canvas(target, {
+                backgroundColor: null,
+                scale: 2,
+                logging: false,
+                useCORS: true
+            });
+
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], `today_billiard_${selectedDateStr}.png`, { type: 'image/png' });
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: '오늘의 당구 전적',
+                            text: `${selectedDateStr} 경기 결과입니다!`
+                        });
+                    } catch (e) { console.log('Share failed', e); }
+                } else {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `today_billiard_${selectedDateStr}.png`;
+                    link.click();
+                }
+                shareBtn.style.display = 'block';
+                mainBtns.style.display = 'flex';
+            }, 'image/png');
+        } catch (err) {
+            shareBtn.style.display = 'block';
+            mainBtns.style.display = 'flex';
+            alert("캡처 중 오류가 발생했습니다.");
+        }
     }
 
     function toggleActionOverlay(el) {
@@ -647,7 +724,6 @@
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
-    // --- 데이터 백업 및 복구 로직 시작 ---
 function exportData() {
     if (gameLogs.length === 0) return alert("백업할 데이터가 없습니다.");
     const dataStr = JSON.stringify(gameLogs, null, 2);
@@ -673,9 +749,7 @@ async function importData(event) {
             if (!Array.isArray(importedData)) throw new Error();
             if (confirm(`총 ${importedData.length}개의 기록. Cloud에 복구 진행.\n기존 데이터는 모두 삭제되고 백업 파일로 대체됨.`)) {
                 showLoading(true, "데이터 복구 중");
-                // 1. 기존 데이터 초기화
                 await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
-                // 2. 데이터 순차 업로드
                 for (const item of importedData) {
                     const cleanRanks = [
                         item.ranks[0] || "", item.ranks[1] || "", 
@@ -697,12 +771,11 @@ async function importData(event) {
             alert("올바른 백업 파일(.json)이 아니거나 오류 발생");
         } finally {
             showLoading(false);
-            event.target.value = ''; // 파일 선택 초기화
+            event.target.value = ''; 
         }
     };
     reader.readAsText(file);
 }
-// --- 데이터 백업 및 복구 로직 끝 ---
     
     window.onload = () => { 
         const savedTheme = localStorage.getItem('theme');
