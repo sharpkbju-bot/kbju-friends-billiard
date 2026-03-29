@@ -320,7 +320,6 @@
             width: 100%;
         }
 
-        /* 공유 버튼 스타일 정의 */
         .share-btn-common {
             width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc);
             color: white; border: none; border-radius: 18px; font-weight: 800;
@@ -396,7 +395,10 @@
         <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
         <button class="save-btn btn-cancel" onclick="resetInputs()">취소</button>
     </div>
-    <div id="dayGameList"></div>
+    
+    <div id="capture-area" style="padding: 5px; border-radius: 20px;">
+        <div id="dayGameList"></div>
+    </div>
 </div>
 
 <div class="card stats-card">
@@ -616,10 +618,8 @@
         const listArea = document.getElementById('dayGameList');
         
         if(games.length > 0) {
-            // 헤더와 공유 버튼 생성
-            let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">RECORD</span></div>`;
+            let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>`;
             
-            // --- 오늘의 전적 공유 버튼 추가 ---
             html += `<button id="today-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareTodayResult()">📸 오늘의 전적 스크린샷 공유</button>`;
             
             games.forEach((g, idx) => { 
@@ -633,23 +633,13 @@
         }
     }
 
-    /* --- 오늘의 전적 공유 기능 구현 --- */
     async function shareTodayResult() {
-        const target = document.getElementById('inputCard'); 
+        // 타겟을 RECORD 타이틀이 포함된 'capture-area'로 변경
+        const target = document.getElementById('capture-area'); 
         if (!target) return;
         
-        // 스크린샷 캡처 시 버튼들 숨기기
         const shareBtn = document.getElementById('today-share-btn');
-        const mainBtns = document.querySelector('.btn-group');
-        const themeWrap = document.querySelector('.theme-wrap');
-        const zoomWrap = document.querySelector('.zoom-wrap');
-        const setupRow = document.querySelector('.setup-row');
-        
         if(shareBtn) shareBtn.style.display = 'none';
-        if(mainBtns) mainBtns.style.display = 'none';
-        if(themeWrap) themeWrap.style.display = 'none';
-        if(zoomWrap) zoomWrap.style.display = 'none';
-        if(setupRow) setupRow.style.display = 'none';
 
         try {
             const canvas = await html2canvas(target, {
@@ -675,16 +665,10 @@
                     link.download = `today_record_${selectedDateStr}.png`;
                     link.click();
                 }
-                // 숨겼던 요소 다시 표시
                 if(shareBtn) shareBtn.style.display = 'block';
-                if(mainBtns) mainBtns.style.display = 'flex';
-                if(themeWrap) themeWrap.style.display = 'flex';
-                if(zoomWrap) zoomWrap.style.display = 'flex';
-                if(setupRow) setupRow.style.display = 'flex';
             }, 'image/png');
         } catch (err) {
             if(shareBtn) shareBtn.style.display = 'block';
-            if(mainBtns) mainBtns.style.display = 'flex';
             alert("캡처 중 오류가 발생했습니다.");
         }
     }
