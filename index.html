@@ -263,7 +263,7 @@
         .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .game-item { position: relative; padding: 11px 8px; border-radius: 22px; background: linear-gradient(145deg, #f0f0f0, #ffffff); margin-top: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8); cursor: pointer; transition: transform 0.2s ease; }
+        .game-item { position: relative; padding: 18px 8px; border-radius: 22px; background: linear-gradient(145deg, #f0f0f0, #ffffff); margin-top: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8); cursor: pointer; transition: transform 0.2s ease; }
         
         .game-info { font-size: 20px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; transition: font-size 0.2s; }
         .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
@@ -614,51 +614,31 @@
     }
 
     function renderGameList() {
-    const games = gameLogs.filter(g => g.dateStr === selectedDateStr); 
-    const listArea = document.getElementById('dayGameList');
-    
-    if(games.length > 0) {
-        let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">RECORD</span></div>`;
-        html += `<button id="today-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareTodayResult()">📸 오늘의 전적 스크린샷 공유</button>`;
+        const games = gameLogs.filter(g => g.dateStr === selectedDateStr); 
+        const listArea = document.getElementById('dayGameList');
         
-        games.forEach((g, idx) => { 
-            const names = g.ranks.filter(n => n && n.trim() !== ""); 
-            
-            // 이름과 화살표를 하나의 긴 문자열로 합쳐서 공백 발생을 원천 차단
-            let namesLine = "";
-            names.forEach((name, i) => {
-                const color = i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
-                // 이름 span (태그 앞뒤 공백 제거)
-                namesLine += `<span style="color:${color};display:inline;">${name}</span>`;
-                // 마지막이 아니면 화살표 추가 (공백 없이 처리)
-                if (i < names.length - 1) {
-                    namesLine += `<span style="display:inline;">→</span>`;
-                }
+        if(games.length > 0) {
+            let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>`;
+            html += `<button id="today-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareTodayResult()">📸 오늘의 전적 스크린샷 공유</button>`;
+            games.forEach((g, idx) => { 
+                const names = g.ranks.filter(n => n && n.trim() !== ""); 
+                const styledNames = names.map((name, i) => `<span style="color:${i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)')};">${name}</span>`);
+                html += `<div class="game-item" onclick="toggleActionOverlay(this)"><div class="game-info"><span>${idx+1}G</span> ${styledNames.join(' → ')}</div><div class="action-overlay"><div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div><div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div><div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div></div></div>`; 
             });
-
-            // game-info 내부에서 flex와 gap:0을 사용하여 요소 간 간격을 0으로 고정
-            html += `<div class="game-item" onclick="toggleActionOverlay(this)">` +
-                        `<div class="game-info" style="display:flex; justify-content:center; align-items:center; gap:0; white-space:nowrap;">` +
-                            `<span style="margin-right:8px; flex-shrink:0;">${idx+1}G</span>` + 
-                            `<div style="display:inline-flex; align-items:center; gap:0; letter-spacing:-0.5px;">${namesLine}</div>` +
-                        `</div>` +
-                        `<div class="action-overlay">` +
-                            `<div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>` +
-                            `<div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>` +
-                            `<div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div>` +
-                        `</div>` +
-                    `</div>`; 
-        });
-        listArea.innerHTML = html;
-    } else {
-        listArea.innerHTML = "";
+            listArea.innerHTML = html;
+        } else {
+            listArea.innerHTML = "";
+        }
     }
-}
 
     async function shareTodayResult() {
         const target = document.getElementById('capture-area'); 
         if (!target) return;
         
+        // 캡처 전 버튼을 숨김 (캡처 화면에 안 나오게 함)
+        const shareBtn = document.getElementById('today-share-btn');
+        if(shareBtn) shareBtn.style.display = 'none';
+
         try {
             const canvas = await html2canvas(target, {
                 backgroundColor: null,
@@ -666,6 +646,9 @@
                 logging: false,
                 useCORS: true
             });
+
+            // 캡처 완료 후 버튼을 다시 표시 (공유 앱 목록 화면에는 버튼이 보임)
+            if(shareBtn) shareBtn.style.display = 'block';
 
             canvas.toBlob(async (blob) => {
                 const file = new File([blob], `today_record_${selectedDateStr}.png`, { type: 'image/png' });
@@ -685,6 +668,8 @@
                 }
             }, 'image/png');
         } catch (err) {
+            // 오류 발생 시에도 버튼을 다시 표시
+            if(shareBtn) shareBtn.style.display = 'block';
             alert("캡처 중 오류가 발생했습니다.");
         }
     }
