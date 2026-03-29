@@ -624,25 +624,30 @@
         games.forEach((g, idx) => { 
             const names = g.ranks.filter(n => n && n.trim() !== ""); 
             
-            // 1. 이름을 span으로 감쌀 때 태그 사이의 미세 공백을 없애기 위해 한 줄로 처리
-            const styledNames = names.map((name, i) => {
+            // 이름과 화살표를 하나의 긴 문자열로 합쳐서 공백 발생을 원천 차단
+            let namesLine = "";
+            names.forEach((name, i) => {
                 const color = i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
-                return `<span style="color:${color};display:inline-block;">${name}</span>`;
+                // 이름 span (태그 앞뒤 공백 제거)
+                namesLine += `<span style="color:${color};display:inline;">${name}</span>`;
+                // 마지막이 아니면 화살표 추가 (공백 없이 처리)
+                if (i < names.length - 1) {
+                    namesLine += `<span style="display:inline;">→</span>`;
+                }
             });
 
-            // 2. join에서 공백을 완전히 제거하고, .game-info에 letter-spacing이나 word-spacing 영향을 줄이기 위해 스타일 보강
-            const gameInfoHtml = `<div class="game-info" style="letter-spacing:-0.5px; word-spacing:-2px;">` +
-                                 `<span style="margin-right:5px;">${idx+1}G</span>` + 
-                                 `${styledNames.join('→')}` + 
-                                 `</div>`;
-
+            // game-info 내부에서 flex와 gap:0을 사용하여 요소 간 간격을 0으로 고정
             html += `<div class="game-item" onclick="toggleActionOverlay(this)">` +
-                    gameInfoHtml +
-                    `<div class="action-overlay">` +
-                        `<div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>` +
-                        `<div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>` +
-                        `<div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div>` +
-                    `</div></div>`; 
+                        `<div class="game-info" style="display:flex; justify-content:center; align-items:center; gap:0; white-space:nowrap;">` +
+                            `<span style="margin-right:8px; flex-shrink:0;">${idx+1}G</span>` + 
+                            `<div style="display:inline-flex; align-items:center; gap:0; letter-spacing:-0.5px;">${namesLine}</div>` +
+                        `</div>` +
+                        `<div class="action-overlay">` +
+                            `<div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>` +
+                            `<div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>` +
+                            `<div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div>` +
+                        `</div>` +
+                    `</div>`; 
         });
         listArea.innerHTML = html;
     } else {
