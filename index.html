@@ -612,8 +612,11 @@
     }
 
     function renderGameList() {
-        const games = gameLogs.filter(g => g.dateStr === selectedDateStr); const listArea = document.getElementById('dayGameList');
+        const games = gameLogs.filter(g => g.dateStr === selectedDateStr); 
+        const listArea = document.getElementById('dayGameList');
+        
         if(games.length > 0) {
+            // 헤더와 공유 버튼 생성
             let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">RECORD</span></div>`;
             
             // --- 오늘의 전적 공유 버튼 추가 ---
@@ -625,19 +628,28 @@
                 html += `<div class="game-item" onclick="toggleActionOverlay(this)"><div class="game-info"><span>${idx+1}G</span> ${styledNames.join(' → ')}</div><div class="action-overlay"><div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div><div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div><div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div></div></div>`; 
             });
             listArea.innerHTML = html;
-        } else listArea.innerHTML = "";
+        } else {
+            listArea.innerHTML = "";
+        }
     }
 
     /* --- 오늘의 전적 공유 기능 구현 --- */
     async function shareTodayResult() {
-        const target = document.getElementById('inputCard'); // RECORD 영역을 포함한 입력 카드 캡처
-        if (!target || typeof html2canvas === 'undefined') return alert("캡처 도구를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
-
-        // 스크린샷 캡처 시 버튼 숨기기
+        const target = document.getElementById('inputCard'); 
+        if (!target) return;
+        
+        // 스크린샷 캡처 시 버튼들 숨기기
         const shareBtn = document.getElementById('today-share-btn');
         const mainBtns = document.querySelector('.btn-group');
-        shareBtn.style.display = 'none';
-        mainBtns.style.display = 'none';
+        const themeWrap = document.querySelector('.theme-wrap');
+        const zoomWrap = document.querySelector('.zoom-wrap');
+        const setupRow = document.querySelector('.setup-row');
+        
+        if(shareBtn) shareBtn.style.display = 'none';
+        if(mainBtns) mainBtns.style.display = 'none';
+        if(themeWrap) themeWrap.style.display = 'none';
+        if(zoomWrap) zoomWrap.style.display = 'none';
+        if(setupRow) setupRow.style.display = 'none';
 
         try {
             const canvas = await html2canvas(target, {
@@ -648,7 +660,7 @@
             });
 
             canvas.toBlob(async (blob) => {
-                const file = new File([blob], `today_billiard_${selectedDateStr}.png`, { type: 'image/png' });
+                const file = new File([blob], `today_record_${selectedDateStr}.png`, { type: 'image/png' });
                 if (navigator.share) {
                     try {
                         await navigator.share({
@@ -660,15 +672,19 @@
                 } else {
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
-                    link.download = `today_billiard_${selectedDateStr}.png`;
+                    link.download = `today_record_${selectedDateStr}.png`;
                     link.click();
                 }
-                shareBtn.style.display = 'block';
-                mainBtns.style.display = 'flex';
+                // 숨겼던 요소 다시 표시
+                if(shareBtn) shareBtn.style.display = 'block';
+                if(mainBtns) mainBtns.style.display = 'flex';
+                if(themeWrap) themeWrap.style.display = 'flex';
+                if(zoomWrap) zoomWrap.style.display = 'flex';
+                if(setupRow) setupRow.style.display = 'flex';
             }, 'image/png');
         } catch (err) {
-            shareBtn.style.display = 'block';
-            mainBtns.style.display = 'flex';
+            if(shareBtn) shareBtn.style.display = 'block';
+            if(mainBtns) mainBtns.style.display = 'flex';
             alert("캡처 중 오류가 발생했습니다.");
         }
     }
@@ -793,6 +809,7 @@ async function importData(event) {
     };
     document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
 </script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="share.js"></script>    
 </body>
 </html>
