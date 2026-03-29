@@ -619,9 +619,7 @@
         
         if(games.length > 0) {
             let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>`;
-            
             html += `<button id="today-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareTodayResult()">📸 오늘의 전적 스크린샷 공유</button>`;
-            
             games.forEach((g, idx) => { 
                 const names = g.ranks.filter(n => n && n.trim() !== ""); 
                 const styledNames = names.map((name, i) => `<span style="color:${i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)')};">${name}</span>`);
@@ -634,13 +632,9 @@
     }
 
     async function shareTodayResult() {
-        // 타겟을 RECORD 타이틀이 포함된 'capture-area'로 변경
         const target = document.getElementById('capture-area'); 
         if (!target) return;
         
-        const shareBtn = document.getElementById('today-share-btn');
-        if(shareBtn) shareBtn.style.display = 'none';
-
         try {
             const canvas = await html2canvas(target, {
                 backgroundColor: null,
@@ -665,10 +659,8 @@
                     link.download = `today_record_${selectedDateStr}.png`;
                     link.click();
                 }
-                if(shareBtn) shareBtn.style.display = 'block';
             }, 'image/png');
         } catch (err) {
-            if(shareBtn) shareBtn.style.display = 'block';
             alert("캡처 중 오류가 발생했습니다.");
         }
     }
@@ -707,7 +699,6 @@
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
     
     function closeAppWindow() { 
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         window.close();
         setTimeout(() => {
             document.body.innerHTML = `
