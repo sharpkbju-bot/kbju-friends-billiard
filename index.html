@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="경배와 친구들">
+    <link rel="apple-touch-icon" href="image_0.png">
+    <title>우리들의 Billiard World</title>
+    
+    <style>
+        :root { 
+            --main: #7f8c8d; --bg: rgba(236, 238, 241, 0.4); --accent: #ff4757; --success: #27ae60; --edit: #f39c12; 
+            --today-bg: #e3f2fd; --today-border: #2196f3; --select-bg: #fff0f3; --select-border: #ff4d6d; 
+            --record-bg: #e8f5e9; --record-border: #4caf50; --record-dot: #e67e22; 
+            --shadow: 8px 8px 16px rgba(180, 180, 180, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8);
+            --inner-shadow: inset 3px 3px 7px rgba(180, 180, 180, 0.4), inset -3px -3px 7px rgba(255, 255, 255, 0.8);
+            --rank1: #2196f3; --rank2: #27ae60; --rank3: #8e44ad; --rank4: #f39c12; --rankL: #ff4757; 
+            --card-bg: rgba(243, 230, 255, 0.7); --text-color: #444; --sub-text: #666; --label-text: #777;
+        }
+
+        [data-theme='dark'] {
+            --main: #bdc3c7; --bg: rgba(30, 30, 30, 0.9); --today-bg: #1a237e; --today-border: #448aff;
+            --select-bg: #4a148c; --select-border: #e91e63; --record-bg: #1b5e20; --record-border: #81c784;
+            --shadow: 8px 8px 16px rgba(0, 0, 0, 0.6), -4px -4px 10px rgba(60, 60, 60, 0.2);
+            --card-bg: rgba(60, 60, 65, 0.9); --text-color: #eeeeee; --sub-text: #cccccc; --label-text: #bbbbbb;
+            --rank1: #64b5f6; --rank2: #2ecc71; --rank3: #ba68c8; --rank4: #ffb74d; --rankL: #ff8a80; 
+        }
+
+        body { font-family: -apple-system, system-ui; margin: 0; padding: env(safe-area-inset-top) 15px 100px 15px; background-image: url('image_1.png'); background-size: cover; background-attachment: fixed; min-height: 100vh; color: var(--text-color); }
+        .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
+        
+        /* 참여 친구 선택 테이블 스타일 */
+        .player-select-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; background: rgba(255,255,255,0.2); border-radius: 15px; overflow: hidden; }
+        .player-select-table td { padding: 10px; border: 1px solid rgba(0,0,0,0.05); text-align: center; width: 33.3%; }
+        .player-chip { display: block; padding: 8px; border-radius: 10px; background: #fff; border: 2px solid #ddd; font-weight: 800; font-size: 13px; cursor: pointer; transition: 0.2s; color: #555; }
+        .player-chip.active { background: var(--today-bg); border-color: var(--today-border); color: var(--today-border); }
+        
+        .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        select { width: 85px; padding: 8px; border-radius: 12px; border: none; background: rgba(255,255,255,0.5); font-weight: 800; box-shadow: var(--inner-shadow); }
+
+        .save-btn { width: 100%; padding: 16px; background: linear-gradient(145deg, #abb2b9, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .order-modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:10005; backdrop-filter:blur(5px); }
+        .order-content { background:var(--card-bg); padding:30px; border-radius:32px; text-align:center; width:85%; max-width:320px; border: 2px solid var(--main); }
+        
+        /* 기존 스타일 유지... (생략된 스타일들은 업로드하신 파일과 동일함) */
+        .calendar-card { background: var(--card-bg); border-radius: 32px; padding: 24px 18px; box-shadow: var(--shadow); margin-bottom: 25px; }
+        .day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; font-weight: 700; background: linear-gradient(145deg, rgba(253, 253, 253, 0.8), rgba(226, 229, 234, 0.8)); box-shadow: 4px 4px 10px rgba(0,0,0,0.1); }
+        .day.today { border: 2px solid var(--today-border) !important; color: var(--today-border); }
+        .day.selected { transform: scale(1.1); border: 2px solid var(--select-border) !important; }
+        #welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #4a90e2, #9370db); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.8s; color: white; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<div id="welcome-screen">
+    <img src="image_0.png" style="width:60px; margin-bottom:15px;">
+    <div style="font-size: 14px; font-weight: 300; text-align: center;">경배와 친구들의<br>당구 세상<br><br>Created by Ju Kyung Bae</div>
+</div>
+
+<div id="order-modal" class="order-modal">
+    <div class="order-content">
+        <div style="font-size:40px; margin-bottom:15px;">🎱</div>
+        <h2 style="font-size:18px; font-weight:900; color:var(--rank1); margin-bottom:20px;">추첨 완료!</h2>
+        <div id="order-result" style="font-weight: 900; line-height: 2.2; margin-bottom: 25px; color:var(--text-color);"></div>
+        <button class="save-btn" onclick="closeOrderModal()" style="margin:0;">확인</button>
+    </div>
+</div>
+
+<div class="calendar-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <button onclick="changeMonth(-1)" style="border:none; background:none; font-size:20px;">◀</button>
+        <span id="monthDisplay" style="font-size:20px; font-weight:900;"></span>
+        <button onclick="changeMonth(1)" style="border:none; background:none; font-size:20px;">▶</button>
+    </div>
+    <div id="calendarGrid" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:10px;"></div>
+</div>
+
+<div class="card">
+    <h2 id="selectedDateTitle" style="font-size:17px; font-weight:800; margin-bottom:20px;">📅 날짜 확인 중</h2>
+    
+    <div style="margin-bottom:10px; font-size:14px; font-weight:800; color:#555;">오늘 참여하는 친구 선택</div>
+    <table class="player-select-table">
+        <tr>
+            <td><div class="player-chip" onclick="togglePlayerSelection(this, '경배')">경배</div></td>
+            <td><div class="player-chip" onclick="togglePlayerSelection(this, '원석')">원석</div></td>
+            <td><div class="player-chip" onclick="togglePlayerSelection(this, '정석')">정석</div></td>
+        </tr>
+        <tr>
+            <td><div class="player-chip" onclick="togglePlayerSelection(this, '진웅')">진웅</div></td>
+            <td><div class="player-chip" onclick="togglePlayerSelection(this, '창한')">창한</div></td>
+            <td><div class="player-chip" onclick="togglePlayerSelection(this, '경석')">경석</div></td>
+        </tr>
+    </table>
+
+    <div class="setup-row">
+        <span style="font-size:14px; font-weight:800; color:#555;">경기 인원 설정</span>
+        <select id="playerCount" onchange="updateInputFields()">
+            <option value="2">2명</option>
+            <option value="3" selected>3명</option>
+            <option value="4">4명</option>
+            <option value="5">5명</option>
+        </select>
+    </div>
+
+    <button onclick="pickRandomOrder()" style="width:100%; padding:14px; background:linear-gradient(145deg, #1abc9c, #16a085); color:white; border:none; border-radius:15px; font-weight:900; margin-bottom:20px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+        🎲 선택한 친구들 초구 추첨하기
+    </button>
+
+    <div id="inputArea"></div>
+    <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
+</div>
+
+<script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec";
+    const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
+    let selectedPlayersForLottery = [];
+    let gameLogs = [];
+    let selectedDateStr = new Date().toLocaleDateString('sv-SE');
+
+    // 친구 선택 토글 함수
+    function togglePlayerSelection(el, name) {
+        if (selectedPlayersForLottery.includes(name)) {
+            selectedPlayersForLottery = selectedPlayersForLottery.filter(p => p !== name);
+            el.classList.remove('active');
+        } else {
+            const limit = parseInt(document.getElementById('playerCount').value);
+            if (selectedPlayersForLottery.length >= limit) {
+                alert(`설정한 인원(${limit}명)까지만 선택할 수 있어!`);
+                return;
+            }
+            selectedPlayersForLottery.push(name);
+            el.classList.add('active');
+        }
+    }
+
+    // 랜덤 초구 및 순서 추첨 로직
+    function pickRandomOrder() {
+        const requiredCount = parseInt(document.getElementById('playerCount').value);
+        
+        if (selectedPlayersForLottery.length !== requiredCount) {
+            alert(`참여 친구를 ${requiredCount}명 모두 선택해줘! (현재 ${selectedPlayersForLottery.length}명 선택됨)`);
+            return;
+        }
+
+        // 1. 초구(1번) 1명 랜덤 선정
+        let pool = [...selectedPlayersForLottery];
+        const firstIdx = Math.floor(Math.random() * pool.length);
+        const firstPlayer = pool.splice(firstIdx, 1)[0];
+
+        // 2. 나머지 인원 무작위 셔플
+        const remaining = pool.sort(() => Math.random() - 0.5);
+
+        // 결과 표시
+        const resultArea = document.getElementById('order-result');
+        resultArea.innerHTML = `
+            <div style="background: rgba(33, 150, 243, 0.1); border-radius: 20px; padding: 15px; margin-bottom: 20px; border: 2.5px dashed var(--rank1);">
+                <div style="font-size: 13px; color: var(--rank1); margin-bottom:5px;">🎯 오늘의 초구 당첨!</div>
+                <div style="font-size: 26px; color: var(--rank1); font-weight: 900;">1번 : ${firstPlayer}</div>
+            </div>
+            <div style="font-size: 17px; opacity: 0.9;">
+                ${remaining.map((p, i) => `<div>${i + 2}번 : ${p}</div>`).join('')}
+            </div>
+        `;
+        document.getElementById('order-modal').style.display = 'flex';
+
+        // 편의 기능: 결과 순서를 기록 입력란에 자동으로 채워줌
+        const finalOrder = [firstPlayer, ...remaining];
+        finalOrder.forEach((name, idx) => {
+            document.getElementById('rank' + (idx + 1)).value = name;
+        });
+    }
+
+    function closeOrderModal() { document.getElementById('order-modal').style.display = 'none'; }
+
+    // 기존 데이터 관리 및 렌더링 함수들...
+    function updateInputFields() {
+        const count = parseInt(document.getElementById('playerCount').value);
+        const inputArea = document.getElementById('inputArea');
+        inputArea.innerHTML = "";
+        for(let i=1; i<=count; i++) {
+            const label = i === count ? "꼴찌💀" : (i === 1 ? "1위🥇" : `${i}위`);
+            inputArea.innerHTML += `<div style="display:flex; align-items:center; margin-bottom:12px;"><label style="width:70px; font-size:13px; font-weight:900;">${label}</label><select id="rank${i}" style="flex:1;"><option value="">선택</option>${players.map(p => `<option value="${p}">${p}</option>`).join('')}</select></div>`;
+        }
+        // 인원 설정 바뀌면 선택된 친구 초기화
+        selectedPlayersForLottery = [];
+        document.querySelectorAll('.player-chip').forEach(el => el.classList.remove('active'));
+    }
+
+    // 초기화 및 데이터 로드 (기존 로직 동일)
+    window.onload = () => {
+        setTimeout(() => { document.getElementById('welcome-screen').style.opacity = '0'; }, 2500);
+        updateInputFields();
+        document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
+        // fetchData(), renderCalendar() 등 기존 함수 호출...
+    };
+
+    /* ... 나머지 기존 코드 (기록 저장, 캘린더, 통계 등) 복사하여 유지 ... */
+</script>
+</body>
+</html>
