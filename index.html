@@ -298,6 +298,10 @@
         #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
         .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 30px; text-align: center; width: 80%; max-width: 320px; }
 
+        /* 랜덤 순서 정하기 모달 스타일 */
+        #order-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 10005; backdrop-filter: blur(6px); }
+        .order-content { background: var(--card-bg); border: 2px solid var(--main); padding: 30px; border-radius: 32px; text-align: center; width: 85%; max-width: 320px; box-shadow: var(--shadow); }
+
         .theme-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
         .theme-toggle { position: relative; width: 50px; height: 26px; }
         .theme-toggle input { opacity: 0; width: 0; height: 0; }
@@ -349,6 +353,15 @@
     </div>
 </div>
 
+<div id="order-modal">
+    <div class="order-content">
+        <div style="font-size:40px; margin-bottom:15px;">🎲</div>
+        <h2 style="font-size:18px; font-weight:900; color:var(--rank1); margin:0 0 20px 0;">오늘의 경기 순서</h2>
+        <div id="order-result" style="font-size: 18px; font-weight: 900; line-height: 2.2; margin-bottom: 25px; color:var(--text-color);"></div>
+        <button class="save-btn" style="margin:0; width:100%;" onclick="closeOrderModal()">확인</button>
+    </div>
+</div>
+
 <div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">순위 데이터 동기화 중</div></div>
 
 <div class="calendar-card">
@@ -388,6 +401,12 @@
             <option value="4">4명</option>
             <option value="5">5명</option>
         </select>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <button class="share-btn-common" style="background: linear-gradient(145deg, #1abc9c, #16a085);" onclick="showOrderModal()">
+            🎲 오늘 누가 먼저 칠까? (순서 정하기)
+        </button>
     </div>
 
     <div id="inputArea"></div>
@@ -448,6 +467,36 @@
     let editMode = false;
     let editRound = null;
     let isPercentMode = false;
+
+    // 랜덤 순서 정하기 기능
+    function showOrderModal() {
+        const count = parseInt(document.getElementById('playerCount').value);
+        let selectedPlayers = [];
+        // 입력 필드에 이미 이름이 선택되어 있다면 그 인원들을 대상으로 섞음
+        for(let i=1; i<=count; i++) {
+            const val = document.getElementById('rank'+i).value;
+            if(val) selectedPlayers.push(val);
+        }
+        
+        // 선택된 이름이 부족하면 전체 플레이어 리스트에서 랜덤으로 채움
+        if(selectedPlayers.length < count) {
+            selectedPlayers = [...players].sort(() => Math.random() - 0.5).slice(0, count);
+        } else {
+            // 이미 다 선택되어 있다면 순서만 섞기
+            selectedPlayers.sort(() => Math.random() - 0.5);
+        }
+
+        const resultArea = document.getElementById('order-result');
+        resultArea.innerHTML = selectedPlayers.map((p, idx) => 
+            `<div>${idx + 1}번 : <span style="color:var(--rank${idx+1})">${p}</span></div>`
+        ).join('');
+
+        document.getElementById('order-modal').style.display = 'flex';
+    }
+
+    function closeOrderModal() {
+        document.getElementById('order-modal').style.display = 'none';
+    }
 
     function toggleTheme() {
         const isDark = document.getElementById('themeSwitch').checked;
@@ -599,7 +648,6 @@
         }
         let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#5D4037;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span></div>`;
         
-        // 여기에 스크린샷 버튼 추가
         html += `<button id="member-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareMemberResult('${name}')">📸 ${name}의 최근 5경기 스크린샷 공유</button>`;
 
         personalGames.forEach(g => {
@@ -656,19 +704,15 @@
         games.forEach((g, idx) => { 
             const names = g.ranks.filter(n => n && n.trim() !== ""); 
             
-            // 이름과 화살표를 하나의 긴 문자열로 합쳐서 공백 발생을 원천 차단
             let namesLine = "";
             names.forEach((name, i) => {
                 const color = i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
-                // 이름 span (태그 앞뒤 공백 제거)
                 namesLine += `<span style="color:${color};display:inline;">${name}</span>`;
-                // 마지막이 아니면 화살표 추가 (공백 없이 처리)
                 if (i < names.length - 1) {
                     namesLine += `<span style="display:inline;">→</span>`;
                 }
             });
 
-            // game-info 내부에서 flex와 gap:0을 사용하여 요소 간 간격을 0으로 고정
             html += `<div class="game-item" onclick="toggleActionOverlay(this)">` +
                         `<div class="game-info" style="display:flex; justify-content:center; align-items:center; gap:0; white-space:nowrap;">` +
                             `<span style="margin-right:8px; flex-shrink:0;">${idx+1}G</span>` + 
@@ -691,7 +735,6 @@
         const target = document.getElementById('capture-area'); 
         if (!target) return;
         
-        // 캡처 전 버튼을 숨김 (캡처 화면에 안 나오게 함)
         const shareBtn = document.getElementById('today-share-btn');
         if(shareBtn) shareBtn.style.display = 'none';
 
@@ -703,7 +746,6 @@
                 useCORS: true
             });
 
-            // 캡처 완료 후 버튼을 다시 표시 (공유 앱 목록 화면에는 버튼이 보임)
             if(shareBtn) shareBtn.style.display = 'block';
 
             canvas.toBlob(async (blob) => {
@@ -724,7 +766,6 @@
                 }
             }, 'image/png');
         } catch (err) {
-            // 오류 발생 시에도 버튼을 다시 표시
             if(shareBtn) shareBtn.style.display = 'block';
             alert("캡처 중 오류가 발생했습니다.");
         }
