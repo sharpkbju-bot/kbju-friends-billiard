@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
     <style>
         :root { 
@@ -29,18 +30,19 @@
             --select-border: #ff4d6d; 
             --record-bg: #e8f5e9; 
             --record-border: #4caf50; 
-            --shadow: 8px 8px 16px rgba(0,0,0,0.1), -8px -8px 16px rgba(255,255,255,0.8);
+            --shadow: 8px 8px 16px rgba(0,0,0,0.08), -8px -8px 16px rgba(255,255,255,0.8);
             --inner-shadow: inset 4px 4px 8px rgba(0,0,0,0.05), inset -4px -4px 8px rgba(255,255,255,0.8);
         }
 
         body { 
-            font-family: 'Pretendard', sans-serif; 
+            font-family: 'Pretendard', -apple-system, sans-serif; 
             background: #f0f2f5; 
             margin: 0; 
             padding: 20px; 
             display: flex; 
             flex-direction: column; 
-            align-items: center;
+            align-items: center; 
+            color: #2d3436;
         }
 
         .card { 
@@ -53,23 +55,21 @@
             margin-bottom: 25px; 
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.3);
-            box-sizing: border-box; /* 패딩으로 인한 너비 변화 방지 */
+            box-sizing: border-box;
         }
 
-        /* [확대 모드 대응] 버튼 그룹 레이아웃 수정 */
+        /* 확대 모드 대응을 위한 버튼 그룹 레이아웃 */
         .button-group {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             width: 100%;
             margin-top: 15px;
-            justify-content: space-between;
         }
 
         .button-group button {
-            flex: 1; /* 두 버튼의 너비를 동일하게 유지 */
-            white-space: nowrap; /* 텍스트 줄바꿈 방지 */
-            padding: 15px 5px;
-            border-radius: 15px;
+            flex: 1; 
+            padding: 18px 5px;
+            border-radius: 20px;
             font-size: 16px;
             font-weight: 700;
             border: none;
@@ -78,120 +78,276 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 6px;
+            white-space: nowrap;
         }
 
-        /* [확대 모드 대응] 입력창 텍스트 중앙 정렬 유지 */
-        .search-input-group {
-            background: rgba(255,255,255,0.6);
-            border-radius: 15px;
-            box-shadow: var(--inner-shadow);
-            padding: 0 15px;
-            display: flex;
-            align-items: center;
-            height: 50px;
-        }
+        /* 줌 옵션 */
+        .zoom-wrap { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 450px; }
+        .zoom-wrap span { font-weight: 700; color: #a29bfe; }
 
-        .search-input-group input {
-            background: none;
-            border: none;
-            width: 100%;
-            font-size: 16px;
-            font-weight: 600;
-            color: #2d3436;
-            outline: none;
-            text-align: center;
-            line-height: 50px; /* 세로 중앙 정렬 보정 */
-        }
+        /* 선수 선택 칩 */
+        .chip-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .chip { background: white; padding: 15px; border-radius: 15px; text-align: center; font-weight: 600; box-shadow: var(--shadow); cursor: pointer; transition: 0.2s; }
+        .chip.active { background: var(--select-bg); border: 2px solid var(--select-border); color: var(--select-border); }
 
-        /* 기존 스타일 그대로 유지 */
-        .zoom-wrap { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 450px; }
-        .player-chip { background: white; padding: 12px; border-radius: 15px; text-align: center; font-weight: 600; box-shadow: var(--shadow); cursor: pointer; }
-        .player-chip.selected { background: var(--select-bg); border: 2px solid var(--select-border); color: var(--select-border); }
-        
+        /* 순위 입력 영역 */
+        .rank-input-row { display: flex; align-items: center; gap: 15px; margin-top: 15px; }
+        .rank-label { width: 60px; font-weight: 700; font-size: 15px; }
+        .rank-select { flex: 1; padding: 12px; border-radius: 15px; border: none; background: white; box-shadow: var(--inner-shadow); font-size: 15px; outline: none; text-align: center; }
+
+        /* 검색 입력 스타일 */
+        .search-input-box { background: white; border-radius: 15px; box-shadow: var(--inner-shadow); padding: 2px 15px; height: 50px; display: flex; align-items: center; margin-bottom: 15px; }
+        .search-input-box input, .search-input-box select { border: none; background: none; width: 100%; font-size: 16px; font-weight: 600; text-align: center; outline: none; }
+
+        /* 버튼 컬러 */
         #draw-btn { background: #00b894; color: white; }
-        #reset-select-btn { background: #bdc3c7; color: #2d3436; }
+        #reset-btn { background: #dfe6e9; color: #636e72; }
+        #save-btn { background: #a29bfe; color: white; border-radius: 25px; padding: 20px; }
+        #cancel-btn { background: #b2bec3; color: white; border-radius: 25px; padding: 20px; }
+
+        /* Flatpickr 달력 커스텀 (확대 대응) */
+        .flatpickr-calendar { zoom: 0.9; }
     </style>
 </head>
 <body>
 
     <div class="zoom-wrap">
-        <span style="font-weight:700; color:var(--main);">화면 크기</span>
-        <label><input type="radio" name="zoom" onclick="changeZoom('기본')" checked> 기본</label>
-        <label><input type="radio" name="zoom" onclick="changeZoom('확대')"> 확대</label>
+        <span>화면 크기</span>
+        <label>기본 <input type="radio" name="zm" onclick="changeZoom('기본')" checked></label>
+        <label>확대 <input type="radio" name="zm" onclick="changeZoom('확대')"></label>
     </div>
 
-    <div class="card player-select-wrap">
-        <h3 style="margin-top:0; font-size:18px;">🕹 선수 선택(게임 인원에 맞게)</h3>
-        <div id="friend-chips" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-            <div class="player-chip">경배</div>
-            <div class="player-chip">원석</div>
-            <div class="player-chip">정석</div>
-            <div class="player-chip">진웅</div>
-            <div class="player-chip">창한</div>
-            <div class="player-chip">경석</div>
-        </div>
-        
-        <div class="button-group">
-            <button id="draw-btn" onclick="pickRandomOrder()">🎲 초구 추첨하기</button>
-            <button id="reset-select-btn" onclick="resetSelection()">🔄 선택 취소</button>
-        </div>
-    </div>
-
-    <div class="card searchCard">
-        <h3 style="margin-top:0; font-size:18px;">🔍 기간별 선수 전적 검색</h3>
-        <div style="margin-bottom: 15px;">
-            <p style="font-size: 14px; font-weight: 700; color: var(--main); margin-bottom: 8px;">검색 기간</p>
-            <div class="search-input-group">
-                <input type="text" id="searchRange" placeholder="날짜 선택">
-            </div>
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-            <p style="font-size: 14px; font-weight: 700; color: var(--main); margin-bottom: 8px;">선수명</p>
-            <div class="search-input-group">
-                <select id="searchPlayer" style="width:100%; border:none; background:none; font-size:16px; font-weight:600; outline:none; text-align:center;">
-                    <option value="">선택</option>
-                    </select>
-            </div>
+    <div class="card">
+        <h3 style="margin-top:0; font-size:17px;">🕹 오늘 참여하는 친구 직접 선택 (인원수에 맞게)</h3>
+        <div class="chip-container" id="player-grid">
+            <div class="chip" onclick="togglePlayer(this, '경배')">경배</div>
+            <div class="chip" onclick="togglePlayer(this, '원석')">원석</div>
+            <div class="chip" onclick="togglePlayer(this, '정석')">정석</div>
+            <div class="chip" onclick="togglePlayer(this, '진웅')">진웅</div>
+            <div class="chip" onclick="togglePlayer(this, '창한')">창한</div>
+            <div class="chip" onclick="togglePlayer(this, '경석')">경석</div>
         </div>
 
         <div class="button-group">
-            <button style="background:#0984e3; color:white;" onclick="searchRecords()">기록 검색하기</button>
-            <button style="background:#bdc3c7; color:#2d3436;" onclick="resetSearch()">🔄 리셋</button>
+            <button id="draw-btn" onclick="pickOrder()">🎲 초구 추첨하기</button>
+            <button id="reset-btn" onclick="resetAll()">🔄 선택 취소</button>
         </div>
+    </div>
+
+    <div class="card">
+        <div class="rank-input-row">
+            <div class="rank-label">1위 🥇</div>
+            <select id="p1" class="rank-select"><option value="">선택</option></select>
+        </div>
+        <div class="rank-input-row">
+            <div class="rank-label">2위</div>
+            <select id="p2" class="rank-select"><option value="">선택</option></select>
+        </div>
+        <div class="rank-input-row">
+            <div class="rank-label">꼴찌 💀</div>
+            <select id="p3" class="rank-select"><option value="">선택</option></select>
+        </div>
+
+        <div class="button-group" style="margin-top: 25px;">
+            <button id="save-btn" onclick="saveRecord()">순위 저장</button>
+            <button id="cancel-btn" onclick="resetAll()">취소</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0; font-size:17px;">🔍 기간별 선수 전적 검색</h3>
+        <p style="font-size: 13px; font-weight: 700; color: var(--main); margin-bottom: 5px;">검색 기간</p>
+        <div class="search-input-box">
+            <input type="text" id="datePicker" placeholder="날짜를 선택하세요">
+        </div>
+        
+        <p style="font-size: 13px; font-weight: 700; color: var(--main); margin-bottom: 5px;">선수명</p>
+        <div class="search-input-box">
+            <select id="searchName">
+                <option value="">선택</option>
+                <option value="경배">경배</option>
+                <option value="원석">원석</option>
+                <option value="정석">정석</option>
+                <option value="진웅">진웅</option>
+                <option value="창한">창한</option>
+                <option value="경석">경석</option>
+            </select>
+        </div>
+
+        <div class="button-group">
+            <button style="background:#0984e3; color:white;" onclick="runSearch()">기록 검색하기</button>
+            <button style="background:#b2bec3; color:white;" onclick="resetSearch()">🔄 리셋</button>
+        </div>
+        
+        <div id="searchResult" style="margin-top:20px; font-size:14px; line-height:1.6;"></div>
+    </div>
+
+    <div class="card" style="text-align:center;">
+        <h4 style="margin-top:0; color:#6c5ce7;">데이터 관리 및 백업</h4>
+        <div class="button-group">
+            <button style="background:#00cec9; color:white;" onclick="exportData()">📤 데이터 백업</button>
+            <button style="background:#6c5ce7; color:white;" onclick="importData()">📥 데이터 복구</button>
+        </div>
+        <p style="font-size:11px; color:#ff7675; margin-top:15px; font-weight:700;">초기화 버튼은 함부로 터치하지 마세요.</p>
+        <button style="width:100%; background:#ff7675; color:white; border:none; padding:15px; border-radius:15px; font-weight:700; cursor:pointer;" onclick="clearAllData()">⚠️ 모든 데이터 초기화 (복구 불가)</button>
     </div>
 
     <script>
-        // 확대 모드 대응 changeZoom
+        let selectedPlayers = [];
+
+        // 화면 확대 대응 로직
         function changeZoom(v) {
-            const body = document.body;
-            if (v === '확대') {
-                body.style.zoom = "1.15";
-            } else {
-                body.style.zoom = "1.0";
-            }
+            document.body.style.zoom = (v === '확대') ? "1.12" : "1.0";
         }
 
-        // [중요] Flatpickr 확대 대응 설정
-        flatpickr("#searchRange", {
+        // Flatpickr 초기화 (확대 시 위치 고정 옵션 적용)
+        const fp = flatpickr("#datePicker", {
             locale: "ko",
             mode: "range",
             dateFormat: "Y-m-d",
-            static: true, // 달력이 입력창 밑에 고정되게 하여 확대 시 위치 오류 방지
-            monthSelectorType: "static",
-            onReady: function(selectedDates, dateStr, instance) {
-                // 기존 디자인 유지용 로직
-            }
+            defaultDate: [new Date(), new Date()],
+            static: true, // [해결] 입력창 아래에 달력 고정
+            monthSelectorType: "static"
         });
 
-        // 나머지 기존 기능 코드 (인원 선택, 추첨, 저장 등) 
-        // 사용자께서 작성하신 원본 로직을 이 아래에 그대로 붙여넣으시면 됩니다.
-        function pickRandomOrder() { /* 원본 유지 */ }
-        function resetSelection() { /* 원본 유지 */ }
-        function searchRecords() { /* 원본 유지 */ }
-        function resetSearch() { /* 원본 유지 */ }
+        // 선수 선택 토글
+        function togglePlayer(el, name) {
+            if (selectedPlayers.includes(name)) {
+                selectedPlayers = selectedPlayers.filter(p => p !== name);
+                el.classList.remove('active');
+            } else {
+                if (selectedPlayers.length >= 3) return alert("최대 3명까지만 선택 가능합니다.");
+                selectedPlayers.push(name);
+                el.classList.add('active');
+            }
+            updateDropdowns();
+        }
 
+        // 드롭다운 업데이트
+        function updateDropdowns() {
+            const selects = ['p1', 'p2', 'p3'];
+            selects.forEach(id => {
+                const sel = document.getElementById(id);
+                const currentVal = sel.value;
+                sel.innerHTML = '<option value="">선택</option>';
+                selectedPlayers.forEach(p => {
+                    sel.innerHTML += `<option value="${p}">${p}</option>`;
+                });
+                sel.value = currentVal;
+            });
+        }
+
+        // 초구 및 순위 랜덤 추첨
+        function pickOrder() {
+            if (selectedPlayers.length < 3) return alert("3명의 선수를 먼저 선택해주세요.");
+            let shuffled = [...selectedPlayers].sort(() => Math.random() - 0.5);
+            document.getElementById('p1').value = shuffled[0];
+            document.getElementById('p2').value = shuffled[1];
+            document.getElementById('p3').value = shuffled[2];
+            alert(`🎲 추첨 결과!\n1위(초구): ${shuffled[0]}\n2위: ${shuffled[1]}\n꼴찌: ${shuffled[2]}`);
+        }
+
+        // 기록 저장
+        function saveRecord() {
+            const p1 = document.getElementById('p1').value;
+            const p2 = document.getElementById('p2').value;
+            const p3 = document.getElementById('p3').value;
+            if(!p1 || !p2 || !p3) return alert("순위를 모두 선택해주세요.");
+            
+            const record = {
+                date: new Date().toISOString().split('T')[0],
+                p1, p2, p3
+            };
+            
+            let history = JSON.parse(localStorage.getItem('billiardRecords') || '[]');
+            history.push(record);
+            localStorage.setItem('billiardRecords', JSON.stringify(history));
+            alert("✅ 기록이 저장되었습니다!");
+            resetAll();
+        }
+
+        // 리셋
+        function resetAll() {
+            selectedPlayers = [];
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            document.getElementById('p1').value = "";
+            document.getElementById('p2').value = "";
+            document.getElementById('p3').value = "";
+        }
+
+        // 검색 기능
+        function runSearch() {
+            const range = document.getElementById('datePicker').value;
+            const name = document.getElementById('searchName').value;
+            if(!range || !name) return alert("기간과 선수를 선택하세요.");
+            
+            let history = JSON.parse(localStorage.getItem('billiardRecords') || '[]');
+            const [start, end] = range.split(' ~ ');
+            
+            let filtered = history.filter(r => {
+                const d = r.date;
+                return d >= start && d <= (end || start);
+            });
+
+            let total = 0, first = 0, second = 0, last = 0;
+            filtered.forEach(r => {
+                if(r.p1 === name) { first++; total++; }
+                else if(r.p2 === name) { second++; total++; }
+                else if(r.p3 === name) { last++; total++; }
+            });
+
+            const rate = total > 0 ? ((first/total)*100).toFixed(1) : 0;
+            document.getElementById('searchResult').innerHTML = `
+                <div style="background:white; padding:15px; border-radius:15px; box-shadow:var(--inner-shadow);">
+                    <strong>📊 ${name} 선수 분석 (${range})</strong><br>
+                    총 게임수: ${total}회<br>
+                    1위(초구): ${first}회 (${rate}%)<br>
+                    2위: ${second}회<br>
+                    꼴찌: ${last}회
+                </div>
+            `;
+        }
+
+        function resetSearch() {
+            document.getElementById('datePicker').value = "";
+            document.getElementById('searchName').value = "";
+            document.getElementById('searchResult').innerHTML = "";
+        }
+
+        // 데이터 관리 함수들
+        function exportData() {
+            const data = localStorage.getItem('billiardRecords');
+            const blob = new Blob([data], {type: "text/plain"});
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `billiard_backup_${new Date().toLocaleDateString()}.txt`;
+            a.click();
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    localStorage.setItem('billiardRecords', event.target.result);
+                    alert("✅ 복구가 완료되었습니다!");
+                    location.reload();
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function clearAllData() {
+            if(confirm("정말로 모든 기록을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+                localStorage.removeItem('billiardRecords');
+                alert("삭제되었습니다.");
+                location.reload();
+            }
+        }
     </script>
 </body>
 </html>
