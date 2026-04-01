@@ -485,7 +485,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by Ju Kyung Bae</div>
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by Ju Kyung Bae</div><br>Virsion&nbsp;&nbsp1.3
     </div>
 </div>
 
@@ -695,7 +695,7 @@
     function pickRandomOrder() {
         const limit = parseInt(document.getElementById('playerCount').value);
         if (selectedPlayersForLottery.length !== limit) {
-            alert(`참여할 친구 ${limit}명을 모두 선택해줘! (현재 ${selectedPlayersForLottery.length}명 선택됨)`);
+            alert(`게임 참여 ${limit}명을 선택해! (현재 ${selectedPlayersForLottery.length}명 선택)`);
             return;
         }
 
