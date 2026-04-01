@@ -677,7 +677,7 @@
         } else {
             const limit = parseInt(document.getElementById('playerCount').value);
             if (selectedPlayersForLottery.length >= limit) {
-                alert(`게임 인원 선택 ${limit}명. 인원수 확인`);
+                alert(`게임 인원 ${limit}명. 초과 불가`);
                 return;
             }
             selectedPlayersForLottery.push(name);
