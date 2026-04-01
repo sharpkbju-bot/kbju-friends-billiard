@@ -12,6 +12,7 @@
     <link rel="apple-touch-icon" href="image_0.png">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 
     <title>우리들의 Billiard World</title>
     
@@ -280,6 +281,13 @@
         .zoom-active .game-info { font-size: 16px !important; }
         .zoom-active .game-info span { font-size: 11px !important; } 
         
+        /* 달력 위치 중앙 고정 및 레이아웃 보정 */
+        .flatpickr-calendar { 
+            left: 50% !important; 
+            transform: translateX(-50%) !important; 
+            margin-left: 0 !important;
+        }
+
         /* 확대 모드(Zoom) 전용 스타일 보정 */
         .zoom-active .input-row { gap: 8px !important; }
         .zoom-active .input-row label { width: 75px !important; min-width: 75px !important; max-width: 75px !important; font-size: 13px !important; }
@@ -288,14 +296,12 @@
         .zoom-active .zoom-summary-title { display: block !important; }
         .zoom-active .share-btn-common { font-size: 11px !important; padding: 12px 4px !important; }
         
-        /* 달력 위치 및 크기 완벽 보정 (중앙 정렬) */
+        /* 확대 모드 달력 중앙 정렬 및 크기 보정 */
         .zoom-active .flatpickr-calendar { 
             width: 280px !important; 
-            margin-top: -80px !important; 
+            margin-top: -30px !important; 
             transform: translateX(-50%) scale(0.85) !important; 
             transform-origin: top center !important; 
-            left: 50% !important;
-            margin-left: 0 !important; 
         }
         
         .action-overlay { 
@@ -406,12 +412,11 @@
         }
         /* ========================================================= */
 
-        /* ======== 추가된 Flatpickr(기간 선택 달력) 커스텀 CSS ======== */
+        /* ======== Flatpickr 커스텀 CSS ======== */
         .flatpickr-calendar, .flatpickr-calendar * {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
         }
         
-        /* 달력 헤더(년/월) 폰트 강제 적용 (딱딱함 제거) */
         .flatpickr-current-month .flatpickr-monthhand-title,
         .flatpickr-current-month input.cur-year {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
@@ -426,7 +431,7 @@
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1) !important;
             border: 1px solid rgba(255, 255, 255, 0.6) !important;
             padding: 15px !important;
-            width: 340px !important; 
+            width: 320px !important; 
         }
         .flatpickr-months .flatpickr-month {
             height: 40px !important;
@@ -450,22 +455,11 @@
             max-width: 44px !important;
             margin: 2px !important;
         }
-        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange,
-        .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange,
-        .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus,
-        .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover,
-        .flatpickr-day.selected.prevMonthDay, .flatpickr-day.startRange.prevMonthDay, .flatpickr-day.endRange.prevMonthDay,
-        .flatpickr-day.selected.nextMonthDay, .flatpickr-day.startRange.nextMonthDay, .flatpickr-day.endRange.nextMonthDay {
+        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange {
             background: linear-gradient(145deg, #ff4757, #ff6b81) !important;
             border-color: transparent !important;
             color: #fff !important;
             box-shadow: 2px 4px 10px rgba(255, 71, 87, 0.3) !important;
-        }
-        .flatpickr-day.inRange {
-            box-shadow: -5px 0 0 #fff0f3, 5px 0 0 #fff0f3 !important;
-            background: #fff0f3 !important;
-            border-color: #fff0f3 !important;
-            color: #ff4757 !important;
         }
         
         /* 다크모드 대응 */
@@ -476,21 +470,9 @@
         }
         [data-theme='dark'] .flatpickr-month, 
         [data-theme='dark'] .flatpickr-current-month .flatpickr-monthhand-title, 
-        [data-theme='dark'] .flatpickr-current-month input.cur-year, 
-        [data-theme='dark'] .flatpickr-current-month .numInputWrapper span.arrowUp:after, 
-        [data-theme='dark'] .flatpickr-current-month .numInputWrapper span.arrowDown:after {
+        [data-theme='dark'] .flatpickr-current-month input.cur-year {
             color: #fff !important; fill: #fff !important;
         }
-        [data-theme='dark'] span.flatpickr-weekday {
-            color: #ccc !important;
-        }
-        [data-theme='dark'] .flatpickr-day { color: #eee; }
-        [data-theme='dark'] .flatpickr-day.inRange {
-            background: rgba(233, 30, 99, 0.2) !important;
-            box-shadow: -5px 0 0 rgba(233, 30, 99, 0.2), 5px 0 0 rgba(233, 30, 99, 0.2) !important;
-            color: #ff8a80 !important;
-        }
-        /* ======================================================== */
     </style>
 </head>
 <body id="app-body">
@@ -620,11 +602,11 @@
 </div>
 
 <div class="card" id="searchCard">
-    <h2 style="font-size:16px; margin:5px 0 15px 10px; color:#444; font-weight:800;">🔍 기간별 선수 전적 검색</h2>
+    <h2 style="font-size:16px; margin:5px 0 15px 10px; color:#444; font-weight:800;">🔍 월별 선수 전적 검색</h2>
     
     <div class="input-row">
-        <label>검색 기간</label>
-        <input type="text" id="searchDateRange" style="color: #5D4037; cursor: pointer;" placeholder="기간을 선택하세요" readonly>
+        <label>검색월</label>
+        <input type="text" id="searchDateRange" style="color: #5D4037; cursor: pointer;" placeholder="월을 선택하세요" readonly>
     </div>
     
     <div class="input-row">
@@ -669,6 +651,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
 
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec"; 
@@ -923,7 +906,6 @@
         const shareBtn = document.getElementById('member-share-btn');
         if(shareBtn) shareBtn.style.display = 'none';
         
-        // 캡처 배경/여백 보정 로직 (투명 배경이 까맣게 나오는 현상 방지)
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const bgColor = isDark ? '#3c3c41' : '#f4ebfa'; 
         const originalBg = target.style.background;
@@ -999,7 +981,6 @@
         const shareBtn = document.getElementById('today-share-btn');
         if(shareBtn) shareBtn.style.display = 'none';
         
-        // 캡처 배경/여백 보정 로직
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const bgColor = isDark ? '#3c3c41' : '#f4ebfa'; 
         const originalBg = target.style.background;
@@ -1033,15 +1014,12 @@
         }
     }
 
-    // 기간별 선수 전적 캡처 기능
     async function shareSearchResult() {
         const target = document.getElementById('search-capture-area');
         if (!target) return;
-        
         const shareBtn = document.getElementById('search-share-btn');
         if(shareBtn) shareBtn.style.display = 'none'; 
         
-        // 캡처 배경/여백 보정 로직
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const bgColor = isDark ? '#3c3c41' : '#f4ebfa'; 
         const originalBg = target.style.background;
@@ -1051,14 +1029,14 @@
         target.style.padding = '15px'; 
 
         try {
-            await new Promise(r => setTimeout(r, 50)); // 렌더링 대기
+            await new Promise(r => setTimeout(r, 50));
             const canvas = await html2canvas(target, { backgroundColor: bgColor, scale: 2, logging: false, useCORS: true });
             
             canvas.toBlob(async (blob) => {
                 const dateRange = document.getElementById('searchDateRange').value || '검색결과';
                 const file = new File([blob], `search_record_${dateRange}.png`, { type: 'image/png' });
                 if (navigator.share) {
-                    try { await navigator.share({ files: [file], title: '기간별 선수 전적', text: `기간별 당구 전적 검색 결과입니다!` }); } 
+                    try { await navigator.share({ files: [file], title: '월별 선수 전적', text: `당구 전적 검색 결과입니다!` }); } 
                     catch (e) { console.log('Share failed', e); }
                 } else {
                     const link = document.createElement('a');
@@ -1151,39 +1129,26 @@
     
     function setDefaultSearchDates() {
         const today = new Date();
-        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
         if (searchFlatpickr) {
-            searchFlatpickr.setDate([firstDay, today]);
+            searchFlatpickr.setDate(today);
         }
     }
 
     function searchRecords() {
-        const dateRange = document.getElementById('searchDateRange').value;
+        const selectedMonth = document.getElementById('searchDateRange').value;
         const player = document.getElementById('searchPlayer').value;
 
-        if(!dateRange || !player) return alert("날짜와 선수를 모두 선택해줘!");
-        
-        let start, end;
-        if(dateRange.includes(' ~ ')) {
-            const parts = dateRange.split(' ~ ');
-            start = parts[0];
-            end = parts[1];
-        } else {
-            start = dateRange;
-            end = dateRange;
-        }
-
-        if(start > end) return alert("시작일이 종료일보다 클 수 없어!");
+        if(!selectedMonth || !player) return alert("검색월과 선수를 모두 선택해줘!");
 
         const filteredGames = gameLogs.filter(g => {
-            return g.dateStr >= start && g.dateStr <= end && g.ranks.includes(player);
+            return g.dateStr.startsWith(selectedMonth) && g.ranks.includes(player);
         });
 
         const summaryArea = document.getElementById('searchSummaryArea');
         const listArea = document.getElementById('searchHistoryListArea');
         
         if(filteredGames.length === 0) {
-            summaryArea.innerHTML = `<div style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">해당 기간에 ${player}의 기록이 없습니다.</div>`;
+            summaryArea.innerHTML = `<div style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">해당 월에 ${player}의 기록이 없습니다.</div>`;
             summaryArea.style.display = 'block';
             listArea.style.display = 'none';
             document.getElementById('search-share-btn').style.display = 'none';
@@ -1225,14 +1190,13 @@
 
         const winRate = played > 0 ? ((r[0] / played) * 100).toFixed(1) : "0.0";
 
-        // 확대 모드와 기본 모드를 동시 지원하기 위한 HTML/CSS 구조 적용
         let summaryHtml = `
             <div class="summary-box" style="background:var(--record-bg); border:2px solid var(--record-border); border-radius:15px; padding:15px; box-shadow:var(--shadow);">
                 <div style="text-align:center; font-size:15px; font-weight:900; color:var(--text-color); margin-bottom:12px;">
-                    <span class="default-summary-title">[ ${player}, ${start} ~ ${end} ]</span>
+                    <span class="default-summary-title">[ ${player}, ${selectedMonth} ]</span>
                     <div class="zoom-summary-title" style="display:none; line-height: 1.4;">
                         <div>[ ${player} ]</div>
-                        <div style="font-size: 14px;">[ ${start} ~ ${end} ]</div>
+                        <div style="font-size: 14px;">[ ${selectedMonth} ]</div>
                     </div>
                 </div>
                 <div style="display:flex; justify-content:space-around; text-align:center; font-weight:900; font-size:14px;">
@@ -1273,9 +1237,13 @@
 
     window.onload = () => { 
         searchFlatpickr = flatpickr("#searchDateRange", {
-            mode: "range",
-            dateFormat: "Y-m-d",
-            conjunction: " ~ ",
+            plugins: [
+                new monthSelectPlugin({
+                    shorthand: true,
+                    dateFormat: "Y-m",
+                    altFormat: "Y-m"
+                })
+            ],
             locale: "ko",
             disableMobile: "true" 
         });
