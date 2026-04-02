@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="경배와 친구들">
+    
+    <link rel="apple-touch-icon" href="image_0.png">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+
+    <title>우리들의 Billiard World</title>
+    
+    <style>
+        :root { 
+            --main: #7f8c8d; 
+            --bg: rgba(236, 238, 241, 0.4); 
+            --accent: #ff4757; 
+            --success: #27ae60; 
+            --edit: #f39c12; 
+            --today-bg: #e3f2fd; 
+            --today-border: #2196f3; 
+            --select-bg: #fff0f3; 
+            --select-border: #ff4d6d; 
+            --record-bg: #e8f5e9; 
+            --record-border: #4caf50; 
+            --record-dot: #e67e22; 
+            --shadow: 8px 8px 16px rgba(180, 180, 180, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8);
+            --inner-shadow: inset 3px 3px 7px rgba(180, 180, 180, 0.4), inset -3px -3px 7px rgba(255, 255, 255, 0.8);
+            
+            --rank1: #2196f3; 
+            --rank2: #27ae60; 
+            --rank3: #8e44ad; 
+            --rank4: #f39c12; 
+            --rankL: #ff4757; 
+            
+            --dup-bg: #fffde7;    
+            --dup-border: #ff80ab; 
+            --dup-text: #7b1fa2;
+            
+            --card-bg: rgba(243, 230, 255, 0.7); 
+
+            --edit-mode-bg: #e8f5e9;
+            --edit-mode-border: #2d5a27; 
+            
+            --text-color: #444;
+            --sub-text: #666;
+            --label-text: #777;
+            --danger-text: #7b1fa2; 
+        }
+
+        [data-theme='dark'] {
+            --main: #bdc3c7;
+            --bg: rgba(30, 30, 30, 0.9);
+            --today-bg: #1a237e;
+            --today-border: #448aff;
+            --select-bg: #4a148c;
+            --select-border: #e91e63;
+            --record-bg: #1b5e20;
+            --record-border: #81c784;
+            --shadow: 8px 8px 16px rgba(0, 0, 0, 0.6), -4px -4px 10px rgba(60, 60, 60, 0.2);
+            --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.7), inset -2px -2px 5px rgba(60, 60, 60, 0.2);
+            --card-bg: rgba(60, 60, 65, 0.9);  
+            --dup-bg: #3e2723;
+            --dup-border: #ff5252;
+            --dup-text: #ffccbc;
+            --text-color: #eeeeee;
+            --sub-text: #cccccc;
+            --label-text: #bbbbbb;
+            --danger-text: #ffffff; 
+            --rank1: #64b5f6; 
+            --rank2: #2ecc71;   
+            --rank3: #ba68c8; 
+            --rank4: #ffb74d; 
+            --rankL: #ff8a80; 
+            --edit-mode-bg: rgba(35, 35, 45, 0.9); 
+            --edit-mode-border: #27ae60;
+            [data-theme='dark'] .win-rate-pill { color: #2ecc71 !important; }
+        }
+
+        [data-theme='dark'] #monthDisplay, 
+        [data-theme='dark'] #selectedDateTitle,
+        [data-theme='dark'] .stats-card h2,
+        [data-theme='dark'] #searchCard h2 { color: #ffffff !important; }
+        
+        [data-theme='dark'] .day { color: #ffffff !important; background: linear-gradient(145deg, #2c2c2c, #252525); }
+        [data-theme='dark'] .day.sat { color: #5dade2 !important; }
+        [data-theme='dark'] .day.sun, [data-theme='dark'] .day.holiday { color: #e67e22 !important; }
+        [data-theme='dark'] .weekday { color: #95a5a6 !important; }
+        
+        [data-theme='dark'] .setup-row span,
+        [data-theme='dark'] .theme-wrap span,
+        [data-theme='dark'] .zoom-wrap span,
+        [data-theme='dark'] .input-row label { color: var(--label-text) !important; }
+        
+        [data-theme='dark'] select, [data-theme='dark'] input[type="date"], [data-theme='dark'] input[type="text"]#searchDateRange { 
+            background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; 
+        }
+        
+        [data-theme='dark'] .game-item { background: linear-gradient(145deg, #2c2c2c, #333333); }
+        [data-theme='dark'] .game-info { color: #eee; }
+        [data-theme='dark'] .nav-btn { background: rgba(60, 60, 60, 0.6); color: #ffffff !important; box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5), -2px -2px 6px rgba(70, 70, 70, 0.3); }
+
+        * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; 
+            padding: env(safe-area-inset-top) 15px 100px 15px;
+            background-image: url('image_1.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-color);
+            scroll-behavior: smooth;
+        }
+        
+        #welcome-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #4a90e2, #9370db);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10000; transition: opacity 0.8s ease-out; color: white; text-align: center;
+            pointer-events: none;
+        }
+        .welcome-content { animation: fadeInUp 1s ease-out; }
+        .welcome-logo { width: 60px; height: auto; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+        .welcome-text { font-size: 14px; font-weight: 300; line-height: 1.6; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: "Apple Chancery", "Snell Roundhand", "Comic Sans MS", cursive; }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .calendar-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(5px);
+            border-radius: 32px;
+            padding: 24px 18px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .nav-btn {
+            border: none;
+            background: rgba(236, 238, 241, 0.4);
+            width: 44px; height: 44px; border-radius: 14px;
+            box-shadow: 4px 4px 8px rgba(180, 180, 180, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            cursor: pointer; color: #777; transition: 0.2s;
+        }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
+        .weekday { font-size: 11px; font-weight: 900; padding-bottom: 10px; color: #95a5a6; }
+
+        .day { 
+            aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; position: relative; 
+            background: linear-gradient(145deg, rgba(253, 253, 253, 0.8), rgba(226, 229, 234, 0.8)); 
+            box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.22), -2px -2px 6px rgba(255, 255, 255, 0.8); 
+            transition: 0.3s all cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            color: #555; border: 1px solid rgba(255,255,255,0.4);
+        }
+        .day.sat { color: #5dade2; } 
+        .day.sun, .day.holiday { color: #e67e22; } 
+        .day.today { background: var(--today-bg) !important; color: var(--today-border) !important; border: 2px solid var(--today-border) !important; }
+        .day.selected { background: var(--select-bg) !important; color: var(--select-border) !important; transform: scale(1.15); z-index: 5; border: 2px solid var(--select-border) !important; }
+        .day.has-record { background: var(--record-bg); border: 2px solid var(--record-border); color: #2e7d32; }
+        .day.has-record::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--record-dot); border-radius: 50%; }
+        
+        .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
+        .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; }
+        
+        select#playerCount { 
+            flex: none !important; 
+            width: 85px !important; 
+            padding: 8px !important; 
+            margin-left: auto; 
+            border-radius: 12px !important; 
+        }
+
+        .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; width: 100%; }
+        .input-row label { width: 85px; min-width: 85px; max-width: 85px; font-size: 13px; font-weight: 800; color: var(--label-text); flex-shrink: 0; white-space: nowrap; }
+        
+        select, input[type="date"], input[type="text"]#searchDateRange { 
+            width: 0; flex: 1 1 auto; padding: 12px; border-radius: 15px; border: 2px solid transparent; font-size: 14px; 
+            background: rgba(236, 238, 241, 0.4); box-shadow: var(--inner-shadow); color: var(--text-color); font-weight: 600; 
+            -webkit-appearance: none; text-align: center; text-align-last: center; margin: 0;
+        }
+
+        .edit-active select {
+            background-color: var(--edit-mode-bg) !important;
+            border: 2px solid var(--edit-mode-border) !important;
+            color: #27ae60 !important;
+        }
+
+        select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
+
+        button.save-btn { 
+            width: 100%; padding: 16px; 
+            background: linear-gradient(145deg, #abb2b9, #7f8c8d); 
+            color: white; border: none;
+            border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; 
+            font-size: 14px; 
+            box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.38), -2px -2px 8px rgba(255, 255, 255, 0.5);
+            transition: 0.2s all ease;
+        }
+        button.save-btn:active { transform: scale(0.97); }
+        button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-group button { flex: 1; margin-top: 0 !important; }
+        .btn-cancel { background: #bdc3c7 !important; }
+
+        .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; table-layout: fixed; }
+        .stats-table th { 
+            padding: 8px 0px; 
+            color: #5D4037; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            font-size: 12px; 
+            border-bottom: 2px solid rgba(0,0,0,0.05); 
+            white-space: nowrap; 
+        }
+        .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
+        
+        .stats-table th:first-child { border-radius: 12px 0 0 12px; width: 15%; padding-left: 5px; } 
+        .stats-table th:last-child { border-radius: 0 12px 12px 0; width: 15%; } 
+
+        .stats-table tr { background: rgba(255, 255, 255, 0.4); }
+        .stats-table td { 
+            padding: 12px 0px; 
+            text-align: center; 
+            font-weight: 800; 
+            color: var(--text-color); 
+            white-space: nowrap; 
+            font-size: 14px; 
+        }
+
+        .stats-table td:first-child { border-radius: 12px 0 0 12px; text-align: left; padding-left: 5px; width: 15%; } 
+        .stats-table td:last-child { border-radius: 0 12px 12px 0; padding-right: 5px; width: 15%; text-align: right; } 
+        
+        .val-highlight { font-size: 13px; }
+        .win-rate-pill { 
+            color: #27ae60; 
+            font-size: 13px; 
+            display: inline-block; 
+            text-align: right; 
+            width: 100%; 
+            font-weight: 800; 
+        }
+
+        .history-area { margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; display: none; animation: fadeIn 0.3s ease; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255, 252, 212, 0.85); border-radius: 12px; margin-bottom: 8px; font-weight: 800; color: #555; border: 2.5px solid #ff69b4; }
+
+        /* 다크모드 대응 검색 결과 카드 배경 */
+        .search-result-card { background: rgba(255, 255, 255, 0.6) !important; }
+        [data-theme='dark'] .search-result-card { background: rgba(50, 50, 55, 0.9) !important; border-color: #ff4d6d !important; }
+
+        .toast-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.7); color: white; padding: 12px 25px; border-radius: 20px; font-weight: 800; font-size: 14px; z-index: 10002; display: none; }
+
+        .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
+        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; }
+        
+        .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 14px; }
+        
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
+        #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
+        .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .game-item { position: relative; padding: 18px 8px; border-radius: 22px; background: linear-gradient(145deg, #f0f0f0, #ffffff); margin-top: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8); cursor: pointer; transition: transform 0.2s ease; }
+        
+        .game-info { font-size: 20px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; transition: font-size 0.2s; }
+        .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
+
+        .zoom-active .game-info { font-size: 16px !important; }
+        .zoom-active .game-info span { font-size: 11px !important; } 
+        
+        /* 달력 위치 중앙 고정 및 레이아웃 보정 */
+        .flatpickr-calendar { 
+            left: 50% !important; 
+            transform: translateX(-50%) !important; 
+            margin-left: 0 !important;
+        }
+
+        /* 확대 모드(Zoom) 전용 스타일 보정 */
+        .zoom-active .input-row { gap: 8px !important; }
+        .zoom-active .input-row label { width: 75px !important; min-width: 75px !important; max-width: 75px !important; font-size: 13px !important; }
+        .zoom-active select, .zoom-active input[type="text"]#searchDateRange { font-size: 15px !important; letter-spacing: -0.5px !important; padding: 12px 5px !important; width: 0 !important; flex: 1 1 auto !important; }
+        .zoom-active .default-summary-title { display: none !important; }
+        .zoom-active .zoom-summary-title { display: block !important; }
+        .zoom-active .share-btn-common { font-size: 11px !important; padding: 12px 4px !important; }
+        
+        /* 확대 모드 달력 중앙 정렬 및 크기 보정 */
+        .zoom-active .flatpickr-calendar { 
+            width: 280px !important; 
+            margin-top: -30px !important; 
+            transform: translateX(-50%) scale(0.85) !important; 
+            transform-origin: top center !important; 
+        }
+        
+        .action-overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255, 255, 255, 0.6); 
+            backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; gap: 10px; z-index: 10; 
+            border-radius: 22px;
+        }
+        [data-theme='dark'] .action-overlay { background: rgba(0, 0, 0, 0.7); }
+        .action-overlay.active { display: flex; }
+
+        .overlay-btn { 
+            padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 13px; 
+            box-shadow: 2px 4px 8px rgba(0,0,0,0.15); transition: 0.2s;
+        }
+        .overlay-btn:active { transform: scale(0.95); }
+
+        .btn-edit-p { background: #d1e9ff; color: #0056b3; } 
+        .btn-del-p { background: #ffdada; color: #d63031; }  
+        .btn-cancel-p { background: #f0f0f0; color: #636e72; } 
+
+        [data-theme='dark'] .btn-edit-p { background: #2c3e50; color: #3498db; }
+        [data-theme='dark'] .btn-del-p { background: #4b2323; color: #ff7675; }
+        [data-theme='dark'] .btn-cancel-p { background: #3d3d3d; color: #b2bec3; }
+
+        #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
+        .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 30px; text-align: center; width: 80%; max-width: 320px; }
+
+        .theme-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+        .theme-toggle { position: relative; width: 50px; height: 26px; }
+        .theme-toggle input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #2196f3; }
+        input:checked + .slider:before { transform: translateX(24px); }
+        
+        .zoom-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+        .zoom-options { display: flex; gap: 12px; }
+        .zoom-options label { display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 14px; }
+
+        #confirm-buttons-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        #confirm-buttons-wrap button {
+            margin: 0 !important;
+            width: 100%;
+        }
+
+        .share-btn-common {
+            width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc);
+            color: white; border: none; border-radius: 18px; font-weight: 800;
+            display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer; font-size: 12px; transition: transform 0.2s;
+        }
+        .share-btn-common:active { transform: scale(0.98); }
+
+        .player-select-wrap { margin-bottom: 15px; background: rgba(255,255,255,0.3); border-radius: 18px; padding: 15px; border: 1px solid rgba(255,255,255,0.5); box-shadow: var(--inner-shadow); }
+        .player-select-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .player-chip { padding: 10px 5px; border-radius: 12px; background: rgba(255,255,255,0.8); font-weight: 800; font-size: 13px; text-align: center; cursor: pointer; color: var(--sub-text); border: 2px solid transparent; transition: 0.2s; box-shadow: 2px 2px 6px rgba(0,0,0,0.05); }
+        .player-chip.active { background: var(--today-bg); border-color: var(--today-border); color: var(--today-border); box-shadow: none; }
+        [data-theme='dark'] .player-select-wrap { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); }
+        [data-theme='dark'] .player-chip { background: rgba(60,60,65,0.8); color: var(--sub-text); }
+        [data-theme='dark'] .player-chip.active { background: var(--today-bg); color: var(--today-border); border-color: var(--today-border); }
+        .order-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 10005; backdrop-filter: blur(5px); }
+        
+        /* ======== 1. 초구 추첨 팝업 스포트라이트 효과 (CSS 추가) ======== */
+        @keyframes glimmerspin {
+            0% { --glimmer-angle: 0deg; }
+            100% { --glimmer-angle: 360deg; }
+        }
+        @property --glimmer-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+        .order-content { 
+            position: relative;
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 32px; 
+            text-align: center; 
+            width: 85%; max-width: 320px; 
+            box-shadow: var(--shadow); 
+            overflow: hidden; /* 가상 요소 테두리가 내용물 밖으로 나가지 않게 */
+        }
+        /* 반짝반짝 빛나는 회전 테두리 */
+        .order-content::before {
+            content: '';
+            position: absolute;
+            top: -2.5%; left: -2.5%; width: 105%; height: 105%;
+            border-radius: inherit;
+            background: conic-gradient(from var(--glimmer-angle), transparent 30%, var(--accent), var(--rank1), var(--edit), var(--accent) 70%, transparent);
+            animation: glimmerspin 2s linear infinite;
+            z-index: -2;
+            filter: blur(8px);
+        }
+        /* 내용물 영역 배경색 (테두리가 회전하는 것처럼 보이게) */
+        .order-content::after {
+            content: '';
+            position: absolute;
+            top: 1px; left: 1px; width: calc(100% - 2px); height: calc(100% - 2px);
+            border-radius: inherit;
+            background: var(--card-bg);
+            z-index: -1;
+        }
+        /* ========================================================= */
+
+        /* ======== Flatpickr 커스텀 CSS ======== */
+        .flatpickr-calendar, .flatpickr-calendar * {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+        }
+        
+        .flatpickr-current-month .flatpickr-monthhand-title,
+        .flatpickr-current-month input.cur-year {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+            font-weight: 900 !important;
+            background: transparent !important;
+        }
+
+        .flatpickr-calendar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px) !important;
+            border-radius: 28px !important; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.6) !important;
+            padding: 15px !important;
+            width: 320px !important; 
+        }
+        .flatpickr-months .flatpickr-month {
+            height: 40px !important;
+        }
+        .flatpickr-current-month {
+            font-size: 135% !important;
+            font-weight: 900 !important;
+            padding-top: 5px !important;
+        }
+        span.flatpickr-weekday {
+            font-weight: 900 !important;
+            color: #95a5a6 !important;
+            font-size: 12px !important;
+        }
+        .flatpickr-day {
+            border-radius: 16px !important; 
+            font-size: 16px !important;
+            height: 44px !important;
+            line-height: 44px !important;
+            font-weight: 800 !important;
+            max-width: 44px !important;
+            margin: 2px !important;
+        }
+        /* 월별 달력(Month Picker) 아이템 글자 굵게 및 스타일 */
+        .flatpickr-monthSelect-month {
+            font-weight: 900 !important;
+            border-radius: 12px !important;
+        }
+        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange,
+        .flatpickr-monthSelect-month.selected {
+            background: linear-gradient(145deg, #ff4757, #ff6b81) !important;
+            border-color: transparent !important;
+            color: #fff !important;
+            box-shadow: 2px 4px 10px rgba(255, 71, 87, 0.3) !important;
+        }
+        
+        /* 다크모드 대응 */
+        [data-theme='dark'] .flatpickr-calendar {
+            background: rgba(40, 40, 45, 0.95) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6) !important;
+        }
+        [data-theme='dark'] .flatpickr-month, 
+        [data-theme='dark'] .flatpickr-current-month .flatpickr-monthhand-title, 
+        [data-theme='dark'] .flatpickr-current-month input.cur-year {
+            color: #fff !important; fill: #fff !important;
+        }
+        [data-theme='dark'] span.flatpickr-weekday {
+            color: #ccc !important;
+        }
+        [data-theme='dark'] .flatpickr-day,
+        [data-theme='dark'] .flatpickr-monthSelect-month { color: #eeeeee !important; }
+        [data-theme='dark'] .flatpickr-monthSelect-month:hover { background: rgba(255,255,255,0.1) !important; }
+        [data-theme='dark'] .flatpickr-day.inRange {
+            background: rgba(233, 30, 99, 0.2) !important;
+            box-shadow: -5px 0 0 rgba(233, 30, 99, 0.2), 5px 0 0 rgba(233, 30, 99, 0.2) !important;
+            color: #ff8a80 !important;
+        }
+
+        /* ======== 추가 애니메이션 키프레임 ======== */
+        @keyframes heartbeat {
+            0% { transform: scale(1); text-shadow: 0 0 10px rgba(255, 71, 87, 0); }
+            100% { transform: scale(1.2); text-shadow: 0 0 20px rgba(255, 71, 87, 0.6); }
+        }
+        @keyframes flash {
+            0% { opacity: 0.3; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body id="app-body">
+
+<div id="welcome-screen">
+    <div class="welcome-content">
+        <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp&nbsp&nbsp<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</div><br>Version&nbsp;&nbsp1.5
+    </div>
+</div>
+
+<div id="toast" class="toast-msg">기록 없음</div>
+
+<div id="exit-modal">
+    <div class="modal-content">
+        <div style="font-size:50px; margin-bottom:15px;">👋</div>
+        <div id="exit-msg" style="font-size:16px; font-weight:800; color:#444; line-height:1.6; margin-bottom:25px;">오늘도 다들 즐거웠니?<br>다음에 또 보자!</div>
+        <button class="save-btn" id="modalOkBtn" style="margin-bottom:12px;" onclick="closeAppWindow()">OK</button>
+        <button class="save-btn" style="background:#abb2b9; margin:0; width: 100%;" onclick="closeExitModal()">취소</button>
+    </div>
+</div>
+
+<div id="order-modal" class="order-modal">
+    <div class="order-content">
+        <div style="font-size:40px; margin-bottom:15px;">🎱</div>
+        <h2 style="font-size:18px; font-weight:900; color:var(--rank1); margin:0 0 20px 0;">게임 순서 결정</h2>
+        <div id="order-result" style="font-weight: 900; line-height: 2.0; margin-bottom: 25px; color:var(--text-color);"></div>
+        <button class="save-btn" style="margin:0; width:100%;" onclick="closeOrderModal()">확인</button>
+    </div>
+</div>
+
+<div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">순위 데이터 동기화 중</div></div>
+
+<div class="calendar-card">
+    <div class="calendar-header">
+        <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
+        <span id="monthDisplay" style="font-size:20px; font-weight:900; color:#444; letter-spacing:-1px;"></span>
+        <button class="nav-btn" onclick="changeMonth(1)">▶</button>
+    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
+</div>
+
+<div class="card" id="inputCard">
+    <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 20px 0; color:#444; font-weight:800;">📅 날짜 확인 중</h2>
+    <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:15px; background: var(--edit); padding: 12px; border-radius: 12px; text-align: center;">✏️ 기록 수정 중</div>
+
+    <div class="theme-wrap">
+        <span style="font-size:14px; font-weight:800; color:var(--sub-text);">다크 모드</span>
+        <label class="theme-toggle">
+            <input type="checkbox" id="themeSwitch" onchange="toggleTheme()">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="zoom-wrap">
+        <span style="font-size:14px; font-weight:800; color:var(--sub-text);">화면 크기</span>
+        <div class="zoom-options">
+            <label style="color:#9b59b6;">기본 <input type="radio" name="z" value="1" onclick="changeZoom('1')" checked></label>
+            <label style="color:#ff69b4;">확대 <input type="radio" name="z" value="1.2" onclick="changeZoom('1.2')"></label>
+        </div>
+    </div>
+
+    <div class="setup-row">
+        <span style="font-size:14px; font-weight:800; color:#555;">게임 인원</span>
+        <select id="playerCount" onchange="updateInputFields()">
+            <option value="2">2명</option>
+            <option value="3" selected>3명</option>
+            <option value="4">4명</option>
+            <option value="5">5명</option>
+        </select>
+    </div>
+
+    <div class="player-select-wrap">
+        <div style="font-size:13px; font-weight:800; color:var(--sub-text); margin-bottom:10px;">🕹️ 선수 선택(게임 인원에 맞게)</div>
+        <div class="player-select-grid">
+            <div class="player-chip" onclick="togglePlayerSelection(this, '경배')">경배</div>
+            <div class="player-chip" onclick="togglePlayerSelection(this, '원석')">원석</div>
+            <div class="player-chip" onclick="togglePlayerSelection(this, '정석')">정석</div>
+            <div class="player-chip" onclick="togglePlayerSelection(this, '진웅')">진웅</div>
+            <div class="player-chip" onclick="togglePlayerSelection(this, '창한')">창한</div>
+            <div class="player-chip" onclick="togglePlayerSelection(this, '경석')">경석</div>
+        </div>
+    </div>
+    
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <button class="share-btn-common" style="background: linear-gradient(145deg, #1abc9c, #16a085); flex: 2; margin: 0; font-size: 13px;" onclick="pickRandomOrder()">
+            🎲 초구 추첨하기
+        </button>
+        <button class="share-btn-common" style="background: #bdc3c7; flex: 1; margin: 0; color: #444; font-size: 13px;" onclick="resetPlayerSelection()">
+            🔄 선택 취소
+        </button>
+    </div>
+
+    <div id="inputArea"></div>
+    <div class="btn-group">
+        <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
+        <button class="save-btn btn-cancel" onclick="resetInputs()">취소</button>
+    </div>
+    
+    <div id="capture-area" style="padding: 5px; border-radius: 20px;">
+        <div id="dayGameList"></div>
+    </div>
+</div>
+
+<div class="card stats-card">
+    <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적 (이름 터치)</h2>
+    
+    <table class="stats-table">
+        <thead>
+            <tr>
+                <th style="text-align:left; padding-left:12px;">이름</th>
+                <th>참여</th>
+                <th style="color:var(--rank1);" onclick="toggleAllMode()">1위🥇</th>
+                <th style="color:var(--rank2);" onclick="toggleAllMode()">2위</th>
+                <th style="color:var(--rank3);" onclick="toggleAllMode()">3위</th>
+                <th style="color:var(--rank4);" onclick="toggleAllMode()">4위</th>
+                <th style="color:var(--rankL);" onclick="toggleAllMode()">꼴찌💀</th>
+                <th style="text-align:right; padding-right:12px;">승률</th>
+            </tr>
+        </thead>
+        <tbody id="statsBody"></tbody>
+    </table>
+    <div id="memberHistory-capture-area" style="padding: 5px; border-radius: 20px;">
+        <div id="memberHistoryArea" class="history-area"></div>
+    </div>
+    <div id="richFriendArea" style="display:none; background: var(--bg); padding: 20px; border-radius: 22px; text-align: center; margin-top: 20px; color: #7f8c8d; font-weight: 800;"></div>
+</div>
+
+<div class="card" id="searchCard">
+    <h2 style="font-size:16px; margin:5px 0 15px 10px; color:#444; font-weight:800;">🔍 월별 선수 전적 검색</h2>
+    
+    <div class="input-row">
+        <label>검색월</label>
+        <input type="text" id="searchDateRange" style="color: #5D4037; cursor: pointer;" placeholder="월을 선택하세요" readonly>
+    </div>
+    
+    <div class="input-row">
+        <label>선수명</label>
+        <select id="searchPlayer" style="color: #4a148c; font-weight: 800;">
+            <option value="">선택</option>
+            <option value="경배">경배</option>
+            <option value="원석">원석</option>
+            <option value="정석">정석</option>
+            <option value="진웅">진웅</option>
+            <option value="창한">창한</option>
+            <option value="경석">경석</option>
+        </select>
+    </div>
+
+    <div id="search-capture-area" style="padding: 5px; border-radius: 20px; margin-top: 10px; background: transparent;">
+        <div style="display: flex; gap: 10px;">
+            <button class="save-btn" style="background: linear-gradient(145deg, #3498db, #2980b9); margin-top: 0; flex: 2; padding: 12px; font-size: 13px;" onclick="searchRecords()">기록 검색하기</button>
+            <button class="save-btn" style="background: #bdc3c7; margin-top: 0; flex: 1; padding: 12px; font-size: 13px; color: #444;" onclick="resetSearch()">🔄 리셋</button>
+        </div>
+
+        <button id="search-share-btn" class="share-btn-common" style="margin-top: 15px; display: none;" onclick="shareSearchResult()">📸 검색 결과 스크린샷 공유</button>
+
+        <div id="searchSummaryArea" style="margin-top: 15px; display: none;"></div>
+    </div>
+    <div id="searchHistoryListArea" style="margin-top: 10px; display: none;"></div>
+</div>
+
+<div class="danger-zone">
+    <div style="color: var(--danger-text); font-weight:900; margin-bottom:15px; font-size:12px;">데이터 관리 및 백업</div>
+    <div style="display: flex; gap: 10px; margin-bottom: 15px; justify-content: center;">
+        <button class="save-btn" style="background: linear-gradient(145deg, #4a90e2, #357abd); margin-top:0; flex:1; padding: 8px; font-size: 12px;" onclick="exportData()">📥 데이터 백업</button>
+        <button class="save-btn" style="background:#000080; margin-top:0; flex:1; padding: 8px; font-size: 12px;" onclick="triggerImport()">📤 데이터 복구</button>
+    </div>
+    <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importData(event)">
+    <div style="color: var(--danger-text); font-weight:900; margin-bottom:15px; font-size:12px;">초기화 버튼은 함부로 터치하지 마세요.</div>
+    <div id="resetSteps">
+        <button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>
+    </div>
+    <button id="exitBtn" class="exit-btn" style="margin-top: 10px;" onclick="showExitModal()">🚪 앱 종료</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+
+<script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec"; 
+    const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
+    let gameLogs = [];
+    let currentViewDate = new Date();
+    let selectedDateStr = new Date().toLocaleDateString('sv-SE');
+    let editMode = false;
+    let editRound = null;
+    let isPercentMode = false;
+
+    let selectedPlayersForLottery = [];
+    let searchFlatpickr; 
+    let animationStep = 0;
+
+    function togglePlayerSelection(el, name) {
+        if (selectedPlayersForLottery.includes(name)) {
+            selectedPlayersForLottery = selectedPlayersForLottery.filter(p => p !== name);
+            el.classList.remove('active');
+        } else {
+            const limit = parseInt(document.getElementById('playerCount').value);
+            if (selectedPlayersForLottery.length >= limit) {
+                alert(`게임 가능 인원 ${limit}명. 초과 불가`);
+                return;
+            }
+            selectedPlayersForLottery.push(name);
+            el.classList.add('active');
+        }
+        if(!editMode) updateInputFields();
+    }
+
+    function resetPlayerSelection() {
+        selectedPlayersForLottery = [];
+        document.querySelectorAll('.player-chip').forEach(el => el.classList.remove('active'));
+        if(!editMode) updateInputFields();
+    }
+
+    function pickRandomOrder() {
+        const limit = parseInt(document.getElementById('playerCount').value);
+        if (selectedPlayersForLottery.length !== limit) {
+            alert(`게임 참여 ${limit}명을 선택해!(현재 ${selectedPlayersForLottery.length}명)`);
+            return;
+        }
+
+        let pool = [...selectedPlayersForLottery];
+        const firstIdx = Math.floor(Math.random() * pool.length);
+        const firstPlayer = pool.splice(firstIdx, 1)[0];
+        const remaining = pool.sort(() => Math.random() - 0.5);
+
+        const resultArea = document.getElementById('order-result');
+        const confirmBtn = document.querySelector('#order-modal button');
+        
+        const finalHtml = `
+            <div style="background: rgba(33, 150, 243, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 20px; border: 2.5px dashed var(--rank1);">
+                <div style="font-size: 13px; color: var(--rank1); margin-bottom:5px;">🎯 이 게임의 초구는 바로 너!</div>
+                <div style="font-size: 26px; color: var(--rank1); font-weight: 900;">1번 : ${firstPlayer}</div>
+            </div>
+            <div style="font-size: 17px; opacity: 0.9; line-height: 2.2;">
+                ${remaining.map((p, idx) => `<div>${idx + 2}번 : ${p}</div>`).join('')}
+            </div>
+        `;
+
+        if (confirmBtn) confirmBtn.style.display = 'none';
+        document.getElementById('order-modal').style.display = 'flex';
+
+        function finishAnimation() {
+            resultArea.innerHTML = finalHtml;
+            if (confirmBtn) confirmBtn.style.display = 'block';
+            
+            const finalOrder = [firstPlayer, ...remaining];
+            finalOrder.forEach((name, idx) => {
+                const selectEl = document.getElementById('rank' + (idx + 1));
+                if (selectEl) selectEl.value = name;
+            });
+            checkDuplicates();
+        }
+
+        if (animationStep === 0) {
+            resultArea.innerHTML = `
+                <div style="padding: 30px 0;">
+                    <div style="font-size: 13px; color: var(--sub-text); margin-bottom: 10px;">누가 될까...?</div>
+                    <div id="slotName" style="font-size: 32px; font-weight: 900; color: var(--rank1); letter-spacing: 2px;">🎰</div>
+                </div>
+            `;
+            let start = Date.now();
+            let slotName = document.getElementById('slotName');
+            let counter = 0;
+            function runSlot() {
+                let elapsed = Date.now() - start;
+                if (elapsed < 3000) {
+                    slotName.innerText = selectedPlayersForLottery[counter % selectedPlayersForLottery.length];
+                    counter++;
+                    let speed = 50 + Math.pow(elapsed / 3000, 3) * 400; 
+                    setTimeout(runSlot, speed);
+                } else {
+                    finishAnimation();
+                }
+            }
+            runSlot();
+        } else if (animationStep === 1) {
+            resultArea.innerHTML = `
+                <div style="padding: 30px 0; text-align: left;">
+                    <div style="font-size: 13px; font-weight: 800; color: var(--sub-text); margin-bottom: 12px; text-align: center;">당구공 굴러가는 중... 🎱</div>
+                    <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.1); border-radius: 10px; position: relative; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);">
+                        <div id="billiardGauge" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--rank1), var(--accent)); border-radius: 10px; transition: width 3s cubic-bezier(0.2, 0.8, 0.2, 1);"></div>
+                        <div id="billiardBall" style="font-size: 26px; position: absolute; top: -14px; left: 0%; transition: left 3s cubic-bezier(0.2, 0.8, 0.2, 1), transform 3s cubic-bezier(0.2, 0.8, 0.2, 1); transform: translateX(-50%) rotate(0deg);">🎱</div>
+                    </div>
+                </div>
+            `;
+            setTimeout(() => {
+                const gauge = document.getElementById('billiardGauge');
+                const ball = document.getElementById('billiardBall');
+                if(gauge && ball) {
+                    gauge.style.width = '100%';
+                    ball.style.left = '100%';
+                    ball.style.transform = 'translateX(-50%) rotate(1080deg)'; 
+                }
+            }, 50);
+            setTimeout(finishAnimation, 3000);
+        } else if (animationStep === 2) {
+            resultArea.innerHTML = `
+                <div style="padding: 30px 0; display: flex; flex-direction: column; align-items: center;">
+                    <div style="font-size: 55px; animation: heartbeat 0.3s infinite alternate;">🎱</div>
+                    <div style="margin-top: 20px; font-size: 15px; font-weight: 900; color: var(--accent); animation: flash 0.5s infinite alternate;">두구두구... 초구 확인 중!</div>
+                </div>
+            `;
+            setTimeout(finishAnimation, 3000);
+        }
+
+        animationStep = (animationStep + 1) % 3;
+    }
+
+    function closeOrderModal() {
+        document.getElementById('order-modal').style.display = 'none';
+    }
+
+    function toggleTheme() {
+        const isDark = document.getElementById('themeSwitch').checked;
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        renderStats();
+    }
+
+    function formatDate(dateInput) {
+        const d = new Date(dateInput);
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    async function fetchData() {
+        showLoading(true, "Cloud 동기화 중");
+        try {
+            const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
+            const rawData = await response.json();
+            gameLogs = rawData.map(g => ({ ...g, dateStr: formatDate(g.date) }));
+            renderAll(); 
+        } catch (e) { console.error("Fetch error"); } 
+        finally { 
+            showLoading(false); 
+            document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`;
+        }
+    }
+
+    function renderAll() { renderCalendar(); renderStats(); renderGameList(); }
+
+    function isHoliday(year, month, day) {
+        const dStr = `${month + 1}-${day}`;
+        const fixedHolidays = ["1-1", "3-1", "5-1", "5-5", "6-6", "7-17", "8-15", "10-3", "10-9", "12-25"];
+        const variable2026 = ["2-16", "2-17", "2-18", "2-19", "3-2", "5-24", "5-25", "6-3", "8-17", "9-24", "9-25", "9-26", "10-5"];
+        return fixedHolidays.includes(dStr) || (year === 2026 && variable2026.includes(dStr));
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid'); grid.innerHTML = "";
+        const year = currentViewDate.getFullYear(); const month = currentViewDate.getMonth();
+        const realTodayStr = formatDate(new Date());
+        document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
+        ["일","월","화","수","목","금","토"].forEach((d, idx) => {
+            let color = "#95a5a6"; if(idx === 0) color = "#e67e22"; if(idx === 6) color = "#5dade2";
+            grid.innerHTML += `<div class="weekday" style="color:${color}">${d}</div>`;
+        });
+        const firstDay = new Date(year, month, 1).getDay(); const lastDate = new Date(year, month + 1, 0).getDate();
+        for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
+        for (let d = 1; d <= lastDate; d++) {
+            const dStr = formatDate(new Date(year, month, d)); const dayOfWeek = new Date(year, month, d).getDay();
+            let dayClass = (dayOfWeek === 0 || isHoliday(year, month, d)) ? "sun holiday" : (dayOfWeek === 6 ? "sat" : "");
+            const isToday = dStr === realTodayStr ? 'today' : ''; const isSelected = dStr === selectedDateStr ? 'selected' : '';
+            const hasRecord = gameLogs.some(g => g.dateStr === dStr) ? 'has-record' : '';
+            grid.innerHTML += `<div class="day ${dayClass} ${isSelected} ${isToday} ${hasRecord}" onclick="selectDate('${dStr}')">${d}</div>`;
+        }
+    }
+
+    function selectDate(dateStr) { if(editMode) cancelEdit(); selectedDateStr = dateStr; document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`; renderCalendar(); renderGameList(); }
+    
+    function checkDuplicates() {
+        const selects = Array.from(document.querySelectorAll('#inputArea select')); const values = selects.map(s => s.value);
+        selects.forEach(s => s.classList.remove('duplicate-error'));
+        values.forEach((v, i) => { if(v && values.filter(x => x === v).length > 1) selects[i].classList.add('duplicate-error'); });
+    }
+    
+    function updateInputFields(preFill = null) {
+        if(preFill) document.getElementById('playerCount').value = preFill.length;
+        const count = parseInt(document.getElementById('playerCount').value); 
+        const inputArea = document.getElementById('inputArea');
+        inputArea.innerHTML = "";
+        
+        const targetPlayers = preFill ? preFill.filter(n => n.trim() !== "") : (selectedPlayersForLottery.length > 0 ? selectedPlayersForLottery : players);
+
+        let html = '';
+        for(let i=1; i<=count; i++) {
+            const label = i === count ? "꼴찌💀" : (i === 1 ? "1위🥇" : `${i}위`);
+            html += `<div class="input-row"><label>${label}</label><select id="rank${i}" onchange="checkDuplicates()"><option value="">선택</option>${targetPlayers.map(p => `<option value="${p}" ${preFill && preFill[i-1] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`;
+        }
+        inputArea.innerHTML = html;
+        
+        if(!preFill && !editMode && selectedPlayersForLottery.length === 0) {
+            document.querySelectorAll('.player-chip').forEach(el => el.classList.remove('active'));
+        }
+    }
+    
+    function resetInputs() { if(editMode) cancelEdit(); else { document.getElementById('playerCount').value = "3"; resetPlayerSelection(); updateInputFields(); } }
+    
+    async function saveGame() {
+        const realTodayStr = formatDate(new Date());
+        if (selectedDateStr > realTodayStr) { return alert("미래에서 온거야? 날짜를 잘 확인혀!"); }
+        
+        const count = parseInt(document.getElementById('playerCount').value); const ranks = [];
+        for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("친구를 선택해!"); ranks.push(val); }
+        if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
+        
+        if(!editMode && selectedPlayersForLottery.length > 0) {
+            const isAllIncluded = ranks.every(r => selectedPlayersForLottery.includes(r));
+            if(!isAllIncluded) return alert("참여 친구로 선택되지 않은 이름이 있어! 확인해봐.");
+        }
+
+        showLoading(true, "저장 중");
+        const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound };
+        try { 
+            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); 
+            cancelEdit(); 
+            document.getElementById('playerCount').value = "3";
+            resetPlayerSelection();
+            updateInputFields();
+            fetchData(); 
+        } catch (e) { alert("오류 발생!"); showLoading(false); }
+    }
+
+    function confirmReset(step) {
+        const el = document.getElementById('resetSteps');
+        if(step === 1) {
+            el.innerHTML = `<div style="color:#e67e22; font-weight:900; margin-bottom:10px;">[1단계] 정말 삭제할거야?</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:var(--edit);" onclick="confirmReset(2)">OK</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button><button id="exitBtnConfirm" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button></div>`;
+            document.getElementById('exitBtn').style.display = 'none';
+        } else if(step === 2) {
+            el.innerHTML = `<div style="color:var(--accent); font-weight:900; margin-bottom:10px;">[2단계] 데이터가 모두 삭제돼!</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:var(--accent);" onclick="confirmReset(3)">OK</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button><button id="exitBtnConfirm" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button></div>`;
+        } else if(step === 3) {
+            el.innerHTML = `<div style="color:#000; font-weight:900; margin-bottom:10px;">[최종 확인] 복구 불가! 진짜 삭제!</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:#000; color:#fff;" onclick="executeReset()">OK</button><button class="save-btn btn-cancel" onclick="cancelReset()">아냐. 경배한테 혼나.(취소)</button><button id="exitBtnConfirm" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button></div>`;
+        }
+    }
+    function cancelReset() { 
+        document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; 
+        document.getElementById('exitBtn').style.display = 'block';
+    }
+
+    async function executeReset() { showLoading(true, "초기화 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); location.reload(); } catch(e) { showLoading(false); } }
+
+    function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
+
+    function renderStats() {
+        let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
+        gameLogs.forEach(g => {
+            const actual = g.ranks.filter(n => n.trim() !== "");
+            actual.forEach((name, idx) => { if(stats[name]) { stats[name].played++; if (idx === actual.length - 1 && actual.length > 1) stats[name].ranks[4]++; else if (idx < 4) stats[name].ranks[idx]++; } });
+        });
+        const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
+        const maxCounts = { played: 0, r0: 0, r1: 0, r2: 0, r3: 0, r4: 0 };
+        players.forEach(p => { maxCounts.r0 = Math.max(maxCounts.r0, stats[p].ranks[0]); maxCounts.r4 = Math.max(maxCounts.r4, stats[p].ranks[4]); });
+        const bodyHtml = sortedByWin.map(p => {
+            const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
+            let nameStyle = "font-weight:900; cursor:pointer; text-decoration: underline;";
+            const isTopWinner = (stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0 > 0);
+            const isTopLoser = (stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4 > 0);
+            if (isTopLoser) nameStyle += `color:darkred;`; else if (isTopWinner) nameStyle += `color:darkblue;`; else nameStyle += `color:#8e44ad;`;
+            const getVal = (val, total) => isPercentMode ? (total === 0 ? '0%' : ((val/total)*100).toFixed(0) + '%') : val;
+            return `<tr><td style="${nameStyle}" onclick="renderMemberHistory('${p}')">${p}</td><td style="color:#5D4037;">${stats[p].played}</td><td style="color:var(--rank1);">${getVal(stats[p].ranks[0], stats[p].played)}</td><td style="color:var(--rank2);">${getVal(stats[p].ranks[1], stats[p].played)}</td><td style="color:var(--rank3);">${getVal(stats[p].ranks[2], stats[p].played)}</td><td style="color:var(--rank4);">${getVal(stats[p].ranks[3], stats[p].played)}</td><td style="color:var(--rankL);">${getVal(stats[p].ranks[4], stats[p].played)}</td><td><span class="win-rate-pill">${winRate}%</span></td></tr>`;
+        }).join('');
+        document.getElementById('statsBody').innerHTML = bodyHtml;
+        const richFriend = document.getElementById('richFriendArea');
+        if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:16px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; } else richFriend.style.display = 'none';
+    }
+
+    function renderMemberHistory(name) {
+        const historyArea = document.getElementById('memberHistoryArea');
+        const personalGames = gameLogs.filter(g => g.ranks.includes(name)).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+        if (personalGames.length === 0) {
+            const toast = document.getElementById('toast');
+            toast.innerText = "기록 없음";
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
+            return;
+        }
+        let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#5D4037;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span></div>`;
+        html += `<button id="member-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareMemberResult('${name}')">📸 ${name}의 최근 5경기 스크린샷 공유</button>`;
+        personalGames.forEach(g => {
+            const actual = g.ranks.filter(n => n.trim() !== "");
+            const rankIndex = actual.indexOf(name);
+            const rankLabel = (rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
+            html += `<div class="history-item"><span style="font-size:14px; color:#5D4037;">${g.dateStr}</span><span style="font-size:15px; color:${rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : '#5D4037')};">${rankLabel}</span></div>`;
+        });
+        historyArea.innerHTML = html; 
+        historyArea.style.display = 'block';
+        setTimeout(() => { historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+    }
+
+    async function shareMemberResult(name) {
+        const target = document.getElementById('memberHistory-capture-area');
+        if (!target) return;
+        const shareBtn = document.getElementById('member-share-btn');
+        if(shareBtn) shareBtn.style.display = 'none';
+        
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const bgColor = isDark ? '#3c3c41' : '#f4ebfa'; 
+        const originalBg = target.style.background;
+        const originalPadding = target.style.padding;
+        
+        target.style.background = bgColor;
+        target.style.padding = '15px';
+
+        try {
+            await new Promise(r => setTimeout(r, 50));
+            const canvas = await html2canvas(target, { backgroundColor: bgColor, scale: 2, logging: false, useCORS: true });
+            
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], `${name}_history.png`, { type: 'image/png' });
+                if (navigator.share) {
+                    try { await navigator.share({ files: [file], title: `${name}의 최근 전적`, text: `${name} 친구의 최근 5경기 결과입니다!` }); } 
+                    catch (e) { console.log('Share failed', e); }
+                } else {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `${name}_history.png`;
+                    link.click();
+                }
+            }, 'image/png');
+        } catch (err) {
+            alert("캡처 중 오류가 발생했습니다.");
+        } finally {
+            target.style.background = originalBg;
+            target.style.padding = originalPadding;
+            if(shareBtn) shareBtn.style.display = 'block';
+        }
+    }
+
+    function changeZoom(v) { 
+        document.body.style.zoom = v; 
+        if(v === '1.2') document.body.classList.add('zoom-active');
+        else document.body.classList.remove('zoom-active');
+    }
+
+    function renderGameList() {
+        const games = gameLogs.filter(g => g.dateStr === selectedDateStr); 
+        const listArea = document.getElementById('dayGameList');
+        if(games.length > 0) {
+            let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>`;
+            html += `<button id="today-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareTodayResult()">📸 오늘의 전적 스크린샷 공유</button>`;
+            games.forEach((g, idx) => { 
+                const names = g.ranks.filter(n => n && n.trim() !== ""); 
+                let namesLine = "";
+                names.forEach((name, i) => {
+                    const color = i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
+                    namesLine += `<span style="color:${color};display:inline;">${name}</span>`;
+                    if (i < names.length - 1) namesLine += `<span style="display:inline;">→</span>`;
+                });
+                html += `<div class="game-item" onclick="toggleActionOverlay(this)">` +
+                            `<div class="game-info" style="display:flex; justify-content:center; align-items:center; gap:0; white-space:nowrap;">` +
+                                `<span style="margin-right:8px; flex-shrink:0;">${idx+1}G</span>` + 
+                                `<div style="display:inline-flex; align-items:center; gap:0; letter-spacing:-0.5px;">${namesLine}</div>` +
+                            `</div>` +
+                            `<div class="action-overlay">` +
+                                `<div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>` +
+                                `<div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>` +
+                                `<div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div>` +
+                            `</div>` +
+                        `</div>`; 
+            });
+            listArea.innerHTML = html;
+        } else { listArea.innerHTML = ""; }
+    }
+
+    async function shareTodayResult() {
+        const target = document.getElementById('capture-area'); 
+        if (!target) return;
+        const shareBtn = document.getElementById('today-share-btn');
+        if(shareBtn) shareBtn.style.display = 'none';
+        
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const bgColor = isDark ? '#3c3c41' : '#f4ebfa'; 
+        const originalBg = target.style.background;
+        const originalPadding = target.style.padding;
+        
+        target.style.background = bgColor;
+        target.style.padding = '15px';
+
+        try {
+            await new Promise(r => setTimeout(r, 50));
+            const canvas = await html2canvas(target, { backgroundColor: bgColor, scale: 2, logging: false, useCORS: true });
+            
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], `today_record_${selectedDateStr}.png`, { type: 'image/png' });
+                if (navigator.share) {
+                    try { await navigator.share({ files: [file], title: '오늘의 당구 전적', text: `${selectedDateStr} 경기 결과입니다!` }); } 
+                    catch (e) { console.log('Share failed', e); }
+                } else {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `today_record_${selectedDateStr}.png`;
+                    link.click();
+                }
+            }, 'image/png');
+        } catch (err) {
+            alert("캡처 중 오류가 발생했습니다.");
+        } finally {
+            target.style.background = originalBg;
+            target.style.padding = originalPadding;
+            if(shareBtn) shareBtn.style.display = 'block';
+        }
+    }
+
+    async function shareSearchResult() {
+        const target = document.getElementById('search-capture-area');
+        if (!target) return;
+        const shareBtn = document.getElementById('search-share-btn');
+        if(shareBtn) shareBtn.style.display = 'none'; 
+        
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const bgColor = isDark ? '#3c3c41' : '#f4ebfa'; 
+        const originalBg = target.style.background;
+        const originalPadding = target.style.padding;
+        
+        target.style.background = bgColor;
+        target.style.padding = '15px'; 
+
+        try {
+            await new Promise(r => setTimeout(r, 50));
+            const canvas = await html2canvas(target, { backgroundColor: bgColor, scale: 2, logging: false, useCORS: true });
+            
+            canvas.toBlob(async (blob) => {
+                const dateRange = document.getElementById('searchDateRange').value || '검색결과';
+                const file = new File([blob], `search_record_${dateRange}.png`, { type: 'image/png' });
+                if (navigator.share) {
+                    try { await navigator.share({ files: [file], title: '월별 선수 전적', text: `당구 전적 검색 결과입니다!` }); } 
+                    catch (e) { console.log('Share failed', e); }
+                } else {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `search_record_${dateRange}.png`;
+                    link.click();
+                }
+            }, 'image/png');
+        } catch (err) {
+            alert("캡처 중 오류가 발생했습니다.");
+        } finally {
+            target.style.background = originalBg;
+            target.style.padding = originalPadding;
+            if(shareBtn) shareBtn.style.display = 'block';
+        }
+    }
+
+    function toggleActionOverlay(el) {
+        const overlay = el.querySelector('.action-overlay');
+        const isActive = overlay.classList.contains('active');
+        document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active'));
+        if(!isActive) overlay.classList.add('active');
+    }
+
+    function closeAllOverlays() { document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active')); }
+
+    function enterEditMode(round, rankStr) { 
+        editMode = true; editRound = round; 
+        updateInputFields(rankStr.split(',')); 
+        document.getElementById('editBadge').style.display = 'block'; 
+        document.getElementById('inputCard').classList.add('edit-active');
+        const btn = document.getElementById('mainBtn'); btn.innerText = "수정 완료"; btn.classList.add('edit-btn');
+        document.getElementById('inputArea').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        closeAllOverlays();
+    }
+
+    function cancelEdit() { 
+        editMode = false; editRound = null; 
+        document.getElementById('editBadge').style.display = 'none'; 
+        document.getElementById('inputCard').classList.remove('edit-active');
+        const btn = document.getElementById('mainBtn'); btn.innerText = "순위 저장"; btn.classList.remove('edit-btn'); 
+        document.getElementById('playerCount').value = "3";
+        resetPlayerSelection();
+        updateInputFields(); 
+    }
+
+    async function deleteGame(round) { if(!confirm("정말 삭제할거야?")) return; showLoading(true, "삭제 중"); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) }); fetchData(); } catch (e) { showLoading(false); } }
+    function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
+    function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
+    function closeAppWindow() { window.close(); setTimeout(() => { document.body.innerHTML = `<div style="background:linear-gradient(135deg, #4a90e2, #9370db); height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-family:sans-serif;"><div style="font-size:60px; margin-bottom:20px;">👋</div><div style="font-size:20px; font-weight:900; line-height:1.6;">앱 종료</div><div style="font-size:14px; margin-top:30px; opacity:0.8;">다음에 또 봐!</div></div>`; document.body.style.backgroundImage = 'none'; document.body.style.padding = '0'; }, 300); }
+    function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
+    function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
+
+    function exportData() {
+        if (gameLogs.length === 0) return alert("백업할 데이터가 없습니다.");
+        const dataStr = JSON.stringify(gameLogs, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        const exportFileDefaultName = `billiard_backup_${new Date().toLocaleDateString('sv-SE')}.json`;
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+    }
+
+    function triggerImport() { document.getElementById('importFile').click(); }
+
+    async function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (!Array.isArray(importedData)) throw new Error();
+                if (confirm(`총 ${importedData.length}개의 기록. Cloud에 복구 진행.\n기존 데이터는 모두 삭제되고 백업 파일로 대체됨.`)) {
+                    showLoading(true, "데이터 복구 중");
+                    await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
+                    for (const item of importedData) {
+                        const cleanRanks = [item.ranks[0] || "", item.ranks[1] || "", item.ranks[2] || "", item.ranks[3] || "", item.ranks[4] || ""];
+                        await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "SAVE", date: item.dateStr || item.date, ranks: cleanRanks }) });
+                    }
+                    alert("기존 데이터 복구 완료!");
+                    location.reload();
+                }
+            } catch (err) { alert("올바른 백업 파일(.json)이 아니거나 오류 발생"); } 
+            finally { showLoading(false); event.target.value = ''; }
+        };
+        reader.readAsText(file);
+    }
+    
+    function setDefaultSearchDates() {
+        const today = new Date();
+        if (searchFlatpickr) {
+            searchFlatpickr.setDate(today);
+        }
+    }
+
+    function searchRecords() {
+        const selectedMonth = document.getElementById('searchDateRange').value;
+        const player = document.getElementById('searchPlayer').value;
+
+        if(!selectedMonth || !player) return alert("검색월과 선수를 모두 선택해줘!");
+
+        const filteredGames = gameLogs.filter(g => {
+            return g.dateStr.startsWith(selectedMonth) && g.ranks.includes(player);
+        });
+
+        const summaryArea = document.getElementById('searchSummaryArea');
+        const listArea = document.getElementById('searchHistoryListArea');
+        
+        if(filteredGames.length === 0) {
+            summaryArea.innerHTML = `<div style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">해당 월에 ${player}의 기록이 없습니다.</div>`;
+            summaryArea.style.display = 'block';
+            listArea.style.display = 'none';
+            document.getElementById('search-share-btn').style.display = 'none';
+            return;
+        }
+
+        let played = 0;
+        let r = [0, 0, 0, 0, 0];
+        
+        filteredGames.sort((a,b) => new Date(b.dateStr) - new Date(a.dateStr));
+
+        let historyHtml = '';
+        filteredGames.forEach(g => {
+            played++;
+            const actual = g.ranks.filter(n => n.trim() !== "");
+            const rankIndex = actual.indexOf(player);
+            
+            if (rankIndex === actual.length - 1 && actual.length > 1) r[4]++;
+            else if (rankIndex < 4) r[rankIndex]++;
+
+            const rankLabel = (rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
+            const rankColor = rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : 'var(--text-color)');
+
+            let namesLine = "";
+            actual.forEach((name, i) => {
+                const color = i === 0 ? 'var(--rank1)' : (i === actual.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
+                namesLine += `<span style="color:${color};display:inline;">${name}</span>`;
+                if (i < actual.length - 1) namesLine += `<span style="display:inline;">→</span>`;
+            });
+
+            historyHtml += `<div class="history-item search-result-card" style="flex-direction:column; align-items:flex-start; gap:5px;">
+                <div style="display:flex; justify-content:space-between; width:100%;">
+                    <span style="font-size:13px; color:var(--sub-text);">${g.dateStr}</span>
+                    <span style="font-size:14px; font-weight:900; color:${rankColor};">${rankLabel}</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-color); letter-spacing:-0.5px; display:inline-flex; align-items:center;">${namesLine}</div>
+            </div>`;
+        });
+
+        const winRate = played > 0 ? ((r[0] / played) * 100).toFixed(1) : "0.0";
+
+        let summaryHtml = `
+            <div class="summary-box" style="background:var(--record-bg); border:2px solid var(--record-border); border-radius:15px; padding:15px; box-shadow:var(--shadow);">
+                <div style="text-align:center; font-size:15px; font-weight:900; color:var(--text-color); margin-bottom:12px;">
+                    <span class="default-summary-title">[ ${player}, ${selectedMonth} ]</span>
+                    <div class="zoom-summary-title" style="display:none; line-height: 1.4;">
+                        <div>[ ${player} ]</div>
+                        <div style="font-size: 14px;">[ ${selectedMonth} ]</div>
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-around; text-align:center; font-weight:900; font-size:14px;">
+                    <div><div style="color:var(--sub-text); font-size:11px; margin-bottom:3px;">참여</div><div style="color:var(--text-color);">${played}전</div></div>
+                    <div><div style="color:var(--sub-text); font-size:11px; margin-bottom:3px;">1위</div><div style="color:var(--rank1);">${r[0]}승</div></div>
+                    <div><div style="color:var(--sub-text); font-size:11px; margin-bottom:3px;">꼴찌</div><div style="color:var(--rankL);">${r[4]}회</div></div>
+                    <div><div style="color:var(--sub-text); font-size:11px; margin-bottom:3px;">승률</div><div style="color:var(--success);">${winRate}%</div></div>
+                </div>
+            </div>
+        `;
+
+        summaryArea.innerHTML = summaryHtml;
+        summaryArea.style.display = 'block';
+        
+        listArea.innerHTML = `<div style="max-height:250px; overflow-y:auto; padding-right:5px;">${historyHtml}</div>`;
+        listArea.style.display = 'block';
+        
+        document.getElementById('search-share-btn').style.display = 'block';
+    }
+
+    function resetSearch() {
+        setDefaultSearchDates();
+        document.getElementById('searchPlayer').value = "";
+        
+        document.getElementById('searchSummaryArea').innerHTML = "";
+        document.getElementById('searchSummaryArea').style.display = 'none';
+        
+        document.getElementById('searchHistoryListArea').innerHTML = "";
+        document.getElementById('searchHistoryListArea').style.display = 'none';
+        
+        document.getElementById('search-share-btn').style.display = 'none'; 
+        
+        const toast = document.getElementById('toast');
+        toast.innerText = "검색 조건 초기화";
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 1500);
+    }
+
+    window.onload = () => { 
+        searchFlatpickr = flatpickr("#searchDateRange", {
+            plugins: [
+                new monthSelectPlugin({
+                    shorthand: true,
+                    dateFormat: "Y-m",
+                    altFormat: "Y-m"
+                })
+            ],
+            locale: "ko",
+            disableMobile: "true" 
+        });
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('themeSwitch').checked = true; }
+        setTimeout(() => { const ws = document.getElementById('welcome-screen'); if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); } }, 3000);
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if(isIOS) { document.getElementById('exitBtn').innerText = "📱 Return Home"; document.getElementById('exit-msg').innerHTML = "SWIPE UP<br>다음에 또 보자!"; document.getElementById('modalOkBtn').innerText = "확인"; }
+        updateInputFields(); 
+        setDefaultSearchDates(); 
+        fetchData(); 
+    };
+    document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
+</script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="share.js"></script>    
+</body>
+</html>
