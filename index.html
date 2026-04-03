@@ -48,7 +48,7 @@
             --text-color: #444;
             --sub-text: #666;
             --label-text: #777;
-            --danger-text: #7b1fa2; /* 추가: 위험구역 텍스트 컬러 기본값 */
+            --danger-text: #7b1fa2; 
         }
 
         [data-theme='dark'] {
@@ -62,23 +62,21 @@
             --record-border: #81c784;
             --shadow: 8px 8px 16px rgba(0, 0, 0, 0.6), -4px -4px 10px rgba(60, 60, 60, 0.2);
             --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.7), inset -2px -2px 5px rgba(60, 60, 60, 0.2);
-            --card-bg: rgba(60, 60, 65, 0.9);  /* 부드러운 짙은 그레이로 변경 */
+            --card-bg: rgba(60, 60, 65, 0.9);  
             --dup-bg: #3e2723;
             --dup-border: #ff5252;
             --dup-text: #ffccbc;
             --text-color: #eeeeee;
             --sub-text: #cccccc;
             --label-text: #bbbbbb;
-            --danger-text: #ffffff; /* 추가: 다크모드 시 위험구역 텍스트 흰색 */
-            /* 다크모드 순위별 숫자 색상 보정: 더 밝고 진하게 수정 */
+            --danger-text: #ffffff; 
             --rank1: #64b5f6; 
-            --rank2: #2ecc71;   /* 수정 후(더 진하고 선명한 그린) */
+            --rank2: #2ecc71;   
             --rank3: #ba68c8; 
             --rank4: #ffb74d; 
             --rankL: #ff8a80; 
             --edit-mode-bg: rgba(35, 35, 45, 0.9); 
             --edit-mode-border: #27ae60;
-            /* 승률 열을 위해 아래 줄을 다크모드 스타일 구역에 추가 */
             [data-theme='dark'] .win-rate-pill { color: #2ecc71 !important; }
         }
 
@@ -213,21 +211,42 @@
         .btn-cancel { background: #bdc3c7 !important; }
 
         .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; table-layout: fixed; }
-        .stats-table th { padding: 8px 0px; color: #5D4037; font-weight: 900; text-transform: uppercase; font-size: 12px; border-bottom: 2px solid rgba(0,0,0,0.05); white-space: nowrap; }
+        .stats-table th { 
+            padding: 8px 0px; 
+            color: #5D4037; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            font-size: 12px; 
+            border-bottom: 2px solid rgba(0,0,0,0.05); 
+            white-space: nowrap; 
+        }
         .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
         
-        /* 수정 후 (이름 20%, 승률 20%로 축소하 공간 확보) */
         .stats-table th:first-child { border-radius: 12px 0 0 12px; width: 15%; padding-left: 5px; } 
         .stats-table th:last-child { border-radius: 0 12px 12px 0; width: 15%; } 
 
         .stats-table tr { background: rgba(255, 255, 255, 0.4); }
-        .stats-table td { padding: 12px 0px; text-align: center; font-weight: 800; color: var(--text-color); white-space: nowrap; font-size: 14px;}  /* <--- 이 부분을 원하는 크기로 수정하세요 */ 
+        .stats-table td { 
+            padding: 12px 0px; 
+            text-align: center; 
+            font-weight: 800; 
+            color: var(--text-color); 
+            white-space: nowrap; 
+            font-size: 14px; 
+        }
 
-        /* 수정 후 (여백을 12px -> 10px로 줄이고 너비 동기화) */
         .stats-table td:first-child { border-radius: 12px 0 0 12px; text-align: left; padding-left: 5px; width: 15%; } 
         .stats-table td:last-child { border-radius: 0 12px 12px 0; padding-right: 5px; width: 15%; text-align: right; } 
+        
         .val-highlight { font-size: 13px; }
-        .win-rate-pill { color: #27ae60; font-size: 13px; display: inline-block; text-align: right; width: 100%; font-weight: 800; }
+        .win-rate-pill { 
+            color: #27ae60; 
+            font-size: 13px; 
+            display: inline-block; 
+            text-align: right; 
+            width: 100%; 
+            font-weight: 800; 
+        }
 
         .history-area { margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; display: none; animation: fadeIn 0.3s ease; }
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255, 252, 212, 0.85); border-radius: 12px; margin-bottom: 8px; font-weight: 800; color: #555; border: 2.5px solid #ff69b4; }
@@ -300,6 +319,14 @@
             margin: 0 !important;
             width: 100%;
         }
+
+        .share-btn-common {
+            width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc);
+            color: white; border: none; border-radius: 18px; font-weight: 800;
+            display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer; font-size: 12px; transition: transform 0.2s;
+        }
+        .share-btn-common:active { transform: scale(0.98); }
     </style>
 </head>
 <body id="app-body">
@@ -307,7 +334,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp&nbsp&nbsp<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</div><br>Version&nbsp;&nbsp1.30
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp&nbsp&nbsp<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</div><br>Version&nbsp;&nbsp1.50
     </div>
 </div>
 
@@ -368,7 +395,10 @@
         <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
         <button class="save-btn btn-cancel" onclick="resetInputs()">취소</button>
     </div>
-    <div id="dayGameList"></div>
+    
+    <div id="capture-area" style="padding: 5px; border-radius: 20px;">
+        <div id="dayGameList"></div>
+    </div>
 </div>
 
 <div class="card stats-card">
@@ -389,7 +419,9 @@
         </thead>
         <tbody id="statsBody"></tbody>
     </table>
-    <div id="memberHistoryArea" class="history-area"></div>
+    <div id="memberHistory-capture-area" style="padding: 5px; border-radius: 20px;">
+        <div id="memberHistoryArea" class="history-area"></div>
+    </div>
     <div id="richFriendArea" style="display:none; background: var(--bg); padding: 20px; border-radius: 22px; text-align: center; margin-top: 20px; color: #7f8c8d; font-weight: 800;"></div>
 </div>
 
@@ -566,6 +598,10 @@
             return;
         }
         let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#5D4037;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span></div>`;
+        
+        // 여기에 스크린샷 버튼 추가
+        html += `<button id="member-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareMemberResult('${name}')">📸 ${name}의 최근 5경기 스크린샷 공유</button>`;
+
         personalGames.forEach(g => {
             const actual = g.ranks.filter(n => n.trim() !== "");
             const rankIndex = actual.indexOf(name);
@@ -577,6 +613,32 @@
         setTimeout(() => { historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
     }
 
+    async function shareMemberResult(name) {
+        const target = document.getElementById('memberHistory-capture-area');
+        if (!target) return;
+        const shareBtn = document.getElementById('member-share-btn');
+        if(shareBtn) shareBtn.style.display = 'none';
+        try {
+            const canvas = await html2canvas(target, { backgroundColor: null, scale: 2, logging: false, useCORS: true });
+            if(shareBtn) shareBtn.style.display = 'block';
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], `${name}_history.png`, { type: 'image/png' });
+                if (navigator.share) {
+                    try { await navigator.share({ files: [file], title: `${name}의 최근 전적`, text: `${name} 친구의 최근 5경기 결과입니다!` }); } 
+                    catch (e) { console.log('Share failed', e); }
+                } else {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `${name}_history.png`;
+                    link.click();
+                }
+            }, 'image/png');
+        } catch (err) {
+            if(shareBtn) shareBtn.style.display = 'block';
+            alert("캡처 중 오류가 발생했습니다.");
+        }
+    }
+
     function changeZoom(v) { 
         document.body.style.zoom = v; 
         if(v === '1.2') document.body.classList.add('zoom-active');
@@ -584,16 +646,88 @@
     }
 
     function renderGameList() {
-        const games = gameLogs.filter(g => g.dateStr === selectedDateStr); const listArea = document.getElementById('dayGameList');
-        if(games.length > 0) {
-            let html = `<div style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">RECORD</span></div>`;
-            games.forEach((g, idx) => { 
-                const names = g.ranks.filter(n => n && n.trim() !== ""); 
-                const styledNames = names.map((name, i) => `<span style="color:${i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)')};">${name}</span>`);
-                html += `<div class="game-item" onclick="toggleActionOverlay(this)"><div class="game-info"><span>${idx+1}G</span> ${styledNames.join(' → ')}</div><div class="action-overlay"><div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div><div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div><div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div></div></div>`; 
+    const games = gameLogs.filter(g => g.dateStr === selectedDateStr); 
+    const listArea = document.getElementById('dayGameList');
+    
+    if(games.length > 0) {
+        let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>`;
+        html += `<button id="today-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareTodayResult()">📸 오늘의 전적 스크린샷 공유</button>`;
+        
+        games.forEach((g, idx) => { 
+            const names = g.ranks.filter(n => n && n.trim() !== ""); 
+            
+            // 이름과 화살표를 하나의 긴 문자열로 합쳐서 공백 발생을 원천 차단
+            let namesLine = "";
+            names.forEach((name, i) => {
+                const color = i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
+                // 이름 span (태그 앞뒤 공백 제거)
+                namesLine += `<span style="color:${color};display:inline;">${name}</span>`;
+                // 마지막이 아니면 화살표 추가 (공백 없이 처리)
+                if (i < names.length - 1) {
+                    namesLine += `<span style="display:inline;">→</span>`;
+                }
             });
-            listArea.innerHTML = html;
-        } else listArea.innerHTML = "";
+
+            // game-info 내부에서 flex와 gap:0을 사용하여 요소 간 간격을 0으로 고정
+            html += `<div class="game-item" onclick="toggleActionOverlay(this)">` +
+                        `<div class="game-info" style="display:flex; justify-content:center; align-items:center; gap:0; white-space:nowrap;">` +
+                            `<span style="margin-right:8px; flex-shrink:0;">${idx+1}G</span>` + 
+                            `<div style="display:inline-flex; align-items:center; gap:0; letter-spacing:-0.5px;">${namesLine}</div>` +
+                        `</div>` +
+                        `<div class="action-overlay">` +
+                            `<div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>` +
+                            `<div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>` +
+                            `<div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div>` +
+                        `</div>` +
+                    `</div>`; 
+        });
+        listArea.innerHTML = html;
+    } else {
+        listArea.innerHTML = "";
+    }
+}
+
+    async function shareTodayResult() {
+        const target = document.getElementById('capture-area'); 
+        if (!target) return;
+        
+        // 캡처 전 버튼을 숨김 (캡처 화면에 안 나오게 함)
+        const shareBtn = document.getElementById('today-share-btn');
+        if(shareBtn) shareBtn.style.display = 'none';
+
+        try {
+            const canvas = await html2canvas(target, {
+                backgroundColor: null,
+                scale: 2,
+                logging: false,
+                useCORS: true
+            });
+
+            // 캡처 완료 후 버튼을 다시 표시 (공유 앱 목록 화면에는 버튼이 보임)
+            if(shareBtn) shareBtn.style.display = 'block';
+
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], `today_record_${selectedDateStr}.png`, { type: 'image/png' });
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: '오늘의 당구 전적',
+                            text: `${selectedDateStr} 경기 결과입니다!`
+                        });
+                    } catch (e) { console.log('Share failed', e); }
+                } else {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `today_record_${selectedDateStr}.png`;
+                    link.click();
+                }
+            }, 'image/png');
+        } catch (err) {
+            // 오류 발생 시에도 버튼을 다시 표시
+            if(shareBtn) shareBtn.style.display = 'block';
+            alert("캡처 중 오류가 발생했습니다.");
+        }
     }
 
     function toggleActionOverlay(el) {
@@ -630,14 +764,13 @@
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
     
     function closeAppWindow() { 
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         window.close();
         setTimeout(() => {
             document.body.innerHTML = `
                 <div style="background:linear-gradient(135deg, #4a90e2, #9370db); height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-family:sans-serif;">
                     <div style="font-size:60px; margin-bottom:20px;">👋</div>
-                    <div style="font-size:20px; font-weight:900; line-height:1.6;">앱 종료<br>안녕</div>
-                    <div style="font-size:14px; margin-top:30px; opacity:0.8;">브라우저 하단의 [완료] 버튼<br>[X] 버튼 터치</div>
+                    <div style="font-size:20px; font-weight:900; line-height:1.6;">앱 종료</div>
+                    <div style="font-size:14px; margin-top:30px; opacity:0.8;">다음에 또 봐!</div>
                 </div>`;
             document.body.style.backgroundImage = 'none';
             document.body.style.padding = '0';
@@ -647,7 +780,6 @@
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
-    // --- 데이터 백업 및 복구 로직 시작 ---
 function exportData() {
     if (gameLogs.length === 0) return alert("백업할 데이터가 없습니다.");
     const dataStr = JSON.stringify(gameLogs, null, 2);
@@ -673,9 +805,7 @@ async function importData(event) {
             if (!Array.isArray(importedData)) throw new Error();
             if (confirm(`총 ${importedData.length}개의 기록. Cloud에 복구 진행.\n기존 데이터는 모두 삭제되고 백업 파일로 대체됨.`)) {
                 showLoading(true, "데이터 복구 중");
-                // 1. 기존 데이터 초기화
                 await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
-                // 2. 데이터 순차 업로드
                 for (const item of importedData) {
                     const cleanRanks = [
                         item.ranks[0] || "", item.ranks[1] || "", 
@@ -697,12 +827,11 @@ async function importData(event) {
             alert("올바른 백업 파일(.json)이 아니거나 오류 발생");
         } finally {
             showLoading(false);
-            event.target.value = ''; // 파일 선택 초기화
+            event.target.value = ''; 
         }
     };
     reader.readAsText(file);
 }
-// --- 데이터 백업 및 복구 로직 끝 ---
     
     window.onload = () => { 
         const savedTheme = localStorage.getItem('theme');
@@ -720,6 +849,7 @@ async function importData(event) {
     };
     document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
 </script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="share.js"></script>    
 </body>
 </html>
