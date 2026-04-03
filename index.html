@@ -216,14 +216,11 @@
         .stats-table th { padding: 8px 0px; color: #5D4037; font-weight: 900; text-transform: uppercase; font-size: 12px; border-bottom: 2px solid rgba(0,0,0,0.05); white-space: nowrap; }
         .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
         
-        /* 수정 후 (이름 20%, 승률 20%로 축소하 공간 확보) */
         .stats-table th:first-child { border-radius: 12px 0 0 12px; width: 15%; padding-left: 5px; } 
         .stats-table th:last-child { border-radius: 0 12px 12px 0; width: 15%; } 
 
         .stats-table tr { background: rgba(255, 255, 255, 0.4); }
-        .stats-table td { padding: 12px 0px; text-align: center; font-weight: 800; color: var(--text-color); white-space: nowrap; font-size: 14px;}  /* <--- 이 부분을 원하는 크기로 수정하세요 */ 
-
-        /* 수정 후 (여백을 12px -> 10px로 줄이고 너비 동기화) */
+        .stats-table td { padding: 12px 0px; text-align: center; font-weight: 800; color: var(--text-color); white-space: nowrap; font-size: 14px;} 
         .stats-table td:first-child { border-radius: 12px 0 0 12px; text-align: left; padding-left: 5px; width: 15%; } 
         .stats-table td:last-child { border-radius: 0 12px 12px 0; padding-right: 5px; width: 15%; text-align: right; } 
         .val-highlight { font-size: 13px; }
@@ -249,10 +246,6 @@
         .game-info { font-size: 20px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; transition: font-size 0.2s; }
         .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
 
-        .zoom-active .game-info { font-size: 16px !important; }
-        .zoom-active .game-info span { font-size: 11px !important; } 
-        .zoom-active .share-btn-common { font-size: 12px !important; padding: 12px 2px !important; letter-spacing: -0.5px !important; }
-      
         .action-overlay { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(255, 255, 255, 0.6); 
@@ -301,6 +294,15 @@
             margin: 0 !important;
             width: 100%;
         }
+
+        /* 공유 버튼 스타일 추가 */
+        .share-btn-common {
+            width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc);
+            color: white; border: none; border-radius: 18px; font-weight: 800;
+            display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer; font-size: 12px; transition: transform 0.2s;
+        }
+        .share-btn-common:active { transform: scale(0.98); }
     </style>
 </head>
 <body id="app-body">
@@ -390,7 +392,9 @@
         </thead>
         <tbody id="statsBody"></tbody>
     </table>
-    <div id="memberHistoryArea" class="history-area"></div>
+    <div id="memberHistory-capture-area" style="padding: 5px; border-radius: 20px;">
+        <div id="memberHistoryArea" class="history-area"></div>
+    </div>
     <div id="richFriendArea" style="display:none; background: var(--bg); padding: 20px; border-radius: 22px; text-align: center; margin-top: 20px; color: #7f8c8d; font-weight: 800;"></div>
 </div>
 
@@ -567,6 +571,10 @@
             return;
         }
         let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#5D4037;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span></div>`;
+        
+        // 공유 버튼 추가
+        html += `<button id="member-share-btn" class="share-btn-common" style="margin-bottom:14px;" onclick="shareMemberResult('${name}')">📸 ${name}의 최근 5경기 스크린샷 공유</button>`;
+
         personalGames.forEach(g => {
             const actual = g.ranks.filter(n => n.trim() !== "");
             const rankIndex = actual.indexOf(name);
@@ -576,6 +584,48 @@
         historyArea.innerHTML = html; 
         historyArea.style.display = 'block';
         setTimeout(() => { historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+    }
+
+    // 캡처 영역을 다크 모드에서도 예쁘게 캡처되도록 보정하는 함수 추가
+    async function shareMemberResult(name) {
+        const target = document.getElementById('memberHistory-capture-area');
+        if (!target) return;
+        const shareBtn = document.getElementById('member-share-btn');
+        if(shareBtn) shareBtn.style.display = 'none';
+        
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        // 라이트/다크 모드에 맞춰 배경색 명시적으로 깔아주어 투명하게 검은색으로 찍히는 것 방지
+        const bgColor = isDark ? '#3c3c41' : '#f4ebfa'; 
+        const originalBg = target.style.background;
+        const originalPadding = target.style.padding;
+        
+        target.style.background = bgColor;
+        target.style.padding = '15px';
+
+        try {
+            await new Promise(r => setTimeout(r, 50)); // 렌더링 대기
+            const canvas = await html2canvas(target, { backgroundColor: bgColor, scale: 2, logging: false, useCORS: true });
+            
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], `${name}_history.png`, { type: 'image/png' });
+                if (navigator.share) {
+                    try { await navigator.share({ files: [file], title: `${name}의 최근 전적`, text: `${name} 친구의 최근 5경기 결과입니다!` }); } 
+                    catch (e) { console.log('Share failed', e); }
+                } else {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `${name}_history.png`;
+                    link.click();
+                }
+            }, 'image/png');
+        } catch (err) {
+            alert("캡처 중 오류가 발생했습니다.");
+        } finally {
+            // 버튼 및 스타일 복구
+            target.style.background = originalBg;
+            target.style.padding = originalPadding;
+            if(shareBtn) shareBtn.style.display = 'block';
+        }
     }
 
     function changeZoom(v) { 
@@ -721,6 +771,7 @@ async function importData(event) {
     };
     document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
 </script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="share.js"></script>    
 </body>
 </html>
