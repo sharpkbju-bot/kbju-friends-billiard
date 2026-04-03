@@ -597,10 +597,10 @@
             setTimeout(() => { toast.style.display = 'none'; }, 2000);
             return;
         }
-        let html = `<div style="font-size:13px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#5D4037;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span></div>`;
+        let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#5D4037;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span></div>`;
         
         // 여기에 스크린샷 버튼 추가
-        html += `<button id="member-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareMemberResult('${name}')">📸 ${name}의 최근 5경기 스크린샷 공유</button>`;
+        html += `<button id="member-share-btn" class="share-btn-common" style="margin-bottom:14px;" onclick="shareMemberResult('${name}')">📸 ${name}의 최근 5경기 스크린샷 공유</button>`;
 
         personalGames.forEach(g => {
             const actual = g.ranks.filter(n => n.trim() !== "");
