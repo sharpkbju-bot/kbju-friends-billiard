@@ -403,23 +403,28 @@
 </div>
 
 <div class="card stats-card">
-    <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적 (이름 터치)</h2>
-    
-    <table class="stats-table">
-        <thead>
-            <tr>
-                <th style="text-align:left; padding-left:12px;">이름</th>
-                <th>참여</th>
-                <th style="color:var(--rank1);" onclick="toggleAllMode()">1위🥇</th>
-                <th style="color:var(--rank2);" onclick="toggleAllMode()">2위</th>
-                <th style="color:var(--rank3);" onclick="toggleAllMode()">3위</th>
-                <th style="color:var(--rank4);" onclick="toggleAllMode()">4위</th>
-                <th style="color:var(--rankL);" onclick="toggleAllMode()">꼴찌💀</th>
-                <th style="text-align:right; padding-right:12px;">승률</th>
-            </tr>
-        </thead>
-        <tbody id="statsBody"></tbody>
-    </table>
+    <div id="stats-capture-area" style="padding: 5px; border-radius: 20px;">
+        <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#444; font-weight:800;">📊 멤버별 누적 전적 (이름 터치)</h2>
+        
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th style="text-align:left; padding-left:12px;">이름</th>
+                    <th>참여</th>
+                    <th style="color:var(--rank1);" onclick="toggleAllMode()">1위🥇</th>
+                    <th style="color:var(--rank2);" onclick="toggleAllMode()">2위</th>
+                    <th style="color:var(--rank3);" onclick="toggleAllMode()">3위</th>
+                    <th style="color:var(--rank4);" onclick="toggleAllMode()">4위</th>
+                    <th style="color:var(--rankL);" onclick="toggleAllMode()">꼴찌💀</th>
+                    <th style="text-align:right; padding-right:12px;">승률</th>
+                </tr>
+            </thead>
+            <tbody id="statsBody"></tbody>
+        </table>
+    </div>
+
+    <button id="stats-share-btn" class="share-btn-common" style="margin-top:10px; margin-bottom:15px;" onclick="shareStatsResult()">📸 누적 전적 스크린샷 공유</button>
+
     <div id="memberHistory-capture-area" style="padding: 5px; border-radius: 20px;">
         <div id="memberHistoryArea" class="history-area"></div>
     </div>
@@ -600,7 +605,7 @@
         }
         let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#5D4037;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span></div>`;
         
-        // 여기에 스크린샷 버튼 추가
+        // 기존: 특정 선수의 5경기 스크린샷 버튼
         html += `<button id="member-share-btn" class="share-btn-common" style="margin-bottom:14px;" onclick="shareMemberResult('${name}')">📸 ${name}의 최근 5경기 스크린샷 공유</button>`;
 
         personalGames.forEach(g => {
@@ -612,6 +617,34 @@
         historyArea.innerHTML = html; 
         historyArea.style.display = 'block';
         setTimeout(() => { historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+    }
+
+    // 새로 추가한 누적 전적 테이블(빨간 박스) 전용 캡처 함수
+    async function shareStatsResult() {
+        const target = document.getElementById('stats-capture-area');
+        if (!target) return;
+        const shareBtn = document.getElementById('stats-share-btn');
+        if(shareBtn) shareBtn.style.display = 'none';
+        
+        try {
+            const canvas = await html2canvas(target, { backgroundColor: null, scale: 2, logging: false, useCORS: true });
+            if(shareBtn) shareBtn.style.display = 'block';
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], `total_stats.png`, { type: 'image/png' });
+                if (navigator.share) {
+                    try { await navigator.share({ files: [file], title: '누적 전적', text: '멤버별 누적 전적입니다!' }); } 
+                    catch (e) { console.log('Share failed', e); }
+                } else {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `total_stats.png`;
+                    link.click();
+                }
+            }, 'image/png');
+        } catch (err) {
+            if(shareBtn) shareBtn.style.display = 'block';
+            alert("캡처 중 오류가 발생했습니다.");
+        }
     }
 
     async function shareMemberResult(name) {
