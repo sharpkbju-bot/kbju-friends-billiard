@@ -268,6 +268,10 @@
         .game-info { font-size: 20px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; transition: font-size 0.2s; }
         .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
 
+        .zoom-active .game-info { font-size: 16px !important; }
+        .zoom-active .game-info span { font-size: 11px !important; } 
+        .zoom-active .share-btn-common { font-size: 12px !important; padding: 12px 2px !important; letter-spacing: -0.5px !important; }
+        
         .action-overlay { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(255, 255, 255, 0.6); 
@@ -418,6 +422,7 @@
             <tbody id="statsBody"></tbody>
         </table>
     </div>
+
     <div id="memberHistory-capture-area" style="padding: 5px; border-radius: 20px;">
         <div id="memberHistoryArea" class="history-area"></div>
     </div>
@@ -598,8 +603,8 @@
         }
         let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#5D4037;" onclick="this.parentElement.parentElement.style.display='none'">닫기 ✕</span></div>`;
         
-        // 여기에 누적 전적 스크린샷 공유 버튼 삽입
-        html += `<button id="stats-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareStatsResult()">📸 누적 전적 스크린샷 공유</button>`;
+        // 1번 요청: xx의 최근 5경기 스크린샷 버튼 복원
+        html += `<button id="member-share-btn" class="share-btn-common" style="margin-bottom:14px;" onclick="shareMemberResult('${name}')">📸 ${name}의 최근 5경기 스크린샷 공유</button>`;
 
         personalGames.forEach(g => {
             const actual = g.ranks.filter(n => n.trim() !== "");
@@ -612,24 +617,23 @@
         setTimeout(() => { historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
     }
 
-    async function shareStatsResult() {
-        const target = document.getElementById('stats-capture-area');
+    async function shareMemberResult(name) {
+        const target = document.getElementById('memberHistory-capture-area');
         if (!target) return;
-        const shareBtn = document.getElementById('stats-share-btn');
+        const shareBtn = document.getElementById('member-share-btn');
         if(shareBtn) shareBtn.style.display = 'none';
-        
         try {
             const canvas = await html2canvas(target, { backgroundColor: null, scale: 2, logging: false, useCORS: true });
             if(shareBtn) shareBtn.style.display = 'block';
             canvas.toBlob(async (blob) => {
-                const file = new File([blob], `total_stats.png`, { type: 'image/png' });
+                const file = new File([blob], `${name}_history.png`, { type: 'image/png' });
                 if (navigator.share) {
-                    try { await navigator.share({ files: [file], title: '누적 전적', text: '멤버별 누적 전적입니다!' }); } 
+                    try { await navigator.share({ files: [file], title: `${name}의 최근 전적`, text: `${name} 친구의 최근 5경기 결과입니다!` }); } 
                     catch (e) { console.log('Share failed', e); }
                 } else {
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
-                    link.download = `total_stats.png`;
+                    link.download = `${name}_history.png`;
                     link.click();
                 }
             }, 'image/png');
@@ -650,6 +654,10 @@
         const listArea = document.getElementById('dayGameList');
         if(games.length > 0) {
             let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>`;
+            
+            // 2번, 3번 요청: 삭제하셨다던 기존 (오늘의) 전적 스크린샷 공유 버튼 자리를 삭제하고, 이 자리에 누적 전적 스크린샷 공유 버튼 신규 삽입
+            html += `<button id="stats-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareStatsResult()">📸 누적 전적 스크린샷 공유</button>`;
+            
             games.forEach((g, idx) => { 
                 const names = g.ranks.filter(n => n && n.trim() !== ""); 
                 let namesLine = "";
@@ -672,6 +680,47 @@
             });
             listArea.innerHTML = html;
         } else { listArea.innerHTML = ""; }
+    }
+
+    // 4번 요청: 새로운 누적 전적 스크린샷 캡처 함수 (빨간 박스 영역만 캡처)
+    async function shareStatsResult() {
+        const target = document.getElementById('stats-capture-area'); 
+        if (!target) return;
+        
+        const shareBtn = document.getElementById('stats-share-btn');
+        if(shareBtn) shareBtn.style.display = 'none';
+
+        try {
+            const canvas = await html2canvas(target, {
+                backgroundColor: null,
+                scale: 2,
+                logging: false,
+                useCORS: true
+            });
+
+            if(shareBtn) shareBtn.style.display = 'block';
+
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], `total_stats_${selectedDateStr}.png`, { type: 'image/png' });
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: '누적 전적',
+                            text: '멤버별 누적 전적입니다!'
+                        });
+                    } catch (e) { console.log('Share failed', e); }
+                } else {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `total_stats_${selectedDateStr}.png`;
+                    link.click();
+                }
+            }, 'image/png');
+        } catch (err) {
+            if(shareBtn) shareBtn.style.display = 'block';
+            alert("캡처 중 오류가 발생했습니다.");
+        }
     }
 
     function toggleActionOverlay(el) {
