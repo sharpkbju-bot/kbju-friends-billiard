@@ -1133,13 +1133,21 @@
             setTimeout(() => { toast.style.display = 'none'; }, 2000);
             return;
         }
+        
+        // --- v2.30 닫기 버튼 클릭 시 전적 카드로 스크롤 이동 복구 ---
         let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#5D4037;" onclick="this.parentElement.parentElement.style.display='none'; document.querySelector('.stats-card').scrollIntoView({ behavior: 'smooth', block: 'center' });">닫기 ✕</span></div>`;
         html += `<button id="member-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareMemberResult('${name}')">📸 ${name}의 최근 5경기 스크린샷 공유</button>`;
+        
         personalGames.forEach(g => {
             const actual = g.ranks.filter(n => n.trim() !== "");
             const rankIndex = actual.indexOf(name);
             const rankLabel = (rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
-            html += `<div class="history-item"><span style="font-size:14px; color:#5D4037;">${g.dateStr}</span><span style="font-size:15px; color:${rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : '#5D4037')};">${rankLabel}</span></div>`;
+            
+            // --- v2.30 추가 기능: 해당 날짜의 전체 게임 중 몇 번째 게임인지 계산 ---
+            const dayGames = gameLogs.filter(log => log.dateStr === g.dateStr);
+            const gameIndex = dayGames.indexOf(g) + 1;
+            
+            html += `<div class="history-item"><span style="font-size:14px; color:#5D4037;">${g.dateStr} <span style="font-size:12px; color:#888; margin-left:4px;">${gameIndex}G</span></span><span style="font-size:15px; color:${rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : '#5D4037')};">${rankLabel}</span></div>`;
         });
         historyArea.innerHTML = html; 
         historyArea.style.display = 'block';
@@ -1470,6 +1478,7 @@
     function resetSearch() {
         setDefaultSearchDates();
         
+        // 리셋 시 선수 목록 전체 복구 로직 추가
         let optionsHtml = '<option value="">선택</option>';
         players.forEach(p => { optionsHtml += `<option value="${p}">${p}</option>`; });
         document.getElementById('searchPlayer').innerHTML = optionsHtml;
@@ -1509,8 +1518,10 @@
                         toast.style.display = 'block';
                         setTimeout(() => { toast.style.display = 'none'; }, 2000);
                         
+                        // 게임 기록이 없으면 선수 목록 비우기
                         document.getElementById('searchPlayer').innerHTML = '<option value="">선택</option>';
                     } else {
+                        // 게임 기록이 있으면 참여한 선수만 필터링하여 목록 갱신
                         const gamesInMonth = gameLogs.filter(g => g.dateStr.startsWith(dateStr));
                         const activePlayers = new Set();
                         gamesInMonth.forEach(g => {
