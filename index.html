@@ -84,31 +84,13 @@
             --edit-mode-border: #27ae60;
         }
 
-        /* 🌟 다크 모드 전용 가독성 보정 (v2.15 적용분) */
+        /* 🌟 v2.15: 다크 모드 전용 가독성 보정 */
         [data-theme='dark'] .win-rate-pill { color: #ffd60a !important; }
         [data-theme='dark'] .stats-table td[style*="color:darkblue;"] { color: #448aff !important; } 
         [data-theme='dark'] .stats-table td[style*="color:darkred;"] { color: #ff5252 !important; } 
         [data-theme='dark'] .stats-table td[style*="color:#8e44ad;"] { color: #eeeeee !important; } 
         [data-theme='dark'] .stats-table td[style*="color:#5D4037;"] { color: #eeeeee !important; } 
-
-        [data-theme='dark'] #monthDisplay, 
-        [data-theme='dark'] #selectedDateTitle,
-        [data-theme='dark'] .stats-card h2,
-        [data-theme='dark'] #searchCard h2 { color: #ffffff !important; }
-        [data-theme='dark'] .weekday { color: #95a5a6 !important; }
-        
-        [data-theme='dark'] .setup-row span,
-        [data-theme='dark'] .theme-wrap span,
-        [data-theme='dark'] .zoom-wrap span,
-        [data-theme='dark'] .input-row label { color: var(--label-text) !important; }
-        
-        [data-theme='dark'] select, [data-theme='dark'] input[type="date"], [data-theme='dark'] input[type="text"]#searchDateRange { 
-            background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; 
-        }
-        
-        [data-theme='dark'] .game-item { background: linear-gradient(145deg, #2c2c2c, #333333); }
-        [data-theme='dark'] .game-info { color: #eee; }
-        [data-theme='dark'] .nav-btn { background: rgba(60, 60, 60, 0.6); color: #ffffff !important; box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5), -2px -2px 6px rgba(70, 70, 70, 0.3); }
+        [data-theme='dark'] #monthDisplay, [data-theme='dark'] #selectedDateTitle, [data-theme='dark'] .stats-card h2, [data-theme='dark'] #searchCard h2 { color: #ffffff !important; }
 
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
@@ -141,17 +123,16 @@
         
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 🌟 v2.15: 아이폰 버그 픽스 - 고정 크기 및 하드웨어 가속 */
+        /* 🌟 v2.15: 아이폰 버그 픽스 - 고정 높이 42px 및 하드웨어 가속 */
         .day { 
             width: 100%; max-width: 42px; height: 42px; margin: 0 auto;
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; position: relative; 
-            background: linear-gradient(145deg, rgba(253, 253, 253, 0.9), rgba(226, 229, 234, 0.9)); 
+            background: linear-gradient(145deg, rgba(253, 253, 253, 0.8), rgba(226, 229, 234, 0.8)); 
             box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.22), -2px -2px 6px rgba(255, 255, 255, 0.8); 
             transition: 0.3s all cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             color: #555; border: 1px solid rgba(255,255,255,0.4);
             -webkit-transform: translateZ(0); transform: translateZ(0); 
-            font-family: 'Pretendard', sans-serif;
         }
         .day.sat { color: #5dade2; } 
         .day.sun, .day.holiday { color: #e67e22; } 
@@ -159,7 +140,7 @@
         .day.has-record { background: var(--record-bg) !important; border: 2px solid var(--record-border) !important; color: #2e7d32 !important; }
         .day.has-record::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--record-dot) !important; border-radius: 50%; }
 
-        /* 🌟 진한 핑크색 선택 강조 */
+        /* 🌟 v2.15: 진한 핑크 선택 효과 강조 */
         .day.selected { 
             background: #ff4d6d !important; 
             color: #ffffff !important; 
@@ -177,15 +158,7 @@
         [data-theme='dark'] .calendar-card { background: rgba(45, 55, 70, 0.9); }
 
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .nav-btn {
-            border: none;
-            background: rgba(236, 238, 241, 0.6);
-            width: 44px; height: 44px; border-radius: 14px;
-            box-shadow: 4px 4px 8px rgba(180, 180, 180, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-            cursor: pointer; color: #555; transition: 0.2s;
-            font-family: 'Pretendard', sans-serif;
-        }
+        .nav-btn { border: none; background: rgba(236, 238, 241, 0.6); width: 44px; height: 44px; border-radius: 14px; box-shadow: 4px 4px 8px rgba(180, 180, 180, 0.3); font-size: 14px; cursor: pointer; color: #555; font-family: 'Pretendard', sans-serif; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
         .weekday { font-size: 11px; font-weight: 900; padding-bottom: 10px; color: #7f8c8d; }
 
@@ -210,9 +183,6 @@
         
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255, 252, 212, 0.85); border-radius: 12px; margin-bottom: 8px; font-weight: 800; color: #555; border: 2.5px solid #ff69b4; }
 
-        .zoom-active .calendar-grid { gap: 6px !important; }
-        .zoom-active .day { max-width: 36px !important; height: 36px !important; font-size: 13px !important; border-radius: 12px !important; }
-        
         @keyframes scaleUpPopup { 0% { transform: scale(0.3); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes scaleDownPopup { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.3); opacity: 0; } }
         
@@ -224,14 +194,14 @@
         @property --glimmer-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
 
         .player-chip { padding: 10px 5px; border-radius: 12px; background: rgba(255,255,255,0.8); font-weight: 800; font-size: 13px; text-align: center; cursor: pointer; color: var(--sub-text); border: 2px solid transparent; transition: 0.2s; box-shadow: 2px 2px 6px rgba(0,0,0,0.05); font-family: 'Pretendard', sans-serif; }
-        .player-chip.active { background: #4caf50 !important; border-color: #1b5e20 !important; color: #ffffff !important; font-weight: 800 !important; }
+        .player-chip.active { background: #4caf50 !important; border-color: #1b5e20 !important; color: #ffffff !important; font-weight: 800 !important; box-shadow: none !important; }
         [data-theme='dark'] .player-chip.active { background: #2e7d32 !important; border-color: #81c784 !important; }
         
         .toast-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.7); color: white; padding: 12px 25px; border-radius: 20px; font-weight: 800; font-size: 14px; z-index: 10002; display: none; }
         .danger-zone { text-align: center; margin-top: 20px; }
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 14px; cursor: pointer; }
 
-        .game-item { position: relative; padding: 18px 8px; border-radius: 22px; background: linear-gradient(145deg, #f0f0f0, #ffffff); margin-top: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8); cursor: pointer; }
+        .game-item { position: relative; padding: 18px 8px; border-radius: 22px; background: linear-gradient(145deg, #f0f0f0, #ffffff); margin-top: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 6px 6px 12px rgba(0,0,0,0.1); cursor: pointer; }
         .game-info { font-size: 20px; font-weight: 900; color: var(--text-color); display: flex; justify-content: center; align-items: center; white-space: nowrap; }
         .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
 
@@ -283,7 +253,7 @@
 <div class="calendar-card">
     <div class="calendar-header">
         <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
-        <span id="monthDisplay" style="font-size:20px; font-weight:900; color:#444; letter-spacing:-1px;"></span>
+        <span id="monthDisplay" style="font-size:20px; font-weight:900; color:#444;"></span>
         <button class="nav-btn" onclick="changeMonth(1)">▶</button>
     </div>
     <div class="calendar-grid" id="calendarGrid"></div>
@@ -320,7 +290,7 @@
         </select>
     </div>
 
-    <div class="player-select-wrap" style="background: rgba(255,255,255,0.3); border-radius: 18px; padding: 15px; border: 1px solid rgba(255,255,255,0.5); margin-bottom:15px;">
+    <div class="player-select-wrap">
         <div style="font-size:13px; font-weight:800; color:var(--sub-text); margin-bottom:10px;">🕹️ 선수 선택(게임 인원에 맞게)</div>
         <div class="player-select-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
             <div class="player-chip" onclick="togglePlayerSelection(this, '경배')">경배</div>
@@ -362,7 +332,9 @@
         </thead>
         <tbody id="statsBody"></tbody>
     </table>
-    <div id="memberHistory-capture-area" style="padding: 5px; border-radius: 20px;"><div id="memberHistoryArea" class="history-area"></div></div>
+    <div id="memberHistory-capture-area" style="padding: 5px; border-radius: 20px;">
+        <div id="memberHistoryArea" class="history-area"></div>
+    </div>
 </div>
 
 <div class="card" id="searchCard">
@@ -413,7 +385,7 @@
     let selectedPlayersForLottery = [];
     let searchFlatpickr;
 
-    // 🌟 v2.30: 마지막 게임 팝업
+    // 🌟 v2.30: 마지막 게임 결과 표시
     function showLastGameResult() {
         if (!gameLogs || gameLogs.length === 0) return;
         const latestDate = gameLogs.reduce((max, game) => (game.dateStr > max ? game.dateStr : max), gameLogs[0].dateStr);
@@ -428,9 +400,11 @@
             html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05);"><span style="color:${rankColor};">${rankLabel}</span><span style="color:${rankColor}; font-size:${i === 0 ? '22px' : '16px'};">${name}</span></div>`;
         });
         html += `</div>`;
+        
         const modal = document.getElementById('last-game-modal');
         const content = document.getElementById('last-game-content');
-        content.innerHTML = html; modal.style.display = 'flex';
+        content.innerHTML = html;
+        modal.style.display = 'flex';
         setTimeout(() => { content.style.animation = 'scaleDownPopup 0.4s ease-in forwards'; setTimeout(() => { modal.style.display = 'none'; }, 400); }, 4000);
     }
 
@@ -460,7 +434,7 @@
         const realTodayStr = formatDate(new Date());
         if (selectedDateStr > realTodayStr) return alert("미래에서 온거야? 날짜를 잘 확인혀!");
         const count = parseInt(document.getElementById('playerCount').value); const ranks = [];
-        for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("참여 친구의 순위를 모두 선택해줘!"); ranks.push(val); }
+        for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("참여 친구를 모두 선택해줘!"); ranks.push(val); }
         if(new Set(ranks).size !== ranks.length) return alert("중복된 친구가 있어!");
         showLoading(true, "저장 중");
         const finalRanks = [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||"", ranks[5]||""];
@@ -475,7 +449,8 @@
         if (personalGames.length === 0) return;
         let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#5D4037; cursor:pointer;" onclick="this.parentElement.parentElement.style.display='none'; document.querySelector('.stats-card').scrollIntoView({ behavior: 'smooth', block: 'center' });">닫기 ✕</span></div>`;
         personalGames.forEach(g => {
-            const dailyIndex = gameLogs.filter(log => log.dateStr === g.dateStr).indexOf(g) + 1;
+            const dayGames = gameLogs.filter(log => log.dateStr === g.dateStr);
+            const dailyIndex = dayGames.indexOf(g) + 1;
             const rankIndex = g.ranks.filter(n => n.trim() !== "").indexOf(name);
             html += `<div class="history-item"><span style="font-size:14px;">${g.dateStr} <span style="color:#8e44ad;">${dailyIndex}G</span></span><span>${rankIndex + 1}위</span></div>`;
         });
@@ -491,9 +466,9 @@
     function cancelEdit() { editMode = false; editRound = null; document.getElementById('editBadge').style.display = 'none'; updateInputFields(); }
     function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
+    function closeAppWindow() { window.close(); }
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-    function closeAppWindow() { window.close(); }
 
     async function fetchData() {
         showLoading(true, "Cloud 동기화 중");
@@ -506,18 +481,26 @@
         finally { showLoading(false); document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`; }
     }
 
-    window.onload = () => { 
-        fetchData();
-        const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.getElementById('themeSwitch').checked = true; toggleTheme(); }
+    window.onload = async () => { 
+        updateInputFields();
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.getElementById('themeSwitch').checked = true;
+            toggleTheme();
+        }
+        await fetchData(); // 데이터 로딩 대기
         setTimeout(() => { 
             const ws = document.getElementById('welcome-screen');
             if(ws) {
                 ws.style.opacity = '0';
-                setTimeout(() => { ws.style.display = 'none'; showLastGameResult(); }, 800);
+                setTimeout(() => { 
+                    ws.style.display = 'none'; 
+                    showLastGameResult(); 
+                }, 800);
             }
         }, 3000);
-        updateInputFields();
     };
+    document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
 </script>
 </body>
 </html>
