@@ -84,7 +84,7 @@
             --edit-mode-border: #27ae60;
         }
 
-        /* 🌟 다크 모드 전용 가독성 보정 */
+        /* 🌟 v2.15: 다크 모드 가독성 보정 적용 */
         [data-theme='dark'] .win-rate-pill { color: #ffd60a !important; }
         [data-theme='dark'] .stats-table td[style*="color:darkblue;"] { color: #448aff !important; } 
         [data-theme='dark'] .stats-table td[style*="color:darkred;"] { color: #ff5252 !important; } 
@@ -113,7 +113,7 @@
 
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
-        /* 🌟 전체 레이아웃 최적화 */
+        /* 🌟 전체 레이아웃 최적화 및 폰트 적용 */
         body { 
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             margin: 0; 
@@ -126,7 +126,7 @@
             min-height: 100vh;
             color: var(--text-color);
             scroll-behavior: smooth;
-            max-width: 600px; /* 🌟 넓게 퍼짐 방지 */
+            max-width: 600px;
             margin: 0 auto;
         }
         
@@ -153,13 +153,16 @@
             transition: 0.3s all cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             color: #555; border: 1px solid rgba(255,255,255,0.4);
             -webkit-transform: translateZ(0); transform: translateZ(0); 
+            font-family: 'Pretendard', sans-serif;
         }
         .day.sat { color: #5dade2; } 
         .day.sun, .day.holiday { color: #e67e22; } 
         .day.today { background: var(--today-bg) !important; color: var(--today-border) !important; border: 2px solid var(--today-border) !important; }
+        
         .day.has-record { background: var(--record-bg) !important; border: 2px solid var(--record-border) !important; color: #2e7d32 !important; }
         .day.has-record::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--record-dot) !important; border-radius: 50%; }
 
+        /* 🌟 진한 핑크색 선택 강조 */
         .day.selected { 
             background: #ff4d6d !important; 
             color: #ffffff !important; 
@@ -179,7 +182,7 @@
         .card { background: var(--card-bg); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(5px); }
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; }
         
-        button.save-btn { width: 100%; padding: 16px; background: linear-gradient(145deg, #abb2b9, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; font-size: 14px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.38), -2px -2px 8px rgba(255, 255, 255, 0.5); transition: 0.2s; cursor: pointer; }
+        button.save-btn { width: 100%; padding: 16px; background: linear-gradient(145deg, #abb2b9, #7f8c8d); color: white; border: none; border-radius: 18px; font-weight: 800; font-size: 14px; box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.38), -2px -2px 8px rgba(255, 255, 255, 0.5); transition: 0.2s; font-family: 'Pretendard', sans-serif; cursor: pointer; }
         button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
 
         .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; table-layout: fixed; }
@@ -195,13 +198,14 @@
         @keyframes scaleDownPopup { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.3); opacity: 0; } }
         
         .last-game-content { position: relative; background: var(--card-bg); padding: 30px 20px; border-radius: 32px; text-align: center; width: 85%; max-width: 320px; box-shadow: var(--shadow); overflow: hidden; animation: scaleUpPopup 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .last-game-content::before { content: ''; position: absolute; top: -2.5%; left: -2.5%; width: 105%; height: 105%; border-radius: inherit; background: conic-gradient(from var(--glimmer-angle), transparent 30%, var(--rank1), var(--accent), var(--edit), var(--rank1) 70%, transparent); animation: glimmerspin 2s linear infinite; z-index: -2; filter: blur(8px); }
+        /* 🌟 rgba 오류 수정 */
+        .last-game-content::before { content: ''; position: absolute; top: -2.5%; left: -2.5%; width: 105%; height: 105%; border-radius: inherit; background: conic-gradient(from var(--glimmer-angle), transparent 30%, #ff4757, #2196f3, #f39c12, #ff4757 70%, transparent); animation: glimmerspin 2s linear infinite; z-index: -2; filter: blur(8px); }
         .last-game-content::after { content: ''; position: absolute; top: 2px; left: 2px; width: calc(100% - 4px); height: calc(100% - 4px); border-radius: inherit; background: var(--card-bg); z-index: -1; }
         
         .player-chip.active { background: #4caf50 !important; border-color: #1b5e20 !important; color: #ffffff !important; font-weight: 800 !important; }
         [data-theme='dark'] .player-chip.active { background: #2e7d32 !important; border-color: #81c784 !important; }
         
-        .share-btn-common { width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc); color: white; border: none; border-radius: 18px; font-weight: 800; font-size: 12px; transition: transform 0.2s; cursor: pointer; }
+        .share-btn-common { width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc); color: white; border: none; border-radius: 18px; font-weight: 800; font-size: 12px; transition: transform 0.2s; font-family: 'Pretendard', sans-serif; cursor: pointer; }
     </style>
 </head>
 <body id="app-body">
@@ -209,7 +213,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp&nbsp&nbsp<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</div><br>Version&nbsp;&nbsp2.35
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span><br>Version&nbsp;&nbsp;2.35</div>
     </div>
 </div>
 
@@ -263,8 +267,8 @@
     <div class="zoom-wrap">
         <span style="font-size:14px; font-weight:800; color:var(--sub-text);">화면 크기</span>
         <div class="zoom-options">
-            <label style="color:#9b59b6;">기본 <input type="radio" name="z" value="1" onclick="changeZoom('1')" checked></label>
-            <label style="color:#ff69b4;">확대 <input type="radio" name="z" value="1.2" onclick="changeZoom('1.2')"></label>
+            <label>기본 <input type="radio" name="z" value="1" onclick="changeZoom('1')" checked></label>
+            <label>확대 <input type="radio" name="z" value="1.2" onclick="changeZoom('1.2')"></label>
         </div>
     </div>
 
@@ -292,12 +296,8 @@
     </div>
     
     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <button class="share-btn-common" style="background: linear-gradient(145deg, #1abc9c, #16a085); flex: 2; margin: 0; font-size: 13px;" onclick="pickRandomOrder()">
-            🎲 초구 추첨하기
-        </button>
-        <button class="share-btn-common" style="background: #bdc3c7; flex: 1; margin: 0; color: #444; font-size: 13px;" onclick="resetPlayerSelection()">
-            🔄 선택 취소
-        </button>
+        <button class="share-btn-common" style="background: linear-gradient(145deg, #1abc9c, #16a085); flex: 2; margin: 0; font-size: 13px;" onclick="pickRandomOrder()">🎲 초구 추첨하기</button>
+        <button class="share-btn-common" style="background: #bdc3c7; flex: 1; margin: 0; color: #444; font-size: 13px;" onclick="resetPlayerSelection()">🔄 선택 취소</button>
     </div>
 
     <div id="inputArea"></div>
@@ -305,10 +305,7 @@
         <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
         <button class="save-btn btn-cancel" onclick="resetInputs()">취소</button>
     </div>
-    
-    <div id="capture-area" style="padding: 5px; border-radius: 20px;">
-        <div id="dayGameList"></div>
-    </div>
+    <div id="capture-area" style="padding: 5px; border-radius: 20px;"><div id="dayGameList"></div></div>
 </div>
 
 <div class="card stats-card">
@@ -328,9 +325,7 @@
         </thead>
         <tbody id="statsBody"></tbody>
     </table>
-    <div id="memberHistory-capture-area" style="padding: 5px; border-radius: 20px;">
-        <div id="memberHistoryArea" class="history-area"></div>
-    </div>
+    <div id="memberHistory-capture-area" style="padding: 5px; border-radius: 20px;"><div id="memberHistoryArea" class="history-area"></div></div>
 </div>
 
 <div class="card" id="searchCard">
@@ -362,9 +357,7 @@
     <div id="searchHistoryListArea" style="margin-top: 10px; display: none;"></div>
 </div>
 
-<div class="danger-zone">
-    <button id="exitBtn" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button>
-</div>
+<div class="danger-zone"><button id="exitBtn" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button></div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
@@ -381,20 +374,16 @@
     let editRound = null;
     let isPercentMode = false;
     let selectedPlayersForLottery = [];
-    let searchFlatpickr; 
-    let animationStep = 0;
+    let searchFlatpickr;
 
+    // 🌟 v2.30 통합: 마지막 게임 결과 표시 로직 (안정성 개선)
     function showLastGameResult() {
-        const loadingScreen = document.getElementById('loading');
-        if (loadingScreen.style.display === 'flex' || loadingScreen.style.display === '') {
-            setTimeout(showLastGameResult, 500);
-            return;
-        }
         if (!gameLogs || gameLogs.length === 0) return;
         const latestDate = gameLogs.reduce((max, game) => (game.dateStr > max ? game.dateStr : max), gameLogs[0].dateStr);
         const gamesOnLatestDate = gameLogs.filter(g => g.dateStr === latestDate);
         const lastGame = gamesOnLatestDate[gamesOnLatestDate.length - 1];
         const actualRanks = lastGame.ranks.filter(n => n && n.trim() !== "");
+        
         let html = `<div style="font-size:40px; margin-bottom:10px;">🏆</div><h2 style="font-size:18px; font-weight:900; color:var(--text-color); margin:0 0 5px 0;">지난 마지막 게임 결과</h2><div style="font-size:15px; font-weight:800; color:var(--sub-text); margin-bottom: 20px;">[ ${lastGame.dateStr} ]</div><div style="display:flex; flex-direction:column; gap:8px; font-weight:900;">`;
         actualRanks.forEach((name, i) => {
             const rankLabel = (i === actualRanks.length - 1) ? "꼴찌💀" : `${i + 1}위`;
@@ -402,9 +391,11 @@
             html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05);"><span style="color:${rankColor};">${rankLabel}</span><span style="color:${rankColor}; font-size:${i === 0 ? '22px' : '16px'};">${name}</span></div>`;
         });
         html += `</div>`;
+        
         const modal = document.getElementById('last-game-modal');
         const content = document.getElementById('last-game-content');
-        content.innerHTML = html; modal.style.display = 'flex';
+        content.innerHTML = html;
+        modal.style.display = 'flex';
         setTimeout(() => { content.style.animation = 'scaleDownPopup 0.4s ease-in forwards'; setTimeout(() => { modal.style.display = 'none'; }, 400); }, 4000);
     }
 
@@ -416,27 +407,28 @@
 
     function pickRandomOrder() {
         const realTodayStr = formatDate(new Date());
-        if (selectedDateStr > realTodayStr) { return alert("미래에서 온거야? 날짜를 잘 확인혀!"); }
+        if (selectedDateStr > realTodayStr) return alert("미래에서 온거야? 날짜를 잘 확인혀!");
         const limit = parseInt(document.getElementById('playerCount').value);
-        if (selectedPlayersForLottery.length !== limit) { return alert(`게임 참여 ${limit}명을 선택해!(현재 ${selectedPlayersForLottery.length}명)`); }
+        if (selectedPlayersForLottery.length !== limit) return alert(`게임 참여 ${limit}명을 선택해!(현재 ${selectedPlayersForLottery.length}명)`);
         let pool = [...selectedPlayersForLottery];
         const firstIdx = Math.floor(Math.random() * pool.length);
         const firstPlayer = pool.splice(firstIdx, 1)[0];
         const remaining = pool.sort(() => Math.random() - 0.5);
         document.getElementById('order-result').innerHTML = `<div style="font-size:26px; color:var(--rank1); font-weight:900;">1번 : ${firstPlayer}</div><div style="font-size:17px; margin-top:15px;">${remaining.map((p, idx) => `<div>${idx + 2}번 : ${p}</div>`).join('')}</div>`;
         document.getElementById('order-modal').style.display = 'flex';
-        const finalOrder = [firstPlayer, ...remaining];
-        finalOrder.forEach((name, idx) => { const selectEl = document.getElementById('rank' + (idx + 1)); if (selectEl) selectEl.value = name; });
+        [firstPlayer, ...remaining].forEach((name, idx) => { const selectEl = document.getElementById('rank' + (idx + 1)); if (selectEl) selectEl.value = name; });
         checkDuplicates();
     }
 
     async function saveGame() {
+        const realTodayStr = formatDate(new Date());
+        if (selectedDateStr > realTodayStr) return alert("미래에서 온거야? 날짜를 잘 확인혀!");
         const count = parseInt(document.getElementById('playerCount').value); const ranks = [];
-        for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("참여 친구의 순위를 모두 선택해줘!"); ranks.push(val); }
+        for(let i=1; i<=count; i++) { const val = document.getElementById('rank'+i).value; if(!val) return alert("참여 친구를 모두 선택해줘!"); ranks.push(val); }
+        if(new Set(ranks).size !== ranks.length) return alert("중복된 친구가 있어!");
         showLoading(true, "저장 중");
         const finalRanks = [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||"", ranks[5]||""];
-        const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: finalRanks, round: editRound };
-        await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+        await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: finalRanks, round: editRound }) });
         cancelEdit(); fetchData();
     }
 
@@ -446,8 +438,7 @@
         if (personalGames.length === 0) return;
         let html = `<div style="font-size:14px; font-weight:900; color:var(--text-color); margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#5D4037; cursor:pointer;" onclick="this.parentElement.parentElement.style.display='none'; document.querySelector('.stats-card').scrollIntoView({ behavior: 'smooth', block: 'center' });">닫기 ✕</span></div>`;
         personalGames.forEach(g => {
-            const dayGames = gameLogs.filter(log => log.dateStr === g.dateStr);
-            const dailyIndex = dayGames.indexOf(g) + 1;
+            const dailyIndex = gameLogs.filter(log => log.dateStr === g.dateStr).indexOf(g) + 1;
             const rankIndex = g.ranks.filter(n => n.trim() !== "").indexOf(name);
             html += `<div class="history-item"><span style="font-size:14px;">${g.dateStr} <span style="color:#8e44ad;">${dailyIndex}G</span></span><span>${rankIndex + 1}위</span></div>`;
         });
@@ -467,10 +458,27 @@
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
 
+    async function fetchData() {
+        showLoading(true, "Cloud 동기화 중");
+        try {
+            const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
+            const rawData = await response.json();
+            gameLogs = rawData.map(g => ({ ...g, dateStr: formatDate(g.date) }));
+            renderAll(); 
+        } catch (e) { console.error("Fetch error"); } 
+        finally { showLoading(false); document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`; }
+    }
+
     window.onload = () => { 
         fetchData();
         const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.getElementById('themeSwitch').checked = true; toggleTheme(); }
-        setTimeout(() => { document.getElementById('welcome-screen').style.display = 'none'; showLastGameResult(); }, 3000);
+        setTimeout(() => { 
+            const ws = document.getElementById('welcome-screen');
+            if(ws) {
+                ws.style.opacity = '0';
+                setTimeout(() => { ws.style.display = 'none'; showLastGameResult(); }, 800);
+            }
+        }, 3000);
         updateInputFields();
     };
 </script>
