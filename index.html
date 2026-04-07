@@ -1,0 +1,463 @@
+<!DOCTYPE html>        
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <link rel="manifest" href="manifest.json?v=2.35">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="경배와 친구들">
+
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=2.35">
+    <link rel="apple-touch-icon" href="image_0.png?v=2.35">
+        
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+    <title>우리들의 Billiard World</title>
+    
+    <style>
+        :root { 
+            --main: #ffffff; 
+            --bg: rgba(236, 238, 241, 0.4); 
+            --accent: #ff4757; 
+            --success: #27ae60; 
+            --edit: #f39c12; 
+            --today-bg: #e3f2fd; 
+            --today-border: #2196f3; 
+            --select-bg: #fff0f3; 
+            --select-border: #ff4d6d; 
+            --record-bg: #e8f5e9; 
+            --record-border: #4caf50; 
+            --record-dot: #e67e22; 
+            --shadow: 8px 8px 16px rgba(0, 0, 0, 0.2), -8px -8px 16px rgba(255, 255, 255, 0.5);
+            --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.2), inset -3px -3px 7px rgba(255, 255, 255, 0.3);
+            
+            --rank1: #2196f3; 
+            --rank2: #2ecc71; 
+            --rank3: #9b59b6; 
+            --rank4: #f39c12; 
+            --rankL: #ff4757; 
+            
+            --dup-bg: #3e2723;    
+            --dup-border: #ff5252; 
+            --dup-text: #ffccbc;
+            
+            /* 🌟 v2.35: 사용자 요청으로 진한 블루 컬러 배경 및 흰색 글자 테마 적용 */
+            --card-bg: rgba(20, 40, 85, 0.9); 
+
+            --edit-mode-bg: #1b5e20;
+            --edit-mode-border: #81c784; 
+            
+            --text-color: #ffffff;
+            --sub-text: #e0e0e0;
+            --label-text: #cfd8dc;
+            --danger-text: #ff8a80; 
+        }
+
+        [data-theme='dark'] {
+            --main: #bdc3c7;
+            --bg: rgba(30, 30, 30, 0.9);
+            --today-bg: #1a237e;
+            --today-border: #448aff;
+            --select-bg: #4a148c;
+            --select-border: #e91e63;
+            --record-bg: #1b5e20;
+            --record-border: #81c784;
+            --shadow: 8px 8px 16px rgba(0, 0, 0, 0.6), -4px -4px 10px rgba(60, 60, 60, 0.2);
+            --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.7), inset -2px -2px 5px rgba(60, 60, 60, 0.2);
+            --card-bg: rgba(15, 30, 60, 0.95);  
+            --dup-bg: #3e2723;
+            --dup-border: #ff5252;
+            --dup-text: #ffccbc;
+            --text-color: #eeeeee;
+            --sub-text: #cccccc;
+            --label-text: #bbbbbb;
+            --danger-text: #ffffff; 
+            --rank1: #64b5f6; 
+            --rank2: #2ecc71;   
+            --rank3: #ba68c8; 
+            --rank4: #ffb74d; 
+            --rankL: #ff8a80; 
+            --edit-mode-bg: rgba(35, 35, 45, 0.9); 
+            --edit-mode-border: #27ae60;
+        }
+
+        /* 🌟 v2.15: 다크 모드 승률 노란색 및 이름 컬러 보정 유지 */
+        [data-theme='dark'] .win-rate-pill { color: #ffd60a !important; }
+        [data-theme='dark'] .stats-table td[style*="color:darkblue;"] { color: #448aff !important; } 
+        [data-theme='dark'] .stats-table td[style*="color:darkred;"] { color: #ff5252 !important; } 
+        [data-theme='dark'] .stats-table td[style*="color:#8e44ad;"] { color: #eeeeee !important; } 
+        [data-theme='dark'] .stats-table td[style*="color:#5D4037;"] { color: #eeeeee !important; } 
+
+        [data-theme='dark'] #monthDisplay, 
+        [data-theme='dark'] #selectedDateTitle,
+        [data-theme='dark'] .stats-card h2,
+        [data-theme='dark'] #searchCard h2 { color: #ffffff !important; }
+        
+        [data-theme='dark'] .weekday { color: #95a5a6 !important; }
+        
+        [data-theme='dark'] .setup-row span,
+        [data-theme='dark'] .theme-wrap span,
+        [data-theme='dark'] .zoom-wrap span,
+        [data-theme='dark'] .input-row label { color: var(--label-text) !important; }
+        
+        [data-theme='dark'] select, [data-theme='dark'] input[type="date"], [data-theme='dark'] input[type="text"]#searchDateRange { 
+            background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; 
+        }
+        
+        [data-theme='dark'] .game-item { background: linear-gradient(145deg, #2c2c2c, #333333); }
+        [data-theme='dark'] .game-info { color: #eee; }
+        [data-theme='dark'] .nav-btn { background: rgba(60, 60, 60, 0.6); color: #ffffff !important; box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5), -2px -2px 6px rgba(70, 70, 70, 0.3); }
+
+        * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
+
+        body { 
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; 
+            padding: env(safe-area-inset-top) 15px 100px 15px;
+            background-image: url('image_1.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-color);
+            scroll-behavior: smooth;
+        }
+        
+        #welcome-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #4a90e2, #9370db);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10000; transition: opacity 0.8s ease-out; color: white; text-align: center;
+            pointer-events: none;
+        }
+        .welcome-content { animation: fadeInUp 1s ease-out; }
+        .welcome-logo { width: 60px; height: auto; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+        .welcome-text { font-size: 14px; font-weight: 400; line-height: 1.6; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .calendar-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(5px);
+            border-radius: 32px;
+            padding: 24px 18px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .nav-btn {
+            border: none;
+            background: rgba(236, 238, 241, 0.1);
+            width: 44px; height: 44px; border-radius: 14px;
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2), -2px -2px 6px rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            cursor: pointer; color: #ffffff; transition: 0.2s;
+            font-family: 'Pretendard', sans-serif;
+        }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
+        .weekday { font-size: 11px; font-weight: 900; padding-bottom: 10px; color: #b0bec5; font-family: 'Pretendard', sans-serif; }
+
+        /* 🌟 v2.15: 아이폰 버그 픽스 - 고정 높이 42px 및 하드웨어 가속 */
+        .day { 
+            width: 100%; max-width: 42px; height: 42px; margin: 0 auto;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; position: relative; 
+            background: linear-gradient(145deg, rgba(253, 253, 253, 0.1), rgba(226, 229, 234, 0.05)); 
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -2px -2px 6px rgba(255, 255, 255, 0.1); 
+            transition: 0.3s all cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            color: #ffffff; border: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Pretendard', sans-serif;
+            -webkit-transform: translateZ(0); transform: translateZ(0); 
+        }
+        .day.sat { color: #81d4fa; } 
+        .day.sun, .day.holiday { color: #ffab91; } 
+        .day.today { background: var(--today-bg) !important; color: var(--today-border) !important; border: 2px solid var(--today-border) !important; }
+        
+        .day.has-record { background: var(--record-bg) !important; border: 2px solid var(--record-border) !important; color: #2e7d32 !important; }
+        .day.has-record::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--record-dot) !important; border-radius: 50%; }
+
+        .day.selected { 
+            background: #ff4d6d !important; 
+            color: #ffffff !important; 
+            transform: scale(1.15) translateZ(0) !important; 
+            z-index: 5; 
+            border: 2px solid #c51162 !important; 
+            box-shadow: 4px 4px 10px rgba(255, 77, 109, 0.4), -2px -2px 6px rgba(255, 255, 255, 0.3) !important; 
+        }
+        .day.selected::after { background: #ffffff !important; }
+
+        .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); }
+        .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; }
+        
+        select#playerCount { 
+            flex: none !important; 
+            width: 85px !important; 
+            padding: 8px !important; 
+            margin-left: auto; 
+            border-radius: 12px !important; 
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; width: 100%; }
+        .input-row label { width: 85px; min-width: 85px; max-width: 85px; font-size: 13px; font-weight: 800; color: var(--label-text); flex-shrink: 0; white-space: nowrap; }
+        
+        select, input[type="date"], input[type="text"]#searchDateRange { 
+            width: 0; flex: 1 1 auto; padding: 12px; border-radius: 15px; border: 2px solid transparent; font-size: 14px; 
+            background: rgba(255, 255, 255, 0.1); box-shadow: var(--inner-shadow); color: #ffffff; font-weight: 600; 
+            -webkit-appearance: none; text-align: center; text-align-last: center; margin: 0;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; table-layout: fixed; }
+        .stats-table th { 
+            padding: 8px 0px; 
+            color: #ffffff; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            font-size: 12px; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            white-space: nowrap; 
+        }
+        .stats-table thead tr { background: rgba(255, 255, 255, 0.05); }
+        .stats-table tr { background: rgba(255, 255, 255, 0.05); }
+        .stats-table td { 
+            padding: 12px 0px; 
+            text-align: center; 
+            font-weight: 800; 
+            color: #ffffff; 
+            white-space: nowrap; 
+            font-size: 14px; 
+        }
+
+        .win-rate-pill { color: #ffd60a; font-size: 13px; font-weight: 800; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255, 255, 255, 0.1); border-radius: 12px; margin-bottom: 8px; font-weight: 800; color: #ffffff; border: 1.5px solid #ff69b4; }
+
+        /* 🌟 v2.35: 마지막 게임 팝업 애니메이션 */
+        @keyframes scaleUpPopup { 0% { transform: scale(0.3); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes scaleDownPopup { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.3); opacity: 0; } }
+        
+        .last-game-content {
+            position: relative; background: var(--card-bg); padding: 30px 20px; border-radius: 32px; 
+            text-align: center; width: 85%; max-width: 320px; box-shadow: var(--shadow); overflow: hidden; 
+            animation: scaleUpPopup 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .last-game-content::before {
+            content: ''; position: absolute; top: -2.5%; left: -2.5%; width: 105%; height: 105%; border-radius: inherit; 
+            background: conic-gradient(from var(--glimmer-angle), transparent 30%, #ff4757, #2196f3, #f39c12, #ff4757 70%, transparent); 
+            animation: glimmerspin 2s linear infinite; z-index: -2; filter: blur(8px);
+        }
+        .last-game-content::after { content: ''; position: absolute; top: 2px; left: 2px; width: calc(100% - 4px); height: calc(100% - 4px); border-radius: inherit; background: var(--card-bg); z-index: -1; }
+        
+        @keyframes glimmerspin { 0% { --glimmer-angle: 0deg; } 100% { --glimmer-angle: 360deg; } }
+        @property --glimmer-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+
+        .game-item { position: relative; padding: 18px 8px; border-radius: 22px; background: rgba(255,255,255,0.05); margin-top: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 4px 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
+        .game-info { font-size: 20px; font-weight: 900; color: #ffffff; display: flex; justify-content: center; align-items: center; white-space: nowrap; }
+        .game-info span { color: #b0bec5; margin-right: 8px; font-size: 13px; }
+
+        .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 14px; cursor: pointer; font-family: 'Pretendard', sans-serif; }
+    </style>
+</head>
+<body id="app-body">
+
+<div id="welcome-screen">
+    <div class="welcome-content">
+        <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;2.35
+</div>
+
+<div id="last-game-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 10006; backdrop-filter: blur(8px);">
+    <div class="last-game-content" id="last-game-content"></div>
+</div>
+
+<div id="toast" class="toast-msg">기록 없음</div>
+
+<div id="loading" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20, 30, 60, 0.9); display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column;">
+    <div class="spinner"></div><div id="loadingText" style="font-weight:800; color:#ffffff;">데이터 동기화 중</div>
+</div>
+
+<div class="calendar-card">
+    <div class="calendar-header">
+        <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
+        <span id="monthDisplay" style="font-size:20px; font-weight:900; color:#ffffff;"></span>
+        <button class="nav-btn" onclick="changeMonth(1)">▶</button>
+    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
+</div>
+
+<div class="card" id="inputCard">
+    <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 20px 0; color:#ffffff; font-weight:800;">📅 날짜 확인 중</h2>
+
+    <div class="setup-row">
+        <span style="font-size:14px; font-weight:800; color:#cfd8dc;">게임 인원</span>
+        <select id="playerCount" onchange="updateInputFields()">
+            <option value="2">2명</option>
+            <option value="3" selected>3명</option>
+            <option value="4">4명</option>
+            <option value="5">5명</option>
+            <option value="6">6명</option>
+        </select>
+    </div>
+
+    <div id="inputArea"></div>
+    <div class="btn-group">
+        <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
+        <button class="save-btn btn-cancel" style="background:#455a64;" onclick="resetInputs()">취소</button>
+    </div>
+    <div id="dayGameList"></div>
+</div>
+
+<div class="card stats-card">
+    <h2 style="font-size:16px; margin:5px 0 14px 10px; color:#ffffff; font-weight:800;">📊 멤버별 누적 전적 (이름 터치)</h2>
+    <table class="stats-table">
+        <thead>
+            <tr>
+                <th style="text-align:left; padding-left:12px;">이름</th>
+                <th>참여</th>
+                <th style="color:var(--rank1);">1위🥇</th>
+                <th style="color:var(--rank2);">2위</th>
+                <th style="color:var(--rank3);">3위</th>
+                <th style="color:var(--rank4);">4위</th>
+                <th style="color:var(--rankL);">꼴찌💀</th>
+                <th style="text-align:right; padding-right:12px;">승률</th>
+            </tr>
+        </thead>
+        <tbody id="statsBody"></tbody>
+    </table>
+    <div id="memberHistoryArea" class="history-area"></div>
+</div>
+
+<div class="danger-zone"><button style="width: 100%;" class="exit-btn" onclick="showExitModal()">🚪 앱 종료</button></div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+<script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec"; 
+    const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
+    let gameLogs = []; let currentViewDate = new Date(); let selectedDateStr = new Date().toLocaleDateString('sv-SE');
+    let editMode = false; let editRound = null;
+
+    // 🌟 v2.35: 마지막 게임 팝업 (데이터 로딩 완료 시까지 무조건 대기 후 실행)
+    function showLastGameResult() {
+        if (!gameLogs || gameLogs.length === 0) {
+            setTimeout(showLastGameResult, 500); // 0.5초 후 재시도 (무조건 팝업 보장)
+            return;
+        }
+        const latestDate = gameLogs.reduce((max, game) => (game.dateStr > max ? game.dateStr : max), gameLogs[0].dateStr);
+        const gamesOnLatestDate = gameLogs.filter(g => g.dateStr === latestDate);
+        const lastGame = gamesOnLatestDate[gamesOnLatestDate.length - 1];
+        const actualRanks = lastGame.ranks.filter(n => n && n.trim() !== "");
+        
+        let html = `<div style="font-size:40px; margin-bottom:10px;">🏆</div><h2 style="font-size:18px; font-weight:900; color:#ffffff; margin:0 0 5px 0;">지난 마지막 게임 결과</h2><div style="font-size:15px; font-weight:800; color:#cfd8dc; margin-bottom: 20px;">[ ${lastGame.dateStr} ]</div><div style="display:flex; flex-direction:column; gap:8px; font-weight:900;">`;
+        actualRanks.forEach((name, i) => {
+            const rankLabel = (i === actualRanks.length - 1) ? "꼴찌💀" : `${i + 1}위`;
+            const rankColor = (i === 0) ? 'var(--rank1)' : (i === actualRanks.length - 1 ? 'var(--rankL)' : '#ffffff');
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.1); padding:12px 20px; border-radius:15px; border:1px solid rgba(255,255,255,0.05);"><span style="color:${rankColor};">${rankLabel}</span><span style="color:${rankColor}; font-size:${i === 0 ? '22px' : '16px'};">${name}</span></div>`;
+        });
+        html += `</div>`;
+        
+        const modal = document.getElementById('last-game-modal'); const content = document.getElementById('last-game-content');
+        content.innerHTML = html; modal.style.display = 'flex';
+        // 🌟 팝업을 정확히 3초간 보여줍니다.
+        setTimeout(() => { 
+            content.style.animation = 'scaleDownPopup 0.4s ease-in forwards'; 
+            setTimeout(() => { modal.style.display = 'none'; }, 400); 
+        }, 3000);
+    }
+
+    async function fetchData() {
+        showLoading(true, "데이터 동기화 중");
+        try {
+            const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
+            const rawData = await response.json();
+            gameLogs = rawData.map(g => ({ ...g, dateStr: formatDate(g.date) }));
+            renderAll(); showLoading(false);
+        } catch (e) { showLoading(false); }
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid'); grid.innerHTML = "";
+        const year = currentViewDate.getFullYear(); const month = currentViewDate.getMonth();
+        document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
+        ["일","월","화","수","목","금","토"].forEach((d, idx) => { grid.innerHTML += `<div class="weekday" style="color:${idx === 0 ? '#ffab91' : (idx === 6 ? '#81d4fa' : '#b0bec5')}">${d}</div>`; });
+        const firstDay = new Date(year, month, 1).getDay(); const lastDate = new Date(year, month + 1, 0).getDate();
+        for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
+        for (let d = 1; d <= lastDate; d++) {
+            const dStr = formatDate(new Date(year, month, d));
+            const hasRecord = gameLogs.some(g => g.dateStr === dStr) ? 'has-record' : '';
+            grid.innerHTML += `<div class="day ${dStr === selectedDateStr ? 'selected' : ''} ${hasRecord}" onclick="selectDate('${dStr}')">${d}</div>`;
+        }
+    }
+
+    function renderStats() {
+        let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
+        gameLogs.forEach(g => {
+            const actual = g.ranks.filter(n => n.trim() !== "");
+            actual.forEach((name, idx) => { if(stats[name]) { stats[name].played++; if (idx === actual.length - 1 && actual.length > 1) stats[name].ranks[4]++; else if (idx < 4) stats[name].ranks[idx]++; } });
+        });
+        const sortedByWin = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
+        document.getElementById('statsBody').innerHTML = sortedByWin.map(p => {
+            const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
+            return `<tr><td style="font-weight:900; cursor:pointer;" onclick="renderMemberHistory('${p}')">${p}</td><td>${stats[p].played}</td><td style="color:var(--rank1);">${stats[p].ranks[0]}</td><td style="color:var(--rank2);">${stats[p].ranks[1]}</td><td style="color:var(--rank3);">${stats[p].ranks[2]}</td><td style="color:var(--rank4);">${stats[p].ranks[3]}</td><td style="color:var(--rankL);">${stats[p].ranks[4]}</td><td><span class="win-rate-pill">${winRate}%</span></td></tr>`;
+        }).join('');
+    }
+
+    function renderMemberHistory(name) {
+        const historyArea = document.getElementById('memberHistoryArea');
+        const personalGames = gameLogs.filter(g => g.ranks.includes(name)).sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || ((parseInt(b.round) || 0) - (parseInt(a.round) || 0))).slice(0, 5);
+        if (personalGames.length === 0) return;
+        let html = `<div style="font-size:14px; font-weight:900; color:#ffffff; margin-bottom:12px; display:flex; justify-content:space-between;"><span>🏆 ${name}의 최근 5경기</span><span style="color:#cfd8dc; cursor:pointer;" onclick="this.parentElement.parentElement.style.display='none';">닫기 ✕</span></div>`;
+        personalGames.forEach(g => {
+            const dailyIndex = gameLogs.filter(log => log.dateStr === g.dateStr).indexOf(g) + 1;
+            const rankIndex = g.ranks.filter(n => n.trim() !== "").indexOf(name);
+            html += `<div class="history-item"><span style="font-size:14px;">${g.dateStr} <span style="color:#8e44ad; font-weight:900;">${dailyIndex}G</span></span><span>${rankIndex + 1}위</span></div>`;
+        });
+        historyArea.innerHTML = html; historyArea.style.display = 'block';
+    }
+
+    function renderGameList() {
+        const games = gameLogs.filter(g => g.dateStr === selectedDateStr); const listArea = document.getElementById('dayGameList');
+        if(games.length > 0) {
+            let html = `<div style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#b0bec5; font-weight:800;">DAY'S RECORD</span></div>`;
+            games.forEach((g, idx) => { 
+                const names = g.ranks.filter(n => n && n.trim() !== ""); 
+                let namesLine = names.map((name, i) => `<span style="color:${i === 0 ? 'var(--rank1)' : (i === names.length-1 ? 'var(--rankL)' : '#ffffff')}">${name}</span>`).join('→');
+                html += `<div class="game-item"><span>${idx+1}G</span><div>${namesLine}</div></div>`; 
+            });
+            listArea.innerHTML = html;
+        } else { listArea.innerHTML = ""; }
+    }
+
+    function toggleTheme() { const isDark = document.getElementById('themeSwitch').checked; document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light'); renderStats(); renderCalendar(); }
+    function changeZoom(v) { document.body.style.zoom = v; if(v === '1.2') document.body.classList.add('zoom-active'); else document.body.classList.remove('zoom-active'); }
+    function updateInputFields() { const count = parseInt(document.getElementById('playerCount').value); const area = document.getElementById('inputArea'); area.innerHTML = ""; for(let i=1; i<=count; i++) { area.innerHTML += `<div class="input-row"><label>${i === count ? '꼴찌💀' : i+'위'}</label><select id="rank${i}"><option value="">선택</option>${players.map(pl => `<option value="${pl}">${pl}</option>`).join('')}</select></div>`; } }
+    async function saveGame() { const count = parseInt(document.getElementById('playerCount').value); const ranks = []; for(let i=1; i<=count; i++) { const v = document.getElementById('rank'+i).value; if(!v) return alert("순위 선택 필수!"); ranks.push(v); } showLoading(true, "저장 중"); const finalRanks = [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||"", ranks[5]||""]; await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "SAVE", date: selectedDateStr, ranks: finalRanks }) }); fetchData(); }
+    function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
+    function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
+    function formatDate(d) { const date = new Date(d); return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0'); }
+    function selectDate(d) { selectedDateStr = d; document.getElementById('selectedDateTitle').innerText = `📅 ${d}`; renderCalendar(); renderGameList(); }
+    function renderAll() { renderCalendar(); renderStats(); renderGameList(); }
+    function resetInputs() { updateInputFields(); }
+    function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
+    function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
+    function closeAppWindow() { window.close(); }
+
+    window.onload = async () => { 
+        updateInputFields(); fetchData();
+        setTimeout(() => { const ws = document.getElementById('welcome-screen'); if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; showLastGameResult(); }, 800); } }, 3000);
+    };
+</script>
+<script src="share.js"></script>
+</body>
+</html>
