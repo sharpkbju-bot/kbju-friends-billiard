@@ -581,7 +581,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp&nbsp&nbsp<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</div><br>Version&nbsp;&nbsp2.01
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp&nbsp&nbsp<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</div><br>Version&nbsp;&nbsp2.15
     </div>
 </div>
 
@@ -858,7 +858,7 @@
         
         const finalHtml = `
             <div style="background: rgba(33, 150, 243, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 20px; border: 2.5px dashed var(--rank1);">
-                <div style="font-size: 13px; color: var(--rank1); margin-bottom:5px;">🎯 이 게임의 초구는 바로 너!</div>
+                <div style="font-size: 15px; color: var(--rank1); margin-bottom:5px;">🎯 이 게임의 초구는 바로 너!</div>
                 <div style="font-size: 26px; color: var(--rank1); font-weight: 900;">1번 : ${firstPlayer}</div>
             </div>
             <div style="font-size: 17px; opacity: 0.9; line-height: 2.2;">
@@ -884,7 +884,7 @@
         if (animationStep === 0) {
             resultArea.innerHTML = `
                 <div style="padding: 30px 0;">
-                    <div style="font-size: 13px; color: var(--sub-text); margin-bottom: 10px;">초구의 영광은 누구에게?</div>
+                    <div style="font-size: 15px; color: var(--sub-text); margin-bottom: 10px;">초구의 영광은 누구에게?</div>
                     <div id="slotName" style="font-size: 32px; font-weight: 900; color: var(--rank1); letter-spacing: 2px;">🎰</div>
                 </div>
             `;
@@ -906,7 +906,7 @@
         } else if (animationStep === 1) {
             resultArea.innerHTML = `
                 <div style="padding: 30px 0; text-align: left;">
-                    <div style="font-size: 13px; font-weight: 800; color: var(--sub-text); margin-bottom: 12px; text-align: center;">나도 초구 한번 쳐보자! 🎱</div>
+                    <div style="font-size: 15px; font-weight: 800; color: var(--sub-text); margin-bottom: 12px; text-align: center;">나도 초구 한번 쳐보자! 🎱</div>
                     <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.1); border-radius: 10px; position: relative; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);">
                         <div id="billiardGauge" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--rank1), var(--accent)); border-radius: 10px; transition: width 3s cubic-bezier(0.2, 0.8, 0.2, 1);"></div>
                         <div id="billiardBall" style="font-size: 26px; position: absolute; top: -14px; left: 0%; transition: left 3s cubic-bezier(0.2, 0.8, 0.2, 1), transform 3s cubic-bezier(0.2, 0.8, 0.2, 1); transform: translateX(-50%) rotate(0deg);">🎱</div>
