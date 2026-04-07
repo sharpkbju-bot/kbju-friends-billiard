@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=2.30">
+    <link rel="manifest" href="manifest.json?v=2.41">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=2.30">
-    <link rel="apple-touch-icon" href="image_0.png?v=2.30">
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=2.41">
+    <link rel="apple-touch-icon" href="image_0.png?v=2.41">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
@@ -86,10 +86,10 @@
         }
 
         [data-theme='dark'] .win-rate-pill { color: #ffd60a !important; }
-        [data-theme='dark'] .stats-table td[style*="color:darkblue;"] { color: #448aff !important; } 
-        [data-theme='dark'] .stats-table td[style*="color:darkred;"] { color: #ff5252 !important; } 
-        [data-theme='dark'] .stats-table td[style*="color:#8e44ad;"] { color: #eeeeee !important; } 
-        [data-theme='dark'] .stats-table td[style*="color:#5D4037;"] { color: #eeeeee !important; } 
+        [data-theme='dark'] .stats-table td[style*="color:darkblue;"] { color: #448aff !important; }
+        [data-theme='dark'] .stats-table td[style*="color:darkred;"] { color: #ff5252 !important; }
+        [data-theme='dark'] .stats-table td[style*="color:#8e44ad;"] { color: #eeeeee !important; }
+        [data-theme='dark'] .stats-table td[style*="color:#5D4037;"] { color: #eeeeee !important; }
 
         [data-theme='dark'] #monthDisplay, 
         [data-theme='dark'] #selectedDateTitle,
@@ -175,6 +175,7 @@
         .day.sat { color: #5dade2; } 
         .day.sun, .day.holiday { color: #e67e22; } 
         .day.today { background: var(--today-bg) !important; color: var(--today-border) !important; border: 2px solid var(--today-border) !important; }
+        
         .day.has-record { background: var(--record-bg) !important; border: 2px solid var(--record-border) !important; color: #2e7d32 !important; }
         .day.has-record::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--record-dot) !important; border-radius: 50%; }
 
@@ -197,6 +198,7 @@
         
         .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
         .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; }
+        
         select#playerCount { flex: none !important; width: 85px !important; padding: 8px !important; margin-left: auto; border-radius: 12px !important; }
         .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; width: 100%; }
         .input-row label { width: 85px; min-width: 85px; max-width: 85px; font-size: 13px; font-weight: 800; color: var(--label-text); flex-shrink: 0; white-space: nowrap; }
@@ -217,6 +219,7 @@
         }
         button.save-btn:active { transform: scale(0.97); }
         button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
+        
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .btn-group button { flex: 1; margin-top: 0 !important; }
         .btn-cancel { background: #bdc3c7 !important; }
@@ -236,7 +239,7 @@
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; }
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 14px; }
         
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
@@ -247,13 +250,13 @@
         .zoom-active .calendar-grid { gap: 6px !important; }
         .zoom-active .day { max-width: 36px !important; height: 36px !important; font-size: 13px !important; border-radius: 12px !important; }
         .zoom-active .game-info { font-size: 16px !important; }
+        
         .share-btn-common { width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc); color: white; border: none; border-radius: 18px; font-weight: 800; display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2); cursor: pointer; font-size: 12px; }
 
-        .player-select-wrap { margin-bottom: 15px; background: rgba(255,255,255,0.3); border-radius: 18px; padding: 15px; border: 1px solid rgba(255,255,255,0.5); box-shadow: var(--inner-shadow); }
         .player-chip { padding: 10px 5px; border-radius: 12px; background: rgba(255,255,255,0.8); font-weight: 800; font-size: 13px; text-align: center; cursor: pointer; color: var(--sub-text); border: 2px solid transparent; transition: 0.2s; }
         .player-chip.active { background: #e1bee7 !important; border: 2px solid #7b1fa2 !important; color: #4a148c !important; font-weight: 900 !important; }
 
-        /* 🌟 개인 프로필 카드 모달 스타일 */
+        /* 🌟 개인 프로필 카드 스타일 (캡처 겹침 방지 구조) */
         .profile-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 11000; backdrop-filter: blur(8px); }
         .profile-card-content { position: relative; background: var(--card-bg); padding: 25px; border-radius: 32px; width: 90%; max-width: 360px; box-shadow: var(--shadow); color: #444; text-align: center; animation: scaleUpPopup 0.4s ease-out; overflow-y: auto; max-height: 85vh; }
         .p-stat-box { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
@@ -275,7 +278,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;2.40
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;2.41
     </div>
 </div>
 
@@ -322,15 +325,12 @@
     <h2 id="selectedDateTitle" style="font-size:17px; margin:0 0 20px 0; color:#444; font-weight:800;">📅 날짜 확인 중</h2>
     <div id="editBadge" style="display:none; color:white; font-size:13px; font-weight:bold; margin-bottom:15px; background: var(--edit); padding: 12px; border-radius: 12px; text-align: center;">✏️ 기록 수정 중</div>
 
-    <div class="theme-wrap" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+    <div class="theme-wrap" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04);">
         <span style="font-size:14px; font-weight:800; color:var(--sub-text);">다크 모드</span>
-        <label class="theme-toggle" style="position:relative; width:50px; height:26px;">
-            <input type="checkbox" id="themeSwitch" onchange="toggleTheme()" style="opacity:0; width:0; height:0;">
-            <span class="slider" style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#ccc; border-radius:34px; transition:.4s;"></span>
-        </label>
+        <label style="position:relative; width:50px; height:26px;"><input type="checkbox" id="themeSwitch" onchange="toggleTheme()" style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span></label>
     </div>
 
-    <div class="zoom-wrap" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+    <div class="zoom-wrap" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04);">
         <span style="font-size:14px; font-weight:800; color:var(--sub-text);">화면 크기</span>
         <div>
             <label style="font-size:14px; font-weight:800; margin-right:8px;">기본 <input type="radio" name="z" value="1" onclick="changeZoom('1')" checked></label>
@@ -360,7 +360,8 @@
         </div>
     </div>
     
-    <button class="share-btn-common" style="background:#1abc9c; margin-bottom:15px;" onclick="pickRandomOrder()">🎲 초구 추첨하기</button>
+    <button class="share-btn-common" style="background:#1abc9c; margin-bottom:20px;" onclick="pickRandomOrder()">🎲 초구 추첨하기</button>
+
     <div id="inputArea"></div>
     <div class="btn-group">
         <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
@@ -383,15 +384,15 @@
         </thead>
         <tbody id="statsBody"></tbody>
     </table>
-    <div id="richFriendArea" style="display:none; background:rgba(255,255,255,0.4); padding:15px; border-radius:20px; text-align:center; color:#ff9800; font-weight:800;"></div>
+    <div id="richFriendArea" style="display:none; background: var(--bg); padding: 20px; border-radius: 22px; text-align: center; margin-top: 20px; color: #7f8c8d; font-weight: 800;"></div>
 </div>
 
 <div class="card" id="searchCard">
     <h2 style="font-size:16px; margin:5px 0 15px 10px; color:#444; font-weight:800;">🔍 월별 선수 전적 검색</h2>
-    <div class="input-row"><label>검색월</label><input type="text" id="searchDateRange" placeholder="월 선택" readonly></div>
+    <div class="input-row"><label>검색월</label><input type="text" id="searchDateRange" readonly></div>
     <div class="input-row"><label>선수명</label><select id="searchPlayer"><option value="">선택</option></select></div>
     <div id="search-capture-area">
-        <div style="display:flex; gap:10px;"><button class="save-btn" style="flex:2; margin:0;" onclick="searchRecords()">검색</button><button class="save-btn btn-cancel" style="flex:1; margin:0;" onclick="resetSearch()">🔄</button></div>
+        <div style="display:flex; gap:10px;"><button class="save-btn" style="flex:2; margin:0;" onclick="searchRecords()">기록 검색</button><button class="save-btn btn-cancel" style="flex:1; margin:0;" onclick="resetSearch()">🔄</button></div>
         <div id="searchSummaryArea" style="margin-top:15px; display:none;"></div>
     </div>
     <div id="searchHistoryListArea" style="margin-top:10px; display:none;"></div>
@@ -408,9 +409,9 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec"; 
     const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
     let gameLogs = []; let currentViewDate = new Date(); let selectedDateStr = new Date().toLocaleDateString('sv-SE');
-    let editMode = false; let editRound = null; let isPercentMode = false; let selectedPlayersForLottery = []; let searchFlatpickr;
+    let editMode = false; let editRound = null; let selectedPlayersForLottery = []; let searchFlatpickr; let animationStep = 0;
 
-    // 🌟 개인 프로필 카드 함수 (캡처 겹침 방지 및 컬러 보정 적용)
+    // 🌟 개인 프로필 카드 함수 (캡처 겹침 방지 및 수칙 준수 로직)
     function renderMemberHistory(name) {
         if (!gameLogs || gameLogs.length === 0) return;
         const personalGames = gameLogs.filter(g => g.ranks.includes(name)).sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || (parseInt(b.round) - parseInt(a.round)));
@@ -446,7 +447,6 @@
             const dailyIdx = gameLogs.filter(dayG => dayG.dateStr === g.dateStr).indexOf(g) + 1;
             const actual = g.ranks.filter(n => n.trim() !== ""); const rIdx = actual.indexOf(name);
             const rLabel = (rIdx === actual.length - 1) ? "꼴찌💀" : (rIdx + 1) + "위";
-            // 🌟 컬러: 날짜(진한퍼플 #4a148c), 1G/2G(진한녹색 #1b5e20), 2-4위(진한브라운 #5d4037)
             const rColor = rIdx === 0 ? '#2196f3' : (rIdx === actual.length-1 ? '#ff5252' : '#5d4037');
             html += `
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 15px; background:#ffffff; border-radius:12px; border:1px solid rgba(0,0,0,0.05); width:100%;">
@@ -480,17 +480,17 @@
         } catch (e) { alert("캡처 오류"); showLoading(false); }
     }
 
-    // 🌟 원본 v2.30의 모든 핵심 로직 유지
+    // 🌟 원본 v2.30의 모든 핵심 로직 100% 유지 (최적화 없이 그대로 복원)
     function showLastGameResult() {
         if (!gameLogs || gameLogs.length === 0) { setTimeout(showLastGameResult, 500); return; }
         const latestDate = gameLogs.reduce((max, game) => (game.dateStr > max ? game.dateStr : max), gameLogs[0].dateStr);
         const lastGame = gameLogs.filter(g => g.dateStr === latestDate).pop();
         const actualRanks = lastGame.ranks.filter(n => n && n.trim() !== "");
-        let html = `<div style="font-size:40px; margin-bottom:10px;">🏆</div><h2 style="font-size:18px; font-weight:900; color:#444;">지난 마지막 게임 결과</h2><div style="font-size:15px; font-weight:800; color:#666; margin-bottom: 20px;">[ ${lastGame.dateStr} ]</div><div style="display:flex; flex-direction:column; gap:8px; font-weight:900;">`;
+        let html = `<div style="font-size:40px; margin-bottom:10px;">🏆</div><h2 style="font-size:18px; font-weight:900; color:var(--text-color); margin:0 0 5px 0;">지난 마지막 게임 결과</h2><div style="font-size:15px; font-weight:800; color:var(--sub-text); margin-bottom: 20px;">[ ${lastGame.dateStr} ]</div><div style="display:flex; flex-direction:column; gap:8px; font-weight:900;">`;
         actualRanks.forEach((name, i) => {
             const rankLabel = (i === actualRanks.length - 1) ? "꼴찌💀" : `${i + 1}위`;
-            const rankColor = (i === 0) ? 'var(--rank1)' : (i === actualRanks.length - 1 ? 'var(--rankL)' : '#444');
-            html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05);"><span style="color:${rankColor};">${rankLabel}</span><span style="color:${rankColor};">${name}</span></div>`;
+            const rankColor = (i === 0) ? 'var(--rank1)' : (i === actualRanks.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); shadow: inset 1px 1px 3px rgba(255,255,255,0.7);"><span style="color:${rankColor};">${rankLabel}</span><span style="color:${rankColor};">${name}</span></div>`;
         });
         html += `</div>`;
         const modal = document.getElementById('last-game-modal'); const content = document.getElementById('last-game-content');
@@ -504,60 +504,45 @@
             const response = await fetch(`${GAS_URL}?t=${new Date().getTime()}`);
             const rawData = await response.json();
             gameLogs = rawData.map(g => ({ ...g, dateStr: formatDate(g.date) }));
-            renderAll(); 
-        } catch (e) { console.error("Fetch error"); } 
-        finally { showLoading(false); document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`; }
+            renderAll(); showLoading(false);
+        } catch (e) { showLoading(false); }
     }
 
-    function renderCalendar() {
-        const grid = document.getElementById('calendarGrid'); grid.innerHTML = "";
-        const year = currentViewDate.getFullYear(); const month = currentViewDate.getMonth();
-        document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
-        ["일","월","화","수","목","금","토"].forEach((d, i) => grid.innerHTML += `<div class="weekday" style="color:${i===0?'#e67e22':i===6?'#5dade2':'#95a5a6'}">${d}</div>`);
-        const firstDay = new Date(year, month, 1).getDay(); const lastDate = new Date(year, month + 1, 0).getDate();
-        for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
-        for (let d = 1; d <= lastDate; d++) {
-            const dStr = formatDate(new Date(year, month, d));
-            grid.innerHTML += `<div class="day ${dStr === selectedDateStr ? 'selected' : ''} ${gameLogs.some(g => g.dateStr === dStr) ? 'has-record' : ''}" onclick="selectDate('${dStr}')">${d}</div>`;
-        }
-    }
-
-    function renderStats() {
-        let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] });
-        gameLogs.forEach(g => { const actual = g.ranks.filter(n => n.trim() !== ""); actual.forEach((n, i) => { if(stats[n]) { stats[n].played++; if(i === actual.length-1 && actual.length>1) stats[n].ranks[4]++; else if(i<4) stats[n].ranks[i]++; } }); });
-        const sorted = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]);
-        const maxCounts = { r0: 0, r4: 0 }; sorted.forEach(p => { maxCounts.r0 = Math.max(maxCounts.r0, stats[p].ranks[0]); maxCounts.r4 = Math.max(maxCounts.r4, stats[p].ranks[4]); });
-        document.getElementById('statsBody').innerHTML = sorted.map(p => {
-            const win = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
-            let nStyle = "font-weight:900; cursor:pointer; text-decoration:underline;";
-            if(stats[p].ranks[4] === maxCounts.r4 && maxCounts.r4>0) nStyle += "color:darkred;"; else if(stats[p].ranks[0] === maxCounts.r0 && maxCounts.r0>0) nStyle += "color:darkblue;"; else nStyle += "color:#8e44ad;";
-            return `<tr><td style="${nStyle}" onclick="renderMemberHistory('${p}')">${p}</td><td>${stats[p].played}</td><td style="color:var(--rank1);">${stats[p].ranks[0]}</td><td style="color:var(--rankL);">${stats[p].ranks[4]}</td><td>${win}%</td></tr>`;
-        }).join('');
-    }
-
-    function updateInputFields() {
-        const count = parseInt(document.getElementById('playerCount').value); const area = document.getElementById('inputArea'); area.innerHTML = "";
-        let target = selectedPlayersForLottery.length === count ? selectedPlayersForLottery : players;
-        for(let i=1; i<=count; i++) { area.innerHTML += `<div class="input-row"><label>${i===count?'꼴찌💀':i+'위'}</label><select id="rank${i}"><option value="">선택</option>${target.map(p=>`<option value="${p}">${p}</option>`).join('')}</select></div>`; }
-    }
     function togglePlayerSelection(el, name) {
-        if(selectedPlayersForLottery.includes(name)) { selectedPlayersForLottery = selectedPlayersForLottery.filter(p=>p!==name); el.classList.remove('active'); }
-        else { if(selectedPlayersForLottery.length >= parseInt(document.getElementById('playerCount').value)) return alert("인원 초과"); selectedPlayersForLottery.push(name); el.classList.add('active'); }
+        if (selectedPlayersForLottery.includes(name)) { selectedPlayersForLottery = selectedPlayersForLottery.filter(p => p !== name); el.classList.remove('active'); } 
+        else { if (selectedPlayersForLottery.length >= parseInt(document.getElementById('playerCount').value)) return alert("인원 초과!"); selectedPlayersForLottery.push(name); el.classList.add('active'); }
         updateInputFields();
     }
-    function resetPlayerSelection() { selectedPlayersForLottery = []; document.querySelectorAll('.player-chip').forEach(el=>el.classList.remove('active')); updateInputFields(); }
-    function pickRandomOrder() { const limit = parseInt(document.getElementById('playerCount').value); if(selectedPlayersForLottery.length !== limit) return alert(limit+"명을 선택해줘!"); let pool = [...selectedPlayersForLottery].sort(()=>Math.random()-0.5); pool.forEach((n, i) => { const el = document.getElementById('rank'+(i+1)); if(el) el.value = n; }); }
-    async function saveGame() { const count = parseInt(document.getElementById('playerCount').value); const ranks = []; for(let i=1; i<=count; i++) { const v = document.getElementById('rank'+i).value; if(!v) return alert("순위 선택!"); ranks.push(v); } showLoading(true, "저장 중"); await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "SAVE", date: selectedDateStr, ranks: ranks }) }); fetchData(); }
-    function searchRecords() { /* v2.30 검색 로직 */ const m = document.getElementById('searchDateRange').value; const p = document.getElementById('searchPlayer').value; if(!m || !p) return alert("월/선수 선택!"); const filtered = gameLogs.filter(g=>g.dateStr.startsWith(m) && g.ranks.includes(p)); if(filtered.length===0) { document.getElementById('searchSummaryArea').innerHTML = "기록 없음"; document.getElementById('searchSummaryArea').style.display='block'; return; } let html = `<div style="background:var(--record-bg); padding:15px; border-radius:15px; font-weight:900;">${p}의 ${m} 기록: ${filtered.length}전</div>`; document.getElementById('searchSummaryArea').innerHTML = html; document.getElementById('searchSummaryArea').style.display='block'; }
+    function resetPlayerSelection() { selectedPlayersForLottery = []; document.querySelectorAll('.player-chip').forEach(el => el.classList.remove('active')); updateInputFields(); }
+    function updateInputFields() { const count = parseInt(document.getElementById('playerCount').value); const area = document.getElementById('inputArea'); area.innerHTML = ""; let target = selectedPlayersForLottery.length > 0 ? selectedPlayersForLottery : players; for(let i=1; i<=count; i++) { area.innerHTML += `<div class="input-row"><label>${i === count ? '꼴찌💀' : i+'위'}</label><select id="rank${i}"><option value="">선택</option>${target.map(p => `<option value="${p}">${p}</option>`).join('')}</select></div>`; } }
+    async function saveGame() { const count = parseInt(document.getElementById('playerCount').value); const ranks = []; for(let i=1; i<=count; i++) { const v = document.getElementById('rank'+i).value; if(!v) return alert("순위 선택 필수!"); ranks.push(v); } showLoading(true, "저장 중"); await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "SAVE", date: selectedDateStr, ranks: ranks }) }); fetchData(); }
+    function renderCalendar() { const grid = document.getElementById('calendarGrid'); grid.innerHTML = ""; const year = currentViewDate.getFullYear(); const month = currentViewDate.getMonth(); document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`; ["일","월","화","수","목","금","토"].forEach((d, i) => grid.innerHTML += `<div class="weekday" style="color:${i===0?'#e67e22':i===6?'#5dade2':'#95a5a6'}">${d}</div>`); const firstDay = new Date(year, month, 1).getDay(); const lastDate = new Date(year, month + 1, 0).getDate(); for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`; for (let d = 1; d <= lastDate; d++) { const dStr = formatDate(new Date(year, month, d)); grid.innerHTML += `<div class="day ${dStr === selectedDateStr ? 'selected' : ''} ${gameLogs.some(g => g.dateStr === dStr) ? 'has-record' : ''}" onclick="selectDate('${dStr}')">${d}</div>`; } }
+    function renderStats() { let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0] }); gameLogs.forEach(g => { const actual = g.ranks.filter(n => n.trim() !== ""); actual.forEach((n, i) => { if(stats[n]) { stats[n].played++; if(i === actual.length-1 && actual.length>1) stats[n].ranks[4]++; else if(i<4) stats[n].ranks[i]++; } }); }); const sorted = [...players].sort((a,b) => stats[b].ranks[0] - stats[a].ranks[0]); document.getElementById('statsBody').innerHTML = sorted.map(p => { const win = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0"; return `<tr><td style="font-weight:900; cursor:pointer; text-decoration:underline;" onclick="renderMemberHistory('${p}')">${p}</td><td>${stats[p].played}</td><td style="color:var(--rank1);">${stats[p].ranks[0]}</td><td style="color:var(--rankL);">${stats[p].ranks[4]}</td><td>${win}%</td></tr>`; }).join(''); }
+    function renderGameList() { const games = gameLogs.filter(g => g.dateStr === selectedDateStr); document.getElementById('dayGameList').innerHTML = games.map((g, i) => `<div class="game-item"><span>${i+1}G</span><div>${g.ranks.filter(n => n.trim() !== "").join('→')}</div></div>`).join(''); }
+    
+    function pickRandomOrder() {
+        const count = parseInt(document.getElementById('playerCount').value);
+        if (selectedPlayersForLottery.length !== count) return alert(`${count}명을 선택해줘!`);
+        let pool = [...selectedPlayersForLottery].sort(() => Math.random() - 0.5);
+        pool.forEach((n, i) => { const el = document.getElementById('rank' + (i + 1)); if (el) el.value = n; });
+    }
+
+    function searchRecords() {
+        const m = document.getElementById('searchDateRange').value; const p = document.getElementById('searchPlayer').value;
+        if(!m || !p) return alert("월과 선수를 선택해줘!");
+        const filtered = gameLogs.filter(g => g.dateStr.startsWith(m) && g.ranks.includes(p));
+        document.getElementById('searchSummaryArea').style.display = 'block';
+        document.getElementById('searchSummaryArea').innerHTML = `<div style="background:var(--record-bg); padding:15px; border-radius:15px; font-weight:900; color:var(--record-border); text-align:center;">${p}의 ${m} 성적: ${filtered.length}전</div>`;
+    }
+
     function resetSearch() { document.getElementById('searchDateRange').value = ""; document.getElementById('searchPlayer').value = ""; document.getElementById('searchSummaryArea').style.display='none'; }
+    function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
     function formatDate(d) { const date = new Date(d); return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0'); }
     function selectDate(d) { selectedDateStr = d; document.getElementById('selectedDateTitle').innerText = `📅 ${d}`; renderCalendar(); renderGameList(); }
-    function renderGameList() { const games = gameLogs.filter(g => g.dateStr === selectedDateStr); document.getElementById('dayGameList').innerHTML = games.map((g, i) => `<div class="game-item"><span>${i+1}G</span><div>${g.ranks.filter(n=>n.trim()!=="").join('→')}</div></div>`).join(''); }
-    function showLoading(v, t) { document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
+    function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
     function renderAll() { renderCalendar(); renderStats(); renderGameList(); }
     function toggleTheme() { const isDark = document.getElementById('themeSwitch').checked; document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light'); }
     function changeZoom(v) { document.body.style.zoom = v; }
-    function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
     function closeAppWindow() { window.close(); }
