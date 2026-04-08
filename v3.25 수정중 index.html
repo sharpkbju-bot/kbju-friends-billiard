@@ -44,7 +44,6 @@
             --dup-border: #ff80ab; 
             --dup-text: #7b1fa2;
             
-            /* 🌟 기본 카드 배경 (파스텔 노랑) */
             --card-bg: rgba(255, 252, 225, 0.8); 
 
             --edit-mode-bg: #e8f5e9;
@@ -56,7 +55,6 @@
             --danger-text: #7b1fa2; 
         }
 
-        /* 🌟 v3.00 테마별 카드 배경 설정 */
         [data-theme='yellow'] { --card-bg: rgba(255, 252, 225, 0.8); }
         [data-theme='yellowgreen'] { --card-bg: rgba(240, 255, 230, 0.8); }
         [data-theme='purple'] { --card-bg: rgba(243, 230, 255, 0.8); }
@@ -267,7 +265,7 @@
         }
         .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
         
-        /* 🌟 v3.25 수정: 이름 열 너비 확대하여 겹침 방지 */
+        /* 🌟 v3.25 수정: 이름 열 너비 확대 (28%) 및 참여 숫자 겹침 방지 */
         .stats-table th:first-child { border-radius: 12px 0 0 12px; width: 28%; padding-left: 8px; } 
         .stats-table th:last-child { border-radius: 0 12px 12px 0; width: 15%; } 
 
@@ -305,7 +303,7 @@
             justify-content: center !important; 
             align-items: center !important;
             gap: 8px !important; 
-            padding: 12px !important; 
+            padding: 15px !important; 
         }
         .zoom-active .cond-responsive > div { 
             text-align: center !important; 
@@ -454,7 +452,7 @@
             position: absolute;
             top: -2.5%; left: -2.5%; width: 105%; height: 105%;
             border-radius: inherit;
-            background: conic-gradient(from var(--glimmer-angle), transparent 30%, var(--rank1), var(--edit), var(--rank1) 70%, transparent);
+            background: conic-gradient(from var(--glimmer-angle), transparent 30%, var(--rank1), var(--accent), var(--edit), var(--rank1) 70%, transparent);
             animation: glimmerspin 2s linear infinite;
             z-index: -2;
             filter: blur(8px);
@@ -561,7 +559,6 @@
         .empty-search-msg { white-space: nowrap; letter-spacing: -0.5px; font-size: clamp(12px, 4vw, 14px); }
         .zoom-active .empty-search-msg { font-size: 11px !important; }
 
-        /* 🌟 추가: 마지막 게임 결과 팝업 애니메이션 및 스타일 */
         @keyframes scaleUpPopup {
             0% { transform: scale(0.3); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
@@ -822,15 +819,16 @@
         "경석": { emoji: "🍀", color: "#1ABC9c" } 
     };
 
+    /* 🌟 v3.25 수정: 승점 기반 랭킹 티어 변경 (유저 요청 기준) */
     function getTier(score) {
         if (score >= 60) return { name: "챌린저", icon: "👑", color: "#e67e22" };
         if (score >= 50) return { name: "플래티넘", icon: "💎", color: "#1abc9c" };
         if (score >= 40) return { name: "골드", icon: "🥇", color: "#f1c40f" };
-        if (score >= 30)  return { name: "실버", icon: "🥈", color: "#95a5a6" };
-        if (score > 30) return { name: "브론즈", icon: "🥉", color: "#cd7f32" };
+        if (score >= 30) return { name: "실버", icon: "🥈", color: "#95a5a6" };
+        return { name: "브론즈", icon: "🥉", color: "#cd7f32" };
     }
 
-    /* 🌟 v3.25 추가: 안내 모달창 표시 로직 (축약 문구 적용) */
+    /* 🌟 v3.25 추가: 안내 모달창 표시 로직 (유저 요청 로직 100% 반영) */
     function showInfoModal(type) {
         let title = "";
         let desc = "";
@@ -847,13 +845,13 @@
             icon = "🏅";
             title = "랭킹 티어(계급) 기준";
             desc = "👑<b>챌린저</b>:60+ 💎<b>플래티넘</b>:50+<br>" +
-                   "🥇<b>골드</b>:40+   🥈<b>실버</b>:30+  🥉<b>브론즈</b>:30미만";
+                   "🥇<b>골드</b>:40+    🥈<b>실버</b>:30+  🥉<b>브론즈</b>:30미만";
         } else if (type === 'condition') {
             icon = "🌡️";
             title = "최근 컨디션 분석 기준";
-            desc = "• ☀️<b>최상</b>:1위 비율 30%↑   🌧️<b>비상</b>:꼴찌 비율 30%↑<br>" +
-                   "• ⛅<b>보통</b>:1위 비율 30% 이하. 안정적인 보통 순위";
-                   "• ⚡<b>도깨비</b>:1위 30%↑ & 꼴찌 30%↑<br>" 
+            desc = "• ☀️<b>최상</b>:1위 비율 30%↑    🌧️<b>비상</b>:꼴찌 비율 30%↑<br>" +
+                   "• ⛅<b>보통</b>:1위 비율 30% 이하. 안정적인 보통 순위<br>" +
+                   "• ⚡<b>도깨비</b>:1위 30%↑ & 꼴찌 30%↑";
         }
         
         document.getElementById('info-modal-icon').innerHTML = icon;
