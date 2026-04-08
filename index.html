@@ -823,11 +823,11 @@
     };
 
     function getTier(score) {
-        if (score >= 30) return { name: "챌린저", icon: "👑", color: "#e67e22" };
-        if (score >= 20) return { name: "플래티넘", icon: "💎", color: "#1abc9c" };
-        if (score >= 10) return { name: "골드", icon: "🥇", color: "#f1c40f" };
-        if (score >= 0)  return { name: "실버", icon: "🥈", color: "#95a5a6" };
-        return { name: "브론즈", icon: "🥉", color: "#cd7f32" };
+        if (score >= 60) return { name: "챌린저", icon: "👑", color: "#e67e22" };
+        if (score >= 50) return { name: "플래티넘", icon: "💎", color: "#1abc9c" };
+        if (score >= 40) return { name: "골드", icon: "🥇", color: "#f1c40f" };
+        if (score >= 30)  return { name: "실버", icon: "🥈", color: "#95a5a6" };
+        if (score > 30) return { name: "브론즈", icon: "🥉", color: "#cd7f32" };
     }
 
     /* 🌟 v3.25 추가: 안내 모달창 표시 로직 (축약 문구 적용) */
@@ -846,8 +846,8 @@
         } else if (type === 'tier') {
             icon = "🏅";
             title = "랭킹 티어(계급) 기준";
-            desc = "👑<b>챌린저</b>:30+ 💎<b>플래티넘</b>:20+<br>" +
-                   "🥇<b>골드</b>:10+   🥈<b>실버</b>:0+  🥉<b>브론즈</b>:0미만";
+            desc = "👑<b>챌린저</b>:60+ 💎<b>플래티넘</b>:50+<br>" +
+                   "🥇<b>골드</b>:40+   🥈<b>실버</b>:30+  🥉<b>브론즈</b>:30미만";
         } else if (type === 'condition') {
             icon = "🌡️";
             title = "최근 컨디션 분석 기준";
