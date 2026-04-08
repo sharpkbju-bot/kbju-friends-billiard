@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=3.25">
+    <link rel="manifest" href="manifest.json?v=3.26">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=3.25">
-    <link rel="apple-touch-icon" href="image_0.png?v=3.25">
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=3.26">
+    <link rel="apple-touch-icon" href="image_0.png?v=3.26">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
@@ -265,7 +265,6 @@
         }
         .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
         
-        /* 🌟 v3.25 수정: 이름 열 너비 확대 (28%) 및 참여 숫자 겹침 방지 */
         .stats-table th:first-child { border-radius: 12px 0 0 12px; width: 28%; padding-left: 8px; } 
         .stats-table th:last-child { border-radius: 0 12px 12px 0; width: 15%; } 
 
@@ -294,7 +293,6 @@
 
         .history-area { margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; display: none; animation: fadeIn 0.3s ease; transition: border 0.3s ease, box-shadow 0.3s ease; }
         
-        /* 🌟 v3.01 겹침 방지 유지 */
         .condition-box { display:flex; align-items:center; justify-content:space-between; background:rgba(255, 255, 255, 0.5); padding:12px 12px; border-radius:15px; margin-bottom:15px; border: 1.5px solid navy; width: 100%; box-sizing: border-box; overflow: hidden; position: relative; }
         [data-theme='dark'] .condition-box { background:rgba(0, 0, 0, 0.3); border: 1.5px solid navy; }
 
@@ -303,7 +301,7 @@
             justify-content: center !important; 
             align-items: center !important;
             gap: 8px !important; 
-            padding: 15px !important; 
+            padding: 12px !important; 
         }
         .zoom-active .cond-responsive > div { 
             text-align: center !important; 
@@ -605,7 +603,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;3.25
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;3.26
     </div>
 </div>
 
@@ -819,7 +817,6 @@
         "경석": { emoji: "🍀", color: "#1ABC9c" } 
     };
 
-    /* 🌟 v3.25 수정: 승점 기반 랭킹 티어 변경 (유저 요청 기준) */
     function getTier(score) {
         if (score >= 60) return { name: "챌린저", icon: "👑", color: "#e67e22" };
         if (score >= 50) return { name: "플래티넘", icon: "💎", color: "#1abc9c" };
@@ -828,7 +825,6 @@
         return { name: "브론즈", icon: "🥉", color: "#cd7f32" };
     }
 
-    /* 🌟 v3.25 추가: 안내 모달창 표시 로직 (유저 요청 로직 100% 반영) */
     function showInfoModal(type) {
         let title = "";
         let desc = "";
@@ -852,7 +848,7 @@
             desc = "• ☀️<b>최상</b>: 1위 비율 30%↑<br>" +   
                    "• ⛅<b>보통</b>: 1위 비율 30% 이하. 안정적인 순위<br>" +
                    "• ⚡<b>도깨비</b>: 1위 30%↑ & 꼴찌 30%↑<br>" + 
-                   "• 🌧️<b>비상</b>: 꼴찌 비율 30%↑<br>";
+                   "• 🌧️<b>비상</b>: 꼴찌 비율 30%↑";
         }
         
         document.getElementById('info-modal-icon').innerHTML = icon;
@@ -1356,7 +1352,6 @@
                         <span style="color:var(--sub-text); font-size:13px; cursor:pointer;" onclick="this.parentElement.parentElement.style.display='none'; document.querySelector('.stats-card').scrollIntoView({ behavior: 'smooth', block: 'center' });">닫기 ✕</span>
                     </div>`;
         
-        /* 🌟 v3.25 팝업 호출 터치 이벤트 추가 및 밑줄 적용 */
         html += `<div class="condition-box cond-responsive" style="gap:4px; margin-bottom:12px; padding:12px 12px;">
                     <div style="font-size:13px; font-weight:900; color:var(--sub-text); white-space:nowrap; letter-spacing:-0.5px; cursor:pointer; text-decoration:underline;" onclick="showInfoModal('score')">현재 랭킹 티어 (승점: ${totalScore}점)</div>
                     <div style="font-size:14px; font-weight:900; color:${currentTier.color}; white-space:nowrap; letter-spacing:-0.5px; text-align:right; cursor:pointer; text-decoration:underline;" onclick="showInfoModal('tier')">${currentTier.icon} ${currentTier.name}</div>
@@ -1377,7 +1372,9 @@
 
             const actual = g.ranks.filter(n => n.trim() !== "");
             const rankIndex = actual.indexOf(name);
-            const rankLabel = (rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
+            
+            /* 🌟 v3.26 수정: 1위에 메달 이모지(🥇) 추가 */
+            const rankLabel = (rankIndex === 0) ? "1위🥇" : ((rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위");
             
             html += `<div class="history-item">
                 <span style="font-size:14px; color:#5D4037;">${g.dateStr} <span style="font-size:12px; font-weight:900; color:#8e44ad; margin-left:4px;">${dailyIndex}G</span></span>
