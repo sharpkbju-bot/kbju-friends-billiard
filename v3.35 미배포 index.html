@@ -183,7 +183,6 @@
         
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 🌟 전체 카드 곡률 축소 (약간 둥근 형태) */
         .calendar-card {
             background: var(--card-bg);
             backdrop-filter: blur(5px);
@@ -195,8 +194,6 @@
         }
 
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        
-        /* 🌟 전체 버튼 패딩 12px 및 라운드 8px 통일 */
         .nav-btn {
             border: none;
             background: rgba(236, 238, 241, 0.4);
@@ -278,7 +275,6 @@
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
 
-        /* 🌟 모든 버튼 렌더링 오차 방지 및 디자인 통일 (패딩 12px, 라운드 8px) */
         button.save-btn { 
             width: 100%; padding: 12px !important; 
             background: linear-gradient(145deg, #abb2b9, #7f8c8d); 
@@ -364,10 +360,10 @@
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 12px !important; border-radius: 8px !important; font-weight: 800; font-size: 14px; line-height: 1.5 !important; box-sizing: border-box !important; display: block; }
         
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
+        #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
         .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* 🌟 DAY'S RECORD 아이템 모양 버튼과 동일하게 8px 통일 */
         .game-item { position: relative; padding: 18px 8px; border-radius: 8px; background: linear-gradient(145deg, #f0f0f0, #ffffff); margin-top: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8); cursor: pointer; transition: transform 0.2s ease; }
         
         .game-info { font-size: 20px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; transition: font-size 0.2s; }
@@ -878,7 +874,6 @@
         "경석": { emoji: "🍀", color: "#1ABC9c" } 
     };
 
-    // --- 최적화 공통 헬퍼 함수 ---
     function getEarnedScore(idx, pCount) {
         if (idx === pCount - 1 && pCount > 1) return 0;
         if (pCount === 2 && idx === 0) return 2;
@@ -895,7 +890,6 @@
         }).join('<span style="display:inline;">→</span>');
     }
 
-    // 🌟 캡처 라이브러리 실행 시 스크롤 위치 보정 옵션 적용 완료 (v3.32 베이스 유지)
     async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
         const target = document.getElementById(targetId);
         if (!target) return;
@@ -941,11 +935,10 @@
             if (shareBtn) shareBtn.style.display = 'block';
         }
     }
-    // ------------------------------
 
     function getPlayerColor(name) {
         const theme = document.documentElement.getAttribute('data-theme');
-        if (name === "경배" && theme === "navy") return "#5D4037"; // 네이비 테마 시 진한 브라운
+        if (name === "경배" && theme === "navy") return "#5D4037";
         return playerThemes[name] ? playerThemes[name].color : 'var(--text-color)';
     }
 
@@ -1019,7 +1012,6 @@
             <div style="display:flex; flex-direction:column; gap:8px; font-weight:900;">
         `;
         actualRanks.forEach((name, i) => {
-            // 🌟 v3.35 수정 사항 1: 1위 이모지(🥇) 정상 표시
             const rankLabel = (i === 0) ? "1위🥇" : (i === actualRanks.length - 1 ? "꼴찌💀" : `${i + 1}위`);
             const rankColor = (i === 0) ? 'var(--rank1)' : (i === actualRanks.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
             const labelSize = (i === 0) ? '16px' : '14px';
@@ -1043,7 +1035,6 @@
         }, 3000);
     }
 
-    // 🌟 게임 인원 선택 시 초구 추첨 영역으로 자동 포커스 (추가 로직 유지)
     function focusOnDrawCard() {
         setTimeout(() => {
             const el = document.getElementById('drawCardArea');
@@ -1682,10 +1673,8 @@
             const actual = g.ranks.filter(n => n.trim() !== "");
             const rankIndex = actual.indexOf(player);
             
-            if (rankIndex === actual.length - 1 && actual.length > 1) r[4]++;
-            else if (rankIndex < 4) r[rankIndex]++;
-
-            const rankLabel = (rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
+            // 🌟 v3.35 수정 사항: 검색 결과 리스트에서도 1위 이모지(🥇) 표시되도록 수정
+            const rankLabel = (rankIndex === 0) ? "1위🥇" : ((rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위");
             const rankColor = rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : 'var(--text-color)');
 
             let namesLine = "";
