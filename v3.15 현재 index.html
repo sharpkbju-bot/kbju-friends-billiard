@@ -44,7 +44,6 @@
             --dup-border: #ff80ab; 
             --dup-text: #7b1fa2;
             
-            /* 🌟 기본 카드 배경 (파스텔 노랑) */
             --card-bg: rgba(255, 252, 225, 0.8); 
 
             --edit-mode-bg: #e8f5e9;
@@ -56,7 +55,6 @@
             --danger-text: #7b1fa2; 
         }
 
-        /* 🌟 v3.00 테마별 카드 배경 설정 */
         [data-theme='yellow'] { --card-bg: rgba(255, 252, 225, 0.8); }
         [data-theme='yellowgreen'] { --card-bg: rgba(240, 255, 230, 0.8); }
         [data-theme='purple'] { --card-bg: rgba(243, 230, 255, 0.8); }
@@ -161,8 +159,7 @@
         .nav-btn {
             border: none;
             background: rgba(236, 238, 241, 0.4);
-            width: 44px; height: 44px; 
-            border-radius: 8px; /* 🌟 버튼 모서리 미세한 곡선 처리 */
+            width: 44px; height: 44px; border-radius: 8px; /* 🌟 8px 통일 */
             box-shadow: 4px 4px 8px rgba(180, 180, 180, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.7);
             font-size: 14px;
             cursor: pointer; color: #777; transition: 0.2s;
@@ -218,7 +215,7 @@
             flex: none !important; 
             padding: 8px !important; 
             margin-left: auto; 
-            border-radius: 8px !important; /* 🌟 입력 필드 곡률 동일 적용 */
+            border-radius: 8px !important; /* 🌟 8px 통일 */
         }
         select#playerCount { width: 85px !important; }
         select#themeSelect { width: 120px !important; font-weight: 800; color: #4a148c; cursor: pointer; }
@@ -227,8 +224,7 @@
         .input-row label { width: 85px; min-width: 85px; max-width: 85px; font-size: 13px; font-weight: 800; color: var(--label-text); flex-shrink: 0; white-space: nowrap; }
         
         select, input[type="date"], input[type="text"]#searchDateRange { 
-            width: 0; flex: 1 1 auto; padding: 12px; 
-            border-radius: 8px; /* 🌟 입력 필드 곡률 동일 적용 */
+            width: 0; flex: 1 1 auto; padding: 12px; border-radius: 8px; /* 🌟 8px 통일 */
             border: 2px solid transparent; font-size: 14px; 
             background: rgba(236, 238, 241, 0.4); box-shadow: var(--inner-shadow); color: var(--text-color); font-weight: 600; 
             -webkit-appearance: none; text-align: center; text-align-last: center; margin: 0;
@@ -242,17 +238,16 @@
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
 
-        /* 🌟 모든 버튼(저장계열) 패딩 및 모서리 라운드 통일 */
+        /* 🌟 모든 버튼 디자인 완벽 통일 (패딩 12px, 라운드 8px, 렌더링 오차 방지) */
         button.save-btn { 
-            width: 100%; 
-            padding: 12px; /* 🌟 일괄 통일 */
+            width: 100%; padding: 12px !important; 
             background: linear-gradient(145deg, #abb2b9, #7f8c8d); 
             color: white; border: none;
-            border-radius: 8px; /* 🌟 아주 약간의 곡선 처리 */
-            font-weight: 800; margin-top: 15px; cursor: pointer; 
+            border-radius: 8px !important; font-weight: 800; margin-top: 15px; cursor: pointer; 
             font-size: 14px; 
             box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.38), -2px -2px 8px rgba(255, 255, 255, 0.5);
             transition: 0.2s all ease;
+            line-height: 1.5 !important; box-sizing: border-box !important; display: block;
         }
         button.save-btn:active { transform: scale(0.97); }
         button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
@@ -325,9 +320,9 @@
 
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
         
-        /* 🌟 모든 버튼의 padding 12px, border-radius: 8px 적용 */
-        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; margin-bottom: 8px; }
-        .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 14px; }
+        /* 🌟 모든 버튼 렌더링 오차 방지 및 디자인 통일 */
+        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 12px !important; border-radius: 8px !important; font-weight: bold; margin-bottom: 8px; line-height: 1.5 !important; box-sizing: border-box !important; display: block; }
+        .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 12px !important; border-radius: 8px !important; font-weight: 800; font-size: 14px; line-height: 1.5 !important; box-sizing: border-box !important; display: block; }
         
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
@@ -344,7 +339,7 @@
             max-width: 36px !important; 
             height: 36px !important; 
             font-size: 13px !important; 
-            border-radius: 8px !important; /* 🌟 확대 모드 날짜칸 라운드 수정 */
+            border-radius: 8px !important; 
         }
         .zoom-active .day.selected { transform: scale(1.1) translateZ(0) !important; }
         .zoom-active .day.has-record::after { bottom: 3px !important; width: 4px !important; height: 4px !important; }
@@ -363,7 +358,9 @@
         .zoom-active select, .zoom-active input[type="text"]#searchDateRange { font-size: 14px !important; padding: 12px !important; width: 0 !important; flex: 1 1 auto !important; }
         .zoom-active .default-summary-title { display: none !important; }
         .zoom-active .zoom-summary-title { display: block !important; }
-        .zoom-active .share-btn-common { font-size: 11px !important; padding: 12px 2px !important; letter-spacing: -0.5px !important; white-space: nowrap !important; }
+        
+        /* 🌟 공유버튼 확대모드 폰트 축소 시에도 일관된 디자인 유지 */
+        .zoom-active .share-btn-common, .zoom-active #custom-share-btn { font-size: 11px !important; padding: 12px !important; letter-spacing: -0.5px !important; white-space: nowrap !important; }
         
         .zoom-active .flatpickr-calendar { 
             width: 280px !important; 
@@ -382,12 +379,11 @@
         [data-theme='dark'] .action-overlay { background: rgba(0, 0, 0, 0.7); }
         .action-overlay.active { display: flex; }
 
-        /* 🌟 오버레이 버튼 패딩 및 모서리 라운드 통일 */
+        /* 🌟 오버레이 버튼 디자인 통일 */
         .overlay-btn { 
-            padding: 12px; 
-            border-radius: 8px; 
-            font-weight: 900; font-size: 13px; 
+            padding: 12px !important; border-radius: 8px !important; font-weight: 900; font-size: 13px; 
             box-shadow: 2px 4px 8px rgba(0,0,0,0.15); transition: 0.2s;
+            line-height: 1.5 !important; box-sizing: border-box !important; display: flex; justify-content: center; align-items: center;
         }
         .overlay-btn:active { transform: scale(0.95); }
 
@@ -420,14 +416,11 @@
 
         /* 🌟 공유계열 버튼 패딩 및 모서리 라운드 통일 (share.js 동적 버튼 포함) */
         .share-btn-common, #custom-share-btn {
-            width: 100%; 
-            padding: 12px !important; 
-            background: linear-gradient(145deg, #6a11cb, #2575fc);
-            color: white; border: none; 
-            border-radius: 8px !important; 
-            font-weight: 800;
+            width: 100%; padding: 12px !important; background: linear-gradient(145deg, #6a11cb, #2575fc);
+            color: white; border: none; border-radius: 8px !important; font-weight: 800;
             display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
             cursor: pointer; font-size: 12px; transition: transform 0.2s;
+            line-height: 1.5 !important; box-sizing: border-box !important;
         }
         .share-btn-common:active, #custom-share-btn:active { transform: scale(0.98); }
 
@@ -435,7 +428,7 @@
         .player-select-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         
         /* 🌟 선수 선택 칩 패딩 및 모서리 라운드 통일 */
-        .player-chip { padding: 12px 5px; border-radius: 8px; background: rgba(255,255,255,0.8); font-weight: 800; font-size: 13px; text-align: center; cursor: pointer; color: var(--sub-text); border: 2px solid transparent; transition: 0.2s; box-shadow: 2px 2px 6px rgba(0,0,0,0.05); }
+        .player-chip { padding: 12px 5px !important; border-radius: 8px !important; background: rgba(255,255,255,0.8); font-weight: 800; font-size: 13px; text-align: center; cursor: pointer; color: var(--sub-text); border: 2px solid transparent; transition: 0.2s; box-shadow: 2px 2px 6px rgba(0,0,0,0.05); line-height: 1.5 !important; box-sizing: border-box !important; }
         
         .player-chip.active { background: #4caf50 !important; border-color: #1b5e20 !important; color: #ffffff !important; font-weight: 800 !important; box-shadow: none !important; }
         
