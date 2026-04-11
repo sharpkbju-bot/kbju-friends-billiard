@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=3.33">
+    <link rel="manifest" href="manifest.json?v=3.35">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=3.33">
-    <link rel="apple-touch-icon" href="image_0.png?v=3.33">
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=3.35">
+    <link rel="apple-touch-icon" href="image_0.png?v=3.35">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
@@ -197,7 +197,7 @@
         .nav-btn {
             border: none;
             background: rgba(236, 238, 241, 0.4);
-            width: 44px; height: 44px; border-radius: 8px;
+            width: 44px; height: 44px; border-radius: 14px;
             box-shadow: 4px 4px 8px rgba(180, 180, 180, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.7);
             font-size: 14px;
             cursor: pointer; color: #777; transition: 0.2s;
@@ -208,7 +208,7 @@
         .day { 
             width: 100%; max-width: 42px; height: 42px; margin: 0 auto;
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 700; position: relative; 
+            border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; position: relative; 
             background: linear-gradient(145deg, rgba(253, 253, 253, 0.8), rgba(226, 229, 234, 0.8)); 
             box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.22), -2px -2px 6px rgba(255, 255, 255, 0.8); 
             transition: 0.3s all cubic-bezier(0.175, 0.885, 0.32, 1.275); 
@@ -253,7 +253,7 @@
             flex: none !important; 
             padding: 8px !important; 
             margin-left: auto; 
-            border-radius: 8px !important; 
+            border-radius: 12px !important; 
         }
         select#playerCount { width: 85px !important; }
         select#themeSelect { width: 120px !important; font-weight: 800; color: #4a148c; cursor: pointer; }
@@ -262,7 +262,7 @@
         .input-row label { width: 85px; min-width: 85px; max-width: 85px; font-size: 13px; font-weight: 800; color: var(--label-text); flex-shrink: 0; white-space: nowrap; }
         
         select, input[type="date"], input[type="text"]#searchDateRange { 
-            width: 0; flex: 1 1 auto; padding: 12px; border-radius: 8px; border: 2px solid transparent; font-size: 14px; 
+            width: 0; flex: 1 1 auto; padding: 12px; border-radius: 15px; border: 2px solid transparent; font-size: 14px; 
             background: rgba(236, 238, 241, 0.4); box-shadow: var(--inner-shadow); color: var(--text-color); font-weight: 600; 
             -webkit-appearance: none; text-align: center; text-align-last: center; margin: 0;
         }
@@ -276,14 +276,13 @@
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
 
         button.save-btn { 
-            width: 100%; padding: 12px !important; 
+            width: 100%; padding: 16px; 
             background: linear-gradient(145deg, #abb2b9, #7f8c8d); 
             color: white; border: none;
-            border-radius: 8px !important; font-weight: 800; margin-top: 15px; cursor: pointer; 
+            border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; 
             font-size: 14px; 
             box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.38), -2px -2px 8px rgba(255, 255, 255, 0.5);
             transition: 0.2s all ease;
-            line-height: 1.5 !important; box-sizing: border-box !important; display: block;
         }
         button.save-btn:active { transform: scale(0.97); }
         button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
@@ -304,8 +303,8 @@
         }
         .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
         
-        .stats-table th:first-child { border-radius: 8px 0 0 8px; width: 28%; padding-left: 8px; } 
-        .stats-table th:last-child { border-radius: 0 8px 8px 0; width: 15%; } 
+        .stats-table th:first-child { border-radius: 12px 0 0 12px; width: 28%; padding-left: 8px; } 
+        .stats-table th:last-child { border-radius: 0 12px 12px 0; width: 15%; } 
 
         .stats-table tr { background: rgba(255, 255, 255, 0.4); }
         .stats-table td { 
@@ -317,8 +316,8 @@
             font-size: 14px; 
         }
 
-        .stats-table td:first-child { border-radius: 8px 0 0 8px; text-align: left; padding-left: 8px; width: 28%; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.5px; } 
-        .stats-table td:last-child { border-radius: 0 8px 8px 0; padding-right: 5px; width: 15%; text-align: right; } 
+        .stats-table td:first-child { border-radius: 12px 0 0 12px; text-align: left; padding-left: 8px; width: 28%; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.5px; } 
+        .stats-table td:last-child { border-radius: 0 12px 12px 0; padding-right: 5px; width: 15%; text-align: right; } 
         
         .val-highlight { font-size: 13px; }
         .win-rate-pill { 
@@ -332,7 +331,7 @@
 
         .history-area { margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; display: none; animation: fadeIn 0.3s ease; transition: border 0.3s ease, box-shadow 0.3s ease; }
         
-        .condition-box { display:flex; align-items:center; justify-content:space-between; background:rgba(255, 255, 255, 0.5); padding:12px 14px; border-radius:15px; margin-bottom:15px; border: 1.5px solid navy; width: 100%; box-sizing: border-box; overflow: hidden; position: relative; }
+        .condition-box { display:flex; align-items:center; justify-content:space-between; background:rgba(255, 255, 255, 0.5); padding:12px 12px; border-radius:15px; margin-bottom:15px; border: 1.5px solid navy; width: 100%; box-sizing: border-box; overflow: hidden; position: relative; }
         [data-theme='dark'] .condition-box, [data-theme='navy'] .condition-box { background:rgba(0, 0, 0, 0.3); border: 1.5px solid navy; }
 
         .zoom-active .cond-responsive { 
@@ -355,16 +354,17 @@
         .toast-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.7); color: white; padding: 12px 25px; border-radius: 20px; font-weight: 800; font-size: 14px; z-index: 10002; display: none; }
 
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
-        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 12px !important; border-radius: 8px !important; font-weight: bold; margin-bottom: 8px; line-height: 1.5 !important; box-sizing: border-box !important; display: block; }
+        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; }
         
-        .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 12px !important; border-radius: 8px !important; font-weight: 800; font-size: 14px; line-height: 1.5 !important; box-sizing: border-box !important; display: block; }
+        .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 14px; }
         
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
         .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .game-item { position: relative; padding: 18px 8px; border-radius: 22px; background: linear-gradient(145deg, #f0f0f0, #ffffff); margin-top: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8); cursor: pointer; transition: transform 0.2s ease; }
+        /* 🌟 수정: DAY'S RECORD 카드 모양 변경 (버튼 라운드와 동일하게 18px 적용) */
+        .game-item { position: relative; padding: 18px 8px; border-radius: 18px; background: linear-gradient(145deg, #f0f0f0, #ffffff); margin-top: 15px; display: flex; justify-content: center; align-items: center; box-shadow: 6px 6px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8); cursor: pointer; transition: transform 0.2s ease; }
         
         .game-info { font-size: 20px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; transition: font-size 0.2s; }
         .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
@@ -374,7 +374,7 @@
             max-width: 36px !important; 
             height: 36px !important; 
             font-size: 13px !important; 
-            border-radius: 8px !important; 
+            border-radius: 12px !important; 
         }
         .zoom-active .day.selected { transform: scale(1.1) translateZ(0) !important; }
         .zoom-active .day.has-record::after { bottom: 3px !important; width: 4px !important; height: 4px !important; }
@@ -393,7 +393,7 @@
         .zoom-active select, .zoom-active input[type="text"]#searchDateRange { font-size: 14px !important; padding: 12px !important; width: 0 !important; flex: 1 1 auto !important; }
         .zoom-active .default-summary-title { display: none !important; }
         .zoom-active .zoom-summary-title { display: block !important; }
-        .zoom-active .share-btn-common, .zoom-active #custom-share-btn { font-size: 11px !important; padding: 12px !important; letter-spacing: -0.5px !important; white-space: nowrap !important; }
+        .zoom-active .share-btn-common { font-size: 11px !important; padding: 12px 2px !important; letter-spacing: -0.5px !important; white-space: nowrap !important; }
         
         .zoom-active .flatpickr-calendar { 
             width: 280px !important; 
@@ -413,9 +413,8 @@
         .action-overlay.active { display: flex; }
 
         .overlay-btn { 
-            padding: 12px !important; border-radius: 8px !important; font-weight: 900; font-size: 13px; 
+            padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 13px; 
             box-shadow: 2px 4px 8px rgba(0,0,0,0.15); transition: 0.2s;
-            line-height: 1.5 !important; box-sizing: border-box !important; display: flex; justify-content: center; align-items: center;
         }
         .overlay-btn:active { transform: scale(0.95); }
 
@@ -446,18 +445,17 @@
             width: 100%;
         }
 
-        .share-btn-common, #custom-share-btn {
-            width: 100%; padding: 12px !important; background: linear-gradient(145deg, #6a11cb, #2575fc);
-            color: white; border: none; border-radius: 8px !important; font-weight: 800;
+        .share-btn-common {
+            width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc);
+            color: white; border: none; border-radius: 18px; font-weight: 800;
             display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
             cursor: pointer; font-size: 12px; transition: transform 0.2s;
-            line-height: 1.5 !important; box-sizing: border-box !important;
         }
-        .share-btn-common:active, #custom-share-btn:active { transform: scale(0.98); }
+        .share-btn-common:active { transform: scale(0.98); }
 
         .player-select-wrap { margin-bottom: 15px; background: rgba(255,255,255,0.3); border-radius: 18px; padding: 15px; border: 1px solid rgba(255,255,255,0.5); box-shadow: var(--inner-shadow); }
         .player-select-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .player-chip { padding: 12px 5px !important; border-radius: 8px !important; background: rgba(255,255,255,0.8); font-weight: 800; font-size: 13px; text-align: center; cursor: pointer; color: var(--sub-text); border: 2px solid transparent; transition: 0.2s; box-shadow: 2px 2px 6px rgba(0,0,0,0.05); line-height: 1.5 !important; box-sizing: border-box !important; }
+        .player-chip { padding: 10px 5px; border-radius: 12px; background: rgba(255,255,255,0.8); font-weight: 800; font-size: 13px; text-align: center; cursor: pointer; color: var(--sub-text); border: 2px solid transparent; transition: 0.2s; box-shadow: 2px 2px 6px rgba(0,0,0,0.05); }
         
         .player-chip.active { background: #4caf50 !important; border-color: #1b5e20 !important; color: #ffffff !important; font-weight: 800 !important; box-shadow: none !important; }
         
@@ -659,7 +657,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;3.33
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;3.35
     </div>
 </div>
 
@@ -714,6 +712,7 @@
     <div class="theme-wrap">
         <span style="font-size:14px; font-weight:800; color:var(--sub-text);">테마 모드</span>
         <select id="themeSelect" onchange="changeAppTheme()">
+            <option value="navy">네이비</option>
             <option value="yellow">파스텔 노랑</option>
             <option value="yellowgreen">파스텔 연두</option>
             <option value="purple">파스텔 보라</option>
@@ -721,7 +720,6 @@
             <option value="pink">파스텔 분홍</option>
             <option value="gray">라이트 그레이</option>
             <option value="dark">다크</option>
-            <option value="navy">네이비</option>
         </select>
     </div>
 
@@ -1006,7 +1004,8 @@
             <div style="display:flex; flex-direction:column; gap:8px; font-weight:900;">
         `;
         actualRanks.forEach((name, i) => {
-            const rankLabel = (i === actualRanks.length - 1) ? "꼴찌💀" : `${i + 1}위`;
+            // 🌟 1위와 꼴찌 이모지 노출
+            const rankLabel = (i === 0) ? "1위🥇" : (i === actualRanks.length - 1 ? "꼴찌💀" : `${i + 1}위`);
             const rankColor = (i === 0) ? 'var(--rank1)' : (i === actualRanks.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
             const labelSize = (i === 0) ? '16px' : '14px';
             const nameSize = (i === 0) ? '22px' : '16px';
@@ -1664,12 +1663,19 @@
             const rankLabel = (rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
             const rankColor = rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : 'var(--text-color)');
 
+            let namesLine = "";
+            actual.forEach((name, i) => {
+                const color = i === 0 ? 'var(--rank1)' : (i === actual.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
+                namesLine += `<span style="color:${color};display:inline;">${name}</span>`;
+                if (i < actual.length - 1) namesLine += `<span style="display:inline;">→</span>`;
+            });
+
             historyHtml += `<div class="history-item search-result-card" style="flex-direction:column; align-items:flex-start; gap:5px;">
                 <div style="display:flex; justify-content:space-between; width:100%;">
                     <span style="font-size:13px; color:var(--sub-text);">${g.dateStr} <span style="font-size:11px; font-weight:900; color:#8e44ad; margin-left:4px;">${dailyIndex}G</span></span>
                     <span style="font-size:14px; font-weight:900; color:${rankColor};">${rankLabel}</span>
                 </div>
-                <div style="font-size:12px; color:var(--text-color); letter-spacing:-0.5px; display:inline-flex; align-items:center;">${generateNamesHTML(actual)}</div>
+                <div style="font-size:12px; color:var(--text-color); letter-spacing:-0.5px; display:inline-flex; align-items:center;">${namesLine}</div>
             </div>`;
         });
 
