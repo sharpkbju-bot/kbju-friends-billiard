@@ -1289,11 +1289,11 @@
         const modal = document.getElementById('graph-modal');
         modal.style.display = 'flex';
 
-        // 4초 후 자동 닫기
+        // 10초 후 자동 닫기
         if (window.graphTimeout) clearTimeout(window.graphTimeout);
         window.graphTimeout = setTimeout(() => {
             closeGraphModal();
-        }, 4000);
+        }, 10000);
     }
     
     function closeGraphModal() {
