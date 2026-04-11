@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=3.10">
+    <link rel="manifest" href="manifest.json?v=3.15">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=3.10">
-    <link rel="apple-touch-icon" href="image_0.png?v=3.10">
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=3.15">
+    <link rel="apple-touch-icon" href="image_0.png?v=3.15">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
@@ -44,6 +44,7 @@
             --dup-border: #ff80ab; 
             --dup-text: #7b1fa2;
             
+            /* 🌟 기본 카드 배경 (파스텔 노랑) */
             --card-bg: rgba(255, 252, 225, 0.8); 
 
             --edit-mode-bg: #e8f5e9;
@@ -55,6 +56,7 @@
             --danger-text: #7b1fa2; 
         }
 
+        /* 🌟 v3.00 테마별 카드 배경 설정 */
         [data-theme='yellow'] { --card-bg: rgba(255, 252, 225, 0.8); }
         [data-theme='yellowgreen'] { --card-bg: rgba(240, 255, 230, 0.8); }
         [data-theme='purple'] { --card-bg: rgba(243, 230, 255, 0.8); }
@@ -171,8 +173,7 @@
         .day { 
             width: 100%; max-width: 42px; height: 42px; margin: 0 auto;
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            border-radius: 8px; /* 🌟 날짜 칸도 동일한 곡률 적용 */
-            cursor: pointer; font-size: 15px; font-weight: 700; position: relative; 
+            border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 700; position: relative; 
             background: linear-gradient(145deg, rgba(253, 253, 253, 0.8), rgba(226, 229, 234, 0.8)); 
             box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.22), -2px -2px 6px rgba(255, 255, 255, 0.8); 
             transition: 0.3s all cubic-bezier(0.175, 0.885, 0.32, 1.275); 
@@ -417,18 +418,18 @@
             width: 100%;
         }
 
-        /* 🌟 공유계열 버튼 패딩 및 모서리 라운드 통일 */
-        .share-btn-common {
+        /* 🌟 공유계열 버튼 패딩 및 모서리 라운드 통일 (share.js 동적 버튼 포함) */
+        .share-btn-common, #custom-share-btn {
             width: 100%; 
-            padding: 12px; 
+            padding: 12px !important; 
             background: linear-gradient(145deg, #6a11cb, #2575fc);
             color: white; border: none; 
-            border-radius: 8px; 
+            border-radius: 8px !important; 
             font-weight: 800;
             display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
             cursor: pointer; font-size: 12px; transition: transform 0.2s;
         }
-        .share-btn-common:active { transform: scale(0.98); }
+        .share-btn-common:active, #custom-share-btn:active { transform: scale(0.98); }
 
         .player-select-wrap { margin-bottom: 15px; background: rgba(255,255,255,0.3); border-radius: 18px; padding: 15px; border: 1px solid rgba(255,255,255,0.5); box-shadow: var(--inner-shadow); }
         .player-select-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -627,7 +628,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;3.10
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;3.15
     </div>
 </div>
 
@@ -1273,7 +1274,6 @@
 
         html += `<button id="member-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareMemberResult('${name}')">📸 ${name}의 최근 전적 스크린샷 공유</button>`;
         
-        html += `<div id="recent-games-wrap">`;
         html += `<div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px; padding-left:2px;">최근 10경기 기록</div>`;
 
         personalGames.forEach(g => {
@@ -1289,9 +1289,6 @@
                 <span style="font-size:15px; color:${rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : '#5D4037')};">${rankLabel}</span>
             </div>`;
         });
-        
-        html += `</div>`; 
-        
         historyArea.innerHTML = html; 
         historyArea.style.display = 'block';
         setTimeout(() => { historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
@@ -1407,6 +1404,7 @@
 
         try {
             await new Promise(r => setTimeout(r, 100));
+            
             const canvas = await html2canvas(target, { 
                 backgroundColor: bgColor, 
                 scale: 2, 
@@ -1453,6 +1451,7 @@
 
         try {
             await new Promise(r => setTimeout(r, 100));
+            
             const canvas = await html2canvas(target, { 
                 backgroundColor: bgColor, 
                 scale: 2, 
