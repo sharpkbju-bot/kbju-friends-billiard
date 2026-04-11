@@ -53,6 +53,9 @@
             --sub-text: #666;
             --label-text: #777;
             --danger-text: #7b1fa2; 
+            
+            /* 🌟 그래프 꺾은선 라이트/기본 컬러 (청명한 파란색) */
+            --graph-line: #2980b9;
         }
 
         [data-theme='yellow'] { --card-bg: rgba(255, 252, 225, 0.8); }
@@ -88,6 +91,8 @@
             --rankL: #ff8a80; 
             --edit-mode-bg: rgba(30, 45, 90, 0.9); 
             --edit-mode-border: #66bb6a;
+            /* 🌟 네이비 테마용 그래프 꺾은선 (밝은 시안) */
+            --graph-line: #4dd0e1;
         }
 
         [data-theme='dark'] {
@@ -116,6 +121,8 @@
             --rankL: #ff8a80; 
             --edit-mode-bg: rgba(35, 35, 45, 0.9); 
             --edit-mode-border: #27ae60;
+            /* 🌟 다크 테마용 그래프 꺾은선 (밝은 시안) */
+            --graph-line: #4dd0e1;
         }
 
         [data-theme='dark'] .win-rate-pill, [data-theme='navy'] .win-rate-pill { color: #ffd60a !important; }
@@ -1241,7 +1248,8 @@
             for(let i=1; i<points.length; i++) {
                 pathD += ` L ${points[i].x} ${points[i].y}`;
             }
-            svg += `<path d="${pathD}" fill="none" stroke="#95a5a6" stroke-width="2.5" stroke-linejoin="round" />`;
+            // 🌟 꺾은선 색상을 회색에서 시원하고 눈에 띄는 동적 CSS 변수 컬러로 수정
+            svg += `<path d="${pathD}" fill="none" stroke="var(--graph-line)" stroke-width="3" stroke-linejoin="round" />`;
 
             points.forEach((p) => {
                 svg += `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="${p.pColor}" />`;
@@ -1773,6 +1781,13 @@
 
             const rankLabel = (rankIndex === 0) ? "1위🥇" : ((rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위");
             const rankColor = rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : 'var(--text-color)');
+
+            let namesLine = "";
+            actual.forEach((name, i) => {
+                const color = i === 0 ? 'var(--rank1)' : (i === actual.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
+                namesLine += `<span style="color:${color};display:inline;">${name}</span>`;
+                if (i < actual.length - 1) namesLine += `<span style="display:inline;">→</span>`;
+            });
 
             historyHtml += `<div class="history-item search-result-card" style="flex-direction:column; align-items:flex-start; gap:5px;">
                 <div style="display:flex; justify-content:space-between; width:100%;">
