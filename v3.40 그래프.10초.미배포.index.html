@@ -12,6 +12,8 @@
     <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=3.40">
     <link rel="apple-touch-icon" href="image_0.png?v=3.40">
         
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 
@@ -157,7 +159,8 @@
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            /* 🌟 프리텐다드 폰트를 1순위로 적용하여 전체 디자인을 세련되게 업그레이드 */
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             margin: 0; 
             padding: env(safe-area-inset-top) 15px 100px 15px;
             background-image: url('image_1.png');
@@ -359,7 +362,7 @@
         
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 12px !important; border-radius: 8px !important; font-weight: 800; font-size: 14px; line-height: 1.5 !important; box-sizing: border-box !important; display: block; }
         
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
         .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -386,6 +389,7 @@
             left: 50% !important; 
             transform: translateX(-50%) !important; 
             margin-left: 0 !important;
+            font-family: 'Pretendard', sans-serif !important; 
         }
 
         .zoom-active .input-row { gap: 8px !important; }
@@ -506,12 +510,12 @@
         }
 
         .flatpickr-calendar, .flatpickr-calendar * {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
         }
         
         .flatpickr-current-month .flatpickr-monthhand-title,
         .flatpickr-current-month input.cur-year {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
             font-weight: 900 !important;
             background: transparent !important;
         }
@@ -654,7 +658,6 @@
             background: rgba(255, 255, 255, 0.95); border-radius: 12px;
         }
 
-        /* 🌟 다중 당첨자 최근 10경기 흐름 그래프 팝업 스타일 */
         .graph-box { background:rgba(255, 255, 255, 0.5); border-radius:8px; border: 1px solid rgba(0,0,0,0.05); }
         [data-theme='dark'] .graph-box, [data-theme='navy'] .graph-box { background:rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.05); }
     </style>
@@ -879,7 +882,7 @@
     let selectedPlayersForLottery = [];
     let searchFlatpickr; 
     let animationStep = 0;
-    let lastDrawnPlayers = []; // 🌟 다중 당첨자 임시 저장 배열로 수정
+    let lastDrawnPlayers = []; 
 
     const playerThemes = {
         "경배": { emoji: "👑", color: "#1A237E" },
@@ -958,7 +961,6 @@
         return playerThemes[name] ? playerThemes[name].color : 'var(--text-color)';
     }
 
-    // 🌟 테마 호환성을 위한 고대비 그래프 전용 컬러 추출 함수 (다크/네이비 테마 시 밝은 색 적용)
     function getGraphColor(name) {
         const theme = document.documentElement.getAttribute('data-theme');
         const isDark = theme === 'dark' || theme === 'navy';
@@ -1112,7 +1114,6 @@
         const firstPlayer = pool.splice(firstIdx, 1)[0];
         const remaining = pool.sort(() => Math.random() - 0.5);
 
-        // 🌟 수정: 이번 게임에 참여한 모든 선수를 다중 꺾은선 그래프 호출을 위해 저장
         lastDrawnPlayers = [firstPlayer, ...remaining]; 
 
         const resultArea = document.getElementById('order-result');
@@ -1207,35 +1208,29 @@
 
     function closeOrderModal() {
         document.getElementById('order-modal').style.display = 'none';
-        // 🌟 수정: 팝업이 닫힐 때 다중 선수의 최근 흐름을 그리는 그래프 모달 호출
         if (lastDrawnPlayers && lastDrawnPlayers.length > 0) {
             showPlayersGraph(lastDrawnPlayers);
-            lastDrawnPlayers = []; // 중복 호출 방지 리셋
+            lastDrawnPlayers = []; 
         }
     }
 
-    // 🌟 추가: 참여한 선수들의 최근 10경기 흐름을 그려주는 다중 꺾은선 그래프
     function showPlayersGraph(players) {
         const container = document.getElementById('graph-container');
         const legendArea = document.getElementById('graph-legend');
         
         let legendHtml = "";
-        // viewBox 좌측 여백을 확보하여 Y축 라벨 텍스트 삽입 (-15부터 시작)
         let svg = `<svg width="100%" height="100%" viewBox="-15 -10 130 120" preserveAspectRatio="none" style="overflow: visible; font-family: inherit;">`;
         
-        // Y축 라벨 & 그리드 생성 (1위 ~ 5위)
         const yLabels = ["1위", "2위", "3위", "4위", "꼴찌"];
         for(let i=0; i<=4; i++) {
             let y = i * 25;
             svg += `<line x1="0" y1="${y}" x2="100" y2="${y}" stroke="rgba(150,150,150,0.25)" stroke-width="1" stroke-dasharray="3,3" />`;
-            // 선과 겹치지 않게 좌측(x="-4")에 Y축 안내 라벨 표시
             svg += `<text x="-4" y="${y + 3}" font-size="7" font-weight="900" fill="var(--sub-text)" text-anchor="end">${yLabels[i]}</text>`;
         }
 
         players.forEach(playerName => {
-            const pColor = getGraphColor(playerName); // 테마에 맞는 고대비 색상 추출
+            const pColor = getGraphColor(playerName); 
             
-            // 상단 범례(Legend) 추가
             legendHtml += `<div style="display:flex; align-items:center; gap:4px;">
                 <span style="display:inline-block; width:10px; height:3px; background-color:${pColor}; border-radius:2px;"></span>
                 <span style="color:var(--text-color);">${playerName}</span>
@@ -1247,7 +1242,7 @@
                 return (parseInt(b.round) || 0) - (parseInt(a.round) || 0);
             });
 
-            if (allPersonalGames.length === 0) return; // 전적 없으면 스킵
+            if (allPersonalGames.length === 0) return; 
 
             const recent10Games = allPersonalGames.slice(0, 10).reverse(); 
             
@@ -1266,7 +1261,6 @@
                 points.push({x, y});
             });
 
-            // 꺾은선 그리기 (선들을 겹쳐도 예쁘도록 opacity 및 round 처리)
             if (points.length > 0) {
                 let pathD = `M ${points[0].x} ${points[0].y}`;
                 for(let i=1; i<points.length; i++) {
@@ -1274,7 +1268,6 @@
                 }
                 svg += `<path d="${pathD}" fill="none" stroke="${pColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85" />`;
 
-                // 데이터 포인트(동그라미) 그리기 (카드 배경색의 테두리를 넣어 분리감 향상)
                 points.forEach((p) => {
                     svg += `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="${pColor}" stroke="var(--card-bg)" stroke-width="1.5" />`;
                 });
@@ -1289,7 +1282,7 @@
         const modal = document.getElementById('graph-modal');
         modal.style.display = 'flex';
 
-        // 10초 후 자동 닫기
+        // 🌟 수정: 10초 후 자동 닫기 처리 적용
         if (window.graphTimeout) clearTimeout(window.graphTimeout);
         window.graphTimeout = setTimeout(() => {
             closeGraphModal();
