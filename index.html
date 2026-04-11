@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=3.00">
+    <link rel="manifest" href="manifest.json?v=3.10">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=3.00">
-    <link rel="apple-touch-icon" href="image_0.png?v=3.00">
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=3.10">
+    <link rel="apple-touch-icon" href="image_0.png?v=3.10">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
@@ -44,7 +44,6 @@
             --dup-border: #ff80ab; 
             --dup-text: #7b1fa2;
             
-            /* 🌟 기본 카드 배경 (파스텔 노랑) */
             --card-bg: rgba(255, 252, 225, 0.8); 
 
             --edit-mode-bg: #e8f5e9;
@@ -56,7 +55,6 @@
             --danger-text: #7b1fa2; 
         }
 
-        /* 🌟 v3.00 테마별 카드 배경 설정 */
         [data-theme='yellow'] { --card-bg: rgba(255, 252, 225, 0.8); }
         [data-theme='yellowgreen'] { --card-bg: rgba(240, 255, 230, 0.8); }
         [data-theme='purple'] { --card-bg: rgba(243, 230, 255, 0.8); }
@@ -161,7 +159,8 @@
         .nav-btn {
             border: none;
             background: rgba(236, 238, 241, 0.4);
-            width: 44px; height: 44px; border-radius: 14px;
+            width: 44px; height: 44px; 
+            border-radius: 999px; /* 🌟 버튼 모서리 완벽 라운드 처리 */
             box-shadow: 4px 4px 8px rgba(180, 180, 180, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.7);
             font-size: 14px;
             cursor: pointer; color: #777; transition: 0.2s;
@@ -239,11 +238,14 @@
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
 
+        /* 🌟 버튼 디자인 통일 (모서리 완벽 라운드 및 padding 12px 고정) */
         button.save-btn { 
-            width: 100%; padding: 16px; 
+            width: 100%; 
+            padding: 12px; 
             background: linear-gradient(145deg, #abb2b9, #7f8c8d); 
             color: white; border: none;
-            border-radius: 18px; font-weight: 800; margin-top: 15px; cursor: pointer; 
+            border-radius: 999px; 
+            font-weight: 800; margin-top: 15px; cursor: pointer; 
             font-size: 14px; 
             box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.38), -2px -2px 8px rgba(255, 255, 255, 0.5);
             transition: 0.2s all ease;
@@ -318,9 +320,10 @@
         .toast-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.7); color: white; padding: 12px 25px; border-radius: 20px; font-weight: 800; font-size: 14px; z-index: 10002; display: none; }
 
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
-        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 8px; }
         
-        .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 14px; }
+        /* 🌟 버튼 디자인 통일 (모서리 라운드 999px, padding 12px) */
+        .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 12px; border-radius: 999px; font-weight: bold; margin-bottom: 8px; }
+        .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 12px; border-radius: 999px; font-weight: 800; font-size: 14px; }
         
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
@@ -375,8 +378,11 @@
         [data-theme='dark'] .action-overlay { background: rgba(0, 0, 0, 0.7); }
         .action-overlay.active { display: flex; }
 
+        /* 🌟 오버레이 버튼 디자인 통일 */
         .overlay-btn { 
-            padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 13px; 
+            padding: 12px; 
+            border-radius: 999px; 
+            font-weight: 900; font-size: 13px; 
             box-shadow: 2px 4px 8px rgba(0,0,0,0.15); transition: 0.2s;
         }
         .overlay-btn:active { transform: scale(0.95); }
@@ -408,9 +414,10 @@
             width: 100%;
         }
 
+        /* 🌟 공유 계열 버튼 디자인 통일 */
         .share-btn-common {
             width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc);
-            color: white; border: none; border-radius: 18px; font-weight: 800;
+            color: white; border: none; border-radius: 999px; font-weight: 800;
             display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
             cursor: pointer; font-size: 12px; transition: transform 0.2s;
         }
@@ -418,7 +425,9 @@
 
         .player-select-wrap { margin-bottom: 15px; background: rgba(255,255,255,0.3); border-radius: 18px; padding: 15px; border: 1px solid rgba(255,255,255,0.5); box-shadow: var(--inner-shadow); }
         .player-select-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .player-chip { padding: 10px 5px; border-radius: 12px; background: rgba(255,255,255,0.8); font-weight: 800; font-size: 13px; text-align: center; cursor: pointer; color: var(--sub-text); border: 2px solid transparent; transition: 0.2s; box-shadow: 2px 2px 6px rgba(0,0,0,0.05); }
+        
+        /* 🌟 칩(선수선택 버튼)도 동일한 라운드 스타일 적용 */
+        .player-chip { padding: 12px 5px; border-radius: 999px; background: rgba(255,255,255,0.8); font-weight: 800; font-size: 13px; text-align: center; cursor: pointer; color: var(--sub-text); border: 2px solid transparent; transition: 0.2s; box-shadow: 2px 2px 6px rgba(0,0,0,0.05); }
         
         .player-chip.active { background: #4caf50 !important; border-color: #1b5e20 !important; color: #ffffff !important; font-weight: 800 !important; box-shadow: none !important; }
         
@@ -551,11 +560,14 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        .summary-stats-wrap .stat-lbl { font-size: clamp(9px, 2.5vw, 11px); letter-spacing: -0.5px; }
-        .summary-stats-wrap .stat-val { font-size: clamp(10px, 3.2vw, 14px); letter-spacing: -0.5px; }
-        .zoom-active .summary-stats-wrap .stat-lbl { font-size: 9px !important; letter-spacing: -0.5px !important; }
-        .zoom-active .summary-stats-wrap .stat-val { font-size: 11px !important; letter-spacing: -0.5px !important; }
-        
+        .summary-stats-wrap .stat-lbl { font-size: clamp(11px, 3.5vw, 13px); letter-spacing: -0.5px; }
+        .summary-stats-wrap .stat-val { font-size: clamp(14px, 4.5vw, 17px); letter-spacing: -0.5px; }
+        .summary-stats-wrap .win-rate-val { font-size: clamp(15px, 4.8vw, 18px) !important; }
+
+        .zoom-active .summary-stats-wrap .stat-lbl { font-size: 11px !important; letter-spacing: -0.5px !important; }
+        .zoom-active .summary-stats-wrap .stat-val { font-size: 14px !important; letter-spacing: -0.5px !important; }
+        .zoom-active .summary-stats-wrap .win-rate-val { font-size: 15px !important; }
+
         .empty-search-msg { white-space: nowrap; letter-spacing: -0.5px; font-size: clamp(12px, 4vw, 14px); }
         .zoom-active .empty-search-msg { font-size: 11px !important; }
 
@@ -608,7 +620,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;3.00
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;3.10
     </div>
 </div>
 
@@ -761,8 +773,8 @@
 
     <div id="search-capture-area" style="padding: 5px; border-radius: 20px; margin-top: 10px; background: transparent;">
         <div style="display: flex; gap: 10px;">
-            <button class="save-btn" style="background: linear-gradient(145deg, #3498db, #2980b9); margin-top: 0; flex: 2; padding: 12px; font-size: 13px;" onclick="searchRecords()">기록 검색하기</button>
-            <button class="save-btn" style="background: #bdc3c7; margin-top: 0; flex: 1; padding: 12px; font-size: 13px; color: #444;" onclick="resetSearch()">🔄 리셋</button>
+            <button class="save-btn" style="background: linear-gradient(145deg, #3498db, #2980b9); margin-top: 0; flex: 2; font-size: 13px;" onclick="searchRecords()">기록 검색하기</button>
+            <button class="save-btn" style="background: #bdc3c7; margin-top: 0; flex: 1; font-size: 13px; color: #444;" onclick="resetSearch()">🔄 리셋</button>
         </div>
 
         <button id="search-share-btn" class="share-btn-common" style="margin-top: 15px; display: none;" onclick="shareSearchResult()">📸 검색 결과 스크린샷 공유</button>
@@ -775,8 +787,8 @@
 <div class="danger-zone">
     <div style="color: var(--danger-text); font-weight:900; margin-bottom:15px; font-size:12px;">데이터 관리 및 백업</div>
     <div style="display: flex; gap: 10px; margin-bottom: 15px; justify-content: center;">
-        <button class="save-btn" style="background: linear-gradient(145deg, #4a90e2, #357abd); margin-top:0; flex:1; padding: 8px; font-size: 12px;" onclick="exportData()">📥 데이터 백업</button>
-        <button class="save-btn" style="background:#000080; margin-top:0; flex:1; padding: 8px; font-size: 12px;" onclick="triggerImport()">📤 데이터 복구</button>
+        <button class="save-btn" style="background: linear-gradient(145deg, #4a90e2, #357abd); margin-top:0; flex:1; font-size: 12px;" onclick="exportData()">📥 데이터 백업</button>
+        <button class="save-btn" style="background:#000080; margin-top:0; flex:1; font-size: 12px;" onclick="triggerImport()">📤 데이터 복구</button>
     </div>
     <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importData(event)">
     <div style="color: var(--danger-text); font-weight:900; margin-bottom:15px; font-size:12px;">초기화 버튼은 함부로 터치하지 마세요.</div>
@@ -853,14 +865,13 @@
         }, 3000);
     }
 
-    // 🌟 추가 사항 1: 게임 인원 선택 시 초구 추첨하기 버튼으로 포커스 자동 스크롤
     function focusOnDrawCard() {
         setTimeout(() => {
             const el = document.getElementById('drawCardArea');
             if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-        }, 150); // 드롭다운 업데이트 후 안정적인 스크롤을 위해 약간의 딜레이
+        }, 150); 
     }
 
     function togglePlayerSelection(el, name) {
@@ -1248,15 +1259,14 @@
                         <span style="color:var(--sub-text); font-size:13px; cursor:pointer;" onclick="this.parentElement.parentElement.style.display='none'; document.querySelector('.stats-card').scrollIntoView({ behavior: 'smooth', block: 'center' });">닫기 ✕</span>
                     </div>`;
         
-        // 🌟 수정: 캡처 잘림/돌출 방지 처리 적용 (기존 UI 레이아웃 유지)
         html += `<div class="condition-box cond-responsive" style="gap:4px; padding:12px 10px; overflow:hidden;">
                     <div style="font-size:12.5px; font-weight:900; color:var(--sub-text); white-space:nowrap; letter-spacing:-0.5px;">최근 컨디션 분석 (${recent10Games.length}G)</div>
                     <div style="font-size:13px; font-weight:900; color:${conditionColor}; white-space:nowrap; letter-spacing:-0.8px; text-align:right; padding-right:2px;">${conditionEmoji} ${conditionText}</div>
                  </div>`;
 
-        // 🌟 버튼은 캡처에서 숨겨지도록 JS에서 처리
         html += `<button id="member-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareMemberResult('${name}')">📸 ${name}의 최근 전적 스크린샷 공유</button>`;
         
+        html += `<div id="recent-games-wrap">`;
         html += `<div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px; padding-left:2px;">최근 10경기 기록</div>`;
 
         personalGames.forEach(g => {
@@ -1272,6 +1282,9 @@
                 <span style="font-size:15px; color:${rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : '#5D4037')};">${rankLabel}</span>
             </div>`;
         });
+        
+        html += `</div>`;
+        
         historyArea.innerHTML = html; 
         historyArea.style.display = 'block';
         setTimeout(() => { historyArea.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
@@ -1291,8 +1304,11 @@
     async function shareMemberResult(name) {
         const target = document.getElementById('memberHistory-capture-area');
         if (!target) return;
+        
         const shareBtn = document.getElementById('member-share-btn');
-        if(shareBtn) shareBtn.style.display = 'none'; // 🌟 공유 버튼 숨김 (캡처 제외)
+        const recentGamesWrap = document.getElementById('recent-games-wrap');
+        
+        if(shareBtn) shareBtn.style.display = 'none';
         
         const bgColor = getCaptureBgColor();
         const originalBg = target.style.background;
@@ -1302,10 +1318,8 @@
         target.style.padding = '15px';
 
         try {
-            await new Promise(r => setTimeout(r, 100)); // 🌟 캡처 전 레이아웃 변경 대기 시간 증가
+            await new Promise(r => setTimeout(r, 100));
             
-            // 🌟 수정 사항 2: 모바일 브라우저에서 화면 아래(10경기 리스트)가 캡처 시 잘려나가는 html2canvas 버그를 막기 위해
-            // 문서 전체 스크롤 길이를 직접 인식시키는 오프셋 옵션 적용
             const canvas = await html2canvas(target, { 
                 backgroundColor: bgColor, 
                 scale: 2, 
@@ -1333,7 +1347,8 @@
         } finally {
             target.style.background = originalBg;
             target.style.padding = originalPadding;
-            if(shareBtn) shareBtn.style.display = 'block'; // 🌟 공유 버튼 원상복구
+            
+            if(shareBtn) shareBtn.style.display = 'block';
         }
     }
 
@@ -1388,7 +1403,7 @@
 
         try {
             await new Promise(r => setTimeout(r, 100));
-            // 🌟 캡처 잘림 방지 로직 동일 적용
+            
             const canvas = await html2canvas(target, { 
                 backgroundColor: bgColor, 
                 scale: 2, 
@@ -1435,7 +1450,7 @@
 
         try {
             await new Promise(r => setTimeout(r, 100));
-            // 🌟 캡처 잘림 방지 로직 동일 적용
+            
             const canvas = await html2canvas(target, { 
                 backgroundColor: bgColor, 
                 scale: 2, 
