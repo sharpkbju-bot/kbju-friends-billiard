@@ -323,16 +323,17 @@
         .val-highlight { font-size: 13px; }
         .win-rate-pill { 
             color: #27ae60; 
-            font-size: 13px; 
+            /* 🌟 메인 테이블 승률도 동일한 14px로 크기 통일 */
+            font-size: 14px; 
             display: inline-block; 
             text-align: right; 
             width: 100%; 
             font-weight: 800; 
         }
 
-        .history-area { margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.3); border-radius: 12px; display: none; animation: fadeIn 0.3s ease; transition: border 0.3s ease, box-shadow 0.3s ease; }
+        .history-area { margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; display: none; animation: fadeIn 0.3s ease; transition: border 0.3s ease, box-shadow 0.3s ease; }
         
-        .condition-box { display:flex; align-items:center; justify-content:space-between; background:rgba(255, 255, 255, 0.5); padding:12px 10px; border-radius:8px; margin-bottom:15px; border: 1.5px solid navy; width: 100%; box-sizing: border-box; overflow: hidden; position: relative; }
+        .condition-box { display:flex; align-items:center; justify-content:space-between; background:rgba(255, 255, 255, 0.5); padding:12px 10px; border-radius:15px; margin-bottom:15px; border: 1.5px solid navy; width: 100%; box-sizing: border-box; overflow: hidden; position: relative; }
         [data-theme='dark'] .condition-box, [data-theme='navy'] .condition-box { background:rgba(0, 0, 0, 0.3); border: 1.5px solid navy; }
 
         .zoom-active .cond-responsive { 
@@ -359,7 +360,7 @@
         
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 12px !important; border-radius: 8px !important; font-weight: 800; font-size: 14px; line-height: 1.5 !important; box-sizing: border-box !important; display: block; }
         
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_1.png'); background-size: cover; display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
         #loading::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); z-index: -1; }
         .spinner { border: 5px solid rgba(209, 217, 230, 0.6); border-top: 5px solid var(--main); border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -590,11 +591,13 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        .summary-stats-wrap .stat-lbl { font-size: clamp(9px, 2.5vw, 11px); letter-spacing: -0.5px; }
-        .summary-stats-wrap .stat-val { font-size: clamp(10px, 3.2vw, 14px); letter-spacing: -0.5px; }
-        .zoom-active .summary-stats-wrap .stat-lbl { font-size: 9px !important; letter-spacing: -0.5px !important; }
-        .zoom-active .summary-stats-wrap .stat-val { font-size: 11px !important; letter-spacing: -0.5px !important; }
-        
+        /* 🌟 수정 사항: 독립적인 win-rate-val 클래스를 완전히 제거하고 공통 stat-val 클래스 적용하여 크기 일치 */
+        .summary-stats-wrap .stat-lbl { font-size: clamp(11px, 3.5vw, 13px); letter-spacing: -0.5px; }
+        .summary-stats-wrap .stat-val { font-size: clamp(14px, 4.5vw, 17px); letter-spacing: -0.5px; }
+
+        .zoom-active .summary-stats-wrap .stat-lbl { font-size: 11px !important; letter-spacing: -0.5px !important; }
+        .zoom-active .summary-stats-wrap .stat-val { font-size: 14px !important; letter-spacing: -0.5px !important; }
+
         .empty-search-msg { white-space: nowrap; letter-spacing: -0.5px; font-size: clamp(12px, 4vw, 14px); }
         .zoom-active .empty-search-msg { font-size: 11px !important; }
 
@@ -904,7 +907,7 @@
         target.style.padding = '15px';
 
         try {
-            await new Promise(r => setTimeout(r, 100));
+            await new Promise(r => setTimeout(r, 50));
             const canvas = await html2canvas(target, { 
                 backgroundColor: bgColor, 
                 scale: 2, 
@@ -938,7 +941,7 @@
 
     function getPlayerColor(name) {
         const theme = document.documentElement.getAttribute('data-theme');
-        if (name === "경배" && theme === "navy") return "#5D4037";
+        if (name === "경배" && theme === "navy") return "#5D4037"; 
         return playerThemes[name] ? playerThemes[name].color : 'var(--text-color)';
     }
 
@@ -1673,7 +1676,7 @@
             const actual = g.ranks.filter(n => n.trim() !== "");
             const rankIndex = actual.indexOf(player);
             
-            // 🌟 v3.35 수정 사항: 검색 결과 리스트에서도 1위 이모지(🥇) 표시되도록 수정
+            // 🌟 v3.35 추가 사항: 검색 결과 리스트에서도 1위 이모지(🥇) 표시 적용
             const rankLabel = (rankIndex === 0) ? "1위🥇" : ((rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위");
             const rankColor = rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : 'var(--text-color)');
 
@@ -1710,7 +1713,7 @@
                     <div style="flex:1; min-width:0;"><div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap;">1위</div><div class="stat-val" style="color:var(--rank1); white-space:nowrap;">${r[0]}승</div></div>
                     <div style="flex:1; min-width:0;"><div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap;">기타</div><div class="stat-val" style="color:var(--rank4); white-space:nowrap;">${othersCount}회</div></div>
                     <div style="flex:1; min-width:0;"><div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap;">꼴찌</div><div class="stat-val" style="color:var(--rankL); white-space:nowrap;">${r[4]}회</div></div>
-                    <div style="flex:1; min-width:0;"><div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap;">승률</div><div class="stat-val win-rate-val" style="color:var(--success); white-space:nowrap;">${winRate}%</div></div>
+                    <div style="flex:1; min-width:0;"><div class="stat-lbl" style="color:var(--success); margin-bottom:3px; white-space:nowrap;">승률</div><div class="stat-val" style="color:var(--success); white-space:nowrap;">${winRate}%</div></div>
                 </div>
             </div>
         `;
