@@ -215,7 +215,7 @@
             flex: none !important; 
             padding: 8px !important; 
             margin-left: auto; 
-            border-radius: 8px !important; /* 🌟 8px 통일 */
+            border-radius: 8px !important; /* 🌟 입력 필드 곡률 동일 적용 */
         }
         select#playerCount { width: 85px !important; }
         select#themeSelect { width: 120px !important; font-weight: 800; color: #4a148c; cursor: pointer; }
@@ -224,7 +224,8 @@
         .input-row label { width: 85px; min-width: 85px; max-width: 85px; font-size: 13px; font-weight: 800; color: var(--label-text); flex-shrink: 0; white-space: nowrap; }
         
         select, input[type="date"], input[type="text"]#searchDateRange { 
-            width: 0; flex: 1 1 auto; padding: 12px; border-radius: 8px; /* 🌟 8px 통일 */
+            width: 0; flex: 1 1 auto; padding: 12px; 
+            border-radius: 8px; /* 🌟 입력 필드 곡률 동일 적용 */
             border: 2px solid transparent; font-size: 14px; 
             background: rgba(236, 238, 241, 0.4); box-shadow: var(--inner-shadow); color: var(--text-color); font-weight: 600; 
             -webkit-appearance: none; text-align: center; text-align-last: center; margin: 0;
@@ -238,12 +239,14 @@
 
         select.duplicate-error { background: var(--dup-bg) !important; border: 2px solid var(--dup-border) !important; color: var(--dup-text) !important; }
 
-        /* 🌟 모든 버튼 디자인 완벽 통일 (패딩 12px, 라운드 8px, 렌더링 오차 방지) */
+        /* 🌟 모든 버튼(저장계열) 패딩 및 모서리 라운드 통일 */
         button.save-btn { 
-            width: 100%; padding: 12px !important; 
+            width: 100%; 
+            padding: 12px !important; /* 🌟 일괄 통일 */
             background: linear-gradient(145deg, #abb2b9, #7f8c8d); 
             color: white; border: none;
-            border-radius: 8px !important; font-weight: 800; margin-top: 15px; cursor: pointer; 
+            border-radius: 8px !important; /* 🌟 아주 약간의 곡선 처리 */
+            font-weight: 800; margin-top: 15px; cursor: pointer; 
             font-size: 14px; 
             box-shadow: 8px 10px 20px rgba(0, 0, 0, 0.38), -2px -2px 8px rgba(255, 255, 255, 0.5);
             transition: 0.2s all ease;
@@ -320,7 +323,7 @@
 
         .danger-zone { margin-top: 50px; padding: 25px; border-radius: 28px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
         
-        /* 🌟 모든 버튼 렌더링 오차 방지 및 디자인 통일 */
+        /* 🌟 모든 버튼 디자인 완벽 통일 */
         .reset-btn { width: 100%; background: linear-gradient(145deg, #e67e22, #d35400); color: white; border: none; padding: 12px !important; border-radius: 8px !important; font-weight: bold; margin-bottom: 8px; line-height: 1.5 !important; box-sizing: border-box !important; display: block; }
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 12px !important; border-radius: 8px !important; font-weight: 800; font-size: 14px; line-height: 1.5 !important; box-sizing: border-box !important; display: block; }
         
@@ -339,7 +342,7 @@
             max-width: 36px !important; 
             height: 36px !important; 
             font-size: 13px !important; 
-            border-radius: 8px !important; 
+            border-radius: 12px !important; 
         }
         .zoom-active .day.selected { transform: scale(1.1) translateZ(0) !important; }
         .zoom-active .day.has-record::after { bottom: 3px !important; width: 4px !important; height: 4px !important; }
@@ -561,13 +564,14 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        .summary-stats-wrap .stat-lbl { font-size: clamp(11px, 3.5vw, 13px); letter-spacing: -0.5px; }
-        .summary-stats-wrap .stat-val { font-size: clamp(14px, 4.5vw, 17px); letter-spacing: -0.5px; }
-        .summary-stats-wrap .win-rate-val { font-size: clamp(15px, 4.8vw, 18px) !important; }
+        /* 🌟 수정 사항: 모든 stat-val에 높이 정렬 및 line-height 일괄 적용 */
+        .summary-stats-wrap .stat-lbl { font-size: clamp(11px, 3.5vw, 13px); letter-spacing: -0.5px; line-height: 1; }
+        .summary-stats-wrap .stat-val { font-size: clamp(14px, 4.5vw, 17px); letter-spacing: -0.5px; line-height: 1; display: flex; align-items: flex-end; justify-content: center; height: 100%; }
+        .summary-stats-wrap .win-rate-val { font-size: clamp(15px, 4.8vw, 18px) !important; line-height: 1; display: flex; align-items: flex-end; justify-content: center; height: 100%; }
 
-        .zoom-active .summary-stats-wrap .stat-lbl { font-size: 11px !important; letter-spacing: -0.5px !important; }
-        .zoom-active .summary-stats-wrap .stat-val { font-size: 14px !important; letter-spacing: -0.5px !important; }
-        .zoom-active .summary-stats-wrap .win-rate-val { font-size: 15px !important; }
+        .zoom-active .summary-stats-wrap .stat-lbl { font-size: 11px !important; letter-spacing: -0.5px !important; line-height: 1; }
+        .zoom-active .summary-stats-wrap .stat-val { font-size: 14px !important; letter-spacing: -0.5px !important; line-height: 1; display: flex; align-items: flex-end; justify-content: center; height: 100%; }
+        .zoom-active .summary-stats-wrap .win-rate-val { font-size: 15px !important; line-height: 1; display: flex; align-items: flex-end; justify-content: center; height: 100%; }
 
         .empty-search-msg { white-space: nowrap; letter-spacing: -0.5px; font-size: clamp(12px, 4vw, 14px); }
         .zoom-active .empty-search-msg { font-size: 11px !important; }
@@ -774,8 +778,8 @@
 
     <div id="search-capture-area" style="padding: 5px; border-radius: 20px; margin-top: 10px; background: transparent;">
         <div style="display: flex; gap: 10px;">
-            <button class="save-btn" style="background: linear-gradient(145deg, #3498db, #2980b9); margin-top: 0; flex: 2; font-size: 13px;" onclick="searchRecords()">기록 검색하기</button>
-            <button class="save-btn" style="background: #bdc3c7; margin-top: 0; flex: 1; font-size: 13px; color: #444;" onclick="resetSearch()">🔄 리셋</button>
+            <button class="save-btn" style="background: linear-gradient(145deg, #3498db, #2980b9); margin-top: 0; flex: 2; padding: 12px; font-size: 13px;" onclick="searchRecords()">기록 검색하기</button>
+            <button class="save-btn" style="background: #bdc3c7; margin-top: 0; flex: 1; padding: 12px; font-size: 13px; color: #444;" onclick="resetSearch()">🔄 리셋</button>
         </div>
 
         <button id="search-share-btn" class="share-btn-common" style="margin-top: 15px; display: none;" onclick="shareSearchResult()">📸 검색 결과 스크린샷 공유</button>
@@ -788,8 +792,8 @@
 <div class="danger-zone">
     <div style="color: var(--danger-text); font-weight:900; margin-bottom:15px; font-size:12px;">데이터 관리 및 백업</div>
     <div style="display: flex; gap: 10px; margin-bottom: 15px; justify-content: center;">
-        <button class="save-btn" style="background: linear-gradient(145deg, #4a90e2, #357abd); margin-top:0; flex:1; font-size: 12px;" onclick="exportData()">📥 데이터 백업</button>
-        <button class="save-btn" style="background:#000080; margin-top:0; flex:1; font-size: 12px;" onclick="triggerImport()">📤 데이터 복구</button>
+        <button class="save-btn" style="background: linear-gradient(145deg, #4a90e2, #357abd); margin-top:0; flex:1; padding: 8px; font-size: 12px;" onclick="exportData()">📥 데이터 백업</button>
+        <button class="save-btn" style="background:#000080; margin-top:0; flex:1; padding: 8px; font-size: 12px;" onclick="triggerImport()">📤 데이터 복구</button>
     </div>
     <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importData(event)">
     <div style="color: var(--danger-text); font-weight:900; margin-bottom:15px; font-size:12px;">초기화 버튼은 함부로 터치하지 마세요.</div>
@@ -1301,7 +1305,6 @@
     async function shareMemberResult(name) {
         const target = document.getElementById('memberHistory-capture-area');
         if (!target) return;
-        
         const shareBtn = document.getElementById('member-share-btn');
         if(shareBtn) shareBtn.style.display = 'none';
         
@@ -1313,17 +1316,8 @@
         target.style.padding = '15px';
 
         try {
-            await new Promise(r => setTimeout(r, 100)); 
-            
-            const canvas = await html2canvas(target, { 
-                backgroundColor: bgColor, 
-                scale: 2, 
-                logging: false, 
-                useCORS: true,
-                windowWidth: document.documentElement.scrollWidth,
-                windowHeight: document.documentElement.scrollHeight,
-                scrollY: -window.scrollY
-            });
+            await new Promise(r => setTimeout(r, 50));
+            const canvas = await html2canvas(target, { backgroundColor: bgColor, scale: 2, logging: false, useCORS: true });
             
             canvas.toBlob(async (blob) => {
                 const file = new File([blob], `${name}_history.png`, { type: 'image/png' });
@@ -1342,7 +1336,7 @@
         } finally {
             target.style.background = originalBg;
             target.style.padding = originalPadding;
-            if(shareBtn) shareBtn.style.display = 'block'; 
+            if(shareBtn) shareBtn.style.display = 'block';
         }
     }
 
@@ -1396,17 +1390,8 @@
         target.style.padding = '15px';
 
         try {
-            await new Promise(r => setTimeout(r, 100));
-            
-            const canvas = await html2canvas(target, { 
-                backgroundColor: bgColor, 
-                scale: 2, 
-                logging: false, 
-                useCORS: true,
-                windowWidth: document.documentElement.scrollWidth,
-                windowHeight: document.documentElement.scrollHeight,
-                scrollY: -window.scrollY
-            });
+            await new Promise(r => setTimeout(r, 50));
+            const canvas = await html2canvas(target, { backgroundColor: bgColor, scale: 2, logging: false, useCORS: true });
             
             canvas.toBlob(async (blob) => {
                 const file = new File([blob], `today_record_${selectedDateStr}.png`, { type: 'image/png' });
@@ -1443,17 +1428,8 @@
         target.style.padding = '15px'; 
 
         try {
-            await new Promise(r => setTimeout(r, 100));
-            
-            const canvas = await html2canvas(target, { 
-                backgroundColor: bgColor, 
-                scale: 2, 
-                logging: false, 
-                useCORS: true,
-                windowWidth: document.documentElement.scrollWidth,
-                windowHeight: document.documentElement.scrollHeight,
-                scrollY: -window.scrollY
-            });
+            await new Promise(r => setTimeout(r, 50));
+            const canvas = await html2canvas(target, { backgroundColor: bgColor, scale: 2, logging: false, useCORS: true });
             
             canvas.toBlob(async (blob) => {
                 const dateRange = document.getElementById('searchDateRange').value || '검색결과';
@@ -1600,7 +1576,7 @@
             if (rankIndex === actual.length - 1 && actual.length > 1) r[4]++;
             else if (rankIndex < 4) r[rankIndex]++;
 
-            const rankLabel = (rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위";
+            const rankLabel = (rankIndex === 0) ? "1위🥇" : ((rankIndex === actual.length - 1) ? "꼴찌💀" : (rankIndex + 1) + "위");
             const rankColor = rankIndex === 0 ? 'var(--rank1)' : (rankIndex === actual.length-1 ? 'var(--rankL)' : 'var(--text-color)');
 
             let namesLine = "";
@@ -1631,12 +1607,27 @@
                         <div style="font-size: 14px;">[ ${selectedMonth} ]</div>
                     </div>
                 </div>
-                <div class="summary-stats-wrap" style="display:flex; justify-content:space-between; text-align:center; font-weight:900; width:100%; gap:2px;">
-                    <div style="flex:1; min-width:0;"><div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap;">참여</div><div class="stat-val" style="color:var(--text-color); white-space:nowrap;">${played}전</div></div>
-                    <div style="flex:1; min-width:0;"><div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap;">1위</div><div class="stat-val" style="color:var(--rank1); white-space:nowrap;">${r[0]}승</div></div>
-                    <div style="flex:1; min-width:0;"><div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap;">기타</div><div class="stat-val" style="color:var(--rank4); white-space:nowrap;">${othersCount}회</div></div>
-                    <div style="flex:1; min-width:0;"><div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap;">꼴찌</div><div class="stat-val" style="color:var(--rankL); white-space:nowrap;">${r[4]}회</div></div>
-                    <div style="flex:1; min-width:0;"><div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap;">승률</div><div class="stat-val win-rate-val" style="color:var(--success); white-space:nowrap;">${winRate}%</div></div>
+                <div class="summary-stats-wrap" style="display:flex; justify-content:space-between; text-align:center; font-weight:900; width:100%; gap:2px; align-items:flex-end;">
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;">
+                        <div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap; line-height:1;">참여</div>
+                        <div class="stat-val" style="color:var(--text-color); white-space:nowrap; line-height:1;">${played}전</div>
+                    </div>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;">
+                        <div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap; line-height:1;">1위</div>
+                        <div class="stat-val" style="color:var(--rank1); white-space:nowrap; line-height:1;">${r[0]}승</div>
+                    </div>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;">
+                        <div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap; line-height:1;">기타</div>
+                        <div class="stat-val" style="color:var(--rank4); white-space:nowrap; line-height:1;">${othersCount}회</div>
+                    </div>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;">
+                        <div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap; line-height:1;">꼴찌</div>
+                        <div class="stat-val" style="color:var(--rankL); white-space:nowrap; line-height:1;">${r[4]}회</div>
+                    </div>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;">
+                        <div class="stat-lbl" style="color:var(--sub-text); margin-bottom:3px; white-space:nowrap; line-height:1;">승률</div>
+                        <div class="stat-val win-rate-val" style="color:var(--success); white-space:nowrap; line-height:1;">${winRate}%</div>
+                    </div>
                 </div>
             </div>
         `;
