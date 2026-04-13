@@ -166,7 +166,6 @@
         * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
         body { 
-            /* 🌟 프리텐다드 폰트를 1순위로 적용하여 전체 디자인을 세련되게 업그레이드 */
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             margin: 0; 
             padding: env(safe-area-inset-top) 15px 100px 15px;
@@ -302,7 +301,6 @@
         .btn-group button { flex: 1; margin-top: 0 !important; }
         .btn-cancel { background: #bdc3c7 !important; }
 
-        /* 🌟 테이블 너비 및 텍스트 중앙 정렬 유지 */
         .stats-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 12px; table-layout: fixed; }
         .stats-table th { 
             padding: 8px 0px; 
@@ -1316,17 +1314,6 @@
         if (window.graphTimeout) clearTimeout(window.graphTimeout);
     }
 
-    function closePlayerScoreModal() {
-        const modal = document.getElementById('player-score-modal');
-        const content = document.getElementById('player-score-content');
-        if(window.scoreModalTimeout) clearTimeout(window.scoreModalTimeout);
-        content.style.animation = 'scaleDownPopup 0.4s ease-in forwards'; 
-        setTimeout(() => { 
-            modal.style.display = 'none'; 
-            content.style.animation = 'scaleUpPopup 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards'; 
-        }, 400); 
-    }
-
     function changeAppTheme() {
         const theme = document.getElementById('themeSelect').value;
         document.documentElement.setAttribute('data-theme', theme);
@@ -1536,7 +1523,6 @@
         const maxCounts = { played: 0, r0: 0, r1: 0, r2: 0, r3: 0, r4: 0 };
         players.forEach(p => { maxCounts.r0 = Math.max(maxCounts.r0, stats[p].ranks[0]); maxCounts.r4 = Math.max(maxCounts.r4, stats[p].ranks[4]); });
         
-        // 🌟 수정: 순위 정렬이 끝난 후 순위 번호(currentRank)를 함께 계산해서 renderMemberHistory 함수로 넘겨주도록 처리
         let currentRank = 1;
         const bodyHtml = sortedByWin.map((p, index) => {
             if (index > 0) {
@@ -1547,9 +1533,7 @@
                 const prevEligible = stats[prevP].score >= 20;
                 const currEligible = stats[p].score >= 20;
 
-                // 평균 승점과 1위 횟수가 같으면 공동 순위 부여, 아니면 다음 순위 번호
                 if (prevEligible === currEligible && currAvg === prevAvg && stats[p].ranks[0] === stats[prevP].ranks[0]) {
-                    // 동률이므로 순위 변동 없음
                 } else {
                     currentRank = index + 1;
                 }
@@ -1566,7 +1550,6 @@
             
             const tier = getTier(stats[p].score);
 
-            // 🌟 수정: 클릭 이벤트에 현재 순위(currentRank) 파라미터 추가
             return `<tr><td style="${nameStyle}" onclick="renderMemberHistory('${p}', '${currentRank}')"><span style="font-size:11px;">${tier.icon}</span> ${p}</td><td style="color:#5D4037;">${stats[p].played}</td><td style="color:var(--rank1);">${getVal(stats[p].ranks[0], stats[p].played)}</td><td style="color:var(--rank2);">${getVal(stats[p].ranks[1], stats[p].played)}</td><td style="color:var(--rank3);">${getVal(stats[p].ranks[2], stats[p].played)}</td><td style="color:var(--rank4);">${getVal(stats[p].ranks[3], stats[p].played)}</td><td style="color:var(--rankL);">${getVal(stats[p].ranks[4], stats[p].played)}</td><td><span class="win-rate-pill">${winRate}%</span></td></tr>`;
         }).join('');
         
@@ -1575,7 +1558,6 @@
         if(maxCounts.r4 > 0) { const losers = players.filter(p => stats[p].ranks[4] === maxCounts.r4); richFriend.style.display = 'block'; richFriend.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:16px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; } else richFriend.style.display = 'none';
     }
 
-    // 🌟 수정: rank 파라미터를 추가로 받아 스포트라이트 팝업에 표기하도록 처리
     function renderMemberHistory(name, rank = "") {
         const historyArea = document.getElementById('memberHistoryArea');
         
@@ -1613,12 +1595,12 @@
         const scoreModal = document.getElementById('player-score-modal');
         const scoreContent = document.getElementById('player-score-content');
         
-        // 🌟 수정: 순위 정보가 있으면 팝업 제목 옆에 표기
-        const rankStr = rank ? `<span style="color:var(--text-color); font-size:20px; font-weight:900; margin-right:5px;">${rank}위</span>` : "";
+        // 🌟 수정: 스포트라이트 팝업의 텍스트 크기를 밖으로 나가지 않게 Clamp 처리하고 시원하게 키움
+        const rankStr = rank ? `<span style="color:var(--text-color); font-size:clamp(22px, 6vw, 30px); font-weight:900; margin-right:8px;">${rank}위</span>` : "";
 
         scoreContent.innerHTML = `
-            <div style="font-size:45px; margin-bottom:5px;">${pEmoji}</div>
-            <h2 style="display:flex; justify-content:center; align-items:center; font-size:22px; font-weight:900; color:${pColor}; margin:0 0 20px 0;">
+            <div style="font-size:clamp(45px, 10vw, 55px); margin-bottom:5px;">${pEmoji}</div>
+            <h2 style="display:flex; justify-content:center; align-items:center; font-size:clamp(28px, 8vw, 38px); font-weight:900; color:${pColor}; margin:0 0 20px 0; word-break:keep-all;">
                 ${rankStr}${name}
             </h2>
             <div style="display:flex; flex-direction:column; gap:12px; font-weight:900; text-align:center;">
