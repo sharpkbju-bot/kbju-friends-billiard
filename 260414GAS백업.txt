@@ -1,0 +1,108 @@
+function doPost(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var data = JSON.parse(e.postData.contents);
+  var action = data.action;
+
+  // [백업 로직 실행] 모든 작업(저장, 수정, 삭제, 초기화) 시 기록을 남깁니다.
+  runAutoBackup(ss, data);
+
+  if (action === "SAVE") {
+    // [날짜, 게임(회차), 1위, 2위, 3위, 4위, 5위] 순서로 저장
+    var nextRound = getNextRound(sheet);
+    var rowData = [
+      data.date, 
+      nextRound, 
+      data.ranks[0] || "", // 1위
+      data.ranks[1] || "", // 2위
+      data.ranks[2] || "", // 3위
+      data.ranks[3] || "", // 4위
+      data.ranks[4] || ""  // 5위
+    ];
+    sheet.appendRow(rowData);
+    return ContentService.createTextOutput("Success");
+  }
+
+  if (action === "UPDATE") {
+    var values = sheet.getDataRange().getValues();
+    for (var i = 1; i < values.length; i++) {
+      if (values[i][1] == data.round) { // B열(게임 회차)이 일치하는 행 찾기
+        var row = i + 1;
+        // 각 열을 정확하게 지정하여 업데이트
+        sheet.getRange(row, 1).setValue(data.date); // A열: 날짜
+        sheet.getRange(row, 3).setValue(data.ranks[0] || ""); // C열: 1위
+        sheet.getRange(row, 4).setValue(data.ranks[1] || ""); // D열: 2위
+        sheet.getRange(row, 5).setValue(data.ranks[2] || ""); // E열: 3위
+        sheet.getRange(row, 6).setValue(data.ranks[3] || ""); // F열: 4위
+        sheet.getRange(row, 7).setValue(data.ranks[4] || ""); // G열: 5위
+        break;
+      }
+    }
+    return ContentService.createTextOutput("Updated");
+  }
+
+  if (action === "DELETE") {
+    var values = sheet.getDataRange().getValues();
+    for (var i = 1; i < values.length; i++) {
+      if (values[i][1] == data.round) {
+        sheet.deleteRow(i + 1);
+        break;
+      }
+    }
+    return ContentService.createTextOutput("Deleted");
+  }
+
+  if (action === "RESET") {
+    var lastRow = sheet.getLastRow();
+    if (lastRow > 1) {
+      sheet.deleteRows(2, lastRow - 1);
+    }
+    return ContentService.createTextOutput("Reset");
+  }
+}
+
+// 실시간 자동 백업 및 로그 기록 함수
+function runAutoBackup(ss, data) {
+  var backupSheet = ss.getSheetByName("Backup") || ss.insertSheet("Backup");
+  
+  // 백업 시트 헤더 생성 (처음 생성될 때만 실행)
+  if (backupSheet.getLastRow() === 0) {
+    backupSheet.appendRow(["백업 일시", "작업 유형", "게임 날짜", "회차(Round)", "순위 기록"]);
+    backupSheet.getRange(1, 1, 1, 5).setBackground("#f3f3f3").setFontWeight("bold");
+  }
+  
+  var timestamp = Utilities.formatDate(new Date(), "Asia/Seoul", "yyyy-MM-dd HH:mm:ss");
+  var logData = data.ranks ? data.ranks.filter(function(r){return r !== "";}).join(" → ") : "N/A";
+  
+  // 백업 시트에 데이터 추가
+  backupSheet.appendRow([
+    timestamp, 
+    data.action, 
+    data.date || "N/A", 
+    data.round || "New Game", 
+    logData
+  ]);
+}
+
+function doGet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var values = sheet.getDataRange().getValues();
+  var results = [];
+
+  for (var i = 1; i < values.length; i++) {
+    results.push({
+      date: values[i][0],
+      round: values[i][1],
+      ranks: [values[i][2], values[i][3], values[i][4], values[i][5], values[i][6]]
+    });
+  }
+  return ContentService.createTextOutput(JSON.stringify(results)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function getNextRound(sheet) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return 1;
+  var lastRound = sheet.getRange(lastRow, 2).getValue(); // B열(게임 회차) 확인
+  return Number(lastRound) + 1;
+}
