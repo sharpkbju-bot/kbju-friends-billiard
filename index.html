@@ -1271,7 +1271,7 @@
         else {
             let html = "<table class='stats-table'><thead><tr><th>앞 주자</th><th>경기</th><th>평균</th><th style='color:var(--rank1);'>1위</th><th style='color:var(--rankL);'>꼴찌</th></tr></thead><tbody>";
             sorted.forEach(p => { const s = stats[p]; html += `<tr><td style='color:${getPlayerColor(p)}; font-weight:900;'>${p}</td><td>${s.c}전</td><td>${(s.s/s.c).toFixed(1)}위</td><td style='color:var(--rank1);'>${((s.w/s.c)*100).toFixed(0)}%</td><td style='color:var(--rankL);'>${((s.l/s.c)*100).toFixed(0)}%</td></tr>`; });
-            resArea.innerHTML = html + "</tbody></table><div style='font-size:11px; color:var(--sub-text); margin-top:10px; font-weight:800; text-align:center;'>※ 선택한 선수가 누구의 다음 순서로 쳤을 때의 결과인지 분석합니다.</div>";
+            resArea.innerHTML = html + "</tbody></table><div style='font-size:11px; color:var(--sub-text); margin-top:10px; font-weight:800; text-align:center;'>※ 해당 선수가 누구의 다음 순서로 쳤을 때의 분석입니다.</div>";
             shareBtn.style.display = 'block';
         }
         resArea.style.display = 'block';
@@ -1327,7 +1327,7 @@
         let cond = (w10/recent.length>=0.3 && l10/recent.length>=0.3) ? ["⚡", "도깨비", "var(--rank3)"] : (w10/recent.length>=0.3 ? ["☀️", "최상", "var(--rankL)"] : (l10/recent.length>=0.3 ? ["🌧️", "비상", "var(--rank1)"] : ["⛅", "보통", "var(--rank2)"]));
         html += `<div class="condition-box cond-responsive" onclick="showInfoModal('score')"><div style="flex:1; display:flex; flex-direction:column;"><div style="font-size:12px; font-weight:900; color:var(--sub-text);">현재 랭킹 티어</div></div><div style="font-size:14px; font-weight:900; color:${getTier(totalScore).color};">${getTier(totalScore).icon} ${getTier(totalScore).name}</div></div>`;
         html += `<div class="condition-box cond-responsive" onclick="showInfoModal('condition')"><div style="font-size:12px; flex:1; font-weight:900; color:var(--sub-text);">최근 컨디션 (${recent.length}G)</div><div style="font-size:14px; font-weight:900; color:${cond[2]};">${cond[0]} ${cond[1]}</div></div>`;
-        html += `<button id="member-share-btn" class="share-btn-common" style="margin:15px 0;" onclick="shareMemberResult('${name}')">📸 전적 공유</button>`;
+        html += `<button id="member-share-btn" class="share-btn-common" style="margin:15px 0;" onclick="shareMemberResult('${name}')">📸 전적 스크린샷 공유</button>`;
         recent.forEach(g => { const actual = g.ranks.filter(n => n.trim() !== ""); const rIdx = actual.indexOf(name); html += `<div class="history-item"><span style="font-size:14px; color:#5D4037;">${g.dateStr}</span><span style="font-size:15px; color:${rIdx===0?'var(--rank1)':(rIdx===actual.length-1?'var(--rankL)':'#5D4037')};">${rIdx===0?'1위🥇':(rIdx===actual.length-1?'꼴찌💀':(rIdx+1)+'위')}</span></div>`; });
         area.innerHTML = html; area.style.display = 'block'; area.style.border = `2.5px solid ${getPlayerColor(name)}`; setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
     }
