@@ -934,7 +934,7 @@
     let scoreModalTimeout = null;
     let hideScoreModalTimeout = null;
 
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
     const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
     let gameLogs = [];
     let currentViewDate = new Date();
@@ -985,9 +985,10 @@
         const originalPadding = target.style.padding;
         const originalFilter = target.style.backdropFilter;
         
+        // 캡처 최적화를 위해 임시 스타일 보정
         target.style.background = bgColor;
         target.style.padding = '15px';
-        target.style.backdropFilter = 'none'; 
+        target.style.backdropFilter = 'none'; // backdrop-filter는 html2canvas에서 오류를 유발함
 
         try {
             await new Promise(r => setTimeout(r, 150));
@@ -1530,7 +1531,14 @@
         
         const finalRanks = [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""];
 
-        const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: finalRanks, round: editRound, startOrder: currentStartOrder.length > 0 ? currentStartOrder : null };
+        // 안전하게 배열로 넘기기 위한 이중 안전장치
+        let safeStartOrder = [];
+        if (currentStartOrder && currentStartOrder.length > 0) {
+            safeStartOrder = currentStartOrder;
+        }
+
+        const payload = { action: editMode ? "UPDATE" : "SAVE", date: selectedDateStr, ranks: finalRanks, round: editRound, startOrder: safeStartOrder };
+        
         try { 
             await fetch(GAS_URL, { 
                 method: 'POST', 
@@ -1914,7 +1922,7 @@
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr); 
         const listArea = document.getElementById('dayGameList');
         
-        renderTodayMVP();
+        renderTodayMVP(); // v3.60 MVP 렌더링 호출
 
         if(games.length > 0) {
             let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>`;
@@ -1956,7 +1964,7 @@
     function closeAllOverlays() { 
         document.querySelectorAll('.action-overlay').forEach(o => {
             o.classList.remove('active');
-            o.style.display = 'none'; 
+            o.style.display = 'none'; // 팝업 잔상 방지용 리셋
             setTimeout(() => o.style.display = '', 10);
         }); 
     }
