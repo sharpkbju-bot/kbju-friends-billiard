@@ -411,6 +411,9 @@
         .zoom-active .stats-table td:last-child { padding-right: 0 !important; text-align: center !important; }
         .zoom-active .win-rate-pill { font-size: 11.5px !important; text-align: center !important; }
         
+        /* 확대 모드 시 상성 분석 카드의 부제목 줄바꿈 적용 */
+        .zoom-active .strategy-subtitle { display: block; margin-top: 4px; font-size: 11px !important; }
+
         .action-overlay { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(255, 255, 255, 0.6); 
@@ -665,7 +668,7 @@
         .graph-box { background:rgba(255, 255, 255, 0.5); border-radius:8px; border: 1px solid rgba(0,0,0,0.05); }
         [data-theme='dark'] .graph-box, [data-theme='navy'] .graph-box { background:rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.05); }
 
-        /* MVP Section Styling for v3.60 */
+        /* MVP Section Styling for v4.00 픽스 (이름 완벽 열맞춤) */
         .mvp-container {
             margin-top: 15px;
             padding: 15px;
@@ -683,19 +686,17 @@
         .mvp-badge {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             background: rgba(255, 255, 255, 0.7);
             padding: 10px 15px;
             border-radius: 10px;
             box-shadow: 2px 2px 6px rgba(0,0,0,0.05);
-            flex-wrap: wrap;
             gap: 5px;
         }
         [data-theme='dark'] .mvp-badge, [data-theme='navy'] .mvp-badge { background: rgba(60,60,65,0.8); }
 
-        .mvp-title { font-size: 12px; font-weight: 800; color: var(--sub-text); }
-        .mvp-player { font-size: 15px; font-weight: 900; color: var(--rank1); }
-        .mvp-value { font-size: 11px; font-weight: 800; color: var(--rankL); }
+        .mvp-title { font-size: 12px; font-weight: 800; color: var(--sub-text); flex: 1; text-align: left; }
+        .mvp-player { font-size: 15px; font-weight: 900; color: var(--rank1); flex: 1; text-align: center; }
+        .mvp-value { font-size: 11px; font-weight: 800; color: var(--rankL); flex: 1; text-align: right; }
 
     </style>
 </head>
@@ -861,7 +862,7 @@
 </div>
 
 <div class="card" id="strategyCard">
-    <h2 style="font-size:16px; margin:5px 0 15px 10px; color:#444; font-weight:800;">🎯 순번별 상성 분석 <span style="font-size:12px; color:var(--rank1);">(누구 뒤에서 칠 때 잘 칠까?)</span></h2>
+    <h2 style="font-size:16px; margin:5px 0 15px 10px; color:#444; font-weight:800;">🎯 순번별 상성 분석 <span class="strategy-subtitle" style="font-size:12px; color:var(--rank1);">(누구 뒤에서 칠 때 잘 칠까?)</span></h2>
     <div class="input-row">
         <label>분석 선수</label>
         <select id="strategyPlayer" style="color: #4a148c; font-weight: 800;" onchange="analyzeStrategy()">
@@ -946,7 +947,7 @@
     let searchFlatpickr; 
     let animationStep = 0;
     let lastDrawnPlayers = []; 
-    let currentStartOrder = []; // v4.00 추가
+    let currentStartOrder = []; 
 
     const playerThemes = {
         "경배": { emoji: "👑", color: "#1A237E" },
@@ -984,10 +985,9 @@
         const originalPadding = target.style.padding;
         const originalFilter = target.style.backdropFilter;
         
-        // 캡처 최적화를 위해 임시 스타일 보정
         target.style.background = bgColor;
         target.style.padding = '15px';
-        target.style.backdropFilter = 'none'; // backdrop-filter는 html2canvas에서 오류를 유발함
+        target.style.backdropFilter = 'none'; 
 
         try {
             await new Promise(r => setTimeout(r, 150));
@@ -1195,7 +1195,7 @@
         const remaining = pool.sort(() => Math.random() - 0.5);
 
         lastDrawnPlayers = [firstPlayer, ...remaining]; 
-        currentStartOrder = [...lastDrawnPlayers]; // v4.00 추가
+        currentStartOrder = [...lastDrawnPlayers]; 
 
         const resultArea = document.getElementById('order-result');
         const confirmBtn = document.querySelector('#order-modal button');
@@ -1538,7 +1538,7 @@
             }); 
             
             cancelEdit(); 
-            currentStartOrder = []; // v4.00 추가
+            currentStartOrder = []; 
             document.getElementById('playerCount').value = "3";
             resetPlayerSelection();
             updateInputFields();
@@ -1855,7 +1855,6 @@
         else document.body.classList.remove('zoom-active');
     }
 
-    // New Function for Today's MVP (v3.60)
     function renderTodayMVP() {
         const gamesToday = gameLogs.filter(g => g.dateStr === selectedDateStr);
         const mvpArea = document.getElementById('mvpArea');
@@ -1915,7 +1914,7 @@
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr); 
         const listArea = document.getElementById('dayGameList');
         
-        renderTodayMVP(); // v3.60 MVP 렌더링 호출
+        renderTodayMVP();
 
         if(games.length > 0) {
             let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>`;
@@ -1957,7 +1956,7 @@
     function closeAllOverlays() { 
         document.querySelectorAll('.action-overlay').forEach(o => {
             o.classList.remove('active');
-            o.style.display = 'none'; // 팝업 잔상 방지용 리셋
+            o.style.display = 'none'; 
             setTimeout(() => o.style.display = '', 10);
         }); 
     }
