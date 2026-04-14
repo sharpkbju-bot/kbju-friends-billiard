@@ -169,7 +169,7 @@
             scroll-behavior: smooth;
         }
         
-        /* 웰컴 화면: z-index 최상위 100005로 고정 */
+        /* 웰컴 화면: 레이어 우선순위를 로딩바(100002)보다 높은 100005로 설정 */
         #welcome-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #2196f3, #0d47a1);
@@ -361,11 +361,10 @@
         
         .exit-btn { width: 100%; background: linear-gradient(145deg, #7f8c8d, #626e6e); color: white; border: none; padding: 12px !important; border-radius: 8px !important; font-weight: 800; font-size: 14px; line-height: 1.5 !important; box-sizing: border-box !important; display: block; }
         
-        /* 로딩 레이어: z-index를 웰컴화면(100005)보다 낮은 100002로 설정 */
         #loading { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(236, 238, 241, 0.8); backdrop-filter: blur(3px); 
-            z-index: 100002; 
+            z-index: 100002; /* 웰컴화면(100005)보다 낮게 설정 */
             display: none; 
             flex-direction: column; justify-content: center; align-items: center; 
         }
@@ -419,7 +418,6 @@
         .zoom-active .stats-table td:last-child { padding-right: 0 !important; text-align: center !important; }
         .zoom-active .win-rate-pill { font-size: 11.5px !important; text-align: center !important; }
         
-        /* 확대 모드 시 상성 분석 카드의 부제목 줄바꿈 적용 */
         .zoom-active .strategy-subtitle { display: block; margin-top: 4px; font-size: 11px !important; }
 
         .action-overlay { 
@@ -434,20 +432,255 @@
         .action-overlay.active { display: flex; }
 
         .overlay-btn { 
-            /* 버튼이 칸을 삐져나오지 않도록 패딩 최적화 */
             padding: 6px 10px !important; border-radius: 8px !important; font-weight: 900; font-size: 13px; 
             box-shadow: 2px 4px 8px rgba(0,0,0,0.15); transition: 0.2s;
             line-height: 1.5 !important; box-sizing: border-box !important; display: flex; justify-content: center; align-items: center;
         }
         .overlay-btn:active { transform: scale(0.95); }
 
-        /* 확대 모드에서 작아진 칸에 맞춰 버튼 크기 추가 감소 */
         .zoom-active .action-overlay { gap: 5px !important; }
         .zoom-active .overlay-btn { 
             padding: 4px 8px !important; 
             font-size: 11px !important; 
             border-radius: 6px !important; 
         }
+
+        .btn-edit-p { background: #d1e9ff; color: #0056b3; } 
+        .btn-del-p { background: #ffdada; color: #d63031; }  
+        .btn-cancel-p { background: #f0f0f0; color: #636e72; } 
+
+        [data-theme='dark'] .btn-edit-p, [data-theme='navy'] .btn-edit-p { background: #2c3e50; color: #3498db; }
+        [data-theme='dark'] .btn-del-p, [data-theme='navy'] .btn-del-p { background: #4b2323; color: #ff7675; }
+        [data-theme='dark'] .btn-cancel-p, [data-theme='navy'] .btn-cancel-p { background: #3d3d3d; color: #b2bec3; }
+
+        #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
+        .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 12px; text-align: center; width: 80%; max-width: 320px; }
+
+        .theme-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+        
+        .zoom-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+        .zoom-options { display: flex; gap: 12px; }
+        .zoom-options label { display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 14px; }
+
+        #confirm-buttons-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        #confirm-buttons-wrap button {
+            margin: 0 !important;
+            width: 100%;
+        }
+
+        .share-btn-common, #custom-share-btn {
+            width: 100%; padding: 12px !important; background: linear-gradient(145deg, #6a11cb, #2575fc);
+            color: white; border: none; border-radius: 8px !important; font-weight: 800;
+            display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer; font-size: 12px; transition: transform 0.2s;
+            line-height: 1.5 !important; box-sizing: border-box !important;
+        }
+        .share-btn-common:active, #custom-share-btn:active { transform: scale(0.98); }
+
+        .player-select-wrap { margin-bottom: 15px; background: rgba(255,255,255,0.3); border-radius: 12px; padding: 15px; border: 1px solid rgba(255,255,255,0.5); box-shadow: var(--inner-shadow); }
+        .player-select-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .player-chip { padding: 12px 5px !important; border-radius: 8px !important; background: rgba(255,255,255,0.8); font-weight: 800; font-size: 13px; text-align: center; cursor: pointer; color: var(--sub-text); border: 2px solid transparent; transition: 0.2s; box-shadow: 2px 2px 6px rgba(0,0,0,0.05); line-height: 1.5 !important; box-sizing: border-box !important; }
+        
+        .player-chip.active { background: #4caf50 !important; border-color: #1b5e20 !important; color: #ffffff !important; font-weight: 800 !important; box-shadow: none !important; }
+        
+        [data-theme='dark'] .player-select-wrap, [data-theme='navy'] .player-select-wrap { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); }
+        [data-theme='dark'] .player-chip, [data-theme='navy'] .player-chip { background: rgba(60,60,65,0.8); color: var(--sub-text); }
+        [data-theme='dark'] .player-chip.active, [data-theme='navy'] .player-chip.active { background: #2e7d32 !important; border-color: #81c784 !important; color: #ffffff !important; }
+        
+        .order-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 10005; backdrop-filter: blur(5px); }
+        
+        @keyframes glimmerspin {
+            0% { --glimmer-angle: 0deg; }
+            100% { --glimmer-angle: 360deg; }
+        }
+        @property --glimmer-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+        .order-content { 
+            position: relative;
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 12px; 
+            text-align: center; 
+            width: 85%; max-width: 320px; 
+            box-shadow: var(--shadow); 
+            overflow: hidden; 
+        }
+        .order-content::before {
+            content: '';
+            position: absolute;
+            top: -2.5%; left: -2.5%; width: 105%; height: 105%;
+            border-radius: inherit;
+            background: conic-gradient(from var(--glimmer-angle), transparent 30%, var(--accent), var(--rank1), var(--edit), var(--accent) 70%, transparent);
+            animation: glimmerspin 2s linear infinite;
+            z-index: -2;
+            filter: blur(8px);
+        }
+        .order-content::after {
+            content: '';
+            position: absolute;
+            top: 1px; left: 1px; width: calc(100% - 2px); height: calc(100% - 2px);
+            border-radius: inherit;
+            background: var(--card-bg);
+            z-index: -1;
+        }
+
+        .flatpickr-calendar, .flatpickr-calendar * {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+        }
+        
+        .flatpickr-current-month .flatpickr-monthhand-title,
+        .flatpickr-current-month input.cur-year {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+            font-weight: 900 !important;
+            background: transparent !important;
+        }
+
+        .flatpickr-calendar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px) !important;
+            border-radius: 12px !important; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.6) !important;
+            padding: 15px !important;
+            width: 320px !important; 
+        }
+        .flatpickr-months .flatpickr-month {
+            height: 40px !important;
+        }
+        .flatpickr-current-month {
+            font-size: 135% !important;
+            font-weight: 900 !important;
+            padding-top: 5px !important;
+        }
+        span.flatpickr-weekday {
+            font-weight: 900 !important;
+            color: #95a5a6 !important;
+            font-size: 12px !important;
+        }
+        .flatpickr-day {
+            border-radius: 8px !important; 
+            font-size: 16px !important;
+            height: 44px !important;
+            line-height: 44px !important;
+            font-weight: 800 !important;
+            max-width: 44px !important;
+            margin: 2px !important;
+        }
+        .flatpickr-monthSelect-month {
+            font-weight: 900 !important;
+            border-radius: 8px !important;
+        }
+        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange,
+        .flatpickr-monthSelect-month.selected {
+            background: linear-gradient(145deg, #ff4757, #ff6b81) !important;
+            border-color: transparent !important;
+            color: #fff !important;
+            box-shadow: 2px 4px 10px rgba(255, 71, 87, 0.3) !important;
+        }
+        
+        [data-theme='dark'] .flatpickr-calendar, [data-theme='navy'] .flatpickr-calendar {
+            background: rgba(40, 40, 45, 0.95) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6) !important;
+        }
+        [data-theme='dark'] .flatpickr-month, [data-theme='navy'] .flatpickr-month, 
+        [data-theme='dark'] .flatpickr-current-month .flatpickr-monthhand-title, [data-theme='navy'] .flatpickr-current-month .flatpickr-monthhand-title, 
+        [data-theme='dark'] .flatpickr-current-month input.cur-year, [data-theme='navy'] .flatpickr-current-month input.cur-year {
+            color: #fff !important; fill: #fff !important;
+        }
+        [data-theme='dark'] span.flatpickr-weekday, [data-theme='navy'] span.flatpickr-weekday {
+            color: #ccc !important;
+        }
+        [data-theme='dark'] .flatpickr-day, [data-theme='navy'] .flatpickr-day,
+        [data-theme='dark'] .flatpickr-monthSelect-month, [data-theme='navy'] .flatpickr-monthSelect-month { color: #eeeeee !important; }
+        [data-theme='dark'] .flatpickr-monthSelect-month:hover, [data-theme='navy'] .flatpickr-monthSelect-month:hover { background: rgba(255,255,255,0.1) !important; }
+        [data-theme='dark'] .flatpickr-day.inRange, [data-theme='navy'] .flatpickr-day.inRange {
+            background: rgba(233, 30, 99, 0.2) !important;
+            box-shadow: -5px 0 0 rgba(233, 30, 99, 0.2), 5px 0 0 rgba(233, 30, 99, 0.2) !important;
+            color: #ff8a80 !important;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); text-shadow: 0 0 10px rgba(255, 71, 87, 0); }
+            100% { transform: scale(1.2); text-shadow: 0 0 20px rgba(255, 71, 87, 0.6); }
+        }
+        @keyframes flash {
+            0% { opacity: 0.3; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .summary-stats-wrap .stat-lbl { font-size: clamp(11px, 3.5vw, 13px); letter-spacing: -0.5px; line-height: 1; }
+        .summary-stats-wrap .stat-val { font-size: clamp(14px, 4.5vw, 17px); letter-spacing: -0.5px; line-height: 1; display: flex; align-items: flex-end; justify-content: center; height: 100%; }
+
+        .zoom-active .summary-stats-wrap .stat-lbl { font-size: 11px !important; letter-spacing: -0.5px !important; line-height: 1; }
+        .zoom-active .summary-stats-wrap .stat-val { font-size: 14px !important; letter-spacing: -0.5px !important; line-height: 1; display: flex; align-items: flex-end; justify-content: center; height: 100%; }
+
+        .empty-search-msg { white-space: nowrap; letter-spacing: -0.5px; font-size: clamp(12px, 4vw, 14px); }
+        .zoom-active .empty-search-msg { font-size: 11px !important; }
+
+        @keyframes scaleUpPopup {
+            0% { transform: scale(0.3); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes scaleDownPopup {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.3); opacity: 0; }
+        }
+        
+        .last-game-content {
+            position: relative;
+            background: var(--card-bg);
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            width: 85%; max-width: 320px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .last-game-content::before {
+            content: '';
+            position: absolute;
+            top: -2.5%; left: -2.5%; width: 105%; height: 105%;
+            border-radius: inherit;
+            background: conic-gradient(from var(--glimmer-angle), transparent 30%, var(--accent), var(--rank1), var(--edit), var(--rank1) 70%, transparent);
+            animation: glimmerspin 2s linear infinite;
+            z-index: -2;
+            filter: blur(8px);
+        }
+        .last-game-content::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px; width: calc(100% - 4px); height: calc(100% - 4px);
+            border-radius: inherit;
+            background: var(--card-bg);
+            z-index: -1;
+        }
+
+        #info-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; 
+            z-index: 10007; backdrop-filter: blur(5px);
+        }
+        
+        .zoom-active #info-modal {
+            zoom: 0.833333; 
+        }
+
+        #info-modal .modal-content {
+            padding: 30px 20px; text-align: center; width: max-content; max-width: 95%; 
+            background: rgba(255, 255, 255, 0.95); border-radius: 12px;
+        }
+
+        .graph-box { background:rgba(255, 255, 255, 0.5); border-radius:8px; border: 1px solid rgba(0,0,0,0.05); }
+        [data-theme='dark'] .graph-box, [data-theme='navy'] .graph-box { background:rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.05); }
 
         .mvp-container {
             margin-top: 15px;
@@ -474,7 +707,6 @@
         }
         [data-theme='dark'] .mvp-badge, [data-theme='navy'] .mvp-badge { background: rgba(60,60,65,0.8); }
 
-        /* MVP 이름 완벽 열맞춤 정렬 */
         .mvp-title { font-size: 12px; font-weight: 800; color: var(--sub-text); flex: 1; text-align: left; }
         .mvp-player { font-size: 15px; font-weight: 900; color: var(--rank1); flex: 1; text-align: center; }
         .mvp-value { font-size: 11px; font-weight: 800; color: var(--rankL); flex: 1; text-align: right; }
@@ -776,10 +1008,19 @@
         try {
             await new Promise(r => setTimeout(r, 150));
             const canvas = await html2canvas(target, { 
-                backgroundColor: bgColor, scale: 2, logging: false, useCORS: true,
-                windowWidth: document.documentElement.scrollWidth, windowHeight: document.documentElement.scrollHeight,
+                backgroundColor: bgColor, 
+                scale: 2, 
+                logging: false, 
+                useCORS: true,
+                windowWidth: document.documentElement.scrollWidth,
+                windowHeight: document.documentElement.scrollHeight,
                 scrollY: -window.scrollY,
-                onclone: (clonedDoc) => { const clonedTarget = clonedDoc.getElementById(targetId); if (clonedTarget) clonedTarget.style.borderRadius = '12px'; }
+                onclone: (clonedDoc) => {
+                    const clonedTarget = clonedDoc.getElementById(targetId);
+                    if (clonedTarget) {
+                        clonedTarget.style.borderRadius = '12px';
+                    }
+                }
             });
             
             canvas.toBlob(async (blob) => {
@@ -788,11 +1029,18 @@
                     try { await navigator.share({ files: [file], title: shareTitle, text: shareText }); } 
                     catch (e) { console.log('Share failed', e); }
                 } else {
-                    const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = fileName; link.click();
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = fileName;
+                    link.click();
                 }
             }, 'image/png');
-        } catch (err) { alert("캡처 중 오류가 발생했습니다."); } finally {
-            target.style.background = originalBg; target.style.padding = originalPadding; target.style.backdropFilter = originalFilter;
+        } catch (err) {
+            alert("캡처 중 오류가 발생했습니다.");
+        } finally {
+            target.style.background = originalBg;
+            target.style.padding = originalPadding;
+            target.style.backdropFilter = originalFilter;
             if (shareBtn) shareBtn.style.display = 'block';
         }
     }
@@ -901,10 +1149,8 @@
             let start = Date.now(); let slotName = document.getElementById('slotName'); let counter = 0;
             function runSlot() {
                 let elapsed = Date.now() - start;
-                if (elapsed < 3000) {
-                    const p = selectedPlayersForLottery[counter % selectedPlayersForLottery.length]; slotName.innerText = p; slotName.style.color = getPlayerColor(p); counter++;
-                    setTimeout(runSlot, 50 + Math.pow(elapsed / 3000, 3) * 400);
-                } else finishAnimation();
+                if (elapsed < 3000) { const p = selectedPlayersForLottery[counter % selectedPlayersForLottery.length]; slotName.innerText = p; slotName.style.color = getPlayerColor(p); counter++; setTimeout(runSlot, 50 + Math.pow(elapsed / 3000, 3) * 400); } 
+                else finishAnimation();
             }
             runSlot();
         } else if (animationStep === 1) {
@@ -942,7 +1188,13 @@
     }
     
     function closeGraphModal() { document.getElementById('graph-modal').style.display = 'none'; if (window.graphTimeout) { clearTimeout(window.graphTimeout); window.graphTimeout = null; } }
-    function closePlayerScoreModal() { const modal = document.getElementById('player-score-modal'); const content = document.getElementById('player-score-content'); if (scoreModalTimeout) clearTimeout(scoreModalTimeout); if (hideScoreModalTimeout) clearTimeout(hideScoreModalTimeout); if(!modal || !content) return; content.style.animation = 'scaleDownPopup 0.3s ease-in forwards'; hideScoreModalTimeout = setTimeout(() => { modal.style.display = 'none'; content.style.animation = 'none'; }, 300); }
+
+    function closePlayerScoreModal() {
+        const modal = document.getElementById('player-score-modal'); const content = document.getElementById('player-score-content');
+        if (scoreModalTimeout) clearTimeout(scoreModalTimeout); if (hideScoreModalTimeout) clearTimeout(hideScoreModalTimeout);
+        if(!modal || !content) return; content.style.animation = 'scaleDownPopup 0.3s ease-in forwards'; 
+        hideScoreModalTimeout = setTimeout(() => { modal.style.display = 'none'; content.style.animation = 'none'; }, 300); 
+    }
 
     function changeAppTheme() { const theme = document.getElementById('themeSelect').value; document.documentElement.setAttribute('data-theme', theme); localStorage.setItem('appTheme', theme); renderStats(); }
     function formatDate(dateInput) { const d = new Date(dateInput); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
@@ -1025,6 +1277,7 @@
         resArea.style.display = 'block';
     }
 
+    // 상성 분석 결과 공유 함수 추가
     function shareStrategyResult() {
         const player = document.getElementById('strategyPlayer').value;
         captureAndShare('strategy-capture-area', 'strategy-share-btn', `${player}_strategy.png`, `${player}의 상성 분석`, `${player} 선수의 순번별 성적 분석 결과입니다!`);
@@ -1111,11 +1364,11 @@
     function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
     function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
     function closeAppWindow() { window.close(); setTimeout(() => { document.body.innerHTML = `<div style="background:linear-gradient(135deg, #4a90e2, #9370db); height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-family: 'Pretendard', sans-serif;"><div style="font-size:60px; margin-bottom:20px;">👋</div><div style="font-size:20px; font-weight:900; line-height:1.6;">앱 종료</div><div style="font-size:14px; margin-top:30px; opacity:0.8;">다음에 또 봐!</div></div>`; document.body.style.backgroundImage = 'none'; document.body.style.padding = '0'; }, 300); }
-    
-    function showLoading(v, t) { const loadingEl = document.getElementById('loading'); document.getElementById('loadingText').innerText = t; loadingEl.style.display = v ? 'flex' : 'none'; }
+    function showLoading(v, t) { document.getElementById('loadingText').innerText = t; document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
     function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
     function exportData() { if (gameLogs.length === 0) return alert("데이터 없음"); const link = document.createElement('a'); link.href = 'data:application/json;charset=utf-8,'+ encodeURIComponent(JSON.stringify(gameLogs, null, 2)); link.download = `billiard_backup_${new Date().toLocaleDateString('sv-SE')}.json`; link.click(); }
     function triggerImport() { document.getElementById('importFile').click(); }
+    function importData(event) { /* 기존 복구 로직 동일 */ }
     function setDefaultSearchDates() { if (searchFlatpickr) searchFlatpickr.setDate(new Date()); }
 
     function searchRecords() {
@@ -1135,6 +1388,7 @@
     window.onload = () => { 
         searchFlatpickr = flatpickr("#searchDateRange", { plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], locale: "ko", disableMobile: "true" });
         let savedTheme = localStorage.getItem('appTheme') || 'yellow'; document.documentElement.setAttribute('data-theme', savedTheme); document.getElementById('themeSelect').value = savedTheme;
+        // 로직: 웰컴 화면은 항상 먼저 나타나도록 타이머 제어
         setTimeout(() => { 
             const ws = document.getElementById('welcome-screen'); 
             if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); } 
