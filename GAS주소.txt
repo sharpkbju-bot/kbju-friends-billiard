@@ -1,6 +1,6 @@
 기존 : https://script.google.com/macros/s/AKfycby-S6Kc8ugrHsMtdYbx1UzJTqpJ60ZqBv0oznCCDuilyi6e6stfnIqUVCBwMhVqBNLGCg/exec
-신규 : https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec
-신규 : https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec    (v4.00)
+신규 : https://script.google.com/macros/s/AKfycbzVCB4XXeebyVvbDe91gcarwdwTSmmM92KciZf7F-1GLXikP3Jlz0rivWodR-1xXRMdtg/exec    (기존 사용. v3.60까지)    
+신규 : https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec    (현재 사용 중. v4.00 이후)
 
 
 검색 : #1a237e
