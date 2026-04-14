@@ -420,16 +420,27 @@
             backdrop-filter: blur(4px);
             display: none; justify-content: center; align-items: center; gap: 10px; z-index: 10; 
             border-radius: 8px;
+            /* v4.00 핫픽스: 오버레이 영역 밖으로 잔상 표시 방지 */
+            overflow: hidden;
         }
         [data-theme='dark'] .action-overlay, [data-theme='navy'] .action-overlay { background: rgba(0, 0, 0, 0.7); }
         .action-overlay.active { display: flex; }
 
         .overlay-btn { 
-            padding: 12px !important; border-radius: 8px !important; font-weight: 900; font-size: 13px; 
+            /* v4.00 핫픽스: 기본 모드에서 버튼 크기가 칸을 삐져나오는 현상 수정 (Padding 감소) */
+            padding: 6px 10px !important; border-radius: 8px !important; font-weight: 900; font-size: 13px; 
             box-shadow: 2px 4px 8px rgba(0,0,0,0.15); transition: 0.2s;
             line-height: 1.5 !important; box-sizing: border-box !important; display: flex; justify-content: center; align-items: center;
         }
         .overlay-btn:active { transform: scale(0.95); }
+
+        /* v4.00 핫픽스: 확대 모드에서 작아진 칸에 맞춰 버튼 크기 추가 감소 */
+        .zoom-active .action-overlay { gap: 5px !important; }
+        .zoom-active .overlay-btn { 
+            padding: 4px 8px !important; 
+            font-size: 11px !important; 
+            border-radius: 6px !important; 
+        }
 
         .btn-edit-p { background: #d1e9ff; color: #0056b3; } 
         .btn-del-p { background: #ffdada; color: #d63031; }  
@@ -985,10 +996,9 @@
         const originalPadding = target.style.padding;
         const originalFilter = target.style.backdropFilter;
         
-        // 캡처 최적화를 위해 임시 스타일 보정
         target.style.background = bgColor;
         target.style.padding = '15px';
-        target.style.backdropFilter = 'none'; // backdrop-filter는 html2canvas에서 오류를 유발함
+        target.style.backdropFilter = 'none'; 
 
         try {
             await new Promise(r => setTimeout(r, 150));
@@ -1531,7 +1541,6 @@
         
         const finalRanks = [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""];
 
-        // 안전하게 배열로 넘기기 위한 이중 안전장치
         let safeStartOrder = [];
         if (currentStartOrder && currentStartOrder.length > 0) {
             safeStartOrder = currentStartOrder;
@@ -1889,11 +1898,8 @@
             return;
         }
 
-        // 오늘의 승부사 (다승)
         const winner = activeToday.reduce((a, b) => (dayStats[a].wins > dayStats[b].wins ? a : (dayStats[a].wins === dayStats[b].wins && dayStats[a].played < dayStats[b].played ? a : b)));
-        // 오늘의 열정왕 (다회 참여)
         const worker = activeToday.reduce((a, b) => (dayStats[a].played > dayStats[b].played ? a : b));
-        // 오늘의 생존자 (최저 꼴찌율)
         const survivor = activeToday.reduce((a, b) => {
             const rateA = dayStats[a].lasts / dayStats[a].played;
             const rateB = dayStats[b].lasts / dayStats[b].played;
@@ -1910,9 +1916,9 @@
             </div>
         `;
 
-        html += createBadge("오늘의 승부사", winner, `${dayStats[winner].wins}승 / ${dayStats[winner].played}전`, "🔥");
-        html += createBadge("오늘의 열정왕", worker, `${dayStats[worker].played}경기 소화`, "🏃");
-        html += createBadge("오늘의 생존자", survivor, `꼴찌 단 ${dayStats[survivor].lasts}회`, "🛡️");
+        html += createBadge("승부사", winner, `${dayStats[winner].wins}승 / ${dayStats[winner].played}전`, "🔥");
+        html += createBadge("열정왕", worker, `${dayStats[worker].played}경기 소화`, "🏃");
+        html += createBadge("생존자", survivor, `꼴찌 단 ${dayStats[survivor].lasts}회`, "🛡️");
 
         mvpArea.innerHTML = html;
         mvpArea.style.display = 'flex';
@@ -1922,7 +1928,7 @@
         const games = gameLogs.filter(g => g.dateStr === selectedDateStr); 
         const listArea = document.getElementById('dayGameList');
         
-        renderTodayMVP(); // v3.60 MVP 렌더링 호출
+        renderTodayMVP();
 
         if(games.length > 0) {
             let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>`;
@@ -1964,7 +1970,7 @@
     function closeAllOverlays() { 
         document.querySelectorAll('.action-overlay').forEach(o => {
             o.classList.remove('active');
-            o.style.display = 'none'; // 팝업 잔상 방지용 리셋
+            o.style.display = 'none'; 
             setTimeout(() => o.style.display = '', 10);
         }); 
     }
