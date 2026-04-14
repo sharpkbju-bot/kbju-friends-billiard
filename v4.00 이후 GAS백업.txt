@@ -1,0 +1,84 @@
+function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("data");
+  var data = sheet.getDataRange().getValues();
+  var result = [];
+  
+  for (var i = 1; i < data.length; i++) {
+    if(!data[i][0]) continue; // 날짜 없는 빈 줄은 무시
+    result.push({
+      date: data[i][0],      // A열
+      round: data[i][1],     // B열
+      ranks: [
+        data[i][2] ? data[i][2].toString() : "", // C열
+        data[i][3] ? data[i][3].toString() : "", // D열
+        data[i][4] ? data[i][4].toString() : "", // E열
+        data[i][5] ? data[i][5].toString() : "", // F열
+        data[i][6] ? data[i][6].toString() : ""  // G열
+      ],
+      startOrder: data[i][7] ? data[i][7].toString().split(',') : null // H열
+    });
+  }
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("data");
+  var params = JSON.parse(e.postData.contents);
+  var action = params.action;
+  
+  if (action === "SAVE") {
+    var lastRow = sheet.getLastRow();
+    var lastRound = 0;
+    if (lastRow > 1) {
+      lastRound = parseInt(sheet.getRange(lastRow, 2).getValue()) || 0; // B열 기준
+    }
+    
+    var startOrderStr = "";
+    if (params.startOrder && Array.isArray(params.startOrder) && params.startOrder.length > 0) {
+      startOrderStr = params.startOrder.join(',');
+    }
+    
+    sheet.appendRow([
+      params.date,           // A열
+      lastRound + 1,         // B열
+      params.ranks[0] || "", // C열
+      params.ranks[1] || "", // D열
+      params.ranks[2] || "", // E열
+      params.ranks[3] || "", // F열
+      params.ranks[4] || "", // G열
+      startOrderStr          // H열
+    ]);
+  } else if (action === "UPDATE") {
+    var data = sheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][1] == params.round) {
+        var row = i + 1;
+        sheet.getRange(row, 1).setValue(params.date);
+        sheet.getRange(row, 3, 1, 5).setValues([[
+          params.ranks[0] || "", params.ranks[1] || "", params.ranks[2] || "", params.ranks[3] || "", params.ranks[4] || ""
+        ]]);
+        var startOrderStr = "";
+        if (params.startOrder && Array.isArray(params.startOrder) && params.startOrder.length > 0) {
+          startOrderStr = params.startOrder.join(',');
+        }
+        if (startOrderStr) sheet.getRange(row, 8).setValue(startOrderStr);
+        break;
+      }
+    }
+  } else if (action === "DELETE") {
+    var data = sheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][1] == params.round) {
+        sheet.deleteRow(i + 1);
+        break;
+      }
+    }
+  } else if (action === "RESET") {
+    sheet.clear();
+    sheet.appendRow(["날짜", "게임", "1위", "2위", "3위", "4위", "꼴찌", "startOrder"]);
+  }
+  
+  return ContentService.createTextOutput("Success");
+}
