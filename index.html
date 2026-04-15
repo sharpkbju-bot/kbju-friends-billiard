@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=4.10">
+    <link rel="manifest" href="manifest.json?v=4.20">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=4.10">
-    <link rel="apple-touch-icon" href="image_0.png?v=4.10">
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=4.20">
+    <link rel="apple-touch-icon" href="image_0.png?v=4.20">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     
@@ -288,6 +288,15 @@
         button.save-btn:active { transform: scale(0.97); }
         button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !important; }
         
+        @keyframes saveFlash {
+            0% { box-shadow: 0 0 0 transparent, 8px 10px 20px rgba(0,0,0,0.38), -2px -2px 8px rgba(255,255,255,0.5); outline: 2px solid transparent; }
+            50% { box-shadow: 0 0 20px #ff4757, 8px 10px 20px rgba(0,0,0,0.38), -2px -2px 8px rgba(255,255,255,0.5); outline: 3px solid #ff4757; outline-offset: 2px; }
+            100% { box-shadow: 0 0 0 transparent, 8px 10px 20px rgba(0,0,0,0.38), -2px -2px 8px rgba(255,255,255,0.5); outline: 2px solid transparent; }
+        }
+        .flash-save-active {
+            animation: saveFlash 1s infinite alternate !important;
+        }
+
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .btn-group button { flex: 1; margin-top: 0 !important; }
         .btn-cancel { background: #bdc3c7 !important; }
@@ -718,7 +727,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;4.10
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;4.20
     </div>
 </div>
 
@@ -1345,6 +1354,12 @@
     function closeGraphModal() { 
         document.getElementById('graph-modal').style.display = 'none'; 
         if (window.graphTimeout) { clearTimeout(window.graphTimeout); window.graphTimeout = null; } 
+        
+        // 순위 저장 버튼 깜빡임 추가
+        const saveBtn = document.getElementById('mainBtn');
+        if (saveBtn) {
+            saveBtn.classList.add('flash-save-active');
+        }
     }
 
     function closePlayerScoreModal() {
@@ -1492,9 +1507,17 @@
             resetPlayerSelection(); 
             updateInputFields(); 
         } 
+        
+        // 순위 저장 버튼 깜빡임 해제
+        const saveBtn = document.getElementById('mainBtn');
+        if (saveBtn) saveBtn.classList.remove('flash-save-active');
     }
     
     async function saveGame() {
+        // 순위 저장 버튼 깜빡임 해제
+        const saveBtn = document.getElementById('mainBtn');
+        if (saveBtn) saveBtn.classList.remove('flash-save-active');
+
         const today = formatDate(new Date()); 
         if (selectedDateStr > today) return alert("미래에서 온거야? 날짜를 잘 확인혀!"); 
         
@@ -1786,8 +1809,11 @@
             const rColor = rIdx === 0 ? 'var(--rank1)' : (rIdx === actual.length - 1 ? 'var(--rankL)' : '#5D4037');
             const rLabel = rIdx === 0 ? '1위🥇' : (rIdx === actual.length - 1 ? '꼴찌💀' : (rIdx + 1) + '위');
             
+            const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr);
+            const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
+            
             html += `<div class="history-item">
-                        <span style="font-size:14px; color:#5D4037;">${g.dateStr}</span>
+                        <span style="font-size:14px; color:#5D4037;">${g.dateStr} <span style="font-size:12px; font-weight:900; color:var(--rank1); margin-left:6px;">${gameNumber}G</span></span>
                         <span style="font-size:15px; color:${rColor};">${rLabel}</span>
                      </div>`; 
         });
@@ -1950,6 +1976,9 @@
         document.getElementById('playerCount').value = "3"; 
         resetPlayerSelection(); 
         updateInputFields(); 
+        
+        // 순위 저장 버튼 깜빡임 해제
+        if (btn) btn.classList.remove('flash-save-active');
     }
     
     async function deleteGame(round) { 
@@ -2043,9 +2072,13 @@
                                    const rankIndex = actual.indexOf(player);
                                    const rankColor = rankIndex === 0 ? 'darkblue' : (rankIndex === actual.length-1 ? 'red' : 'var(--text-color)');
                                    const rankLabel = rankIndex === 0 ? '1위🥇' : (rankIndex === actual.length-1 ? '꼴찌💀' : (rankIndex+1)+'위');
+                                   
+                                   const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr);
+                                   const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
+                                   
                                    return `<div class="history-item search-result-card" style="flex-direction:column; align-items:flex-start; gap:5px;">
                                                <div style="display:flex; justify-content:space-between; width:100%;">
-                                                   <span style="font-size:13px; color:var(--sub-text);">${g.dateStr}</span>
+                                                   <span style="font-size:13px; color:var(--sub-text);">${g.dateStr} <span style="font-size:12px; font-weight:900; color:var(--rank1); margin-left:6px;">${gameNumber}G</span></span>
                                                    <span style="font-size:14px; font-weight:900; color:${rankColor};">${rankLabel}</span>
                                                </div>
                                                <div style="font-size:12px; display:inline-flex; align-items:center;">${generateNamesHTML(actual)}</div>
