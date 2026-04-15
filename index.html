@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데일리 MVP v4.01</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9fafb;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card_wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* 그린 카드 */
+        .card_wrap .green_card {
+            width: 340px; /* v4.01 수정: 분홍색 카드와 동일하게 340px로 변경 */
+            height: 200px; /* v4.01 수정: 분홍색 카드와 동일하게 200px로 변경 */
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            color: #15803d;
+            padding: 20px;
+        }
+
+        .card_wrap .green_card h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .card_wrap .green_card p {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        /* 핑크 카드 */
+        .card_wrap .pink_card {
+            width: 340px;
+            height: 200px;
+            background-color: #fdf2f8;
+            border: 1px solid #fbcfe8;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            color: #be185d;
+            padding: 20px;
+        }
+
+        .card_wrap .pink_card h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .card_wrap .pink_card p {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .btn_wrap {
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #059669;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>데일리 MVP - v4.01</h1> <div class="card_wrap">
+        <div class="green_card">
+            <h2>그린 카드</h2>
+            <p>이것은 그린 카드입니다.</p>
+        </div>
+
+        <div class="pink_card">
+            <h2>핑크 카드</h2>
+            <p>이것은 핑크 카드입니다.</p>
+        </div>
+    </div>
+
+    <div class="btn_wrap">
+        <button id="check_btn">확인</button>
+    </div>
+</div>
+
+<script>
+    document.getElementById('check_btn').addEventListener('click', function() {
+        alert('v4.01 확인 완료!');
+    });
+</script>
+
+</body>
+</html>
