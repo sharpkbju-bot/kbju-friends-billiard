@@ -700,7 +700,6 @@ function toggleAllMode() {
 }
 
 function renderStats() {
-    // 💡 결함 수정: 누적 전적 타이틀을 모드에 따라 다이내믹하게 변경 (.stats-subtitle 클래스로 정확히 타겟팅)
     const subtitleEl = document.querySelector('.stats-subtitle');
     if (subtitleEl) {
         subtitleEl.innerText = isPercentMode ? "(평균 승점 기준. 확률 %)" : "(평균 승점 기준. 횟수)";
@@ -749,7 +748,6 @@ function renderStats() {
             nameStyle += `color:#8e44ad;`;
         }
         
-        // 💡 결함 수정: 캡처 시 글자 겹침을 방지하기 위해 셀 내부의 '%' 기호를 제거
         const getVal = (val, total) => isPercentMode ? (total === 0 ? '0' : ((val/total)*100).toFixed(0)) : val;
         
         return `<tr>
@@ -1227,7 +1225,23 @@ function resetSearch() {
 }
 
 window.onload = () => { 
-    searchFlatpickr = flatpickr("#searchDateRange", { plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], locale: "ko", disableMobile: "true" });
+    searchFlatpickr = flatpickr("#searchDateRange", { 
+        plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
+        locale: "ko", 
+        disableMobile: "true",
+        onChange: function(selectedDates, dateStr, instance) {
+            if (dateStr) {
+                const hasRecord = gameLogs.some(g => g.dateStr.startsWith(dateStr));
+                if (!hasRecord) {
+                    const toast = document.getElementById('toast');
+                    toast.innerText = "게임 기록 없음";
+                    toast.style.display = 'block';
+                    setTimeout(() => { toast.style.display = 'none'; }, 3000);
+                }
+            }
+        }
+    });
+    
     let savedTheme = localStorage.getItem('appTheme') || 'yellow'; 
     document.documentElement.setAttribute('data-theme', savedTheme); 
     document.getElementById('themeSelect').value = savedTheme;
