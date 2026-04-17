@@ -1,6 +1,7 @@
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
+let genseiModalTimeout = null; // 겐세이 팝업 타이머 변수 (v5.41 추가)
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
 const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
@@ -911,7 +912,7 @@ function changeZoom(v) {
     else document.body.classList.remove('zoom-active'); 
 }
 
-// 겐세이 모달 오픈 (v5.40 추가)
+// 겐세이 모달 오픈 (v5.41 수정: 4초 후 자동 종료)
 function showGenseiModal(playerName) {
     const gamesToday = gameLogs.filter(g => g.dateStr === selectedDateStr);
     let victims = [];
@@ -968,12 +969,25 @@ function showGenseiModal(playerName) {
     content.innerHTML = html;
     modal.style.display = 'flex';
     content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+
+    // 4초 후 자동 종료 로직 (v5.41 추가)
+    if (genseiModalTimeout) clearTimeout(genseiModalTimeout);
+    genseiModalTimeout = setTimeout(() => {
+        closeGenseiModal();
+    }, 4000);
 }
 
-// 겐세이 모달 닫기 (v5.40 추가)
+// 겐세이 모달 닫기
 function closeGenseiModal() {
     const modal = document.getElementById('gensei-modal');
     const content = document.getElementById('gensei-modal-content');
+    
+    // 모달 닫힐 때 타이머 초기화 (v5.41 추가)
+    if (genseiModalTimeout) {
+        clearTimeout(genseiModalTimeout);
+        genseiModalTimeout = null;
+    }
+
     if(!modal || !content) return;
 
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards';
@@ -992,7 +1006,7 @@ function renderTodayMVP() {
     }
     
     let stats = {}; 
-    let genseiStats = {}; // 겐세이 통계 저장 (v5.40 추가)
+    let genseiStats = {};
 
     gamesToday.forEach(g => { 
         const actual = g.ranks.filter(n => n && n.trim() !== ""); 
@@ -1003,7 +1017,6 @@ function renderTodayMVP() {
             if (idx === actual.length - 1 && actual.length > 1) stats[name].lasts++; 
         }); 
 
-        // 겐세이 분석 계산 (v5.40 추가)
         if (g.startOrder && g.startOrder.length > 0) {
             const order = g.startOrder;
             for (let i = 0; i < order.length; i++) {
@@ -1034,7 +1047,6 @@ function renderTodayMVP() {
         return rA < rB ? a : (rA === rB && stats[a].played > stats[b].played ? a : b); 
     });
 
-    // 겐세이 MVP 선정 (v5.40 추가)
     let genseiMVP = null;
     let maxAvgNextRank = -1;
     let genseiDesc = "";
@@ -1047,7 +1059,8 @@ function renderTodayMVP() {
             return avgA > avgB ? a : b;
         });
         maxAvgNextRank = (genseiStats[genseiMVP].nextTotalRank / genseiStats[genseiMVP].count).toFixed(1);
-        genseiDesc = `뒷주자 평균 ${maxAvgNextRank}위`;
+        // v5.41 줄바꿈 처리
+        genseiDesc = `뒷주자<br>평균 ${maxAvgNextRank}위`;
     }
     
     let html = `<div style="text-align:center; font-weight:900; font-size:14px; color:var(--rank1); margin-bottom:5px;">🏆 오늘의 MVP 분석</div>
@@ -1067,7 +1080,6 @@ function renderTodayMVP() {
                     <span class="mvp-value">꼴찌 단 ${stats[survivor].lasts}회</span>
                 </div>`; 
 
-    // 겐세이 MVP 뱃지 추가 (v5.40)
     if (genseiMVP) {
         html += `<div class="mvp-badge" onclick="showGenseiModal('${genseiMVP}')" style="cursor: pointer; border: 1.5px dashed var(--edit);">
                     <span class="mvp-title">😈 겐세이</span>
