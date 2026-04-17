@@ -911,6 +911,78 @@ function changeZoom(v) {
     else document.body.classList.remove('zoom-active'); 
 }
 
+// 겐세이 모달 오픈 (v5.40 추가)
+function showGenseiModal(playerName) {
+    const gamesToday = gameLogs.filter(g => g.dateStr === selectedDateStr);
+    let victims = [];
+
+    gamesToday.forEach(g => {
+        if (g.startOrder && g.startOrder.length > 0) {
+            const order = g.startOrder;
+            const pIdx = order.indexOf(playerName);
+            if (pIdx !== -1) {
+                const nextP = order[(pIdx + 1) % order.length];
+                const actual = g.ranks.filter(n => n && n.trim() !== "");
+                const nextPRankIdx = actual.indexOf(nextP);
+                if (nextPRankIdx !== -1) {
+                    victims.push({
+                        round: g.round,
+                        victimName: nextP,
+                        victimRank: nextPRankIdx + 1,
+                        actual: actual
+                    });
+                }
+            }
+        }
+    });
+
+    if (victims.length === 0) return;
+
+    let html = `<div style="font-size:40px; margin-bottom:10px;">😈</div>
+                <h2 style="font-size:18px; font-weight:900; color:var(--text-color); margin:0 0 5px 0;">${playerName}의 겐세이 희생양들</h2>
+                <div style="font-size:14px; font-weight:800; color:var(--sub-text); margin-bottom: 20px;">[ ${selectedDateStr} ] 뒷주자 성적</div>
+                <div style="display:flex; flex-direction:column; gap:8px; font-weight:900;">`;
+
+    victims.forEach((v) => {
+        const rankColor = v.victimRank === 1 ? 'var(--rank1)' : (v.victimRank === v.actual.length ? 'var(--rankL)' : 'var(--text-color)');
+        const rankLabel = v.victimRank === 1 ? '1위🥇' : (v.victimRank === v.actual.length ? '꼴찌💀' : `${v.victimRank}위`);
+
+        const sameDateGames = gameLogs.filter(x => x.dateStr === selectedDateStr);
+        const gameNumber = sameDateGames.findIndex(x => x.round === v.round) + 1;
+
+        html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
+                    <span style="color:var(--sub-text); font-size:12px; font-weight:800; width: 30px; text-align: left;">${gameNumber}G</span>
+                    <span style="color:${getPlayerColor(v.victimName)}; font-size:16px; font-weight:900; flex: 1; text-align: center;">${v.victimName}</span>
+                    <span style="color:${rankColor}; font-size:16px; font-weight:900; width: 50px; text-align: right;">${rankLabel}</span>
+                 </div>`;
+    });
+
+    html += `</div>
+             <div style="margin-top:15px; font-size:12px; color:var(--sub-text); font-weight:800;">※ ${playerName} 선수의 바로 다음 순서로 친<br>선수들의 결과입니다.</div>`;
+
+    const modal = document.getElementById('gensei-modal');
+    const content = document.getElementById('gensei-modal-content');
+
+    if(!modal || !content) return;
+
+    content.innerHTML = html;
+    modal.style.display = 'flex';
+    content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+}
+
+// 겐세이 모달 닫기 (v5.40 추가)
+function closeGenseiModal() {
+    const modal = document.getElementById('gensei-modal');
+    const content = document.getElementById('gensei-modal-content');
+    if(!modal || !content) return;
+
+    content.style.animation = 'scaleDownPopup 0.3s ease-in forwards';
+    setTimeout(() => {
+        modal.style.display = 'none';
+        content.style.animation = 'none';
+    }, 300);
+}
+
 function renderTodayMVP() {
     const gamesToday = gameLogs.filter(g => g.dateStr === selectedDateStr); 
     const area = document.getElementById('mvpArea');
@@ -920,6 +992,8 @@ function renderTodayMVP() {
     }
     
     let stats = {}; 
+    let genseiStats = {}; // 겐세이 통계 저장 (v5.40 추가)
+
     gamesToday.forEach(g => { 
         const actual = g.ranks.filter(n => n && n.trim() !== ""); 
         actual.forEach((name, idx) => { 
@@ -928,6 +1002,22 @@ function renderTodayMVP() {
             if (idx === 0) stats[name].wins++; 
             if (idx === actual.length - 1 && actual.length > 1) stats[name].lasts++; 
         }); 
+
+        // 겐세이 분석 계산 (v5.40 추가)
+        if (g.startOrder && g.startOrder.length > 0) {
+            const order = g.startOrder;
+            for (let i = 0; i < order.length; i++) {
+                const preP = order[i];
+                const nextP = order[(i + 1) % order.length];
+                const nextPRankIdx = actual.indexOf(nextP);
+
+                if (nextPRankIdx !== -1) {
+                    if (!genseiStats[preP]) genseiStats[preP] = { nextTotalRank: 0, count: 0 };
+                    genseiStats[preP].nextTotalRank += (nextPRankIdx + 1);
+                    genseiStats[preP].count++;
+                }
+            }
+        }
     });
     
     const active = Object.keys(stats); 
@@ -943,23 +1033,50 @@ function renderTodayMVP() {
         const rB = stats[b].lasts / stats[b].played; 
         return rA < rB ? a : (rA === rB && stats[a].played > stats[b].played ? a : b); 
     });
+
+    // 겐세이 MVP 선정 (v5.40 추가)
+    let genseiMVP = null;
+    let maxAvgNextRank = -1;
+    let genseiDesc = "";
+    const genseiCandidates = Object.keys(genseiStats);
+
+    if (genseiCandidates.length > 0) {
+        genseiMVP = genseiCandidates.reduce((a, b) => {
+            const avgA = genseiStats[a].nextTotalRank / genseiStats[a].count;
+            const avgB = genseiStats[b].nextTotalRank / genseiStats[b].count;
+            return avgA > avgB ? a : b;
+        });
+        maxAvgNextRank = (genseiStats[genseiMVP].nextTotalRank / genseiStats[genseiMVP].count).toFixed(1);
+        genseiDesc = `뒷주자 평균 ${maxAvgNextRank}위`;
+    }
     
-    area.innerHTML = `<div style="text-align:center; font-weight:900; font-size:14px; color:var(--rank1); margin-bottom:5px;">🏆 오늘의 MVP 분석</div>
-                      <div class="mvp-badge">
-                          <span class="mvp-title">🔥 승부사</span>
-                          <span class="mvp-player">${winner}</span>
-                          <span class="mvp-value">${stats[winner].wins}승 / ${stats[winner].played}전</span>
-                      </div>
-                      <div class="mvp-badge">
-                          <span class="mvp-title">🏃 열정왕</span>
-                          <span class="mvp-player">${worker}</span>
-                          <span class="mvp-value">${stats[worker].played}경기</span>
-                      </div>
-                      <div class="mvp-badge">
-                          <span class="mvp-title">🛡️ 생존자</span>
-                          <span class="mvp-player">${survivor}</span>
-                          <span class="mvp-value">꼴찌 단 ${stats[survivor].lasts}회</span>
-                      </div>`; 
+    let html = `<div style="text-align:center; font-weight:900; font-size:14px; color:var(--rank1); margin-bottom:5px;">🏆 오늘의 MVP 분석</div>
+                <div class="mvp-badge">
+                    <span class="mvp-title">🔥 승부사</span>
+                    <span class="mvp-player">${winner}</span>
+                    <span class="mvp-value">${stats[winner].wins}승 / ${stats[winner].played}전</span>
+                </div>
+                <div class="mvp-badge">
+                    <span class="mvp-title">🏃 열정왕</span>
+                    <span class="mvp-player">${worker}</span>
+                    <span class="mvp-value">${stats[worker].played}경기</span>
+                </div>
+                <div class="mvp-badge">
+                    <span class="mvp-title">🛡️ 생존자</span>
+                    <span class="mvp-player">${survivor}</span>
+                    <span class="mvp-value">꼴찌 단 ${stats[survivor].lasts}회</span>
+                </div>`; 
+
+    // 겐세이 MVP 뱃지 추가 (v5.40)
+    if (genseiMVP) {
+        html += `<div class="mvp-badge" onclick="showGenseiModal('${genseiMVP}')" style="cursor: pointer; border: 1.5px dashed var(--edit);">
+                    <span class="mvp-title">😈 겐세이</span>
+                    <span class="mvp-player" style="color: var(--edit); text-decoration: underline;">${genseiMVP}</span>
+                    <span class="mvp-value" style="color: var(--edit);">${genseiDesc}</span>
+                </div>`;
+    }
+
+    area.innerHTML = html; 
     area.style.display = 'flex';
 }
 
