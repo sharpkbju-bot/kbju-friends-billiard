@@ -1,7 +1,7 @@
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
-let genseiModalTimeout = null; // 겐세이 팝업 타이머 변수 (v5.41 추가)
+let genseiModalTimeout = null;
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
 const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
@@ -912,7 +912,7 @@ function changeZoom(v) {
     else document.body.classList.remove('zoom-active'); 
 }
 
-// 겐세이 모달 오픈 (v5.41 수정: 4초 후 자동 종료)
+// 겐세이 모달 오픈
 function showGenseiModal(playerName) {
     const gamesToday = gameLogs.filter(g => g.dateStr === selectedDateStr);
     let victims = [];
@@ -970,7 +970,7 @@ function showGenseiModal(playerName) {
     modal.style.display = 'flex';
     content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
 
-    // 4초 후 자동 종료 로직 (v5.41 추가)
+    // 4초 후 자동 종료 로직
     if (genseiModalTimeout) clearTimeout(genseiModalTimeout);
     genseiModalTimeout = setTimeout(() => {
         closeGenseiModal();
@@ -982,7 +982,7 @@ function closeGenseiModal() {
     const modal = document.getElementById('gensei-modal');
     const content = document.getElementById('gensei-modal-content');
     
-    // 모달 닫힐 때 타이머 초기화 (v5.41 추가)
+    // 모달 닫힐 때 타이머 초기화
     if (genseiModalTimeout) {
         clearTimeout(genseiModalTimeout);
         genseiModalTimeout = null;
@@ -1017,6 +1017,7 @@ function renderTodayMVP() {
             if (idx === actual.length - 1 && actual.length > 1) stats[name].lasts++; 
         }); 
 
+        // 겐세이 통계 축적 (v5.42: allLast 상태값 추가)
         if (g.startOrder && g.startOrder.length > 0) {
             const order = g.startOrder;
             for (let i = 0; i < order.length; i++) {
@@ -1025,9 +1026,14 @@ function renderTodayMVP() {
                 const nextPRankIdx = actual.indexOf(nextP);
 
                 if (nextPRankIdx !== -1) {
-                    if (!genseiStats[preP]) genseiStats[preP] = { nextTotalRank: 0, count: 0 };
+                    if (!genseiStats[preP]) genseiStats[preP] = { nextTotalRank: 0, count: 0, allLast: true };
                     genseiStats[preP].nextTotalRank += (nextPRankIdx + 1);
                     genseiStats[preP].count++;
+                    
+                    // 한번이라도 꼴찌가 아니면(단독 게임 제외) allLast를 false로 전환
+                    if (nextPRankIdx !== actual.length - 1 || actual.length <= 1) {
+                        genseiStats[preP].allLast = false;
+                    }
                 }
             }
         }
@@ -1058,9 +1064,14 @@ function renderTodayMVP() {
             const avgB = genseiStats[b].nextTotalRank / genseiStats[b].count;
             return avgA > avgB ? a : b;
         });
-        maxAvgNextRank = (genseiStats[genseiMVP].nextTotalRank / genseiStats[genseiMVP].count).toFixed(1);
-        // v5.41 줄바꿈 처리
-        genseiDesc = `뒷주자<br>평균 ${maxAvgNextRank}위`;
+        
+        // v5.42: 모든 뒷주자가 꼴찌일 경우 '평균 꼴찌'로 표기
+        if (genseiStats[genseiMVP].allLast) {
+            genseiDesc = `뒷주자<br>평균 꼴찌`;
+        } else {
+            maxAvgNextRank = (genseiStats[genseiMVP].nextTotalRank / genseiStats[genseiMVP].count).toFixed(1);
+            genseiDesc = `뒷주자<br>평균 ${maxAvgNextRank}위`;
+        }
     }
     
     let html = `<div style="text-align:center; font-weight:900; font-size:14px; color:var(--rank1); margin-bottom:5px;">🏆 오늘의 MVP 분석</div>
