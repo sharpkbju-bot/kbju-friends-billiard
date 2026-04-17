@@ -1,4 +1,4 @@
-// share.js - 버튼 중복 생성 방지 및 위치 최적화 버전
+// share.js - 버튼 중복 생성 방지 및 위치 최적화 버전 (v5.42)
 (function() {
     const script = document.createElement('script');
     script.src = "https://html2canvas.hertzen.com/dist/html2canvas.min.js";
