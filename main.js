@@ -1149,7 +1149,6 @@ function searchRecords() {
     const player = document.getElementById('searchPlayer').value;
     if(!mon || !player) return alert("검색월과 선수를 선택해줘!");
     
-    // 💡 결함 수정: 날짜별 기록 검색 시 내림차순(최신순)으로 정렬되도록 로직 변경
     const filtered = gameLogs.filter(g => g.dateStr.startsWith(mon) && g.ranks.includes(player));
     filtered.sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || ((parseInt(b.round) || 0) - (parseInt(a.round) || 0)));
 
@@ -1236,7 +1235,10 @@ window.onload = () => {
                     const toast = document.getElementById('toast');
                     toast.innerText = "게임 기록 없음";
                     toast.style.display = 'block';
-                    setTimeout(() => { toast.style.display = 'none'; }, 3000);
+                    setTimeout(() => { 
+                        toast.style.display = 'none'; 
+                        setDefaultSearchDates(); // 토스트 종료 후 현재 달로 자동 리셋
+                    }, 3000);
                 }
             }
         }
