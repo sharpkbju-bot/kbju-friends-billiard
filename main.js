@@ -72,6 +72,14 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
                 const clonedTarget = clonedDoc.getElementById(targetId);
                 if (clonedTarget) {
                     clonedTarget.style.borderRadius = '12px';
+                    
+                    // 캡처 시 select, input 등의 테두리와 그림자가 깨지는 현상 방지
+                    const formElements = clonedTarget.querySelectorAll('select, input');
+                    formElements.forEach(el => {
+                        el.style.boxShadow = 'none';
+                        el.style.border = 'none';
+                        el.style.outline = 'none';
+                    });
                 }
             }
         });
