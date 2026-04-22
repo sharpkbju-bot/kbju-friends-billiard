@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=5.42">
+    <link rel="manifest" href="manifest.json?v=5.50">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=5.42">
-    <link rel="apple-touch-icon" href="image_0.png?v=5.42">
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=5.50">
+    <link rel="apple-touch-icon" href="image_0.png?v=5.50">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 
-    <link rel="stylesheet" href="style.css?v=5.42">
+    <link rel="stylesheet" href="style.css?v=5.50">
 
     <title>우리들의 Billiard World</title>
 </head>
@@ -26,7 +26,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;5.42
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;5.50
     </div>
 </div>
 
@@ -192,6 +192,25 @@
     <div id="richFriendArea" style="display:none; background: var(--bg); padding: 20px; border-radius: 22px; text-align: center; margin-top: 20px; color: #7f8c8d; font-weight: 800;"></div>
 </div>
 
+<div class="card" id="defenseCard">
+    <div id="defense-capture-area" style="padding: 5px; border-radius: 20px; background: transparent;">
+        <h2 style="font-size:16px; margin:5px 0 15px 0; color:#444; font-weight:800; text-align:center;">🛡️ Defense 순위</h2>
+        <div style="font-size:12px; color:var(--sub-text); font-weight:800; text-align:center; margin-bottom: 15px;">(본인 바로 뒷순서 선수의 평균 순위)</div>
+        <table class="stats-table defense-table">
+            <thead>
+                <tr>
+                    <th style="width: 22%; text-align:center;">랭킹</th>
+                    <th style="width: 30%; text-align:center;">선수이름</th>
+                    <th style="width: 20%; text-align:center;">게임수</th>
+                    <th style="width: 28%; text-align:center;">평균순위</th>
+                </tr>
+            </thead>
+            <tbody id="defenseBody"></tbody>
+        </table>
+        <button id="defense-share-btn" class="share-btn-common" style="margin-top: 15px;" onclick="shareDefenseResult()">📸 디펜스 랭킹 스크린샷 공유</button>
+    </div>
+</div>
+
 <div class="card" id="strategyCard">
     <div id="strategy-capture-area" style="padding: 5px; border-radius: 20px; background: transparent;">
         <h2 style="font-size:16px; margin:5px 0 15px 10px; color:#444; font-weight:800;">🎯 순번별 상성 분석 <span class="strategy-subtitle" style="font-size:12px; color:var(--rank1);">(특정 선수 뒤에서의 결과)</span></h2>
@@ -265,7 +284,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-<script src="main.js?v=5.42"></script>
+<script src="main.js?v=5.50"></script>
 
 </body>
 </html>
