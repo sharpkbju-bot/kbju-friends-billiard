@@ -114,7 +114,8 @@
 [data-theme='dark'] #selectedDateTitle, [data-theme='navy'] #selectedDateTitle,
 [data-theme='dark'] .stats-card h2, [data-theme='navy'] .stats-card h2,
 [data-theme='dark'] #searchCard h2, [data-theme='navy'] #searchCard h2,
-[data-theme='dark'] #strategyCard h2, [data-theme='navy'] #strategyCard h2 { color: #ffffff !important; }
+[data-theme='dark'] #strategyCard h2, [data-theme='navy'] #strategyCard h2,
+[data-theme='dark'] #defenseCard h2, [data-theme='navy'] #defenseCard h2 { color: #ffffff !important; }
 
 [data-theme='dark'] .weekday, [data-theme='navy'] .weekday { color: #95a5a6 !important; }
 
@@ -326,6 +327,10 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 .stats-table td:first-child { border-radius: 8px 0 0 8px; text-align: center; padding-left: 0; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.5px; } 
 .stats-table td:last-child { border-radius: 0 8px 8px 0; padding-right: 0; text-align: center; } 
 
+/* Defense 순위 테이블 설정: 영역 밖 돌출 방지 (v5.50 추가) */
+.defense-table th { padding: 8px 2px !important; letter-spacing: -0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.defense-table td { padding: 12px 2px !important; letter-spacing: -0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 .strategy-table th { font-size: 14px !important; text-transform: none !important; }
 .zoom-active .strategy-table th { font-size: 12px !important; }
 
@@ -426,6 +431,10 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 .zoom-active .stats-table th:last-child { width: 19% !important; padding-right: 0 !important; text-align: center !important; }
 .zoom-active .stats-table td:last-child { padding-right: 0 !important; text-align: center !important; }
 .zoom-active .win-rate-pill { font-size: 11.5px !important; text-align: center !important; }
+
+/* Defense 순위 확대모드 적용 (v5.50 추가) */
+.zoom-active .defense-table th { font-size: 9.5px !important; letter-spacing: -1px !important; padding: 6px 1px !important; }
+.zoom-active .defense-table td { font-size: 11px !important; letter-spacing: -1px !important; padding: 10px 1px !important; }
 
 .zoom-active .strategy-subtitle { display: block; margin-top: 4px; font-size: 11px !important; }
 
@@ -738,7 +747,7 @@ span.flatpickr-weekday {
     font-size: 13px !important;
 }
 
-/* 결함 수정: 확대 모드에서 누적 전적 부제목 줄바꿈 제어 */
+/* 확대 모드에서 누적 전적 부제목 줄바꿈 제어 */
 .zoom-active .stats-subtitle {
     display: block;
     margin-top: 5px;
