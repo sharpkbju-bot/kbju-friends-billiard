@@ -327,7 +327,7 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 .stats-table td:first-child { border-radius: 8px 0 0 8px; text-align: center; padding-left: 0; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.5px; } 
 .stats-table td:last-child { border-radius: 0 8px 8px 0; padding-right: 0; text-align: center; } 
 
-/* Defense 순위 테이블 영역 밖 돌출 방지 (v5.50 추가) */
+/* Defense 순위 테이블 설정 */
 .defense-table th { padding: 8px 2px !important; letter-spacing: -0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .defense-table td { padding: 12px 2px !important; letter-spacing: -0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -432,7 +432,7 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 .zoom-active .stats-table td:last-child { padding-right: 0 !important; text-align: center !important; }
 .zoom-active .win-rate-pill { font-size: 11.5px !important; text-align: center !important; }
 
-/* Defense 순위 확대모드 적용 (v5.50 추가) */
+/* Defense 순위 확대모드 적용 */
 .zoom-active .defense-table th { font-size: 9.5px !important; letter-spacing: -1px !important; padding: 6px 1px !important; }
 .zoom-active .defense-table td { font-size: 11px !important; letter-spacing: -1px !important; padding: 10px 1px !important; }
 
@@ -732,7 +732,7 @@ span.flatpickr-weekday {
 
 .mvp-title { font-size: 12px; font-weight: 800; color: var(--sub-text); flex: 1; text-align: left; }
 .mvp-player { font-size: 15px; font-weight: 900; color: var(--rank1); flex: 1; text-align: center; }
-.mvp-value { font-size: 11px; font-weight: 800; color: var(--rankL); flex: 1; text-align: right; }
+.mvp-value { font-size: 11px; font-weight: 800; color: var(--rankL); flex: 1; text-align: right; line-height: 1.3; }
 
 #graph-countdown-text {
     font-size: clamp(13px, 4vw, 15px);
@@ -746,7 +746,6 @@ span.flatpickr-weekday {
     font-size: 13px !important;
 }
 
-/* 확대 모드에서 누적 전적 부제목 줄바꿈 제어 */
 .zoom-active .stats-subtitle {
     display: block;
     margin-top: 5px;
