@@ -1046,7 +1046,7 @@ function showGenseiModal(playerName) {
     });
 
     html += `</div>
-             <div style="margin-top:15px; font-size:12px; color:var(--sub-text); font-weight:800;">※ ${playerName} 선수의 바로 다음 순서로 친<br>선수들의 결과입니다.</div>`;
+             <div style="margin-top:15px; font-size:12px; color:var(--sub-text); font-weight:800;">※ ${playerName} 선수의 바로 다음 순서<br>선수들의 결과입니다.</div>`;
 
     const modal = document.getElementById('gensei-modal');
     const content = document.getElementById('gensei-modal-content');
