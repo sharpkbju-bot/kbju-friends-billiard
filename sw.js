@@ -1,5 +1,5 @@
-// 캐시 버전을 v5.51로 올려 이전 캐시를 초기화합니다. (확대모드 캡처 렌더링 오류 개선 반영)
-const CACHE_NAME = 'billiard-v5.51';
+// 캐시 버전을 v5.50으로 올려 이전 캐시를 초기화합니다.
+const CACHE_NAME = 'billiard-v5.50';
 
 // 설치 시 캐시 저장
 self.addEventListener('install', (e) => {
