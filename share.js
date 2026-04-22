@@ -1,4 +1,4 @@
-// share.js - v5.50
+// share.js - 버튼 중복 생성 방지 및 위치 최적화 버전 (v5.51)
 (function() {
     const script = document.createElement('script');
     script.src = "https://html2canvas.hertzen.com/dist/html2canvas.min.js";
@@ -20,7 +20,7 @@
 
                 const shareBtn = document.createElement('button');
                 shareBtn.id = 'custom-share-btn';
-                shareBtn.innerHTML = "📸 누적 전적 스크린샷 공유";
+                shareBtn.innerHTML = "📸 전적 스크린샷 공유";
                 shareBtn.style.cssText = `
                     width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc);
                     color: white; border: none; border-radius: 18px; font-weight: 800;
@@ -40,12 +40,6 @@
                         scrollX: 0,
                         scrollY: -window.scrollY,
                         onclone: (clonedDoc) => {
-                            // 확대 모드 캡처 깨짐 방지: 캡처용 복제 문서에서는 줌 효과를 강제 해제하여 기본 모드로 렌더링
-                            if (clonedDoc.body) {
-                                clonedDoc.body.style.zoom = '1';
-                                clonedDoc.body.classList.remove('zoom-active');
-                            }
-                            
                             const clonedCard = clonedDoc.querySelector('.stats-card');
                             if (clonedCard) {
                                 clonedCard.style.backgroundColor = isDark ? '#1e1e1e' : '#ffffff';
