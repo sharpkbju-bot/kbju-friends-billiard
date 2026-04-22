@@ -39,8 +39,8 @@ function getEarnedScore(idx, pCount) {
 function generateNamesHTML(names) {
     return names.map((name, i) => {
         const color = i === 0 ? 'var(--rank1)' : (i === names.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
-        return `<span style="color:${color};display:inline-block;">${name}</span>`;
-    }).join('<span style="display:inline-block; margin: 0 3px;">→</span>');
+        return `<span style="color:${color};display:inline;">${name}</span>`;
+    }).join('<span style="display:inline;">→</span>');
 }
 
 async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
@@ -48,16 +48,6 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
     if (!target) return;
     const shareBtn = document.getElementById(btnId);
     if (shareBtn) shareBtn.style.display = 'none';
-    
-    // v5.51: 캡처 전 줌(확대) 모드 강제 해제 (렌더링 오류 방지)
-    const isZoomed = document.body.classList.contains('zoom-active');
-    const originalZoom = document.body.style.zoom;
-    
-    if (isZoomed) {
-        document.body.style.zoom = '1';
-        document.body.classList.remove('zoom-active');
-        await new Promise(r => setTimeout(r, 150)); // DOM 재배치 대기
-    }
     
     const bgColor = getCaptureBgColor();
     const originalBg = target.style.background;
@@ -79,6 +69,12 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
             windowHeight: document.documentElement.scrollHeight,
             scrollY: -window.scrollY,
             onclone: (clonedDoc) => {
+                // 확대 모드 캡처 깨짐 방지: 캡처용 복제 문서에서는 줌 효과를 강제 해제하여 기본 모드로 렌더링
+                if (clonedDoc.body) {
+                    clonedDoc.body.style.zoom = '1';
+                    clonedDoc.body.classList.remove('zoom-active');
+                }
+
                 const clonedTarget = clonedDoc.getElementById(targetId);
                 if (clonedTarget) {
                     clonedTarget.style.borderRadius = '12px';
@@ -116,12 +112,6 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
         target.style.padding = originalPadding;
         target.style.backdropFilter = originalFilter;
         if (shareBtn) shareBtn.style.display = 'block';
-        
-        // v5.51: 캡처 완료 후 줌(확대) 모드 복구
-        if (isZoomed) {
-            document.body.style.zoom = originalZoom;
-            document.body.classList.add('zoom-active');
-        }
     }
 }
 
@@ -1176,27 +1166,26 @@ function renderTodayMVP() {
         }
     }
     
-    // v5.51: 이모지와 텍스트 겹침 방지를 위해 <span>으로 강제 여백(margin-right) 추가
     let html = `<div style="text-align:center; font-weight:900; font-size:14px; color:var(--rank1); margin-bottom:5px;">🏆 오늘의 MVP 분석</div>
                 <div class="mvp-badge">
-                    <span class="mvp-title"><span style="display:inline-block; margin-right:4px;">🔥</span>승부사</span>
+                    <span class="mvp-title">🔥 승부사</span>
                     <span class="mvp-player">${winner}</span>
                     <span class="mvp-value">${stats[winner].wins}승 / ${stats[winner].played}전</span>
                 </div>
                 <div class="mvp-badge">
-                    <span class="mvp-title"><span style="display:inline-block; margin-right:4px;">🏃</span>열정왕</span>
+                    <span class="mvp-title">🏃 열정왕</span>
                     <span class="mvp-player">${worker}</span>
                     <span class="mvp-value">${stats[worker].played}경기</span>
                 </div>
                 <div class="mvp-badge">
-                    <span class="mvp-title"><span style="display:inline-block; margin-right:4px;">🛡️</span>생존자</span>
+                    <span class="mvp-title">🛡️ 생존자</span>
                     <span class="mvp-player">${survivor}</span>
                     <span class="mvp-value">꼴찌 단 ${stats[survivor].lasts}회</span>
                 </div>`; 
 
     if (genseiMVP) {
         html += `<div class="mvp-badge" onclick="showGenseiModal('${genseiMVP}')" style="cursor: pointer; border: 1.5px dashed var(--edit);">
-                    <span class="mvp-title"><span style="display:inline-block; margin-right:4px;">😈</span>겐세이</span>
+                    <span class="mvp-title">😈 겐세이</span>
                     <span class="mvp-player" style="color: var(--edit); text-decoration: underline;">${genseiMVP}</span>
                     <span class="mvp-value" style="color: var(--edit);">${genseiDesc}</span>
                 </div>`;
@@ -1213,19 +1202,14 @@ function renderGameList() {
     
     if(games.length > 0) { 
         let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>
-                    <button id="today-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareTodayResult()">📸 오늘의 전적 공유</button>`; 
+                    <button id="today-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareTodayResult()">📸 오늘의 전적 스크린샷 공유</button>`; 
                     
         games.forEach((g, idx) => { 
             const names = g.ranks.filter(n => n && n.trim() !== ""); 
-            
-            // v5.51: 인원수가 5명 이상일 때 게임 리스트의 컨테이너가 줄바꿈(wrap) 되도록 인라인 속성 적용
-            const wrapStyle = names.length >= 5 ? 'flex-wrap: wrap; justify-content: center; line-height: 1.6;' : '';
-            const spanStyle = names.length >= 5 ? 'flex-shrink: 0; align-self: flex-start; margin-top: 2px;' : '';
-
             html += `<div class="game-item" onclick="toggleActionOverlay(this)">
                          <div class="game-info">
-                             <span style="${spanStyle}">${idx+1}G</span>
-                             <div style="display:inline-flex; align-items:center; ${wrapStyle}">${generateNamesHTML(names)}</div>
+                             <span>${idx+1}G</span>
+                             <div style="display:inline-flex; align-items:center;">${generateNamesHTML(names)}</div>
                          </div>
                          <div class="action-overlay">
                              <div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
