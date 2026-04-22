@@ -79,16 +79,38 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
                 if (clonedTarget) {
                     clonedTarget.style.borderRadius = '12px';
                     
-                    // 캡처 시 select, input 등의 테두리가 깨지고 글자 하단이 잘리는 현상 완벽 방지
+                    // [v5.52 핵심] 네이티브 select, input 폼 요소를 일반 div로 완벽하게 치환하여 글자 잘림 원천 차단
                     const formElements = clonedTarget.querySelectorAll('select, input');
                     formElements.forEach(el => {
-                        el.style.boxShadow = 'none';
-                        el.style.border = 'none';
-                        el.style.outline = 'none';
-                        // 글자 하단 잘림 방지를 위해 캡처 순간에만 padding-bottom을 넉넉히 부여
-                        el.style.padding = '12px 12px 18px 12px';
-                        el.style.lineHeight = 'normal';
-                        el.style.height = 'auto';
+                        const replacementDiv = clonedDoc.createElement('div');
+                        
+                        // 값 추출
+                        if (el.tagName === 'SELECT') {
+                            replacementDiv.innerText = el.options[el.selectedIndex] ? el.options[el.selectedIndex].text : '';
+                        } else {
+                            replacementDiv.innerText = el.value || el.placeholder || '';
+                        }
+                        
+                        // 기존 인라인 스타일 복사
+                        replacementDiv.style.cssText = el.style.cssText;
+                        
+                        // CSS 클래스에서 상속받던 핵심 스타일 수동 적용 (html2canvas 렌더링 최적화)
+                        replacementDiv.style.display = 'flex';
+                        replacementDiv.style.alignItems = 'center';
+                        replacementDiv.style.justifyContent = 'center';
+                        replacementDiv.style.padding = '12px';
+                        replacementDiv.style.fontSize = '14px';
+                        replacementDiv.style.fontWeight = el.style.fontWeight || '800';
+                        replacementDiv.style.color = el.style.color || 'var(--text-color)';
+                        replacementDiv.style.background = 'rgba(236, 238, 241, 0.4)';
+                        replacementDiv.style.borderRadius = '8px';
+                        replacementDiv.style.width = '100%';
+                        replacementDiv.style.flex = '1 1 auto';
+                        replacementDiv.style.boxSizing = 'border-box';
+                        replacementDiv.style.border = '2px solid transparent';
+                        
+                        // 말썽을 일으키는 폼 태그를 깔끔한 div로 DOM 치환
+                        el.parentNode.replaceChild(replacementDiv, el);
                     });
                 }
             }
@@ -1114,7 +1136,7 @@ function renderTodayMVP() {
             if (idx === actual.length - 1 && actual.length > 1) stats[name].lasts++; 
         }); 
 
-        // 겐세이 통계 축적
+        // 겐세이 통계 축적 (v5.42: allLast 상태값 추가)
         if (g.startOrder && g.startOrder.length > 0) {
             const order = g.startOrder;
             for (let i = 0; i < order.length; i++) {
@@ -1162,6 +1184,7 @@ function renderTodayMVP() {
             return avgA > avgB ? a : b;
         });
         
+        // v5.42: 모든 뒷주자가 꼴찌일 경우 '평균 꼴찌'로 표기
         if (genseiStats[genseiMVP].allLast) {
             genseiDesc = `뒷주자<br>평균 꼴찌`;
         } else {
