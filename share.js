@@ -1,4 +1,4 @@
-// share.js - 버튼 중복 방지 및 확대모드 캡처 렌더링 오류 개선 버전 (v5.51)
+// share.js - v5.50
 (function() {
     const script = document.createElement('script');
     script.src = "https://html2canvas.hertzen.com/dist/html2canvas.min.js";
@@ -20,7 +20,7 @@
 
                 const shareBtn = document.createElement('button');
                 shareBtn.id = 'custom-share-btn';
-                shareBtn.innerHTML = "📸 전적 스크린샷 공유";
+                shareBtn.innerHTML = "📸 누적 전적 스크린샷 공유";
                 shareBtn.style.cssText = `
                     width: 100%; padding: 12px; background: linear-gradient(145deg, #6a11cb, #2575fc);
                     color: white; border: none; border-radius: 18px; font-weight: 800;
@@ -32,73 +32,59 @@
                     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
                     const richArea = document.getElementById('richFriendArea');
                     
-                    // v5.51: 누적 전적도 캡처 전 줌(zoom) 효과 임시 해제하여 겹침 방지
-                    const isZoomed = document.body.classList.contains('zoom-active');
-                    const originalZoom = document.body.style.zoom;
-                    
-                    if (isZoomed) {
-                        document.body.style.zoom = '1';
-                        document.body.classList.remove('zoom-active');
-                        await new Promise(r => setTimeout(r, 150));
-                    }
-                    
-                    try {
-                        const canvas = await html2canvas(statsCard, {
-                            backgroundColor: null, 
-                            scale: 2,
-                            useCORS: true,
-                            allowTaint: true,
-                            scrollX: 0,
-                            scrollY: -window.scrollY,
-                            onclone: (clonedDoc) => {
-                                const clonedCard = clonedDoc.querySelector('.stats-card');
-                                if (clonedCard) {
-                                    clonedCard.style.backgroundColor = isDark ? '#1e1e1e' : '#ffffff';
-                                    clonedCard.style.borderRadius = '28px';
-                                    clonedCard.style.overflow = 'hidden';
-                                    // 캡처본에서는 버튼 숨기기
-                                    const clonedBtn = clonedDoc.getElementById('custom-share-btn');
-                                    if(clonedBtn) clonedBtn.style.display = 'none';
-                                }
-
-                                const clonedRichArea = clonedDoc.getElementById('richFriendArea');
-                                if(clonedRichArea) {
-                                    clonedRichArea.style.boxShadow = 'none';
-                                    clonedRichArea.style.border = 'none';
-                                    clonedRichArea.style.width = '100%';
-                                    clonedRichArea.style.margin = '20px 0 0 0';
-                                    if(isDark) clonedRichArea.style.backgroundColor = 'rgba(50, 50, 50, 0.8)';
-                                }
-                                
-                                const rows = clonedDoc.querySelectorAll('.stats-table tr');
-                                rows.forEach(row => {
-                                    row.style.backgroundColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)';
-                                });
+                    const canvas = await html2canvas(statsCard, {
+                        backgroundColor: null, 
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        scrollX: 0,
+                        scrollY: -window.scrollY,
+                        onclone: (clonedDoc) => {
+                            // 확대 모드 캡처 깨짐 방지: 캡처용 복제 문서에서는 줌 효과를 강제 해제하여 기본 모드로 렌더링
+                            if (clonedDoc.body) {
+                                clonedDoc.body.style.zoom = '1';
+                                clonedDoc.body.classList.remove('zoom-active');
                             }
-                        });
-
-                        canvas.toBlob(async (blob) => {
-                            const file = new File([blob], 'billiard_rank.png', { type: 'image/png' });
-                            if (navigator.share) {
-                                try {
-                                    await navigator.share({ files: [file], title: '당구 전적', text: '오늘의 결과입니다!' });
-                                } catch (e) { }
-                            } else {
-                                const link = document.createElement('a');
-                                link.href = URL.createObjectURL(blob);
-                                link.download = 'billiard_rank.png';
-                                link.click();
+                            
+                            const clonedCard = clonedDoc.querySelector('.stats-card');
+                            if (clonedCard) {
+                                clonedCard.style.backgroundColor = isDark ? '#1e1e1e' : '#ffffff';
+                                clonedCard.style.borderRadius = '28px';
+                                clonedCard.style.overflow = 'hidden';
+                                // 캡처본에서는 버튼 숨기기
+                                const clonedBtn = clonedDoc.getElementById('custom-share-btn');
+                                if(clonedBtn) clonedBtn.style.display = 'none';
                             }
-                        }, 'image/png');
-                    } catch (err) {
-                        console.error('Capture failed', err);
-                    } finally {
-                        // v5.51: 캡처 종료 후 줌 상태 복구
-                        if (isZoomed) {
-                            document.body.style.zoom = originalZoom;
-                            document.body.classList.add('zoom-active');
+
+                            const clonedRichArea = clonedDoc.getElementById('richFriendArea');
+                            if(clonedRichArea) {
+                                clonedRichArea.style.boxShadow = 'none';
+                                clonedRichArea.style.border = 'none';
+                                clonedRichArea.style.width = '100%';
+                                clonedRichArea.style.margin = '20px 0 0 0';
+                                if(isDark) clonedRichArea.style.backgroundColor = 'rgba(50, 50, 50, 0.8)';
+                            }
+                            
+                            const rows = clonedDoc.querySelectorAll('.stats-table tr');
+                            rows.forEach(row => {
+                                row.style.backgroundColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)';
+                            });
                         }
-                    }
+                    });
+
+                    canvas.toBlob(async (blob) => {
+                        const file = new File([blob], 'billiard_rank.png', { type: 'image/png' });
+                        if (navigator.share) {
+                            try {
+                                await navigator.share({ files: [file], title: '당구 전적', text: '오늘의 결과입니다!' });
+                            } catch (e) { }
+                        } else {
+                            const link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = 'billiard_rank.png';
+                            link.click();
+                        }
+                    }, 'image/png');
                 };
 
                 // 전적 카드 제목(h2) 바로 아래에 버튼 삽입
