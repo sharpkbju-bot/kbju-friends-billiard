@@ -472,6 +472,7 @@ async function fetchData() {
 function renderAll() { 
     renderCalendar(); 
     renderStats(); 
+    renderDefenseStats(); 
     renderGameList(); 
     analyzeStrategy(); 
 }
@@ -783,6 +784,84 @@ function renderStats() {
     }
 }
 
+function renderDefenseStats() {
+    let defenseStats = {};
+    players.forEach(p => defenseStats[p] = { totalNextRank: 0, count: 0 });
+
+    gameLogs.forEach(g => {
+        if (g.startOrder && g.startOrder.length > 0) {
+            const order = g.startOrder;
+            const actual = g.ranks.filter(n => n && n.trim() !== "");
+            for (let i = 0; i < order.length; i++) {
+                const preP = order[i];
+                const nextP = order[(i + 1) % order.length];
+                const nextPRankIdx = actual.indexOf(nextP);
+
+                if (nextPRankIdx !== -1 && defenseStats[preP]) {
+                    defenseStats[preP].totalNextRank += (nextPRankIdx + 1);
+                    defenseStats[preP].count++;
+                }
+            }
+        }
+    });
+
+    const activePlayers = players.filter(p => defenseStats[p].count > 0);
+
+    activePlayers.sort((a, b) => {
+        const avgA = defenseStats[a].totalNextRank / defenseStats[a].count;
+        const avgB = defenseStats[b].totalNextRank / defenseStats[b].count;
+        return avgB - avgA; 
+    });
+
+    const tbody = document.getElementById('defenseBody');
+    if (!tbody) return;
+
+    if (activePlayers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">데이터가 없습니다.</td></tr>`;
+        return;
+    }
+
+    let currentRank = 1;
+    let html = '';
+    activePlayers.forEach((p, index) => {
+        const avgRank = (defenseStats[p].totalNextRank / defenseStats[p].count).toFixed(2);
+        
+        if (index > 0) {
+            const prevP = activePlayers[index - 1];
+            const prevAvg = (defenseStats[prevP].totalNextRank / defenseStats[prevP].count).toFixed(2);
+            if (avgRank !== prevAvg) {
+                currentRank = index + 1;
+            }
+        }
+
+        let rankLabel = currentRank + '위';
+        let rankColor = 'var(--text-color)';
+        
+        if (currentRank === 1) { 
+            rankLabel = '1위🥇'; 
+            rankColor = 'var(--rank1)'; 
+        } else if (currentRank === 2) { 
+            rankColor = 'var(--rank2)'; 
+        } else if (currentRank === 3) { 
+            rankColor = 'var(--rank3)'; 
+        } else if (currentRank === activePlayers.length && activePlayers.length > 3) { 
+            rankColor = 'var(--rankL)'; 
+        }
+
+        html += `<tr>
+                    <td style="color:${rankColor}; font-weight:900;">${rankLabel}</td>
+                    <td style="color:${getPlayerColor(p)}; font-weight:900;">${p}</td>
+                    <td style="color:#5D4037;">${defenseStats[p].count}전</td>
+                    <td style="color:var(--accent); font-weight:900;">${avgRank}위</td>
+                 </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+function shareDefenseResult() {
+    captureAndShare('defense-capture-area', 'defense-share-btn', 'defense_ranking.png', 'Defense 순위', '멤버별 전체 디펜스 랭킹입니다!');
+}
+
 function closeMemberHistory() {
     const area = document.getElementById('memberHistoryArea');
     area.style.display = 'none';
@@ -1025,7 +1104,7 @@ function renderTodayMVP() {
             if (idx === actual.length - 1 && actual.length > 1) stats[name].lasts++; 
         }); 
 
-        // 겐세이 통계 축적 (v5.42: allLast 상태값 추가)
+        // 겐세이 통계 축적
         if (g.startOrder && g.startOrder.length > 0) {
             const order = g.startOrder;
             for (let i = 0; i < order.length; i++) {
@@ -1073,7 +1152,6 @@ function renderTodayMVP() {
             return avgA > avgB ? a : b;
         });
         
-        // v5.42: 모든 뒷주자가 꼴찌일 경우 '평균 꼴찌'로 표기
         if (genseiStats[genseiMVP].allLast) {
             genseiDesc = `뒷주자<br>평균 꼴찌`;
         } else {
