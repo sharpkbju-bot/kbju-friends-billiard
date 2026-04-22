@@ -1,5 +1,5 @@
-// 캐시 버전을 v5.51로 올려 이전 캐시를 초기화하고 최신 로직을 반영합니다.
-const CACHE_NAME = 'billiard-v5.51';
+// 캐시 버전을 v5.52로 올려 이전 캐시를 초기화하고 클론 요소 치환 로직을 완벽하게 반영합니다.
+const CACHE_NAME = 'billiard-v5.52';
 
 // 설치 시 캐시 저장
 self.addEventListener('install', (e) => {
