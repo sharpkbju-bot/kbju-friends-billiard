@@ -79,12 +79,16 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
                 if (clonedTarget) {
                     clonedTarget.style.borderRadius = '12px';
                     
-                    // 캡처 시 select, input 등의 테두리와 그림자가 깨지는 현상 방지
+                    // 캡처 시 select, input 등의 테두리가 깨지고 글자 하단이 잘리는 현상 완벽 방지
                     const formElements = clonedTarget.querySelectorAll('select, input');
                     formElements.forEach(el => {
                         el.style.boxShadow = 'none';
                         el.style.border = 'none';
                         el.style.outline = 'none';
+                        // 글자 하단 잘림 방지를 위해 캡처 순간에만 padding-bottom을 넉넉히 부여
+                        el.style.padding = '12px 12px 18px 12px';
+                        el.style.lineHeight = 'normal';
+                        el.style.height = 'auto';
                     });
                 }
             }
