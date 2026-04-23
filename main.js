@@ -5,19 +5,19 @@ let genseiModalTimeout = null;
 let defenseModalTimeout = null; 
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
-const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
-let gameLogs = [];
+const players =["경배", "원석", "정석", "진웅", "창한", "경석"];
+let gameLogs =[];
 let currentViewDate = new Date();
 let selectedDateStr = new Date().toLocaleDateString('sv-SE');
 let editMode = false;
 let editRound = null;
 let isPercentMode = false;
 
-let selectedPlayersForLottery = [];
+let selectedPlayersForLottery =[];
 let searchFlatpickr; 
 let animationStep = 0;
 let lastDrawnPlayers = []; 
-let currentStartOrder = []; 
+let currentStartOrder =[]; 
 
 const playerThemes = {
     "경배": { emoji: "👑", color: "#1A237E" },
@@ -186,6 +186,10 @@ function showInfoModal(type) {
         descEl.style.color = ''; 
     }
     
+    // 💡 텍스트가 모달 밖으로 돌출되지 않도록 줄바꿈 속성 동적 적용
+    descEl.style.whiteSpace = 'normal';
+    descEl.style.wordBreak = 'keep-all';
+    
     document.getElementById('info-modal-icon').innerHTML = icon;
     document.getElementById('info-modal-title').innerHTML = title;
     descEl.innerHTML = desc;
@@ -264,7 +268,7 @@ function togglePlayerSelection(el, name) {
 }
 
 function resetPlayerSelection() { 
-    selectedPlayersForLottery = []; 
+    selectedPlayersForLottery =[]; 
     document.querySelectorAll('.player-chip').forEach(el => el.classList.remove('active')); 
     if(!editMode) updateInputFields(); 
     
@@ -363,7 +367,7 @@ function closeOrderModal() {
     document.getElementById('order-modal').style.display = 'none'; 
     if (lastDrawnPlayers && lastDrawnPlayers.length > 0) { 
         showPlayersGraph(lastDrawnPlayers); 
-        lastDrawnPlayers = []; 
+        lastDrawnPlayers =[]; 
     } 
 }
 
@@ -373,7 +377,7 @@ function showPlayersGraph(players) {
     
     let legendHtml = ""; 
     let svg = `<svg width="100%" height="100%" viewBox="-15 -10 130 120" preserveAspectRatio="none" style="overflow: visible; font-family: inherit;">`;
-    const yLabels = ["1위", "2위", "3위", "4위", "꼴찌"];
+    const yLabels =["1위", "2위", "3위", "4위", "꼴찌"];
     
     for(let i=0; i<=4; i++) { 
         let y = i * 25; 
@@ -392,7 +396,7 @@ function showPlayersGraph(players) {
         if (allPersonalGames.length === 0) return; 
         
         const recent10Games = allPersonalGames.slice(0, 10).reverse();
-        let points = []; 
+        let points =[]; 
         let stepX = recent10Games.length > 1 ? 100 / (recent10Games.length - 1) : 50;
         
         recent10Games.forEach((g, i) => { 
@@ -502,8 +506,8 @@ function renderAll() {
 
 function isHoliday(year, month, day) {
     const dStr = `${month + 1}-${day}`; 
-    const fixed = ["1-1", "3-1", "5-1", "5-5", "6-6", "7-17", "8-15", "10-3", "10-9", "12-25"];
-    const variable2026 = ["2-16", "2-17", "2-18", "2-19", "3-2", "5-24", "5-25", "6-3", "8-17", "9-24", "9-25", "9-26", "10-5"];
+    const fixed =["1-1", "3-1", "5-1", "5-5", "6-6", "7-17", "8-15", "10-3", "10-9", "12-25"];
+    const variable2026 =["2-16", "2-17", "2-18", "2-19", "3-2", "5-24", "5-25", "6-3", "8-17", "9-24", "9-25", "9-26", "10-5"];
     return fixed.includes(dStr) || (year === 2026 && variable2026.includes(dStr));
 }
 
@@ -514,9 +518,7 @@ function renderCalendar() {
     const month = currentViewDate.getMonth();
     const realTodayStr = formatDate(new Date()); 
     
-    document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
-    
-    ["일","월","화","수","목","금","토"].forEach((d, idx) => { 
+    document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;["일","월","화","수","목","금","토"].forEach((d, idx) => { 
         let color = "#95a5a6"; 
         if(idx === 0) color = "#e67e22"; 
         if(idx === 6) color = "#5dade2"; 
@@ -609,7 +611,7 @@ async function saveGame() {
     if (selectedDateStr > today) return alert("미래에서 온거야? 날짜를 잘 확인혀!"); 
     
     const count = parseInt(document.getElementById('playerCount').value); 
-    const ranks = [];
+    const ranks =[];
     
     for(let i=1; i<=count; i++) { 
         const val = document.getElementById('rank'+i).value; 
@@ -632,7 +634,7 @@ async function saveGame() {
     try { 
         await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); 
         cancelEdit(); 
-        currentStartOrder = []; 
+        currentStartOrder =[]; 
         document.getElementById('playerCount').value = "3"; 
         resetPlayerSelection(); 
         updateInputFields(); 
@@ -807,7 +809,6 @@ function renderStats() {
     }
 }
 
-// [v5.56 업데이트] 디펜스 상세 기록 모달 타이틀 줄바꿈 겹침 완벽 방지
 function showDefenseDetail(playerName) {
     let victimStats = {}; 
 
@@ -835,8 +836,6 @@ function showDefenseDetail(playerName) {
         (victimStats[b].totalRank / victimStats[b].games) - (victimStats[a].totalRank / victimStats[a].games)
     );
 
-    // [핵심 변경 사항] html2canvas에서 텍스트가 위아래, 좌우로 짓눌리는 것을 막기 위해
-    // &nbsp; 공백 강제 치환 및 line-height: 1.4 적용
     let html = `<div id="defense-modal-capture-area" style="padding: 10px; border-radius: 15px; background: transparent;">
                 <div style="font-size:40px; margin-bottom:10px;">🛡️</div>
                 <h2 style="font-size:19px; font-weight:900; color:var(--text-color); margin:0 0 5px 0; line-height:1.4; white-space:nowrap;">${playerName}의&nbsp;방어&nbsp;리포트</h2>
@@ -1050,7 +1049,7 @@ function renderMemberHistory(name, rank = "") {
         else if(actual.indexOf(name) === actual.length - 1) l10++; 
     });
     
-    let cond = (w10 / recent.length >= 0.3 && l10 / recent.length >= 0.3) ? ["⚡", "도깨비", "var(--rank3)"] : (w10 / recent.length >= 0.3 ? ["☀️", "최상", "var(--rankL)"] : (l10 / recent.length >= 0.3 ? ["🌧️", "비상", "var(--rank1)"] : ["⛅", "보통", "var(--rank2)"]));
+    let cond = (w10 / recent.length >= 0.3 && l10 / recent.length >= 0.3) ? ["⚡", "도깨비", "var(--rank3)"] : (w10 / recent.length >= 0.3 ?["☀️", "최상", "var(--rankL)"] : (l10 / recent.length >= 0.3 ?["🌧️", "비상", "var(--rank1)"] : ["⛅", "보통", "var(--rank2)"]));
     
     html += `<div class="condition-box cond-responsive">
                 <div style="flex:1; display:flex; flex-direction:column; cursor:pointer;" onclick="showInfoModal('score')">
@@ -1118,7 +1117,7 @@ function changeZoom(v) {
 // 겐세이 모달 오픈
 function showGenseiModal(playerName) {
     const gamesToday = gameLogs.filter(g => g.dateStr === selectedDateStr);
-    let victims = [];
+    let victims =[];
 
     gamesToday.forEach(g => {
         if (g.startOrder && g.startOrder.length > 0) {
@@ -1427,7 +1426,7 @@ function importData(event) {
             for (let i = 0; i < importedData.length; i++) {
                 showLoading(true, `데이터 복구 중... (${i + 1} / ${importedData.length})`);
                 const game = importedData[i];
-                const ranks = game.ranks || [];
+                const ranks = game.ranks ||[];
                 const payload = { action: "SAVE", date: game.dateStr, ranks: [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""], startOrder: game.startOrder || null };
                 await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
             }
@@ -1459,7 +1458,7 @@ function searchRecords() {
         sArea.style.display = 'block'; lArea.style.display = 'none'; 
         document.getElementById('search-share-btn').style.display = 'none'; return; 
     }
-    let r = [0, 0, 0, 0, 0]; 
+    let r =[0, 0, 0, 0, 0]; 
     filtered.forEach(g => { 
         const actual = g.ranks.filter(n => n.trim() !== ""); 
         const rIdx = actual.indexOf(player); 
@@ -1509,7 +1508,7 @@ function resetSearch() {
 
 window.onload = () => { 
     searchFlatpickr = flatpickr("#searchDateRange", { 
-        plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
+        plugins:[new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
         locale: "ko", disableMobile: "true",
         onChange: function(selectedDates, dateStr, instance) {
             if (dateStr) {
