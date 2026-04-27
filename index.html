@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json?v=5.60">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+    <link rel="stylesheet" href="style.css?v=5.60">
+    <title>우리들의 Billiard World v5.60</title>
+</head>
+<body id="app-body">
+    <!-- Welcome Screen -->
+    <div id="welcome-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg, #1a237e, #4a148c); z-index:10000; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; transition: opacity 0.8s;">
+        <img src="image_0.png" width="80" style="margin-bottom:20px;">
+        <div style="font-size:18px; font-weight:700;">Billiard World Pro</div>
+        <div style="font-size:12px; margin-top:10px; opacity:0.7;">Version 5.60 Activity Ring</div>
+    </div>
+
+    <!-- UI structure starts here -->
+    <div class="calendar-card">
+        <div class="calendar-header">
+            <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
+            <span id="monthDisplay" style="font-size:20px; font-weight:900;"></span>
+            <button class="nav-btn" onclick="changeMonth(1)">▶</button>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <div class="card" id="inputCard">
+        <h2 id="selectedDateTitle" style="font-size:17px; margin-bottom:20px; font-weight:800;">📅 날짜 로딩 중</h2>
+        <div class="setup-row">
+            <span>게임 인원</span>
+            <select id="playerCount" onchange="updateInputFields()">
+                <option value="2">2명</option>
+                <option value="3" selected>3명</option>
+                <option value="4">4명</option>
+                <option value="5">5명</option>
+            </select>
+        </div>
+        <div class="player-select-wrap">
+            <div class="player-select-grid">
+                <div class="player-chip" onclick="togglePlayerSelection(this, '경배')">경배</div>
+                <div class="player-chip" onclick="togglePlayerSelection(this, '원석')">원석</div>
+                <div class="player-chip" onclick="togglePlayerSelection(this, '정석')">정석</div>
+                <div class="player-chip" onclick="togglePlayerSelection(this, '진웅')">진웅</div>
+                <div class="player-chip" onclick="togglePlayerSelection(this, '창한')">창한</div>
+                <div class="player-chip" onclick="togglePlayerSelection(this, '경석')">경석</div>
+            </div>
+        </div>
+        <div id="drawCardArea" style="display:flex; gap:10px; margin-bottom:20px;">
+            <button class="share-btn-common" style="background:#1abc9c; flex:2;" onclick="pickRandomOrder()">🎲 초구 추첨</button>
+            <button class="share-btn-common" style="background:#bdc3c7; color:#444; flex:1;" onclick="resetPlayerSelection()">🔄 리셋</button>
+        </div>
+        <div id="inputArea"></div>
+        <button id="mainBtn" class="save-btn" onclick="saveGame()">순위 저장</button>
+        <div id="dayGameList" style="margin-top:20px;"></div>
+    </div>
+
+    <div class="card" id="searchCard">
+        <h2 style="font-size:16px; font-weight:800; margin-bottom:15px;">🔍 월별 상세 전적 검색</h2>
+        <div class="input-row">
+            <label>검색월</label>
+            <input type="text" id="searchDateRange" placeholder="월 선택" readonly>
+        </div>
+        <div class="input-row">
+            <label>선수명</label>
+            <select id="searchPlayer">
+                <option value="">선수 선택</option>
+                <option value="경배">경배</option><option value="원석">원석</option>
+                <option value="정석">정석</option><option value="진웅">진웅</option>
+                <option value="창한">창한</option><option value="경석">경석</option>
+            </select>
+        </div>
+        <div id="search-capture-area" style="background:transparent; padding:5px;">
+            <button class="save-btn" onclick="searchRecords()">기록 검색하기</button>
+            <div id="searchSummaryArea" style="margin-top:20px; display:none;"></div>
+        </div>
+        <div id="searchHistoryListArea"></div>
+        <button id="search-share-btn" class="share-btn-common" style="display:none; margin-top:15px;" onclick="shareSearchResult()">📸 검색 결과 캡처 공유</button>
+    </div>
+
+    <!-- Modals -->
+    <div id="loading" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:20000; display:none; flex-direction:column; justify-content:center; align-items:center;">
+        <div class="spinner"></div><div id="loadingText" style="margin-top:10px; font-weight:800;">동기화 중</div>
+    </div>
+    <div id="order-modal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:15000; justify-content:center; align-items:center;">
+        <div class="order-content" style="background:white; padding:30px; border-radius:15px; text-align:center; width:80%;">
+            <div id="order-result"></div>
+            <button class="save-btn" onclick="closeOrderModal()">확인</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="main.js?v=5.60"></script>
+</body>
+</html>
