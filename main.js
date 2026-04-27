@@ -1,8 +1,9 @@
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
-let genseiModalTimeout = null;
+let genseiCountdownInterval = null; 
 let defenseModalTimeout = null; 
+let infoModalCountdownInterval = null; 
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
 const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
@@ -44,7 +45,7 @@ function generateNamesHTML(names) {
     }).join('<span style="display:inline;">→</span>');
 }
 
-// [수정 포인트 1] html2canvas 겹침 및 크기 오류 원천 차단 (Ghost Wrapper 기법)
+// Ghost Wrapper 기법 (캡처 완벽 픽스)
 async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -163,6 +164,42 @@ function getTier(score) {
     return { name: "브론즈", icon: "🥉", color: "#cd7f32" };
 }
 
+function showRingCriteria(type) {
+    let title = "", desc = "";
+    if (type === 'win') {
+        title = "승률 산출 기준";
+        desc = "<b>(1위 횟수 / 참여 경기수) × 100</b><br><br>해당 월에 참여한 전체 경기 중 1위를 차지한 비율입니다. 공격적인 결정력을 보여주는 지표입니다.";
+    } else if (type === 'score') {
+        title = "평균득점 산출 기준";
+        desc = "해당 선수의 월간 평균 승점입니다.";
+    } else if (type === 'safety') {
+        title = "생존율 산출 기준";
+        desc = "<b>((경기수 - 꼴찌수) / 경기수) × 100</b><br><br>참여 경기 중 꼴찌를 하지 않고 살아남은 비율입니다. 무너지지 않는 수비적 안정감을 보여주는 지표입니다.";
+    }
+
+    const timerEl = document.getElementById('info-modal-timer');
+    if(timerEl) {
+        timerEl.style.display = 'block';
+        let timeLeft = 10;
+        timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
+
+        if (infoModalCountdownInterval) clearInterval(infoModalCountdownInterval);
+        infoModalCountdownInterval = setInterval(() => {
+            timeLeft--;
+            if (timerEl) timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
+            if (timeLeft <= 0) {
+                clearInterval(infoModalCountdownInterval);
+                closeInfoModal();
+            }
+        }, 1000);
+    }
+
+    document.getElementById('info-modal-icon').innerHTML = "ℹ️";
+    document.getElementById('info-modal-title').innerHTML = title;
+    document.getElementById('info-modal-desc').innerHTML = desc;
+    document.getElementById('info-modal').style.display = 'flex';
+}
+
 function showInfoModal(type) {
     let title = ""; 
     let desc = ""; 
@@ -183,6 +220,14 @@ function showInfoModal(type) {
     }
     
     const descEl = document.getElementById('info-modal-desc');
+    const timerEl = document.getElementById('info-modal-timer');
+    if(timerEl) timerEl.style.display = 'none'; 
+
+    if (infoModalCountdownInterval) {
+        clearInterval(infoModalCountdownInterval);
+        infoModalCountdownInterval = null;
+    }
+
     const currentTheme = document.documentElement.getAttribute('data-theme');
     
     if (currentTheme === 'navy') {
@@ -199,10 +244,15 @@ function showInfoModal(type) {
 
 function closeInfoModal() { 
     document.getElementById('info-modal').style.display = 'none'; 
+    if (infoModalCountdownInterval) {
+        clearInterval(infoModalCountdownInterval);
+        infoModalCountdownInterval = null;
+    }
 }
 
 function showLastGameResult() {
     if (!gameLogs || gameLogs.length === 0) { 
+        if (document.getElementById('loading').style.display === 'none') return;
         setTimeout(showLastGameResult, 500); 
         return; 
     }
@@ -212,17 +262,17 @@ function showLastGameResult() {
     const lastGame = gamesOnLatestDate[gamesOnLatestDate.length - 1];
     const actualRanks = lastGame.ranks.filter(n => n && n.trim() !== "");
     
-    let html = `<div style="font-size:40px; margin-bottom:10px;">🏆</div>
-                <h2 style="font-size:18px; font-weight:900; color:var(--text-color); margin:0 0 5px 0;">LAST GAME RECORD</h2>
-                <div style="font-size:15px; font-weight:800; color:var(--sub-text); margin-bottom: 20px;">[ ${lastGame.dateStr} ]</div>
-                <div style="display:flex; flex-direction:column; gap:8px; font-weight:900;">`;
+    let html = `<div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">🏆</div>
+                <div style="font-size:18px; font-weight:900; color:var(--text-color); margin-bottom:5px; display:block; text-align:center;">LAST GAME RECORD</div>
+                <div style="font-size:15px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; display:block; text-align:center;">[ ${lastGame.dateStr} ]</div>
+                <div style="display:block; font-weight:900;">`;
     
     actualRanks.forEach((name, i) => {
         const rankLabel = (i === 0) ? "1위🥇" : (i === actualRanks.length - 1 ? "꼴찌💀" : `${i + 1}위`);
         const rankColor = (i === 0) ? 'var(--rank1)' : (i === actualRanks.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
-        html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
-                    <span style="color:${rankColor}; font-size:${i === 0 ? '16px' : '14px'}; font-weight:${i === 0 ? '900' : '800'};">${rankLabel}</span>
-                    <span style="color:${rankColor}; font-size:${i === 0 ? '22px' : '16px'}; font-weight:${i === 0 ? '900' : '800'};">${name}</span>
+        html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7); margin-bottom:8px;">
+                    <div style="color:${rankColor}; font-size:${i === 0 ? '16px' : '14px'}; font-weight:${i === 0 ? '900' : '800'};">${rankLabel}</div>
+                    <div style="color:${rankColor}; font-size:${i === 0 ? '22px' : '16px'}; font-weight:${i === 0 ? '900' : '800'};">${name}</div>
                  </div>`;
     });
     
@@ -296,12 +346,12 @@ function pickRandomOrder() {
     const confirmBtn = document.querySelector('#order-modal button');
     const p1Color = getPlayerColor(firstPlayer);
     
-    const finalHtml = `<div style="background: rgba(128, 128, 128, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 20px; border: 2.5px dashed ${p1Color};">
+    const finalHtml = `<div style="background: rgba(128, 128, 128, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 20px; border: 2.5px dashed ${p1Color}; display:block;">
                            <div style="font-size: 14px; color: ${p1Color}; margin-bottom:5px;">🎯 이 게임의 초구는 바로 너!</div>
                            <div style="font-size: 26px; color: ${p1Color}; font-weight: 900;">1번 : ${firstPlayer}</div>
                        </div>
-                       <div style="font-size: 17px; opacity: 0.9; line-height: 2.2; font-weight: 800;">
-                           ${remaining.map((p, idx) => `<div style="color: ${getPlayerColor(p)};">${idx + 2}번 : ${p}</div>`).join('')}
+                       <div style="font-size: 17px; opacity: 0.9; line-height: 2.2; font-weight: 800; display:block;">
+                           ${remaining.map((p, idx) => `<div style="color: ${getPlayerColor(p)}; display:block;">${idx + 2}번 : ${p}</div>`).join('')}
                        </div>`;
                        
     if (confirmBtn) confirmBtn.style.display = 'none';
@@ -490,7 +540,7 @@ async function fetchData() {
         gameLogs = rawData.map(g => ({ ...g, dateStr: formatDate(g.date) }));
         renderAll(); 
     } catch (e) { 
-        console.error("Fetch error"); 
+        console.error("Fetch error", e); 
     } finally { 
         showLoading(false); 
         document.getElementById('selectedDateTitle').innerText = `📅 ${selectedDateStr}`; 
@@ -812,7 +862,6 @@ function renderStats() {
     }
 }
 
-// [수정 포인트 2] html2canvas가 텍스트를 겹치지 않게 하도록 span + br 구조를 확실한 div 블록 구조로 변경했습니다!
 function showDefenseDetail(playerName) {
     let victimStats = {}; 
 
@@ -860,13 +909,13 @@ function showDefenseDetail(playerName) {
                             <div style="color:${getPlayerColor(v)}; font-size:17px; font-weight:900;">${playerThemes[v].emoji} ${v}</div>
                             <div style="font-size:13px; font-weight:800; color:var(--sub-text);">${s.games}전 / 평균 ${avg}위</div>
                         </div>
-                        <div style="display:flex; gap:10px; font-size:12px; font-weight:900;">
-                            <div style="flex:1; background:var(--bg); padding:8px 6px; border-radius:8px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px;">
-                                <div style="color:var(--sub-text);">1위 확률</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:900;">
+                            <div style="width:48%; background:var(--bg); padding:8px 6px; border-radius:8px; text-align:center; display:block;">
+                                <div style="color:var(--sub-text); margin-bottom:4px;">1위 확률</div>
                                 <div style="color:var(--rank1); font-size:14px;">${winP}%</div>
                             </div>
-                            <div style="flex:1; background:var(--bg); padding:8px 6px; border-radius:8px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px;">
-                                <div style="color:var(--sub-text);">꼴찌 확률</div>
+                            <div style="width:48%; background:var(--bg); padding:8px 6px; border-radius:8px; text-align:center; display:block;">
+                                <div style="color:var(--sub-text); margin-bottom:4px;">꼴찌 확률</div>
                                 <div style="color:var(--rankL); font-size:14px;">${lastP}%</div>
                             </div>
                         </div>
@@ -1016,21 +1065,21 @@ function renderMemberHistory(name, rank = "") {
     if (hideScoreModalTimeout) clearTimeout(hideScoreModalTimeout);
     
     if(scoreModal && scoreContent) { 
-        scoreContent.innerHTML = `<div style="font-size:clamp(45px, 10vw, 55px); margin-bottom:5px;">${playerThemes[name].emoji}</div>
-                                  <h2 style="display:flex; justify-content:center; align-items:center; font-size:clamp(28px, 8vw, 38px); font-weight:900; color:${getPlayerColor(name)}; margin:0 0 15px 0;">
+        scoreContent.innerHTML = `<div style="font-size:clamp(45px, 10vw, 55px); margin-bottom:5px; display:block; text-align:center;">${playerThemes[name].emoji}</div>
+                                  <div style="display:flex; justify-content:center; align-items:center; font-size:clamp(28px, 8vw, 38px); font-weight:900; color:${getPlayerColor(name)}; margin-bottom: 15px;">
                                       ${rank ? rank+'위 ' : ''}${name}
-                                  </h2>
-                                  <div style="display:flex; flex-direction:column; gap:8px; font-weight:900;">
-                                      <div style="background:var(--bg); padding:12px; border-radius:12px;">
-                                          <div style="font-size:13px; color:var(--sub-text);">총 승점</div>
+                                  </div>
+                                  <div style="display:block; font-weight:900;">
+                                      <div style="background:var(--bg); padding:12px; border-radius:12px; margin-bottom:8px; display:block;">
+                                          <div style="font-size:13px; color:var(--sub-text); margin-bottom:4px;">총 승점</div>
                                           <div style="font-size:22px; color:var(--rank1);">${totalScore}점</div>
                                       </div>
-                                      <div style="background:var(--bg); padding:12px; border-radius:12px;">
-                                          <div style="font-size:13px; color:var(--sub-text);">참여 경기</div>
+                                      <div style="background:var(--bg); padding:12px; border-radius:12px; margin-bottom:8px; display:block;">
+                                          <div style="font-size:13px; color:var(--sub-text); margin-bottom:4px;">참여 경기</div>
                                           <div style="font-size:22px; color:var(--rank2);">${allPersonal.length}game</div>
                                       </div>
-                                      <div style="background:var(--bg); padding:12px; border-radius:12px;">
-                                          <div style="font-size:13px; color:var(--sub-text);">평균 승점</div>
+                                      <div style="background:var(--bg); padding:12px; border-radius:12px; margin-bottom:8px; display:block;">
+                                          <div style="font-size:13px; color:var(--sub-text); margin-bottom:4px;">평균 승점</div>
                                           <div style="font-size:22px; color:var(--accent);">${avg}점</div>
                                       </div>
                                   </div>`; 
@@ -1040,8 +1089,8 @@ function renderMemberHistory(name, rank = "") {
     }
 
     let html = `<div style="font-size:15px; font-weight:900; color:${getPlayerColor(name)}; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px dashed ${getPlayerColor(name)}50; padding-bottom:10px;">
-                    <span>${playerThemes[name].emoji} ${name} 프로필</span>
-                    <span style="font-size:13px; cursor:pointer;" onclick="closeMemberHistory()">닫기 ✕</span>
+                    <div>${playerThemes[name].emoji} ${name} 프로필</div>
+                    <div style="font-size:13px; cursor:pointer;" onclick="closeMemberHistory()">닫기 ✕</div>
                 </div>`;
                 
     const recent = allPersonal.slice(0, 10); 
@@ -1082,8 +1131,8 @@ function renderMemberHistory(name, rank = "") {
         const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
         
         html += `<div class="history-item">
-                    <span style="font-size:14px; color:#5D4037;">${g.dateStr} <span style="font-size:12px; font-weight:900; color:var(--rank1); margin-left:6px;">${gameNumber}G</span></span>
-                    <span style="font-size:15px; color:${rColor};">${rLabel}</span>
+                    <div style="font-size:14px; color:#5D4037;">${g.dateStr} <span style="font-size:12px; font-weight:900; color:var(--rank1); margin-left:6px;">${gameNumber}G</span></div>
+                    <div style="font-size:15px; color:${rColor};">${rLabel}</div>
                  </div>`; 
     });
     
@@ -1144,10 +1193,10 @@ function showGenseiModal(playerName) {
 
     if (victims.length === 0) return;
 
-    let html = `<div style="font-size:40px; margin-bottom:10px;">😈</div>
-                <h2 style="font-size:18px; font-weight:900; color:var(--text-color); margin:0 0 5px 0;">${playerName}의 겐세이 희생양들</h2>
-                <div style="font-size:14px; font-weight:800; color:var(--sub-text); margin-bottom: 20px;">[ ${selectedDateStr} ] 뒷주자 성적</div>
-                <div style="display:flex; flex-direction:column; gap:8px; font-weight:900;">`;
+    let html = `<div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">😈</div>
+                <div style="font-size:18px; font-weight:900; color:var(--text-color); margin-bottom:5px; display:block; text-align:center;">${playerName}의 겐세이 희생양들</div>
+                <div style="font-size:14px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; display:block; text-align:center;">[ ${selectedDateStr} ] 뒷주자 성적</div>
+                <div style="display:block; font-weight:900;">`;
 
     victims.forEach((v) => {
         const rankColor = v.victimRank === 1 ? 'var(--rank1)' : (v.victimRank === v.actual.length ? 'var(--rankL)' : 'var(--text-color)');
@@ -1156,15 +1205,16 @@ function showGenseiModal(playerName) {
         const sameDateGames = gameLogs.filter(x => x.dateStr === selectedDateStr);
         const gameNumber = sameDateGames.findIndex(x => x.round === v.round) + 1;
 
-        html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
-                    <span style="color:var(--sub-text); font-size:12px; font-weight:800; width: 30px; text-align: left;">${gameNumber}G</span>
-                    <span style="color:${getPlayerColor(v.victimName)}; font-size:16px; font-weight:900; flex: 1; text-align: center;">${v.victimName}</span>
-                    <span style="color:${rankColor}; font-size:16px; font-weight:900; width: 50px; text-align: right;">${rankLabel}</span>
+        html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7); margin-bottom:8px;">
+                    <div style="color:var(--sub-text); font-size:12px; font-weight:800; width: 30px; text-align: left;">${gameNumber}G</div>
+                    <div style="color:${getPlayerColor(v.victimName)}; font-size:16px; font-weight:900; flex: 1; text-align: center;">${v.victimName}</div>
+                    <div style="color:${rankColor}; font-size:16px; font-weight:900; width: 50px; text-align: right;">${rankLabel}</div>
                  </div>`;
     });
 
     html += `</div>
-             <div style="margin-top:15px; font-size:12px; color:var(--sub-text); font-weight:800;">※ ${playerName} 선수의 바로 다음 순서<br>선수들의 결과입니다.</div>`;
+             <div style="margin-top:15px; font-size:12px; color:var(--sub-text); font-weight:800; display:block; text-align:center;">※ ${playerName} 선수의 바로 다음 순서<br>선수들의 결과입니다.</div>
+             <div id="gensei-countdown-text" style="margin-top:15px; font-size:12px; color:#999; font-weight:800; text-align:center; display:block;">10초 후 자동으로 닫힙니다.</div>`;
 
     const modal = document.getElementById('gensei-modal');
     const content = document.getElementById('gensei-modal-content');
@@ -1175,16 +1225,23 @@ function showGenseiModal(playerName) {
     modal.style.display = 'flex';
     content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
 
-    if (genseiModalTimeout) clearTimeout(genseiModalTimeout);
-    genseiModalTimeout = setTimeout(() => {
-        closeGenseiModal();
-    }, 4000);
+    if (genseiCountdownInterval) clearInterval(genseiCountdownInterval);
+    let gLeft = 10;
+    genseiCountdownInterval = setInterval(() => {
+        gLeft--;
+        const gCountEl = document.getElementById('gensei-countdown-text');
+        if (gCountEl) gCountEl.innerText = `${gLeft}초 후 자동으로 닫힙니다.`;
+        if (gLeft <= 0) {
+            clearInterval(genseiCountdownInterval);
+            closeGenseiModal();
+        }
+    }, 1000);
 }
 
 function closeGenseiModal() {
     const modal = document.getElementById('gensei-modal');
     const content = document.getElementById('gensei-modal-content');
-    if (genseiModalTimeout) { clearTimeout(genseiModalTimeout); genseiModalTimeout = null; }
+    if (genseiCountdownInterval) { clearInterval(genseiCountdownInterval); genseiCountdownInterval = null; }
     if(!modal || !content) return;
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards';
     setTimeout(() => { modal.style.display = 'none'; content.style.animation = 'none'; }, 300);
@@ -1448,22 +1505,7 @@ function importData(event) {
 
 function setDefaultSearchDates() { if (searchFlatpickr) searchFlatpickr.setDate(new Date()); }
 
-function createActivityRing(percent, color, size, label) {
-    const radius = 35; const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (percent / 100) * circumference;
-    return `<div class="ring-container" style="width:${size}px; height:${size+20}px;">
-                <svg width="${size}" height="${size}" viewBox="0 0 100 100">
-                    <g transform="rotate(-90 50 50)">
-                        <circle class="ring-bg" cx="50" cy="50" r="${radius}" stroke-width="10" fill="transparent" />
-                        <circle class="ring-fill" cx="50" cy="50" r="${radius}" stroke-width="10" fill="transparent" 
-                                stroke="${color}" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" />
-                    </g>
-                    <text x="50" y="55" text-anchor="middle" class="ring-text" style="fill:${color};">${percent}%</text>
-                </svg>
-                <div class="ring-label">${label}</div>
-            </div>`;
-}
-
+// 월별 검색 (링 그래프 삭제 및 예전 레이아웃 원복)
 function searchRecords() {
     const mon = document.getElementById('searchDateRange').value; 
     const player = document.getElementById('searchPlayer').value;
@@ -1495,7 +1537,6 @@ function searchRecords() {
     let monthlyAvgScore = filtered.length > 0 ? (monthlyTotalScore / filtered.length).toFixed(2) : "0.00";
     let winRate = filtered.length > 0 ? Math.round((r[0] / filtered.length) * 100) : 0;
     let safetyRate = filtered.length > 0 ? Math.round(((filtered.length - r[4]) / filtered.length) * 100) : 0;
-    let avgScoreRate = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 3.0) * 100)); // 3.0을 만점으로 환산한 비율
     
     let monthlyStatsAll = {};
     players.forEach(p => monthlyStatsAll[p] = { played: 0, score: 0, win: 0 });
@@ -1539,18 +1580,18 @@ function searchRecords() {
 
     sArea.innerHTML = `<div class="summary-box" style="margin: 0 -5px; box-sizing: border-box; background:var(--record-bg); border:2px solid var(--record-border); border-radius:15px; padding:15px 10px;">
                            <div style="text-align:center; font-weight:900; color:var(--text-color); margin-bottom:15px; font-size:15px; letter-spacing:-0.5px;">[ ${player}, ${mon} ]</div>
-                           
-                           <div class="activity-rings-row">
-                               ${createActivityRing(winRate, 'var(--rank1)', 80, '승률')}
-                               ${createActivityRing(avgScoreRate, 'var(--accent)', 80, '평균득점')}
-                               ${createActivityRing(safetyRate, 'var(--success)', 80, '생존율')}
+                           <div class="summary-stats-wrap" style="display:flex; justify-content:space-around; align-items:center; padding:15px 0; background:rgba(255,255,255,0.5); border-radius:12px; margin-bottom:15px; border:1px solid rgba(0,0,0,0.05); text-align:center;">
+                               <div style="flex:1;"><div class="stat-lbl" style="color:var(--sub-text); margin-bottom:5px; font-weight:800;">승률</div><div class="stat-val" style="color:var(--rank1); font-weight:900;">${winRate}%</div></div>
+                               <div style="width:1px; height:30px; background:rgba(0,0,0,0.1);"></div>
+                               <div style="flex:1;"><div class="stat-lbl" style="color:var(--sub-text); margin-bottom:5px; font-weight:800;">평균득점</div><div class="stat-val" style="color:var(--accent); font-weight:900;">${monthlyAvgScore}</div></div>
+                               <div style="width:1px; height:30px; background:rgba(0,0,0,0.1);"></div>
+                               <div style="flex:1;"><div class="stat-lbl" style="color:var(--sub-text); margin-bottom:5px; font-weight:800;">생존율</div><div class="stat-val" style="color:var(--success); font-weight:900;">${safetyRate}%</div></div>
                            </div>
-
                            <div class="summary-stats-grid">
-                               <div class="stat-item">월간순위<br><span>${myMonthlyRank}위</span></div>
-                               <div class="stat-item">총/평균 승점<br><span>${monthlyTotalScore}점 <span style="font-size:11px;">(${monthlyAvgScore})</span></span></div>
-                               <div class="stat-item">티어<br><span style="color:${tier.color};">${tier.icon}${tier.name}</span></div>
-                               <div class="stat-item">컨디션<br><span style="color:${cond[2]};">${cond[0]}${cond[1]}</span></div>
+                               <div class="stat-item"><div style="margin-bottom:4px;">월간순위</div><div style="font-size:15px; font-weight:900; color:var(--text-color);">${myMonthlyRank}위</div></div>
+                               <div class="stat-item"><div style="margin-bottom:4px;">총 승점</div><div style="font-size:15px; font-weight:900; color:var(--text-color);">${monthlyTotalScore}점</div></div>
+                               <div class="stat-item"><div style="margin-bottom:4px;">티어</div><div style="font-size:15px; font-weight:900; color:${tier.color};">${tier.icon}${tier.name}</div></div>
+                               <div class="stat-item"><div style="margin-bottom:4px;">컨디션</div><div style="font-size:15px; font-weight:900; color:${cond[2]};">${cond[0]}${cond[1]}</div></div>
                            </div>
                        </div>`;
                        
@@ -1564,8 +1605,8 @@ function searchRecords() {
                                const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
                                return `<div class="history-item search-result-card" style="flex-direction:column; align-items:flex-start; gap:5px;">
                                            <div style="display:flex; justify-content:space-between; width:100%;">
-                                               <span style="font-size:13px; color:var(--sub-text);">${g.dateStr} <span style="font-size:12px; font-weight:900; color:var(--rank1); margin-left:6px;">${gameNumber}G</span></span>
-                                               <span style="font-size:14px; font-weight:900; color:${rankColor};">${rankLabel}</span>
+                                               <div style="font-size:13px; color:var(--sub-text);">${g.dateStr} <span style="font-size:12px; font-weight:900; color:var(--rank1); margin-left:6px;">${gameNumber}G</span></div>
+                                               <div style="font-size:14px; font-weight:900; color:${rankColor};">${rankLabel}</div>
                                            </div>
                                            <div style="font-size:12px; display:inline-flex; align-items:center;">${generateNamesHTML(actual)}</div>
                                        </div>`;
@@ -1575,14 +1616,6 @@ function searchRecords() {
     sArea.style.display = 'block'; lArea.style.display = 'block'; 
     document.getElementById('search-share-btn').style.display = 'block';
     setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-}
-
-function resetSearch() { 
-    setDefaultSearchDates(); 
-    document.getElementById('searchPlayer').value = ""; 
-    document.getElementById('searchSummaryArea').style.display = 'none'; 
-    document.getElementById('searchHistoryListArea').style.display = 'none'; 
-    document.getElementById('search-share-btn').style.display = 'none'; 
 }
 
 window.onload = () => { 
@@ -1603,14 +1636,17 @@ window.onload = () => {
     } catch(e) {
         console.error("Flatpickr initialization failed", e);
     }
+    
     let savedTheme = localStorage.getItem('appTheme') || 'yellow'; 
     document.documentElement.setAttribute('data-theme', savedTheme); 
     document.getElementById('themeSelect').value = savedTheme;
+    
     setTimeout(() => { 
         const ws = document.getElementById('welcome-screen'); 
         if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); } 
         showLastGameResult(); 
     }, 3000);
+    
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
 
