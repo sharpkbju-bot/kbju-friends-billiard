@@ -1663,7 +1663,7 @@ function searchRecords() {
                            </div>
 
                            <div style="background: rgba(255,255,255,0.7); border: 2px dashed ${styleColor}; border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center;">
-                               <div style="font-size: 13px; font-weight: 800; color: var(--sub-text); margin-bottom: 5px;">나의 당구 성향</div>
+                               <div style="font-size: 13px; font-weight: 800; color: var(--sub-text); margin-bottom: 5px;">나의 당구 MBTI</div>
                                <div style="font-size: 20px; font-weight: 900; color: ${styleColor}; margin-bottom: 8px;">${billiardsStyle}</div>
                                <div style="font-size: 12px; font-weight: 700; color: #555; line-height: 1.4; word-break: keep-all;">${styleDesc}</div>
                            </div>
