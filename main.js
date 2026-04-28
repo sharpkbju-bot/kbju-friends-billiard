@@ -1619,8 +1619,30 @@ function searchRecords() {
     let avgScoreVal = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); 
     let safetyVal = safetyRate;
 
+    // --- [v6.50 당구 성향 분석(Billiards Style) 로직 시작] ---
+    let billiardsStyle = "";
+    let styleDesc = "";
+    let styleColor = "";
+
+    if (winRateVal >= 35 && safetyVal >= 80) {
+        billiardsStyle = "👑 전략적 지배자";
+        styleDesc = "공수 밸런스가 완벽한 최강의 포식자! 상대를 압도하는 실력자입니다.";
+        styleColor = "var(--rank1)";
+    } else if (winRateVal >= 35 && safetyVal < 80) {
+        billiardsStyle = "🐅 폭격형 호랑이";
+        styleDesc = "화끈한 공격력으로 경기를 주도하지만, 수비가 다소 불안한 공격수입니다.";
+        styleColor = "#FF6B81";
+    } else if (winRateVal < 35 && safetyVal >= 80) {
+        billiardsStyle = "🐢 철벽 거북이";
+        styleDesc = "좀처럼 무너지지 않는 수비가 강점! 상대의 실수를 유도하는 짠당구의 고수입니다.";
+        styleColor = "#3498DB";
+    } else {
+        billiardsStyle = "🐣 성장하는 꿈나무";
+        styleDesc = "아직은 경험이 더 필요한 단계! 하지만 잠재력만큼은 무궁무진합니다.";
+        styleColor = "#95a5a6";
+    }
+
     function createRing(val, color, label, type) {
-        // [수정] flex: 1; 속성을 추가하여 세 개의 링이 정확히 1:1:1 비율로 공간을 나눠 가지도록 강제합니다.
         return `<div style="display:flex; flex-direction:column; align-items:center; cursor:pointer; flex: 1;" onclick="showRingCriteria('${type}')">
             <svg viewBox="0 0 36 36" style="width:70px; height:70px; margin-bottom:8px; overflow:visible;">
                 <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(150,150,150,0.2)" stroke-width="4.5" />
@@ -1634,10 +1656,16 @@ function searchRecords() {
     sArea.innerHTML = `<div class="summary-box" style="margin: 0 -5px; box-sizing: border-box; background:var(--record-bg); border:2px solid var(--record-border); border-radius:15px; padding:25px 15px;">
                            <div style="text-align:center; font-weight:900; color:var(--text-color); margin-bottom:20px; font-size:18px; letter-spacing:-0.5px;">[ ${player}, ${mon} ]</div>
                            
-                           <div style="display: flex; justify-content: center; align-items: center; width: 100%; box-sizing: border-box; margin: 25px 0 35px 0;">
+                           <div style="display: flex; justify-content: center; align-items: center; width: 100%; box-sizing: border-box; margin-bottom: 35px;">
                                ${createRing(winRateVal, '#9B59B6', '승률', 'win')}
                                ${createRing(avgScoreVal, '#FF6B81', '평균득점', 'score')}
                                ${createRing(safetyVal, '#3498DB', '생존율', 'safety')}
+                           </div>
+
+                           <div style="background: rgba(255,255,255,0.7); border: 2px dashed ${styleColor}; border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center;">
+                               <div style="font-size: 13px; font-weight: 800; color: var(--sub-text); margin-bottom: 5px;">나의 당구 성향</div>
+                               <div style="font-size: 20px; font-weight: 900; color: ${styleColor}; margin-bottom: 8px;">${billiardsStyle}</div>
+                               <div style="font-size: 12px; font-weight: 700; color: #555; line-height: 1.4; word-break: keep-all;">${styleDesc}</div>
                            </div>
                            
                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -1659,6 +1687,7 @@ function searchRecords() {
                                </div>
                            </div>
                        </div>`;
+    // --- [v6.50 로직 끝] ---
     
                        
     lArea.innerHTML = `<div style="max-height:250px; overflow-y:auto; padding-right:5px; margin-top:15px;">
