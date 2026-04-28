@@ -1601,7 +1601,7 @@ function searchRecords() {
     let cond = (wRatio >= 0.3 && lRatio >= 0.3) ? ["⚡", "도깨비", "var(--rank3)"] : (wRatio >= 0.3 ? ["☀️", "최상", "var(--rankL)"] : (lRatio >= 0.3 ? ["🌧️", "비상", "var(--rank1)"] : ["⛅", "보통", "var(--rank2)"]));
   
     let winRateVal = Math.round(winRateFloat);
-    let avgScorePercent = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); 
+    let avgScoreVal = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); 
     let safetyVal = safetyRate;
 
     function createRing(val, color, label, type) {
