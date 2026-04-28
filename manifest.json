@@ -1,0 +1,16 @@
+{
+"short_name": "경배와 친구들",
+"name": "우리들의 Billiard World",
+"icons": [
+{
+"src": "image_0.png?v=5.61",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "any maskable"
+}
+],
+"start_url": "./index.html?v=5.61",
+"display": "standalone",
+"theme_color": "#eceef1",
+"background_color": "#eceef1"
+}
