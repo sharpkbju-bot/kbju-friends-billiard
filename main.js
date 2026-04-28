@@ -1605,8 +1605,9 @@ function searchRecords() {
     let safetyVal = safetyRate;
 
     function createRing(val, color, label, type) {
-        return `<div style="display:flex; flex-direction:column; align-items:center; cursor:pointer;" onclick="showRingCriteria('${type}')">
-            <svg viewBox="0 0 36 36" style="width:75px; height:75px; margin-bottom:8px; overflow:visible;">
+        // [수정] flex: 1; 속성을 추가하여 세 개의 링이 정확히 1:1:1 비율로 공간을 나눠 가지도록 강제합니다.
+        return `<div style="display:flex; flex-direction:column; align-items:center; cursor:pointer; flex: 1;" onclick="showRingCriteria('${type}')">
+            <svg viewBox="0 0 36 36" style="width:70px; height:70px; margin-bottom:8px; overflow:visible;">
                 <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(150,150,150,0.2)" stroke-width="4.5" />
                 <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="${color}" stroke-width="4.5" stroke-dasharray="${val}, 100" stroke-linecap="round" />
                 <text x="18" y="21.5" text-anchor="middle" font-size="10" font-weight="900" fill="${color}">${val}%</text>
@@ -1616,11 +1617,11 @@ function searchRecords() {
     }
 
     sArea.innerHTML = `<div class="summary-box" style="margin: 0 -5px; box-sizing: border-box; background:var(--record-bg); border:2px solid var(--record-border); border-radius:15px; padding:25px 15px;">
-                           <div style="text-align:center; font-weight:900; color:var(--text-color); margin-bottom:25px; font-size:18px; letter-spacing:-0.5px;">[ ${player}, ${mon} ]</div>
+                           <div style="text-align:center; font-weight:900; color:var(--text-color); margin-bottom:20px; font-size:18px; letter-spacing:-0.5px;">[ ${player}, ${mon} ]</div>
                            
-                           <div style="display: flex; justify-content: space-around; margin-bottom: 30px;">
+                           <div style="display: flex; justify-content: center; align-items: center; width: 100%; box-sizing: border-box; margin: 25px 0 35px 0;">
                                ${createRing(winRateVal, '#9B59B6', '승률', 'win')}
-                               ${createRing(avgScorePercent, '#FF6B81', '평균득점', 'score')}
+                               ${createRing(avgScoreVal, '#FF6B81', '평균득점', 'score')}
                                ${createRing(safetyVal, '#3498DB', '생존율', 'safety')}
                            </div>
                            
