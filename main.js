@@ -1569,5 +1569,4 @@ updateInputFields(); setDefaultSearchDates(); fetchData();
 document.addEventListener('click', (e) => {
 if(!e.target.closest('.game-item')) {
 document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active'));
-}
 });
