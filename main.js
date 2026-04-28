@@ -4,6 +4,7 @@ let graphCountdownInterval = null;
 let genseiCountdownInterval = null; 
 let defenseModalTimeout = null; 
 let infoModalCountdownInterval = null; 
+let scoreCountdownInterval = null; // [v6.00] 개인 전적 팝업용 타이머 변수 추가
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
 const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
@@ -516,6 +517,7 @@ function closePlayerScoreModal() {
     
     if (scoreModalTimeout) clearTimeout(scoreModalTimeout); 
     if (hideScoreModalTimeout) clearTimeout(hideScoreModalTimeout);
+    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; } // [v6.00] 이 줄을 추가하세요
     if(!modal || !content) return; 
     
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards'; 
@@ -1087,10 +1089,23 @@ function renderMemberHistory(name, rank = "") {
                                           <div style="font-size:13px; color:var(--sub-text); margin-bottom:4px;">평균 승점</div>
                                           <div style="font-size:22px; color:var(--accent);">${avg}점</div>
                                       </div>
-                                  </div>`; 
+                                  </div>
+                                  <div id="score-timer" style="margin-top:15px; font-size:12px; color:var(--sub-text); font-weight:800; text-align:center; display:block;">10초 후 자동으로 닫힙니다.</div>`; 
         scoreModal.style.display = 'flex'; 
         scoreContent.style.animation = 'scaleUpPopup 0.4s forwards'; 
-        scoreModalTimeout = setTimeout(() => { closePlayerScoreModal(); }, 3000); 
+        
+        // [v6.00] 기존 3초 자동 종료를 제거하고 10초 카운트다운 로직 추가
+        if (scoreCountdownInterval) clearInterval(scoreCountdownInterval);
+        let sLeft = 10;
+        scoreCountdownInterval = setInterval(() => {
+            sLeft--;
+            const timerEl = document.getElementById('score-timer');
+            if (timerEl) timerEl.innerText = `${sLeft}초 후 자동으로 닫힙니다.`;
+            if (sLeft <= 0) {
+                clearInterval(scoreCountdownInterval);
+                closePlayerScoreModal();
+            }
+        }, 1000);
     }
 
     let html = `<div style="font-size:15px; font-weight:900; color:${getPlayerColor(name)}; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px dashed ${getPlayerColor(name)}50; padding-bottom:10px;">
