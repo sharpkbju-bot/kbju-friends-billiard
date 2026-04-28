@@ -1596,6 +1596,7 @@ function searchRecords() {
     }
     
     // --- [v6.00 링 그래프 및 UI 업데이트 반영 부분 시작] ---
+    
     let winRateVal = Math.round(winRateFloat);
     let avgScoreVal = Math.round((monthlyAvgScore / 5) * 100); 
     let safetyVal = safetyRate;
