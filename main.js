@@ -1595,10 +1595,55 @@ function searchRecords() {
         }
     }
     
-    const tier = getTier(monthlyTotalScore);
-    const wRatio = filtered.length > 0 ? r[0] / filtered.length : 0;
-    const lRatio = filtered.length > 0 ? r[4] / filtered.length : 0;
-    let cond = (wRatio >= 0.3 && lRatio >= 0.3) ? ["⚡", "도깨비", "var(--rank3)"] : (wRatio >= 0.3 ? ["☀️", "최상", "var(--rankL)"] : (lRatio >= 0.3 ? ["🌧️", "비상", "var(--rank1)"] : ["⛅", "보통", "var(--rank2)"]));
+    // --- [v6.00 링 그래프 및 UI 업데이트 반영 부분 시작] ---
+    let winRateVal = Math.round(winRateFloat);
+    let avgScoreVal = Math.round((monthlyAvgScore / 5) * 100); 
+    let safetyVal = safetyRate;
+
+    function createRing(val, color, label, type) {
+        return `<div style="display:flex; flex-direction:column; align-items:center; cursor:pointer;" onclick="showRingCriteria('${type}')">
+            <svg viewBox="0 0 36 36" style="width:75px; height:75px; margin-bottom:8px; overflow:visible;">
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(150,150,150,0.2)" stroke-width="4.5" />
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="${color}" stroke-width="4.5" stroke-dasharray="${val}, 100" stroke-linecap="round" />
+                <text x="18" y="21.5" text-anchor="middle" font-size="10" font-weight="900" fill="${color}">${val}%</text>
+            </svg>
+            <span style="font-size:12px; font-weight:900; color:var(--sub-text);">${label}</span>
+        </div>`;
+    }
+
+    sArea.innerHTML = `<div class="summary-box" style="margin: 0 -5px; box-sizing: border-box; background:var(--record-bg); border:2px solid var(--record-border); border-radius:15px; padding:25px 15px;">
+                           <div style="text-align:center; font-weight:900; color:var(--text-color); margin-bottom:20px; font-size:18px; letter-spacing:-0.5px;">[ ${player}, ${mon} ]</div>
+                           
+                           <div style="display: flex; justify-content: space-around; margin: 25px 0 35px 0;">
+                               ${createRing(winRateVal, '#9B59B6', '승률', 'win')}
+                               ${createRing(avgScoreVal, '#FF6B81', '평균득점', 'score')}
+                               ${createRing(safetyVal, '#3498DB', '생존율', 'safety')}
+                           </div>
+                           
+                           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                               <div style="background: rgba(255,255,255,0.6); padding: 15px 10px; border-radius: 12px; text-align: center; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
+                                   <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 6px;">월간순위</div>
+                                   <div style="font-size: 17px; font-weight: 900; color: var(--text-color);">${myMonthlyRank}위</div>
+                               </div>
+                               <div style="background: rgba(255,255,255,0.6); padding: 15px 10px; border-radius: 12px; text-align: center; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
+                                   <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 6px;">총/평균 승점</div>
+                                   <div style="font-size: 17px; font-weight: 900; color: var(--text-color);">${monthlyTotalScore}점 <span style="font-size:13px; color:var(--sub-text);">(${monthlyAvgScore})</span></div>
+                               </div>
+                               <div style="background: rgba(255,255,255,0.6); padding: 15px 10px; border-radius: 12px; text-align: center; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
+                                   <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 6px;">티어</div>
+                                   <div style="font-size: 17px; font-weight: 900; color: ${tier.color};">${tier.icon}${tier.name}</div>
+                               </div>
+                               <div style="background: rgba(255,255,255,0.6); padding: 15px 10px; border-radius: 12px; text-align: center; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
+                                   <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 6px;">컨디션</div>
+                                   <div style="font-size: 17px; font-weight: 900; color: ${cond[2]};">${cond[0]}${cond[1]}</div>
+                               </div>
+                           </div>
+                       </div>`;
+    // --- [v6.00 링 그래프 및 UI 업데이트 반영 부분 끝] ---
+    
+    lArea.innerHTML = `<div style="max-height:250px; overflow-y:auto; padding-right:5px; margin-top:15px;">
+    
+    // ... (이후 기존 코드 유지)
 
     sArea.innerHTML = `<div class="summary-box" style="margin: 0 -5px; box-sizing: border-box; background:var(--record-bg); border:2px solid var(--record-border); border-radius:15px; padding:15px 10px;">
                            <div style="text-align:center; font-weight:900; color:var(--text-color); margin-bottom:15px; font-size:15px; letter-spacing:-0.5px;">[ ${player}, ${mon} ]</div>
