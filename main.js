@@ -1509,7 +1509,22 @@ function importData(event) {
 }
 
 function setDefaultSearchDates() { if (searchFlatpickr) searchFlatpickr.setDate(new Date()); }
+// [v5.60 Fix] 월별 검색 결과를 초기화하는 리셋 함수
+function resetSearch() {
+    const dateInput = document.getElementById('searchDateRange');
+    const playerInput = document.getElementById('searchPlayer');
+    const sArea = document.getElementById('searchSummaryArea');
+    const lArea = document.getElementById('searchHistoryListArea');
+    const shareBtn = document.getElementById('search-share-btn');
 
+    if(dateInput) dateInput.value = '';
+    if(playerInput) playerInput.value = '';
+    if(sArea) { sArea.innerHTML = ''; sArea.style.display = 'none'; }
+    if(lArea) { lArea.innerHTML = ''; lArea.style.display = 'none'; }
+    if(shareBtn) shareBtn.style.display = 'none';
+    
+    if (typeof setDefaultSearchDates === 'function') setDefaultSearchDates();
+}
 function searchRecords() {
     const mon = document.getElementById('searchDateRange').value; 
     const player = document.getElementById('searchPlayer').value;
