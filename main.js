@@ -1509,6 +1509,7 @@ function importData(event) {
 }
 
 function setDefaultSearchDates() { if (searchFlatpickr) searchFlatpickr.setDate(new Date()); }
+
 // [v5.60 Fix] 월별 검색 결과를 초기화하는 리셋 함수
 function resetSearch() {
     const dateInput = document.getElementById('searchDateRange');
@@ -1525,6 +1526,7 @@ function resetSearch() {
     
     if (typeof setDefaultSearchDates === 'function') setDefaultSearchDates();
 }
+
 function searchRecords() {
     const mon = document.getElementById('searchDateRange').value; 
     const player = document.getElementById('searchPlayer').value;
