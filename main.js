@@ -1626,19 +1626,19 @@ function searchRecords() {
 
     if (winRateVal >= 35 && safetyVal >= 80) {
         billiardsStyle = "👑 전략적 지배자";
-        styleDesc = "공수 밸런스가 완벽한 최강의 포식자! 상대를 압도하는 실력자입니다.";
+        styleDesc = "공수 밸런스가 완벽한 최강의 포식자! 상대를 압도하는 실력자!";
         styleColor = "var(--rank1)";
     } else if (winRateVal >= 35 && safetyVal < 80) {
         billiardsStyle = "🐅 폭격형 호랑이";
-        styleDesc = "화끈한 공격력으로 경기를 주도하지만, 수비가 다소 불안한 공격수입니다.";
+        styleDesc = "화끈한 공격력으로 경기를 주도하지만, 수비가 다소 불안한 공격수!";
         styleColor = "#FF6B81";
     } else if (winRateVal < 35 && safetyVal >= 80) {
         billiardsStyle = "🐢 철벽 거북이";
-        styleDesc = "좀처럼 무너지지 않는 수비가 강점! 상대의 실수를 유도하는 짠당구의 고수입니다.";
+        styleDesc = "좀처럼 무너지지 않는 멘탈! 다양한 공략법으로 득점하는 짠당구의 고수!";
         styleColor = "#3498DB";
     } else {
         billiardsStyle = "🐣 성장하는 꿈나무";
-        styleDesc = "아직은 경험이 더 필요한 단계! 하지만 잠재력만큼은 무궁무진합니다.";
+        styleDesc = "아직은 경험이 더 필요한 단계! 하지만 잠재력만큼은 무궁무진!";
         styleColor = "#95a5a6";
     }
 
