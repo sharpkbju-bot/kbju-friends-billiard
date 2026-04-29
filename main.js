@@ -1633,10 +1633,34 @@ function searchRecords() {
     let cond = (wRatio >= 0.3 && lRatio >= 0.3) ? ["⚡", "도깨비", "var(--rank3)"] : (wRatio >= 0.3 ? ["☀️", "최상", "var(--rankL)"] : (lRatio >= 0.3 ? ["🌧️", "비상", "var(--rank1)"] : ["⛅", "보통", "var(--rank2)"]));
   
     let winRateVal = Math.round(winRateFloat);
-    let avgScoreVal = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); 
+    let avgScoreVal = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); // [v6.60] 변수명 오타 수정 완료
     let safetyVal = safetyRate;
 
-    // --- [v6.55 당구 성향 분석(Billiards Style) 로직 시작] ---
+    // --- [v6.60 신규] 스포트라이트용 랜덤 컬러셋 (파스텔톤 8종) ---
+    const spotlightColors = [
+        { bg: 'rgba(255, 173, 173, 0.25)', shadow: 'rgba(255, 173, 173, 0.5)', border: '#FFADAD' },
+        { bg: 'rgba(255, 214, 165, 0.25)', shadow: 'rgba(255, 214, 165, 0.5)', border: '#FFD6A5' },
+        { bg: 'rgba(253, 255, 182, 0.25)', shadow: 'rgba(253, 255, 182, 0.5)', border: '#FDFFB6' },
+        { bg: 'rgba(202, 255, 191, 0.25)', shadow: 'rgba(202, 255, 191, 0.5)', border: '#CAFFBF' },
+        { bg: 'rgba(155, 246, 255, 0.25)', shadow: 'rgba(155, 246, 255, 0.5)', border: '#9BF6FF' },
+        { bg: 'rgba(160, 196, 255, 0.25)', shadow: 'rgba(160, 196, 255, 0.5)', border: '#A0C4FF' },
+        { bg: 'rgba(189, 178, 255, 0.25)', shadow: 'rgba(189, 178, 255, 0.5)', border: '#BDB2FF' },
+        { bg: 'rgba(255, 198, 255, 0.25)', shadow: 'rgba(255, 198, 255, 0.5)', border: '#FFC6FF' }
+    ];
+    const pick = spotlightColors[Math.floor(Math.random() * spotlightColors.length)];
+
+    // [v6.60] 스포트라이트 카드 생성용 내부 함수
+    function createSpotlightCard(label, value, subValue = "") {
+        return `<div style="background: ${pick.bg}; padding: 15px 10px; border-radius: 12px; text-align: center; 
+                            border: 2px solid ${pick.border}; 
+                            box-shadow: 0 8px 20px -5px ${pick.shadow}, inset 1px 1px 3px rgba(255,255,255,0.8);
+                            backdrop-filter: blur(4px); transition: all 0.3s ease;">
+                    <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 6px;">${label}</div>
+                    <div style="font-size: 17px; font-weight: 900; color: var(--text-color);">${value} ${subValue}</div>
+                </div>`;
+    }
+
+    // --- [v6.55 당구 성향 분석(Billiards Style) 로직 유지] ---
     let billiardsStyle = "";
     let styleDesc = "";
     let styleColor = "";
@@ -1685,28 +1709,15 @@ function searchRecords() {
                                <div style="font-size: 12px; font-weight: 700; color: #555; line-height: 1.4; word-break: keep-all;">${styleDesc}</div>
                            </div>
                            
-                           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                               <div style="background: rgba(255,255,255,0.6); padding: 15px 10px; border-radius: 12px; text-align: center; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
-                                   <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 6px;">월간순위</div>
-                                   <div style="font-size: 17px; font-weight: 900; color: var(--text-color);">${myMonthlyRank}위</div>
-                               </div>
-                               <div style="background: rgba(255,255,255,0.6); padding: 15px 10px; border-radius: 12px; text-align: center; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
-                                   <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 6px;">총/평균 승점</div>
-                                   <div style="font-size: 17px; font-weight: 900; color: var(--text-color);">${monthlyTotalScore}점 <span style="font-size:13px; color:var(--sub-text);">(${monthlyAvgScore})</span></div>
-                               </div>
-                               <div style="background: rgba(255,255,255,0.6); padding: 15px 10px; border-radius: 12px; text-align: center; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
-                                   <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 6px;">티어</div>
-                                   <div style="font-size: 17px; font-weight: 900; color: ${tier.color};">${tier.icon}${tier.name}</div>
-                               </div>
-                               <div style="background: rgba(255,255,255,0.6); padding: 15px 10px; border-radius: 12px; text-align: center; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
-                                   <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 6px;">컨디션</div>
-                                   <div style="font-size: 17px; font-weight: 900; color: ${cond[2]};">${cond[0]}${cond[1]}</div>
-                               </div>
+                           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                               ${createSpotlightCard("월간순위", `${myMonthlyRank}위`)}
+                               ${createSpotlightCard("총/평균 승점", `${monthlyTotalScore}점`, `<span style="font-size:13px; color:var(--sub-text);">(${monthlyAvgScore})</span>`)}
+                               ${createSpotlightCard("티어", `<span style="color: ${tier.color};">${tier.icon}${tier.name}</span>`)}
+                               ${createSpotlightCard("컨디션", `<span style="color: ${cond[2]};">${cond[0]}${cond[1]}</span>`)}
                            </div>
                        </div>`;
-    // --- [v6.55 로직 끝] ---
-    
-                       
+    // --- [v6.60 로직 끝] ---
+                      
     lArea.innerHTML = `<div style="max-height:250px; overflow-y:auto; padding-right:5px; margin-top:15px;">
                            ${filtered.map(g => {
                                const actual = g.ranks.filter(n=>n.trim()!=='');
