@@ -4,7 +4,7 @@ let graphCountdownInterval = null;
 let genseiCountdownInterval = null; 
 let defenseModalTimeout = null; 
 let infoModalCountdownInterval = null; 
-let scoreCountdownInterval = null; // [v6.00] 개인 전적 팝업용 타이머 변수 추가
+let scoreCountdownInterval = null; // [v6.70] 개인 전적 팝업용 타이머 변수 추가
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
 const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
@@ -534,7 +534,7 @@ function closePlayerScoreModal() {
     
     if (scoreModalTimeout) clearTimeout(scoreModalTimeout); 
     if (hideScoreModalTimeout) clearTimeout(hideScoreModalTimeout);
-    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; } // [v6.00] 이 줄을 추가하세요
+    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; } // [v6.70] 이 줄을 추가하세요
     if(!modal || !content) return; 
     
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards'; 
@@ -1111,7 +1111,7 @@ function renderMemberHistory(name, rank = "") {
         scoreModal.style.display = 'flex'; 
         scoreContent.style.animation = 'scaleUpPopup 0.4s forwards'; 
         
-        // [v6.00] 기존 3초 자동 종료를 제거하고 10초 카운트다운 로직 추가
+        // [v6.70] 기존 3초 자동 종료를 제거하고 10초 카운트다운 로직 추가
         if (scoreCountdownInterval) clearInterval(scoreCountdownInterval);
         let sLeft = 10;
         scoreCountdownInterval = setInterval(() => {
