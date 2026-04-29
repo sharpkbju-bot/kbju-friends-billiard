@@ -211,18 +211,26 @@ function showInfoModal(type) {
     let desc = ""; 
     let icon = "";
     
+    // [v6.50 업데이트] 팝업 글자 돌출 방지를 위한 공통 텍스트 래퍼
+    const wrapStart = "<div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.5; text-align: left;'>";
+    const wrapEnd = "</div>";
+
     if (type === 'score') {
         icon = "📊"; 
         title = "인원별 차등 승점 기준";
-        desc = "• <b>2인</b>: 1위(+2), 꼴찌(0)<br>• <b>3인</b>: 1위(+3), 2위(+1), 꼴찌(0)<br>• <b>4인</b>: 1위(+4), 2위(+3), 3위(+2), 꼴찌(0)<br>• <b>5인</b>: 1위(+5), 2위(+4), 3위(+3), 4위(+1), 꼴찌(0)";
+        desc = wrapStart + "• <b>2인</b>: 1위(+2), 꼴찌(0)<br>• <b>3인</b>: 1위(+3), 2위(+1), 꼴찌(0)<br>• <b>4인</b>: 1위(+4), 2위(+3), 3위(+2), 꼴찌(0)<br>• <b>5인</b>: 1위(+5), 2위(+4), 3위(+3), 4위(+1), 꼴찌(0)" + wrapEnd;
     } else if (type === 'tier') {
         icon = "🏅"; 
         title = "랭킹 티어(계급) 기준";
-        desc = "👑<b>챌린저</b>: 60+ &nbsp;💎<b>플래티넘</b>: 50+<br>🥇<b>골드</b>: 40+ &nbsp;&nbsp;🥈<b>실버</b>: 30+ &nbsp;🥉<b>브론즈</b>: 30미만";
+        desc = wrapStart + "👑<b>챌린저</b>: 60+ &nbsp;💎<b>플래티넘</b>: 50+<br>🥇<b>골드</b>: 40+ &nbsp;&nbsp;🥈<b>실버</b>: 30+ &nbsp;🥉<b>브론즈</b>: 30미만" + wrapEnd;
     } else if (type === 'condition') {
         icon = "🌡️"; 
         title = "최근 컨디션 분석 기준";
-        desc = "• ☀️<b>최상</b>: 1위 비율 30%↑<br>• ⛅<b>보통</b>: 1위 비율 30% 미만. 안정적인 보통 순위<br>• ⚡<b>도깨비</b>: 1위 30%↑ & 꼴찌 30%↑<br>• 🌧️<b>비상</b>: 꼴찌 비율 30%↑";
+        desc = wrapStart + "• ☀️<b>최상</b>: 1위 비율 30%↑<br>• ⛅<b>보통</b>: 1위 비율 30% 미만. 안정적인 보통 순위<br>• ⚡<b>도깨비</b>: 1위 30%↑ & 꼴찌 30%↑<br>• 🌧️<b>비상</b>: 꼴찌 비율 30%↑" + wrapEnd;
+    } else if (type === 'style') { // [v6.50 신규 추가] 당구 성향 분석 팝업
+        icon = "🎱";
+        title = "당구 성향 분석 기준";
+        desc = wrapStart + "<b>[승률 35% & 생존율 80% 기준]</b><br><br>• 👑 <b>전략적 지배자</b>: 승률↑ & 생존율↑<br>• 🐅 <b>폭격형 호랑이</b>: 승률↑ & 생존율↓<br>• 🐢 <b>철벽 거북이</b>: 승률↓ & 생존율↑<br>• 🐣 <b>성장하는 꿈나무</b>: 승률↓ & 생존율↓" + wrapEnd;
     }
     
     const descEl = document.getElementById('info-modal-desc');
@@ -235,11 +243,20 @@ function showInfoModal(type) {
     }
 
     const currentTheme = document.documentElement.getAttribute('data-theme');
-    
     if (currentTheme === 'navy') {
         descEl.style.color = '#5D4037';
     } else {
         descEl.style.color = ''; 
+    }
+
+    // [v6.50 업데이트] 확대 모드(Zoom)에서도 팝업창 크기를 기본 모드처럼 원상 복구
+    const popupBox = document.getElementById('info-modal-title').parentElement;
+    if (popupBox) {
+        if (document.body.classList.contains('zoom-active')) {
+            popupBox.style.zoom = '0.85'; // 1.2배 확대를 약 85%로 상쇄시켜 원래 크기 유지
+        } else {
+            popupBox.style.zoom = '1';
+        }
     }
     
     document.getElementById('info-modal-icon').innerHTML = icon;
@@ -1662,8 +1679,8 @@ function searchRecords() {
                                ${createRing(safetyVal, '#3498DB', '생존율', 'safety')}
                            </div>
 
-                           <div style="background: rgba(255,255,255,0.7); border: 2px dashed ${styleColor}; border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center;">
-                               <div style="font-size: 13px; font-weight: 800; color: var(--sub-text); margin-bottom: 5px;">나의 당구 MBTI</div>
+                           <div style="background: rgba(255,255,255,0.7); border: 2px dashed ${styleColor}; border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center; cursor: pointer; transition: all 0.2s;" onclick="showInfoModal('style')">
+                               <div style="font-size: 13px; font-weight: 800; color: var(--sub-text); margin-bottom: 5px;">나의 당구 MBTI <span style="font-size:10px; opacity:0.6;">(터치 시 기준 안내)</span></div>
                                <div style="font-size: 20px; font-weight: 900; color: ${styleColor}; margin-bottom: 8px;">${billiardsStyle}</div>
                                <div style="font-size: 12px; font-weight: 700; color: #555; line-height: 1.4; word-break: keep-all;">${styleDesc}</div>
                            </div>
