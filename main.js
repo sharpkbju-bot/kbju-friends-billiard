@@ -1649,14 +1649,27 @@ function searchRecords() {
     ];
     const pick = spotlightColors[Math.floor(Math.random() * spotlightColors.length)];
 
-    // [v6.60] 스포트라이트 카드 생성용 내부 함수
+    // [v6.70] 네온 사인 효과가 적용된 스포트라이트 카드 생성 함수
     function createSpotlightCard(label, value, subValue = "") {
-        return `<div style="background: ${pick.bg}; padding: 15px 10px; border-radius: 12px; text-align: center; 
-                            border: 2px solid ${pick.border}; 
-                            box-shadow: 0 8px 20px -5px ${pick.shadow}, inset 1px 1px 3px rgba(255,255,255,0.8);
-                            backdrop-filter: blur(4px); transition: all 0.3s ease;">
-                    <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 6px;">${label}</div>
-                    <div style="font-size: 17px; font-weight: 900; color: var(--text-color);">${value} ${subValue}</div>
+        // pick.border 색상을 기반으로 더 진한 네온 광채 색상 계산
+        const neonColor = pick.border; 
+        
+        return `<div style="background: ${pick.bg}; padding: 15px 10px; border-radius: 14px; text-align: center; 
+                            border: 2.5px solid ${neonColor}; 
+                            /* 네온 사인 핵심: 이중 box-shadow (내부광 + 외부 강력 광채) */
+                            box-shadow: 0 0 10px ${neonColor}, 
+                                        0 0 20px ${pick.shadow}, 
+                                        inset 0 0 8px rgba(255,255,255,0.3);
+                            backdrop-filter: blur(5px); 
+                            transition: all 0.4s ease;
+                            margin: 2px;">
+                    <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 8px;
+                                text-shadow: 0 0 5px rgba(255,255,255,0.5);">${label}</div>
+                    <div style="font-size: 18px; font-weight: 900; color: var(--text-color);
+                                /* 텍스트에도 은은한 네온 효과 추가 */
+                                text-shadow: 1px 1px 2px rgba(0,0,0,0.1), 0 0 8px ${pick.shadow};">
+                        ${value} ${subValue}
+                    </div>
                 </div>`;
     }
 
