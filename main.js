@@ -211,7 +211,7 @@ function showInfoModal(type) {
     let desc = ""; 
     let icon = "";
     
-    // [v6.55 업데이트] 팝업 글자 돌출 방지를 위한 공통 텍스트 래퍼
+    // [v6.60 업데이트] 팝업 글자 돌출 방지를 위한 공통 텍스트 래퍼
     const wrapStart = "<div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.5; text-align: left;'>";
     const wrapEnd = "</div>";
 
@@ -227,7 +227,7 @@ function showInfoModal(type) {
         icon = "🌡️"; 
         title = "최근 컨디션 분석 기준";
         desc = wrapStart + "• ☀️<b>최상</b>: 1위 비율 30%↑<br>• ⛅<b>보통</b>: 1위 비율 30% 미만. 안정적인 보통 순위<br>• ⚡<b>도깨비</b>: 1위 30%↑ & 꼴찌 30%↑<br>• 🌧️<b>비상</b>: 꼴찌 비율 30%↑" + wrapEnd;
-    } else if (type === 'style') { // [v6.55 신규 추가] 당구 성향 분석 팝업
+    } else if (type === 'style') { // [v6.60 신규 추가] 당구 성향 분석 팝업
         icon = "🎱";
         title = "당구 성향 분석 기준";
         desc = wrapStart + "<b>[승률 35% & 생존율 80% 기준]</b><br><br>• 👑 <b>전략적 지배자</b>: 승률↑ & 생존율↑<br>• 🐅 <b>폭격형 호랑이</b>: 승률↑ & 생존율↓<br>• 🐢 <b>철벽 거북이</b>: 승률↓ & 생존율↑<br>• 🐣 <b>성장하는 꿈나무</b>: 승률↓ & 생존율↓" + wrapEnd;
@@ -249,7 +249,7 @@ function showInfoModal(type) {
         descEl.style.color = ''; 
     }
 
-    // [v6.55 업데이트] 확대 모드(Zoom)에서도 팝업창 크기를 기본 모드처럼 원상 복구
+    // [v6.60 업데이트] 확대 모드(Zoom)에서도 팝업창 크기를 기본 모드처럼 원상 복구
     const popupBox = document.getElementById('info-modal-title').parentElement;
     if (popupBox) {
         if (document.body.classList.contains('zoom-active')) {
@@ -1660,7 +1660,7 @@ function searchRecords() {
                 </div>`;
     }
 
-    // --- [v6.55 당구 성향 분석(Billiards Style) 로직 유지] ---
+    // --- [v6.60 당구 성향 분석(Billiards Style) 로직 유지] ---
     let billiardsStyle = "";
     let styleDesc = "";
     let styleColor = "";
