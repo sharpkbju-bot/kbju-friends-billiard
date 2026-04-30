@@ -4,7 +4,7 @@ let graphCountdownInterval = null;
 let genseiCountdownInterval = null; 
 let defenseModalTimeout = null; 
 let infoModalCountdownInterval = null; 
-let scoreCountdownInterval = null; // [v6.75] 개인 전적 팝업용 타이머 변수 추가
+let scoreCountdownInterval = null; // [v6.00] 개인 전적 팝업용 타이머 변수 추가
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
 const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
@@ -211,7 +211,7 @@ function showInfoModal(type) {
     let desc = ""; 
     let icon = "";
     
-    // [v6.75 업데이트] 팝업 글자 돌출 방지를 위한 공통 텍스트 래퍼
+    // [v6.70 업데이트] 팝업 글자 돌출 방지를 위한 공통 텍스트 래퍼
     const wrapStart = "<div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.5; text-align: left;'>";
     const wrapEnd = "</div>";
 
@@ -227,7 +227,7 @@ function showInfoModal(type) {
         icon = "🌡️"; 
         title = "최근 컨디션 분석 기준";
         desc = wrapStart + "• ☀️<b>최상</b>: 1위 비율 30%↑<br>• ⛅<b>보통</b>: 1위 비율 30% 미만. 안정적인 보통 순위<br>• ⚡<b>도깨비</b>: 1위 30%↑ & 꼴찌 30%↑<br>• 🌧️<b>비상</b>: 꼴찌 비율 30%↑" + wrapEnd;
-    } else if (type === 'style') { // [v6.75 신규 추가] 당구 성향 분석 팝업
+    } else if (type === 'style') { // [v6.70 신규 추가] 당구 성향 분석 팝업
         icon = "🎱";
         title = "당구 성향 분석 기준";
         desc = wrapStart + "<b>[승률 35% & 생존율 80% 기준]</b><br><br>• 👑 <b>전략적 지배자</b>: 승률↑ & 생존율↑<br>• 🐅 <b>폭격형 호랑이</b>: 승률↑ & 생존율↓<br>• 🐢 <b>철벽 거북이</b>: 승률↓ & 생존율↑<br>• 🐣 <b>성장하는 꿈나무</b>: 승률↓ & 생존율↓" + wrapEnd;
@@ -249,7 +249,7 @@ function showInfoModal(type) {
         descEl.style.color = ''; 
     }
 
-    // [v6.75 업데이트] 확대 모드(Zoom)에서도 팝업창 크기를 기본 모드처럼 원상 복구
+    // [v6.70 업데이트] 확대 모드(Zoom)에서도 팝업창 크기를 기본 모드처럼 원상 복구
     const popupBox = document.getElementById('info-modal-title').parentElement;
     if (popupBox) {
         if (document.body.classList.contains('zoom-active')) {
@@ -534,7 +534,7 @@ function closePlayerScoreModal() {
     
     if (scoreModalTimeout) clearTimeout(scoreModalTimeout); 
     if (hideScoreModalTimeout) clearTimeout(hideScoreModalTimeout);
-    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; } // [v6.75] 이 줄을 추가하세요
+    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; } 
     if(!modal || !content) return; 
     
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards'; 
@@ -573,6 +573,7 @@ async function fetchData() {
 
 function renderAll() { 
     renderCalendar(); 
+    renderRecordedDates(); // [v7.00] 기록 날짜 카드 렌더링 호출
     renderStats(); 
     renderDefenseStats(); 
     renderGameList(); 
@@ -586,6 +587,7 @@ function isHoliday(year, month, day) {
     return fixed.includes(dStr) || (year === 2026 && variable2026.includes(dStr));
 }
 
+// [v6.75] 세련된 디자인의 달력 렌더링 함수
 function renderCalendar() {
     const grid = document.getElementById('calendarGrid');
     grid.innerHTML = "";
@@ -593,27 +595,23 @@ function renderCalendar() {
     const month = currentViewDate.getMonth();
     const realTodayStr = formatDate(new Date());
     
-    // [디자인 변경] 헤더 연.월 표시 형식 변경 (예: 2026.04)
     document.getElementById('monthDisplay').innerText = `${year}.${String(month + 1).padStart(2, '0')}`;
     
-    // 요일 렌더링 - 텍스트를 더 얇고 세련되게
     const daysLabel = ["일","월","화","수","목","금","토"];
     daysLabel.forEach((d, idx) => {
         let color = "var(--sub-text)";
-        if(idx === 0) color = "#ff7675"; // 일요일
-        if(idx === 6) color = "#74b9ff"; // 토요일
+        if(idx === 0) color = "#ff7675"; 
+        if(idx === 6) color = "#74b9ff"; 
         grid.innerHTML += `<div class="weekday" style="color:${color}; font-size: 11px; font-weight: 700; opacity: 0.6; padding-bottom: 15px;">${d}</div>`;
     });
     
     const firstDay = new Date(year, month, 1).getDay();
     const lastDate = new Date(year, month + 1, 0).getDate();
     
-    // 빈 칸
     for (let i = 0; i < firstDay; i++) {
         grid.innerHTML += `<div></div>`;
     }
     
-    // 날짜 렌더링
     for (let d = 1; d <= lastDate; d++) {
         const dStr = formatDate(new Date(year, month, d));
         const dayOfWeek = new Date(year, month, d).getDay();
@@ -625,7 +623,6 @@ function renderCalendar() {
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
         
-        // 기록이 있는 날은 숫자 아래에 세련된 작은 점(dot) 표시
         const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
 
         grid.innerHTML += `
@@ -636,11 +633,39 @@ function renderCalendar() {
     }
 }
 
+// [v7.00] 기록이 있는 날짜들을 작은 카드로 렌더링하는 함수
+function renderRecordedDates() {
+    const container = document.getElementById('recordedDatesContainer');
+    if (!container) return;
+    
+    // 기록이 있는 유효한 날짜들을 추출하고 중복 제거 후 최신순 정렬
+    const uniqueDates = [...new Set(gameLogs.map(g => g.dateStr))].sort((a, b) => new Date(b) - new Date(a));
+    
+    if (uniqueDates.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.style.display = 'flex';
+    container.innerHTML = uniqueDates.map(dStr => {
+        const d = new Date(dStr);
+        const dayNum = d.getDate();
+        const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()];
+        const isActive = dStr === selectedDateStr ? 'active' : '';
+        
+        return `<div class="recorded-date-card ${isActive}" onclick="selectDate('${dStr}')">
+                    <div class="card-day-num">${dayNum}</div>
+                    <div class="card-day-name">${dayName}</div>
+                </div>`;
+    }).join('');
+}
+
 function selectDate(dateStr) {
     if(editMode) cancelEdit();
     selectedDateStr = dateStr;
     document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`;
     renderCalendar();
+    renderRecordedDates(); // [v7.00] 카드 상태 업데이트를 위해 호출
     renderGameList();
     
     const hasRecord = gameLogs.some(g => g.dateStr === dateStr);
@@ -1130,7 +1155,7 @@ function renderMemberHistory(name, rank = "") {
         scoreModal.style.display = 'flex'; 
         scoreContent.style.animation = 'scaleUpPopup 0.4s forwards'; 
         
-        // [v6.75] 기존 3초 자동 종료를 제거하고 10초 카운트다운 로직 추가
+        // [v6.00] 기존 3초 자동 종료를 제거하고 10초 카운트다운 로직 추가
         if (scoreCountdownInterval) clearInterval(scoreCountdownInterval);
         let sLeft = 10;
         scoreCountdownInterval = setInterval(() => {
@@ -1652,10 +1677,10 @@ function searchRecords() {
     let cond = (wRatio >= 0.3 && lRatio >= 0.3) ? ["⚡", "도깨비", "var(--rank3)"] : (wRatio >= 0.3 ? ["☀️", "최상", "var(--rankL)"] : (lRatio >= 0.3 ? ["🌧️", "비상", "var(--rank1)"] : ["⛅", "보통", "var(--rank2)"]));
   
     let winRateVal = Math.round(winRateFloat);
-    let avgScoreVal = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); // [v6.75] 변수명 오타 수정 완료
+    let avgScoreVal = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); // [v6.70] 변수명 오타 수정 완료
     let safetyVal = safetyRate;
 
-    // --- [v6.75 신규] 스포트라이트용 랜덤 컬러셋 (파스텔톤 8종) ---
+    // --- [v6.70 신규] 스포트라이트용 랜덤 컬러셋 (파스텔톤 8종) ---
     const spotlightColors = [
         { bg: 'rgba(255, 173, 173, 0.25)', shadow: 'rgba(255, 173, 173, 0.5)', border: '#FFADAD' },
         { bg: 'rgba(255, 214, 165, 0.25)', shadow: 'rgba(255, 214, 165, 0.5)', border: '#FFD6A5' },
@@ -1668,7 +1693,7 @@ function searchRecords() {
     ];
     const pick = spotlightColors[Math.floor(Math.random() * spotlightColors.length)];
 
-    // [v6.75] 네온 사인 효과가 적용된 스포트라이트 카드 생성 함수
+    // [v6.70] 네온 사인 효과가 적용된 스포트라이트 카드 생성 함수
     function createSpotlightCard(label, value, subValue = "") {
         // pick.border 색상을 기반으로 더 진한 네온 광채 색상 계산
         const neonColor = pick.border; 
@@ -1692,7 +1717,7 @@ function searchRecords() {
                 </div>`;
     }
 
-    // --- [v6.75 당구 성향 분석(Billiards Style) 로직 유지] ---
+    // --- [v6.70 당구 성향 분석(Billiards Style) 로직 유지] ---
     let billiardsStyle = "";
     let styleDesc = "";
     let styleColor = "";
@@ -1748,7 +1773,7 @@ function searchRecords() {
                                ${createSpotlightCard("컨디션", `<span style="color: ${cond[2]};">${cond[0]}${cond[1]}</span>`)}
                            </div>
                        </div>`;
-    // --- [v6.75 로직 끝] ---
+    // --- [v6.70 로직 끝] ---
                       
     lArea.innerHTML = `<div style="max-height:250px; overflow-y:auto; padding-right:5px; margin-top:15px;">
                            ${filtered.map(g => {
@@ -1771,6 +1796,95 @@ function searchRecords() {
     sArea.style.display = 'block'; lArea.style.display = 'block'; 
     document.getElementById('search-share-btn').style.display = 'block';
     setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+}
+
+// [v6.75] 세련된 디자인의 달력 렌더링 함수
+function renderCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = "";
+    const year = currentViewDate.getFullYear();
+    const month = currentViewDate.getMonth();
+    const realTodayStr = formatDate(new Date());
+    
+    document.getElementById('monthDisplay').innerText = `${year}.${String(month + 1).padStart(2, '0')}`;
+    
+    const daysLabel = ["일","월","화","수","목","금","토"];
+    daysLabel.forEach((d, idx) => {
+        let color = "var(--sub-text)";
+        if(idx === 0) color = "#ff7675"; 
+        if(idx === 6) color = "#74b9ff"; 
+        grid.innerHTML += `<div class="weekday" style="color:${color}; font-size: 11px; font-weight: 700; opacity: 0.6; padding-bottom: 15px;">${d}</div>`;
+    });
+    
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDate = new Date(year, month + 1, 0).getDate();
+    
+    for (let i = 0; i < firstDay; i++) {
+        grid.innerHTML += `<div></div>`;
+    }
+    
+    for (let d = 1; d <= lastDate; d++) {
+        const dStr = formatDate(new Date(year, month, d));
+        const dayOfWeek = new Date(year, month, d).getDay();
+        const hasRecord = gameLogs.some(g => g.dateStr === dStr);
+        
+        let dayClass = "day-new";
+        if (dStr === selectedDateStr) dayClass += " selected-new";
+        if (dStr === realTodayStr) dayClass += " today-new";
+        if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
+        if (dayOfWeek === 6) dayClass += " sat-new";
+        
+        const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
+
+        grid.innerHTML += `
+            <div class="${dayClass}" onclick="selectDate('${dStr}')">
+                <span class="day-num">${d}</span>
+                ${recordDot}
+            </div>`;
+    }
+}
+
+// [v7.00] 기록이 있는 날짜들을 작은 카드로 렌더링하는 함수
+function renderRecordedDates() {
+    const container = document.getElementById('recordedDatesContainer');
+    if (!container) return;
+    
+    const uniqueDates = [...new Set(gameLogs.map(g => g.dateStr))].sort((a, b) => new Date(b) - new Date(a));
+    
+    if (uniqueDates.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.style.display = 'flex';
+    container.innerHTML = uniqueDates.map(dStr => {
+        const d = new Date(dStr);
+        const dayNum = d.getDate();
+        const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()];
+        const isActive = dStr === selectedDateStr ? 'active' : '';
+        
+        return `<div class="recorded-date-card ${isActive}" onclick="selectDate('${dStr}')">
+                    <div class="card-day-num">${dayNum}</div>
+                    <div class="card-day-name">${dayName}</div>
+                </div>`;
+    }).join('');
+}
+
+function selectDate(dateStr) {
+    if(editMode) cancelEdit();
+    selectedDateStr = dateStr;
+    document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`;
+    renderCalendar();
+    renderRecordedDates(); // 카드 활성화 상태 업데이트
+    renderGameList();
+    
+    const hasRecord = gameLogs.some(g => g.dateStr === dateStr);
+    if (hasRecord) {
+        setTimeout(() => {
+            const recordTarget = document.getElementById('record-header-wrap');
+            if (recordTarget) recordTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    }
 }
 
 window.onload = () => { 
@@ -1804,7 +1918,6 @@ window.onload = () => {
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
-
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
