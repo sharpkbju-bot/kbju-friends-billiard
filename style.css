@@ -1,6 +1,8 @@
 @charset "UTF-8";
 
-/* Billiard World Style v6.76 - Minimal Modern Calendar Update */
+/* Billiard World Style v7.00 - Full Modern UI & Recorded Date Cards Update */
+/*[cite: 8] v6.76의 모든 스타일을 베이스로 v7.00 기능을 통합함 */
+
 :root { 
     --main: #7f8c8d; 
     --bg: rgba(236, 238, 241, 0.4); 
@@ -40,7 +42,7 @@
     --graph-line: #2980b9;
 }
 
-/* 테마별 카드 배경 설정 */
+/* 테마별 카드 배경 설정[cite: 8] */
 [data-theme='yellow'] { --card-bg: rgba(255, 252, 225, 0.8); }
 [data-theme='yellowgreen'] { --card-bg: rgba(240, 255, 230, 0.8); }
 [data-theme='purple'] { --card-bg: rgba(243, 230, 255, 0.8); }
@@ -48,7 +50,7 @@
 [data-theme='pink'] { --card-bg: rgba(255, 235, 240, 0.8); }
 [data-theme='gray'] { --card-bg: rgba(240, 240, 240, 0.8); }
 
-/* 네이비 테마 설정 */
+/* 네이비 테마 설정[cite: 8] */
 [data-theme='navy'] {
     --main: #bdc3c7;
     --bg: rgba(10, 25, 47, 0.9);
@@ -77,8 +79,14 @@
     --edit-mode-border: #66bb6a;
     --graph-line: #4dd0e1;
 }
+/* [v7.00] Navy 테마 기록 카드 대응 */
+[data-theme='navy'] .recorded-date-card {
+    background: rgba(30, 45, 90, 0.92);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme='navy'] .card-day-num { color: #eeeeee; }
 
-/* 다크 테마 설정 */
+/* 다크 테마 설정[cite: 8] */
 [data-theme='dark'] {
     --main: #bdc3c7;
     --bg: rgba(30, 30, 30, 0.9);
@@ -107,6 +115,12 @@
     --edit-mode-border: #27ae60;
     --graph-line: #4dd0e1;
 }
+/* [v7.00] Dark 테마 기록 카드 대응 */
+[data-theme='dark'] .recorded-date-card {
+    background: rgba(60, 60, 65, 0.92);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme='dark'] .card-day-num { color: #eeeeee; }
 
 [data-theme='dark'] .win-rate-pill, [data-theme='navy'] .win-rate-pill { color: #ffd60a !important; }
 [data-theme='dark'] .stats-table td[style*="color:darkblue;"], [data-theme='navy'] .stats-table td[style*="color:darkblue;"] { color: #448aff !important; } 
@@ -185,7 +199,7 @@ body {
 
 /* 
    ==========================================================================
-   [v6.76] 미니멀 모던 달력 스타일 섹션 (통째로 교체된 부분)
+   [v6.76] 미니멀 모던 달력 스타일 섹션[cite: 8]
    ==========================================================================
 */
 .calendar-card {
@@ -227,7 +241,7 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border-radius: 50%; /* 서클 포인트 디자인 */
+    border-radius: 50%; /* 서클 포인트 디자인[cite: 8] */
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -238,17 +252,17 @@ body {
     color: var(--text-color);
 }
 
-/* 휴일 및 주말 색상 */
+/* 휴일 및 주말 색상[cite: 8] */
 .sun-new .day-num { color: #ff7675; }
 .sat-new .day-num { color: #74b9ff; }
 
-/* 오늘 표시: 테두리로 강조 */
+/* 오늘 표시: 테두리로 강조[cite: 8] */
 .today-new {
     border: 1.5px solid var(--accent);
 }
 .today-new .day-num { color: var(--accent); }
 
-/* 선택된 날짜: 강조 컬러 서클 */
+/* 선택된 날짜: 강조 컬러 서클[cite: 8] */
 .selected-new {
     background: var(--accent) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -256,13 +270,13 @@ body {
 }
 .selected-new .day-num { color: #ffffff !important; }
 
-/* 기록 표시: 숫자 아래 작은 점(Dot) */
+/* 기록 표시: 숫자 아래 작은 점(Dot) - v6.76 강화색상 적용[cite: 8] */
 .record-dot {
     position: absolute;
     bottom: 6px;
     width: 4px;
     height: 4px;
-    background: #2e7d32; /* 세련된 민트그린 */
+    background: #2e7d32; 
     border-radius: 50%;
     z-index: 3;
 }
@@ -279,8 +293,54 @@ body {
     background: rgba(255, 255, 255, 0.1);
 }
 
-/* ========================================================================== */
+/* 
+   ==========================================================================
+   [v7.00] 신규: 하단 기록 날짜 카드 리스트 디자인[cite: 1]
+   ==========================================================================
+*/
+.recorded-dates-list {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 5px 5px 20px 5px;
+    margin-bottom: 25px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.recorded-dates-list::-webkit-scrollbar { display: none; }
 
+.recorded-date-card {
+    min-width: 80px;
+    height: 105px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 6px 15px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+.card-day-num { font-size: 26px; font-weight: 900; color: #333; margin-bottom: 2px; }
+.card-day-name { font-size: 13px; font-weight: 800; color: #999; text-transform: uppercase; }
+
+.recorded-date-card.active {
+    background: var(--accent);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
+}
+.recorded-date-card.active .card-day-num, 
+.recorded-date-card.active .card-day-name { color: #ffffff; }
+
+/* 
+   ==========================================================================
+   기존 카드 및 폼 요소 디자인 보존[cite: 8]
+   ==========================================================================
+*/
 .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 12px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
 .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; }
 
@@ -346,11 +406,9 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
     border-bottom: 2px solid rgba(0,0,0,0.05); 
     white-space: nowrap; 
     letter-spacing: -0.5px;
+    text-align: center;
 }
 .stats-table thead tr { background: rgba(232, 245, 233, 0.8); }
-
-.stats-table th:first-child { border-radius: 8px 0 0 8px; width: 22%; padding-left: 0; text-align: center; } 
-.stats-table th:last-child { border-radius: 0 8px 8px 0; width: 18%; padding-right: 0; text-align: center; } 
 
 .stats-table tr { background: rgba(255, 255, 255, 0.4); }
 .stats-table td { 
@@ -363,9 +421,6 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
     letter-spacing: -0.5px;
 }
 
-.stats-table td:first-child { border-radius: 8px 0 0 8px; text-align: center; padding-left: 0; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.5px; } 
-.stats-table td:last-child { border-radius: 0 8px 8px 0; padding-right: 0; text-align: center; } 
-
 .defense-table th { padding: 8px 2px !important; letter-spacing: -0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .defense-table td { padding: 12px 2px !important; letter-spacing: -0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -374,7 +429,6 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 
 .strategy-footer-text { font-size: 14px !important; white-space: nowrap !important; letter-spacing: -0.8px !important; }
 
-.val-highlight { font-size: 13px; }
 .win-rate-pill { 
     color: #27ae60; 
     font-size: 13.5px; 
@@ -388,18 +442,6 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 
 .condition-box { display:flex; align-items:center; justify-content:space-between; background:rgba(255, 255, 255, 0.5); padding:12px 10px; border-radius:8px; margin-bottom:15px; border: 1.5px solid navy; width: 100%; box-sizing: border-box; overflow: hidden; position: relative; }
 [data-theme='dark'] .condition-box, [data-theme='navy'] .condition-box { background:rgba(0, 0, 0, 0.3); border: 1.5px solid navy; }
-
-.zoom-active .cond-responsive { 
-    flex-direction: column !important; 
-    justify-content: center !important; 
-    align-items: center !important;
-    gap: 8px !important; 
-    padding: 15px !important; 
-}
-.zoom-active .cond-responsive > div { 
-    text-align: center !important; 
-    width: 100% !important; 
-}
 
 .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255, 252, 212, 0.85); border-radius: 8px; margin-bottom: 8px; font-weight: 800; color: #555; border: 2.5px solid #ff69b4; }
 
@@ -429,7 +471,11 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 .game-info { font-size: 20px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; transition: font-size 0.2s; }
 .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
 
-/* 확대 모드 스타일 */
+/* 
+   ==========================================================================
+   확대 모드(Zoom) 정밀 대응[cite: 8]
+   ==========================================================================
+*/
 .zoom-active #calendarGrid { gap: 4px !important; }
 .zoom-active .day-new { 
     max-width: 36px !important; 
@@ -438,7 +484,10 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 .zoom-active .day-num { 
     font-size: 13px !important; 
 }
-.zoom-active .record-dot { bottom: 3px !important; width: 4px !important; height: 4px !important; }
+/* [v7.00] 확대 모드 시 신규 기록 카드 크기 조정 */
+.zoom-active .recorded-date-card { min-width: 70px !important; height: 95px !important; }
+.zoom-active .card-day-num { font-size: 22px !important; }
+.zoom-active .card-day-name { font-size: 11px !important; }
 
 .zoom-active .game-info { font-size: 16px !important; }
 .zoom-active .game-info span { font-size: 11px !important; } 
@@ -498,54 +547,14 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
     border-radius: 6px !important; 
 }
 
-.btn-edit-p { background: #d1e9ff; color: #0056b3; } 
-.btn-del-p { background: #ffdada; color: #d63031; }  
-.btn-cancel-p { background: #f0f0f0; color: #636e72; } 
-
-[data-theme='dark'] .btn-edit-p, [data-theme='navy'] .btn-edit-p { background: #2c3e50; color: #3498db; }
-[data-theme='dark'] .btn-del-p, [data-theme='navy'] .btn-del-p { background: #4b2323; color: #ff7675; }
-[data-theme='dark'] .btn-cancel-p, [data-theme='navy'] .btn-cancel-p { background: #3d3d3d; color: #b2bec3; }
-
 #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
 .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 12px; text-align: center; width: 80%; max-width: 320px; }
 
-.theme-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
-
-.zoom-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
-.zoom-options { display: flex; gap: 12px; }
-.zoom-options label { display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 14px; }
-
-#confirm-buttons-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-#confirm-buttons-wrap button {
-    margin: 0 !important;
-    width: 100%;
-}
-
-.share-btn-common, #custom-share-btn {
-    width: 100%; padding: 12px !important; background: linear-gradient(145deg, #6a11cb, #2575fc);
-    color: white; border: none; border-radius: 8px !important; font-weight: 800;
-    display: block; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
-    cursor: pointer; font-size: 12px; transition: transform 0.2s;
-    line-height: 1.5 !important; box-sizing: border-box !important;
-}
-.share-btn-common:active, #custom-share-btn:active { transform: scale(0.98); }
-
-.player-select-wrap { margin-bottom: 15px; background: rgba(255,255,255,0.3); border-radius: 12px; padding: 15px; border: 1px solid rgba(255,255,255,0.5); box-shadow: var(--inner-shadow); }
-.player-select-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.player-chip { padding: 12px 5px !important; border-radius: 8px !important; background: rgba(255,255,255,0.8); font-weight: 800; font-size: 13px; text-align: center; cursor: pointer; color: var(--sub-text); border: 2px solid transparent; transition: 0.2s; box-shadow: 2px 2px 6px rgba(0,0,0,0.05); line-height: 1.5 !important; box-sizing: border-box !important; }
-
-.player-chip.active { background: #4caf50 !important; border-color: #1b5e20 !important; color: #ffffff !important; font-weight: 800 !important; box-shadow: none !important; }
-
-[data-theme='dark'] .player-select-wrap, [data-theme='navy'] .player-select-wrap { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); }
-[data-theme='dark'] .player-chip, [data-theme='navy'] .player-chip { background: rgba(60,60,65,0.8); color: var(--sub-text); }
-[data-theme='dark'] .player-chip.active, [data-theme='navy'] .player-chip.active { background: #2e7d32 !important; border-color: #81c784 !important; color: #ffffff !important; }
-
-.order-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 10005; backdrop-filter: blur(5px); }
-
+/* 
+   ==========================================================================
+   모달 애니메이션 및 Glimmer 효과 명세[cite: 8]
+   ==========================================================================
+*/
 @keyframes glimmerspin {
     0% { --glimmer-angle: 0deg; }
     100% { --glimmer-angle: 360deg; }
@@ -555,143 +564,6 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
     initial-value: 0deg;
     inherits: false;
 }
-.order-content { 
-    position: relative;
-    background: var(--card-bg); 
-    padding: 30px; 
-    border-radius: 12px; 
-    text-align: center; 
-    width: 85%; max-width: 320px; 
-    box-shadow: var(--shadow); 
-    overflow: hidden; 
-}
-.order-content::before {
-    content: '';
-    position: absolute;
-    top: -2.5%; left: -2.5%; width: 105%; height: 105%;
-    border-radius: inherit;
-    background: conic-gradient(from var(--glimmer-angle), transparent 30%, var(--accent), var(--rank1), var(--edit), var(--accent) 70%, transparent);
-    animation: glimmerspin 2s linear infinite;
-    z-index: -2;
-    filter: blur(8px);
-}
-.order-content::after {
-    content: '';
-    position: absolute;
-    top: 1px; left: 1px; width: calc(100% - 2px); height: calc(100% - 2px);
-    border-radius: inherit;
-    background: var(--card-bg);
-    z-index: -1;
-}
-
-.flatpickr-calendar, .flatpickr-calendar * {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-}
-
-.flatpickr-current-month .flatpickr-monthhand-title,
-.flatpickr-current-month input.cur-year {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-    font-weight: 900 !important;
-    background: transparent !important;
-}
-
-.flatpickr-calendar {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(10px) !important;
-    border-radius: 12px !important; 
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.6) !important;
-    padding: 15px !important;
-    width: 320px !important; 
-}
-.flatpickr-months .flatpickr-month {
-    height: 40px !important;
-}
-.flatpickr-current-month {
-    font-size: 135% !important;
-    font-weight: 900 !important;
-    padding-top: 5px !important;
-}
-span.flatpickr-weekday {
-    font-weight: 900 !important;
-    color: #95a5a6 !important;
-    font-size: 12px !important;
-}
-.flatpickr-day {
-    border-radius: 8px !important; 
-    font-size: 16px !important;
-    height: 44px !important;
-    line-height: 44px !important;
-    font-weight: 800 !important;
-    max-width: 44px !important;
-    margin: 2px !important;
-}
-.flatpickr-monthSelect-month {
-    font-weight: 900 !important;
-    border-radius: 8px !important;
-}
-.flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange,
-.flatpickr-monthSelect-month.selected {
-    background: linear-gradient(145deg, #ff4757, #ff6b81) !important;
-    border-color: transparent !important;
-    color: #fff !important;
-    box-shadow: 2px 4px 10px rgba(255, 71, 87, 0.3) !important;
-}
-
-[data-theme='dark'] .flatpickr-calendar, [data-theme='navy'] .flatpickr-calendar {
-    background: rgba(40, 40, 45, 0.95) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6) !important;
-}
-[data-theme='dark'] .flatpickr-month, [data-theme='navy'] .flatpickr-month, 
-[data-theme='dark'] .flatpickr-current-month .flatpickr-monthhand-title, [data-theme='navy'] .flatpickr-current-month .flatpickr-monthhand-title, 
-[data-theme='dark'] .flatpickr-current-month input.cur-year, [data-theme='navy'] .flatpickr-current-month input.cur-year {
-    color: #fff !important; fill: #fff !important;
-}
-[data-theme='dark'] span.flatpickr-weekday, [data-theme='navy'] span.flatpickr-weekday {
-    color: #ccc !important;
-}
-[data-theme='dark'] .flatpickr-day, [data-theme='navy'] .flatpickr-day,
-[data-theme='dark'] .flatpickr-monthSelect-month, [data-theme='navy'] .flatpickr-monthSelect-month { color: #eeeeee !important; }
-[data-theme='dark'] .flatpickr-monthSelect-month:hover, [data-theme='navy'] .flatpickr-monthSelect-month:hover { background: rgba(255,255,255,0.1) !important; }
-[data-theme='dark'] .flatpickr-day.inRange, [data-theme='navy'] .flatpickr-day.inRange {
-    background: rgba(233, 30, 99, 0.2) !important;
-    box-shadow: -5px 0 0 rgba(233, 30, 99, 0.2), 5px 0 0 rgba(233, 30, 99, 0.2) !important;
-    color: #ff8a80 !important;
-}
-
-@keyframes heartbeat {
-    0% { transform: scale(1); text-shadow: 0 0 10px rgba(255, 71, 87, 0); }
-    100% { transform: scale(1.2); text-shadow: 0 0 20px rgba(255, 71, 87, 0.6); }
-}
-@keyframes flash {
-    0% { opacity: 0.3; transform: scale(0.95); }
-    100% { opacity: 1; transform: scale(1); }
-}
-
-.summary-stats-wrap .stat-lbl { font-size: clamp(11px, 3.5vw, 13px); letter-spacing: -0.5px; line-height: 1; }
-.summary-stats-wrap .stat-val { font-size: clamp(14px, 4.5vw, 17px); letter-spacing: -0.5px; line-height: 1; display: flex; align-items: flex-end; justify-content: center; height: 100%; }
-
-.zoom-active .summary-stats-wrap .stat-lbl { font-size: 11px !important; letter-spacing: -0.5px !important; line-height: 1; }
-.zoom-active .summary-stats-wrap .stat-val { font-size: 14px !important; letter-spacing: -0.5px !important; line-height: 1; display: flex; align-items: flex-end; justify-content: center; height: 100%; }
-
-.empty-search-msg { 
-    white-space: nowrap; 
-    letter-spacing: -0.5px; 
-    font-size: clamp(13px, 4.5vw, 16px); 
-    word-break: keep-all; 
-}
-.zoom-active .empty-search-msg { font-size: 13px !important; }
-
-@keyframes scaleUpPopup {
-    0% { transform: scale(0.3); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-@keyframes scaleDownPopup {
-    0% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(0.3); opacity: 0; }
-}
-
 .last-game-content {
     position: relative;
     background: var(--card-bg);
@@ -702,13 +574,12 @@ span.flatpickr-weekday {
     box-shadow: var(--shadow);
     overflow: hidden;
 }
-
 .last-game-content::before {
     content: '';
     position: absolute;
     top: -2.5%; left: -2.5%; width: 105%; height: 105%;
     border-radius: inherit;
-    background: conic-gradient(from var(--glimmer-angle), transparent 30%, var(--accent), var(--rank1), var(--edit), var(--rank1) 70%, transparent);
+    background: conic-gradient(from var(--glimmer-angle), transparent 30%, var(--accent), var(--rank1), var(--edit), var(--accent) 70%, transparent);
     animation: glimmerspin 2s linear infinite;
     z-index: -2;
     filter: blur(8px);
@@ -716,73 +587,20 @@ span.flatpickr-weekday {
 .last-game-content::after {
     content: '';
     position: absolute;
-    top: 2px; left: 2px; width: calc(100% - 4px); height: calc(100% - 4px);
+    top: 1px; left: 1px; width: calc(100% - 2px); height: calc(100% - 2px);
     border-radius: inherit;
     background: var(--card-bg);
     z-index: -1;
 }
 
-#info-modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; 
-    z-index: 10007; backdrop-filter: blur(5px);
+@keyframes scaleUpPopup {
+    0% { transform: scale(0.3); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
-
-.zoom-active #info-modal {
-    zoom: 0.833333; 
+@keyframes scaleDownPopup {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.3); opacity: 0; }
 }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-#info-modal .modal-content {
-    padding: 30px 20px; text-align: center; width: max-content; max-width: 95%; 
-    background: rgba(255, 255, 255, 0.95); border-radius: 12px;
-}
-
-.graph-box { background:rgba(255, 255, 255, 0.5); border-radius:8px; border: 1px solid rgba(0,0,0,0.05); }
-[data-theme='dark'] .graph-box, [data-theme='navy'] .graph-box { background:rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.05); }
-
-.mvp-container {
-    margin-top: 15px;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 12px;
-    border: 2px solid var(--rank1);
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    box-sizing: border-box;
-}
-[data-theme='dark'] .mvp-container, [data-theme='navy'] .mvp-container { background: rgba(0, 0, 0, 0.3); }
-
-.mvp-badge {
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.7);
-    padding: 10px 15px;
-    border-radius: 10px;
-    box-shadow: 2px 2px 6px rgba(0,0,0,0.05);
-    gap: 5px;
-}
-[data-theme='dark'] .mvp-badge, [data-theme='navy'] .mvp-badge { background: rgba(60,60,65,0.8); }
-
-.mvp-title { font-size: 12px; font-weight: 800; color: var(--sub-text); flex: 1; text-align: left; }
-.mvp-player { font-size: 15px; font-weight: 900; color: var(--rank1); flex: 1; text-align: center; }
-.mvp-value { font-size: 11px; font-weight: 800; color: var(--rankL); flex: 1; text-align: right; line-height: 1.3; }
-
-#graph-countdown-text {
-    font-size: clamp(13px, 4vw, 15px);
-    color: var(--sub-text);
-    margin-top: 15px;
-    font-weight: 800;
-    text-align: center;
-    word-break: keep-all;
-}
-.zoom-active #graph-countdown-text {
-    font-size: 13px !important;
-}
-
-.zoom-active .stats-subtitle {
-    display: block;
-    margin-top: 5px;
-    margin-left: 0 !important;
-}
+.zoom-active #info-modal { zoom: 0.833333; }
