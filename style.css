@@ -76,6 +76,12 @@
     --edit-mode-bg: rgba(30, 45, 90, 0.9); 
     --edit-mode-border: #66bb6a;
     --graph-line: #4dd0e1;
+    /* Navy 테마 블록 맨 밑에 추가 */
+[data-theme='navy'] .recorded-date-card {
+    background: rgba(30, 45, 90, 0.92);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme='navy'] .card-day-num { color: #eeeeee; }
 }
 
 /* 다크 테마 설정 */
@@ -106,6 +112,12 @@
     --edit-mode-bg: rgba(35, 35, 45, 0.9); 
     --edit-mode-border: #27ae60;
     --graph-line: #4dd0e1;
+    /* Dark 테마 블록 맨 밑에 추가 */
+[data-theme='dark'] .recorded-date-card {
+    background: rgba(60, 60, 65, 0.92);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme='dark'] .card-day-num { color: #eeeeee; }
 }
 
 [data-theme='dark'] .win-rate-pill, [data-theme='navy'] .win-rate-pill { color: #ffd60a !important; }
@@ -278,7 +290,44 @@ body {
 [data-theme='dark'] .day-new:hover:not(.selected-new), [data-theme='navy'] .day-new:hover:not(.selected-new) {
     background: rgba(255, 255, 255, 0.1);
 }
+/* [v7.00] 하단 기록 날짜 카드 리스트 디자인 */
+.recorded-dates-list {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 5px 5px 20px 5px;
+    margin-bottom: 25px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.recorded-dates-list::-webkit-scrollbar { display: none; }
 
+.recorded-date-card {
+    min-width: 82px;
+    height: 108px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 6px 15px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+.card-day-num { font-size: 26px; font-weight: 900; color: #222; margin-bottom: 2px; }
+.card-day-name { font-size: 13px; font-weight: 800; color: #999; text-transform: uppercase; }
+
+.recorded-date-card.active {
+    background: var(--accent);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 22px rgba(255, 71, 87, 0.35);
+}
+.recorded-date-card.active .card-day-num, 
+.recorded-date-card.active .card-day-name { color: #ffffff; }
 /* ========================================================================== */
 
 .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 12px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
@@ -438,6 +487,10 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 .zoom-active .day-num { 
     font-size: 13px !important; 
 }
+/* 확대 모드 시 기록 카드 크기 조정 */
+.zoom-active .recorded-date-card { min-width: 70px !important; height: 95px !important; }
+.zoom-active .card-day-num { font-size: 22px !important; }
+.zoom-active .card-day-name { font-size: 11px !important; }
 .zoom-active .record-dot { bottom: 3px !important; width: 4px !important; height: 4px !important; }
 
 .zoom-active .game-info { font-size: 16px !important; }
