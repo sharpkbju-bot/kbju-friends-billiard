@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v6.75 - Minimal Modern Calendar Update */
+/* Billiard World Style v6.76 - Minimal Modern Calendar Update */
 :root { 
     --main: #7f8c8d; 
     --bg: rgba(236, 238, 241, 0.4); 
@@ -185,7 +185,7 @@ body {
 
 /* 
    ==========================================================================
-   [v6.75] 미니멀 모던 달력 스타일 섹션 (통째로 교체된 부분)
+   [v6.76] 미니멀 모던 달력 스타일 섹션 (통째로 교체된 부분)
    ==========================================================================
 */
 .calendar-card {
