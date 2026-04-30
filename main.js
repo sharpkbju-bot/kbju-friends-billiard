@@ -4,7 +4,7 @@ let graphCountdownInterval = null;
 let genseiCountdownInterval = null; 
 let defenseModalTimeout = null; 
 let infoModalCountdownInterval = null; 
-let scoreCountdownInterval = null; // [v6.75] 개인 전적 팝업용 타이머 변수 추가
+let scoreCountdownInterval = null; // [v6.76] 개인 전적 팝업용 타이머 변수 추가
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
 const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
@@ -211,7 +211,7 @@ function showInfoModal(type) {
     let desc = ""; 
     let icon = "";
     
-    // [v6.75 업데이트] 팝업 글자 돌출 방지를 위한 공통 텍스트 래퍼
+    // [v6.76 업데이트] 팝업 글자 돌출 방지를 위한 공통 텍스트 래퍼
     const wrapStart = "<div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.5; text-align: left;'>";
     const wrapEnd = "</div>";
 
@@ -227,7 +227,7 @@ function showInfoModal(type) {
         icon = "🌡️"; 
         title = "최근 컨디션 분석 기준";
         desc = wrapStart + "• ☀️<b>최상</b>: 1위 비율 30%↑<br>• ⛅<b>보통</b>: 1위 비율 30% 미만. 안정적인 보통 순위<br>• ⚡<b>도깨비</b>: 1위 30%↑ & 꼴찌 30%↑<br>• 🌧️<b>비상</b>: 꼴찌 비율 30%↑" + wrapEnd;
-    } else if (type === 'style') { // [v6.75 신규 추가] 당구 성향 분석 팝업
+    } else if (type === 'style') { // [v6.76 신규 추가] 당구 성향 분석 팝업
         icon = "🎱";
         title = "당구 성향 분석 기준";
         desc = wrapStart + "<b>[승률 35% & 생존율 80% 기준]</b><br><br>• 👑 <b>전략적 지배자</b>: 승률↑ & 생존율↑<br>• 🐅 <b>폭격형 호랑이</b>: 승률↑ & 생존율↓<br>• 🐢 <b>철벽 거북이</b>: 승률↓ & 생존율↑<br>• 🐣 <b>성장하는 꿈나무</b>: 승률↓ & 생존율↓" + wrapEnd;
@@ -249,7 +249,7 @@ function showInfoModal(type) {
         descEl.style.color = ''; 
     }
 
-    // [v6.75 업데이트] 확대 모드(Zoom)에서도 팝업창 크기를 기본 모드처럼 원상 복구
+    // [v6.76 업데이트] 확대 모드(Zoom)에서도 팝업창 크기를 기본 모드처럼 원상 복구
     const popupBox = document.getElementById('info-modal-title').parentElement;
     if (popupBox) {
         if (document.body.classList.contains('zoom-active')) {
@@ -534,7 +534,7 @@ function closePlayerScoreModal() {
     
     if (scoreModalTimeout) clearTimeout(scoreModalTimeout); 
     if (hideScoreModalTimeout) clearTimeout(hideScoreModalTimeout);
-    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; } // [v6.75] 이 줄을 추가하세요
+    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; } // [v6.76] 이 줄을 추가하세요
     if(!modal || !content) return; 
     
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards'; 
@@ -1130,7 +1130,7 @@ function renderMemberHistory(name, rank = "") {
         scoreModal.style.display = 'flex'; 
         scoreContent.style.animation = 'scaleUpPopup 0.4s forwards'; 
         
-        // [v6.75] 기존 3초 자동 종료를 제거하고 10초 카운트다운 로직 추가
+        // [v6.76] 기존 3초 자동 종료를 제거하고 10초 카운트다운 로직 추가
         if (scoreCountdownInterval) clearInterval(scoreCountdownInterval);
         let sLeft = 10;
         scoreCountdownInterval = setInterval(() => {
@@ -1652,10 +1652,10 @@ function searchRecords() {
     let cond = (wRatio >= 0.3 && lRatio >= 0.3) ? ["⚡", "도깨비", "var(--rank3)"] : (wRatio >= 0.3 ? ["☀️", "최상", "var(--rankL)"] : (lRatio >= 0.3 ? ["🌧️", "비상", "var(--rank1)"] : ["⛅", "보통", "var(--rank2)"]));
   
     let winRateVal = Math.round(winRateFloat);
-    let avgScoreVal = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); // [v6.75] 변수명 오타 수정 완료
+    let avgScoreVal = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); // [v6.76] 변수명 오타 수정 완료
     let safetyVal = safetyRate;
 
-    // --- [v6.75 신규] 스포트라이트용 랜덤 컬러셋 (파스텔톤 8종) ---
+    // --- [v6.76 신규] 스포트라이트용 랜덤 컬러셋 (파스텔톤 8종) ---
     const spotlightColors = [
         { bg: 'rgba(255, 173, 173, 0.25)', shadow: 'rgba(255, 173, 173, 0.5)', border: '#FFADAD' },
         { bg: 'rgba(255, 214, 165, 0.25)', shadow: 'rgba(255, 214, 165, 0.5)', border: '#FFD6A5' },
@@ -1668,7 +1668,7 @@ function searchRecords() {
     ];
     const pick = spotlightColors[Math.floor(Math.random() * spotlightColors.length)];
 
-    // [v6.75] 네온 사인 효과가 적용된 스포트라이트 카드 생성 함수
+    // [v6.76] 네온 사인 효과가 적용된 스포트라이트 카드 생성 함수
     function createSpotlightCard(label, value, subValue = "") {
         // pick.border 색상을 기반으로 더 진한 네온 광채 색상 계산
         const neonColor = pick.border; 
@@ -1692,7 +1692,7 @@ function searchRecords() {
                 </div>`;
     }
 
-    // --- [v6.75 당구 성향 분석(Billiards Style) 로직 유지] ---
+    // --- [v6.76 당구 성향 분석(Billiards Style) 로직 유지] ---
     let billiardsStyle = "";
     let styleDesc = "";
     let styleColor = "";
@@ -1748,7 +1748,7 @@ function searchRecords() {
                                ${createSpotlightCard("컨디션", `<span style="color: ${cond[2]};">${cond[0]}${cond[1]}</span>`)}
                            </div>
                        </div>`;
-    // --- [v6.75 로직 끝] ---
+    // --- [v6.76 로직 끝] ---
                       
     lArea.innerHTML = `<div style="max-height:250px; overflow-y:auto; padding-right:5px; margin-top:15px;">
                            ${filtered.map(g => {
