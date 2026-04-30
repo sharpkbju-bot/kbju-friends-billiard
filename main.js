@@ -587,33 +587,52 @@ function isHoliday(year, month, day) {
 }
 
 function renderCalendar() {
-    const grid = document.getElementById('calendarGrid'); 
+    const grid = document.getElementById('calendarGrid');
     grid.innerHTML = "";
-    const year = currentViewDate.getFullYear(); 
+    const year = currentViewDate.getFullYear();
     const month = currentViewDate.getMonth();
-    const realTodayStr = formatDate(new Date()); 
+    const realTodayStr = formatDate(new Date());
     
-    document.getElementById('monthDisplay').innerText = `${year}년 ${month + 1}월`;
+    // [디자인 변경] 헤더 연.월 표시 형식 변경 (예: 2026.04)
+    document.getElementById('monthDisplay').innerText = `${year}.${String(month + 1).padStart(2, '0')}`;
     
-    ["일","월","화","수","목","금","토"].forEach((d, idx) => { 
-        let color = "#95a5a6"; 
-        if(idx === 0) color = "#e67e22"; 
-        if(idx === 6) color = "#5dade2"; 
-        grid.innerHTML += `<div class="weekday" style="color:${color}">${d}</div>`; 
+    // 요일 렌더링 - 텍스트를 더 얇고 세련되게
+    const daysLabel = ["일","월","화","수","목","금","토"];
+    daysLabel.forEach((d, idx) => {
+        let color = "var(--sub-text)";
+        if(idx === 0) color = "#ff7675"; // 일요일
+        if(idx === 6) color = "#74b9ff"; // 토요일
+        grid.innerHTML += `<div class="weekday" style="color:${color}; font-size: 11px; font-weight: 700; opacity: 0.6; padding-bottom: 15px;">${d}</div>`;
     });
     
-    const firstDay = new Date(year, month, 1).getDay(); 
+    const firstDay = new Date(year, month, 1).getDay();
     const lastDate = new Date(year, month + 1, 0).getDate();
     
+    // 빈 칸
     for (let i = 0; i < firstDay; i++) {
         grid.innerHTML += `<div></div>`;
     }
     
+    // 날짜 렌더링
     for (let d = 1; d <= lastDate; d++) {
-        const dStr = formatDate(new Date(year, month, d)); 
+        const dStr = formatDate(new Date(year, month, d));
         const dayOfWeek = new Date(year, month, d).getDay();
-        let dayClass = (dayOfWeek === 0 || isHoliday(year, month, d)) ? "sun holiday" : (dayOfWeek === 6 ? "sat" : "");
-        grid.innerHTML += `<div class="day ${dayClass} ${dStr === selectedDateStr ? 'selected' : ''} ${dStr === realTodayStr ? 'today' : ''} ${gameLogs.some(g => g.dateStr === dStr) ? 'has-record' : ''}" onclick="selectDate('${dStr}')">${d}</div>`;
+        const hasRecord = gameLogs.some(g => g.dateStr === dStr);
+        
+        let dayClass = "day-new";
+        if (dStr === selectedDateStr) dayClass += " selected-new";
+        if (dStr === realTodayStr) dayClass += " today-new";
+        if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
+        if (dayOfWeek === 6) dayClass += " sat-new";
+        
+        // 기록이 있는 날은 숫자 아래에 세련된 작은 점(dot) 표시
+        const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
+
+        grid.innerHTML += `
+            <div class="${dayClass}" onclick="selectDate('${dStr}')">
+                <span class="day-num">${d}</span>
+                ${recordDot}
+            </div>`;
     }
 }
 
