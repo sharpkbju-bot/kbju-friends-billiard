@@ -218,7 +218,7 @@ function showInfoModal(type) {
     if (type === 'score') {
         icon = "📊"; 
         title = "인원별 차등 승점 기준";
-        // [v6.77 수정] 승점 기준 팝업은 무조건 한 줄로 나오도록 nowrap 적용 (보존)
+        // [v6.77 수정] 승점 기준 팝업은 무조건 한 줄로 나오도록 nowrap 적용
         desc = "<div style='white-space: nowrap; line-height: 1.5; text-align: left;'>• <b>2인</b>: 1위(+2), 꼴찌(0)<br>• <b>3인</b>: 1위(+3), 2위(+1), 꼴찌(0)<br>• <b>4인</b>: 1위(+4), 2위(+3), 3위(+2), 꼴찌(0)<br>• <b>5인</b>: 1위(+5), 2위(+4), 3위(+3), 4위(+1), 꼴찌(0)</div>";
     } else if (type === 'tier') {
         icon = "🏅"; 
@@ -862,7 +862,7 @@ function renderStats() {
         subtitleEl.innerText = isPercentMode ? "(평균 승점 기준. 확률 %)" : "(평균 승점 기준. 횟수)";
     }
 
-    // [v7.00] 인원별 필터링 값 가져오기
+    // [v7.51] 인원별 필터링 값 가져오기
     const filterEl = document.getElementById('statsFilterCount');
     const filterVal = filterEl ? filterEl.value : "all";
 
@@ -872,10 +872,8 @@ function renderStats() {
     gameLogs.forEach(g => {
         const actual = g.ranks.filter(n => n.trim() !== "");
         
-        // [v7.00] 필터 조건에 맞지 않는 게임 건너뛰기
-        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) {
-            return;
-        }
+        // [v7.51] 콤보박스 조건에 맞지 않는 인원의 게임 건너뛰기
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
 
         actual.forEach((name, idx) => { 
             if(stats[name]) { 
@@ -942,12 +940,20 @@ function renderStats() {
 }
 
 function showDefenseDetail(playerName) {
+    // [v7.51] 인원별 필터링 값 가져오기
+    const filterEl = document.getElementById('statsFilterCount');
+    const filterVal = filterEl ? filterEl.value : "all";
+
     let victimStats = {}; 
 
     gameLogs.forEach(g => {
         if (g.startOrder && g.startOrder.includes(playerName)) {
-            const order = g.startOrder;
             const actual = g.ranks.filter(n => n && n.trim() !== "");
+            
+            // [v7.51] 콤보박스 조건에 맞지 않는 인원의 게임 건너뛰기
+            if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+
+            const order = g.startOrder;
             const pIdx = order.indexOf(playerName);
             const victimName = order[(pIdx + 1) % order.length]; 
             
@@ -968,14 +974,16 @@ function showDefenseDetail(playerName) {
         (victimStats[b].totalRank / victimStats[b].games) - (victimStats[a].totalRank / victimStats[a].games)
     );
 
+    let filterText = filterVal === "all" ? "" : `<span style="color:var(--accent); font-size:11px;">(${filterVal}인 게임 기준)</span>`;
+
     let html = `<div id="defense-modal-capture-area" style="padding: 10px; border-radius: 15px; background: transparent; display: block;">
                 <div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">🛡️</div>
                 <div style="font-size:19px; font-weight:900; color:var(--text-color); margin-bottom:5px; line-height:1.4; display:block; text-align:center;">${playerName}의 방어 리포트</div>
-                <div style="font-size:13px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; line-height:1.4; display:block; text-align:center;">(내 바로 뒷주자 선수들의 성적 분석)</div>
+                <div style="font-size:13px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; line-height:1.4; display:block; text-align:center;">(내 바로 뒷주자 선수들의 성적 분석) ${filterText}</div>
                 <div style="display:block;">`;
 
     if (victims.length === 0) {
-        html += `<div style="padding:30px; color:var(--sub-text); font-weight:800; text-align:center; display:block;">분석 가능한 데이터가 없습니다.</div>`;
+        html += `<div style="padding:30px; color:var(--sub-text); font-weight:800; text-align:center; display:block;">해당 조건의 분석 가능한 데이터가 없습니다.</div>`;
     } else {
         victims.forEach(v => {
             const s = victimStats[v];
@@ -1026,6 +1034,96 @@ function closeDefenseDetail() {
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards';
     setTimeout(() => { modal.style.display = 'none'; content.style.animation = 'none'; }, 300);
 }
+
+function shareDefenseDetail(name) {
+    captureAndShare('defense-modal-capture-area', 'defense-modal-share-btn', `${name}_defense_detail.png`, `${name}의 디펜스 리포트`, `${name} 선수가 방어한 다른 멤버들의 성적 분석 결과입니다!`);
+}
+
+function renderDefenseStats() {
+    // [v7.51] 인원별 필터링 값 가져오기
+    const filterEl = document.getElementById('statsFilterCount');
+    const filterVal = filterEl ? filterEl.value : "all";
+
+    let defenseStats = {};
+    players.forEach(p => defenseStats[p] = { totalNextRank: 0, count: 0 });
+
+    gameLogs.forEach(g => {
+        if (g.startOrder && g.startOrder.length > 0) {
+            const actual = g.ranks.filter(n => n && n.trim() !== "");
+            
+            // [v7.51] 콤보박스 조건에 맞지 않는 인원의 게임 건너뛰기
+            if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+
+            const order = g.startOrder;
+            for (let i = 0; i < order.length; i++) {
+                const preP = order[i];
+                const nextP = order[(i + 1) % order.length];
+                const nextPRankIdx = actual.indexOf(nextP);
+
+                if (nextPRankIdx !== -1 && defenseStats[preP]) {
+                    defenseStats[preP].totalNextRank += (nextPRankIdx + 1);
+                    defenseStats[preP].count++;
+                }
+            }
+        }
+    });
+
+    const activePlayers = players.filter(p => defenseStats[p].count > 0);
+
+    activePlayers.sort((a, b) => {
+        const avgA = defenseStats[a].totalNextRank / defenseStats[a].count;
+        const avgB = defenseStats[b].totalNextRank / defenseStats[b].count;
+        return avgB - avgA; 
+    });
+
+    const tbody = document.getElementById('defenseBody');
+    if (!tbody) return;
+
+    if (activePlayers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">데이터가 없습니다.</td></tr>`;
+        return;
+    }
+
+    let currentRank = 1;
+    let html = '';
+    activePlayers.forEach((p, index) => {
+        const avgRank = (defenseStats[p].totalNextRank / defenseStats[p].count).toFixed(2);
+        
+        if (index > 0) {
+            const prevP = activePlayers[index - 1];
+            const prevAvg = (defenseStats[prevP].totalNextRank / defenseStats[prevP].count).toFixed(2);
+            if (avgRank !== prevAvg) {
+                currentRank = index + 1;
+            }
+        }
+
+        let rankLabel = currentRank + '위';
+        let rankColor = 'var(--text-color)';
+        
+        if (currentRank === 1) { 
+            rankLabel = '1위🥇'; 
+            rankColor = 'var(--rank1)'; 
+        } else if (currentRank === 2) { 
+            rankColor = 'var(--rank2)'; 
+        } else if (currentRank === 3) { 
+            rankColor = 'var(--rank3)'; 
+        } else if (currentRank === activePlayers.length && activePlayers.length > 3) { 
+            rankColor = 'var(--rankL)'; 
+        }
+
+        html += `<tr onclick="showDefenseDetail('${p}')" style="cursor:pointer;">
+                    <td style="color:${rankColor}; font-weight:900;">${rankLabel}</td>
+                    <td style="color:${getPlayerColor(p)}; font-weight:900; text-decoration:underline;">${p}</td>
+                    <td style="color:#5D4037;">${defenseStats[p].count}전</td>
+                    <td style="color:var(--accent); font-weight:900;">${avgRank}위</td>
+                 </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+function shareDefenseResult() {
+    captureAndShare('defense-capture-area', 'defense-share-btn', 'defense_ranking.png', 'Defense 순위', '멤버별 전체 디펜스 랭킹입니다!');
+}
 function closeMemberHistory() {
     const area = document.getElementById('memberHistoryArea');
     area.style.display = 'none';
@@ -1038,21 +1136,21 @@ function closeMemberHistory() {
 function renderMemberHistory(name, rank = "") {
     const area = document.getElementById('memberHistoryArea');
     
-    // [v7.50 신규 로직] 콤보 박스에서 현재 선택된 필터 값 읽어오기
+    // [v7.51] 콤보 박스에서 현재 선택된 필터 값 읽어오기 연동
     const filterEl = document.getElementById('statsFilterCount');
     const filterVal = filterEl ? filterEl.value : "all";
 
-    // [v7.50 신규 로직] 선택된 인원수에 맞는 게임만 필터링하여 개인 전적 추출
+    // [v7.51] 선택된 인원수에 맞는 게임만 필터링하여 개인 전적 추출
     const allPersonal = gameLogs.filter(g => {
         const actual = g.ranks.filter(n => n.trim() !== "");
-        if (!actual.includes(name)) return false; // 해당 선수가 참여하지 않은 게임 제외
-        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return false; // 선택한 인원수와 다르면 제외
+        if (!actual.includes(name)) return false; 
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return false; 
         return true;
     }).sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || ((parseInt(b.round) || 0) - (parseInt(a.round) || 0)));
     
     if (allPersonal.length === 0) { 
         const toast = document.getElementById('toast'); 
-        toast.innerText = "해당 인원으로 진행한 기록이 없습니다."; 
+        toast.innerText = "해당 조건의 기록이 없습니다."; 
         toast.style.display = 'block'; 
         setTimeout(() => { toast.style.display = 'none'; }, 2000); 
         return; 
@@ -1070,6 +1168,7 @@ function renderMemberHistory(name, rank = "") {
     
     if (scoreModalTimeout) clearTimeout(scoreModalTimeout); 
     if (hideScoreModalTimeout) clearTimeout(hideScoreModalTimeout);
+    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; } 
     
     if(scoreModal && scoreContent) { 
         scoreContent.innerHTML = `<div style="font-size:clamp(45px, 10vw, 55px); margin-bottom:5px; display:block; text-align:center;">${playerThemes[name].emoji}</div>
@@ -1094,7 +1193,6 @@ function renderMemberHistory(name, rank = "") {
         scoreModal.style.display = 'flex'; 
         scoreContent.style.animation = 'scaleUpPopup 0.4s forwards'; 
         
-        if (scoreCountdownInterval) clearInterval(scoreCountdownInterval);
         let sLeft = 10;
         scoreCountdownInterval = setInterval(() => {
             sLeft--;
@@ -1107,6 +1205,7 @@ function renderMemberHistory(name, rank = "") {
         }, 1000);
     }
 
+    // [v7.51] 프로필 타이틀에 현재 필터링 상태 표시 추가
     let html = `<div style="font-size:15px; font-weight:900; color:${getPlayerColor(name)}; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px dashed ${getPlayerColor(name)}50; padding-bottom:10px;">
                     <div>${playerThemes[name].emoji} ${name} 프로필 <span style="font-size:11px; color:#999;">(${filterVal === 'all' ? '전체' : filterVal + '인 게임'})</span></div>
                     <div style="font-size:13px; cursor:pointer;" onclick="closeMemberHistory()">닫기 ✕</div>
@@ -1767,7 +1866,6 @@ window.onload = () => {
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
-
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
