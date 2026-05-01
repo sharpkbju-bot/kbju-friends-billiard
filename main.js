@@ -1865,6 +1865,10 @@ window.onload = () => {
     }, 3000);
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
+    const filterEl = document.getElementById('statsFilterCount');
+if (filterEl) {
+    filterEl.addEventListener('change', () => { renderDefenseStats(); });
+}
 };
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
