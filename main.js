@@ -218,7 +218,8 @@ function showInfoModal(type) {
     if (type === 'score') {
         icon = "📊"; 
         title = "인원별 차등 승점 기준";
-        desc = wrapStart + "• <b>2인</b>: 1위(+2), 꼴찌(0)<br>• <b>3인</b>: 1위(+3), 2위(+1), 꼴찌(0)<br>• <b>4인</b>: 1위(+4), 2위(+3), 3위(+2), 꼴찌(0)<br>• <b>5인</b>: 1위(+5), 2위(+4), 3위(+3), 4위(+1), 꼴찌(0)" + wrapEnd;
+        // [v6.77 수정] 승점 기준 팝업은 무조건 한 줄로 나오도록 nowrap 적용
+        desc = "<div style='white-space: nowrap; line-height: 1.5; text-align: left;'>• <b>2인</b>: 1위(+2), 꼴찌(0)<br>• <b>3인</b>: 1위(+3), 2위(+1), 꼴찌(0)<br>• <b>4인</b>: 1위(+4), 2위(+3), 3위(+2), 꼴찌(0)<br>• <b>5인</b>: 1위(+5), 2위(+4), 3위(+3), 4위(+1), 꼴찌(0)</div>";
     } else if (type === 'tier') {
         icon = "🏅"; 
         title = "랭킹 티어(계급) 기준";
@@ -272,7 +273,6 @@ function closeInfoModal() {
         infoModalCountdownInterval = null;
     }
 }
-
 function showLastGameResult() {
     if (!gameLogs || gameLogs.length === 0) { 
         if (document.getElementById('loading').style.display === 'none') return;
@@ -534,7 +534,7 @@ function closePlayerScoreModal() {
     
     if (scoreModalTimeout) clearTimeout(scoreModalTimeout); 
     if (hideScoreModalTimeout) clearTimeout(hideScoreModalTimeout);
-    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; } // [v6.76] 이 줄을 추가하세요
+    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; } 
     if(!modal || !content) return; 
     
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards'; 
@@ -593,27 +593,23 @@ function renderCalendar() {
     const month = currentViewDate.getMonth();
     const realTodayStr = formatDate(new Date());
     
-    // [디자인 변경] 헤더 연.월 표시 형식 변경 (예: 2026.04)
     document.getElementById('monthDisplay').innerText = `${year}.${String(month + 1).padStart(2, '0')}`;
     
-    // 요일 렌더링 - 텍스트를 더 얇고 세련되게
     const daysLabel = ["일","월","화","수","목","금","토"];
     daysLabel.forEach((d, idx) => {
         let color = "var(--sub-text)";
-        if(idx === 0) color = "#ff7675"; // 일요일
-        if(idx === 6) color = "#74b9ff"; // 토요일
+        if(idx === 0) color = "#ff7675"; 
+        if(idx === 6) color = "#74b9ff"; 
         grid.innerHTML += `<div class="weekday" style="color:${color}; font-size: 11px; font-weight: 700; opacity: 0.6; padding-bottom: 15px;">${d}</div>`;
     });
     
     const firstDay = new Date(year, month, 1).getDay();
     const lastDate = new Date(year, month + 1, 0).getDate();
     
-    // 빈 칸
     for (let i = 0; i < firstDay; i++) {
         grid.innerHTML += `<div></div>`;
     }
     
-    // 날짜 렌더링
     for (let d = 1; d <= lastDate; d++) {
         const dStr = formatDate(new Date(year, month, d));
         const dayOfWeek = new Date(year, month, d).getDay();
@@ -625,7 +621,6 @@ function renderCalendar() {
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
         
-        // 기록이 있는 날은 숫자 아래에 세련된 작은 점(dot) 표시
         const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
 
         grid.innerHTML += `
@@ -635,14 +630,13 @@ function renderCalendar() {
             </div>`;
     }
 
-    // --- [v6.77] 하단 타임라인 렌더링 로직 추가 ---
+    // --- [v6.77] 하단 타임라인 렌더링 로직 유지 ---
     const timelineWrap = document.getElementById('monthRecordTimeline');
     if (timelineWrap) {
         timelineWrap.innerHTML = ""; 
         const currentMonthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
         const monthGames = gameLogs.filter(g => g.dateStr.startsWith(currentMonthPrefix));
         
-        // 중복 날짜 제거 및 오름차순 정렬
         const uniqueDates = [...new Set(monthGames.map(g => g.dateStr))].sort();
         
         if (uniqueDates.length > 0) {
@@ -673,7 +667,6 @@ function selectDate(dateStr) {
     selectedDateStr = dateStr;
     document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`;
     
-    // 달력 및 타임라인 상태 갱신
     renderCalendar();
     renderGameList();
     
@@ -685,6 +678,7 @@ function selectDate(dateStr) {
         }, 100);
     }
 }
+
 function checkDuplicates() { 
     const selects = Array.from(document.querySelectorAll('#inputArea select')); 
     const values = selects.map(s => s.value); 
@@ -773,7 +767,6 @@ async function saveGame() {
         showLoading(false); 
     }
 }
-
 function analyzeStrategy() {
     const me = document.getElementById('strategyPlayer').value; 
     const resArea = document.getElementById('strategyResultArea');
@@ -1105,6 +1098,7 @@ function renderDefenseStats() {
 function shareDefenseResult() {
     captureAndShare('defense-capture-area', 'defense-share-btn', 'defense_ranking.png', 'Defense 순위', '멤버별 전체 디펜스 랭킹입니다!');
 }
+
 function closeMemberHistory() {
     const area = document.getElementById('memberHistoryArea');
     area.style.display = 'none';
