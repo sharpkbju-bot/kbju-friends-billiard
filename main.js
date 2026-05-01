@@ -851,6 +851,13 @@ async function executeReset() {
     } 
 }
 
+// [v7.53 신규 추가] 인원별 필터 콤보 박스 중앙 통제 사령탑 함수
+function onFilterChange() {
+    renderStats();           // 1. 누적 전적 테이블 갱신
+    renderDefenseStats();    // 2. 디펜스 순위표 갱신
+    closeMemberHistory();    // 3. 기존에 열려있던 개인 히스토리 창 닫기 (새 필터 적용을 위해 초기화)
+}
+
 function toggleAllMode() { 
     isPercentMode = !isPercentMode; 
     renderStats(); 
@@ -862,7 +869,6 @@ function renderStats() {
         subtitleEl.innerText = isPercentMode ? "(평균 승점 기준. 확률 %)" : "(평균 승점 기준. 횟수)";
     }
 
-    // [v7.51] 인원별 필터링 값 가져오기
     const filterEl = document.getElementById('statsFilterCount');
     const filterVal = filterEl ? filterEl.value : "all";
 
@@ -872,7 +878,6 @@ function renderStats() {
     gameLogs.forEach(g => {
         const actual = g.ranks.filter(n => n.trim() !== "");
         
-        // [v7.51] 콤보박스 조건에 맞지 않는 인원의 게임 건너뛰기
         if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
 
         actual.forEach((name, idx) => { 
@@ -940,7 +945,6 @@ function renderStats() {
 }
 
 function showDefenseDetail(playerName) {
-    // [v7.51] 인원별 필터링 값 가져오기
     const filterEl = document.getElementById('statsFilterCount');
     const filterVal = filterEl ? filterEl.value : "all";
 
@@ -950,7 +954,6 @@ function showDefenseDetail(playerName) {
         if (g.startOrder && g.startOrder.includes(playerName)) {
             const actual = g.ranks.filter(n => n && n.trim() !== "");
             
-            // [v7.51] 콤보박스 조건에 맞지 않는 인원의 게임 건너뛰기
             if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
 
             const order = g.startOrder;
@@ -1040,7 +1043,6 @@ function shareDefenseDetail(name) {
 }
 
 function renderDefenseStats() {
-    // [v7.51] 인원별 필터링 값 가져오기
     const filterEl = document.getElementById('statsFilterCount');
     const filterVal = filterEl ? filterEl.value : "all";
 
@@ -1051,7 +1053,6 @@ function renderDefenseStats() {
         if (g.startOrder && g.startOrder.length > 0) {
             const actual = g.ranks.filter(n => n && n.trim() !== "");
             
-            // [v7.51] 콤보박스 조건에 맞지 않는 인원의 게임 건너뛰기
             if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
 
             const order = g.startOrder;
@@ -1080,7 +1081,7 @@ function renderDefenseStats() {
     if (!tbody) return;
 
     if (activePlayers.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">데이터가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">해당 인원의 데이터가 없습니다.</td></tr>`;
         return;
     }
 
@@ -1136,11 +1137,11 @@ function closeMemberHistory() {
 function renderMemberHistory(name, rank = "") {
     const area = document.getElementById('memberHistoryArea');
     
-    // [v7.51] 콤보 박스에서 현재 선택된 필터 값 읽어오기 연동
+    // [v7.53] 사령탑 함수와 연동된 콤보 박스 필터 값 읽어오기
     const filterEl = document.getElementById('statsFilterCount');
     const filterVal = filterEl ? filterEl.value : "all";
 
-    // [v7.51] 선택된 인원수에 맞는 게임만 필터링하여 개인 전적 추출
+    // [v7.53] 선택된 인원수에 맞는 게임만 필터링하여 개인 전적 추출
     const allPersonal = gameLogs.filter(g => {
         const actual = g.ranks.filter(n => n.trim() !== "");
         if (!actual.includes(name)) return false; 
@@ -1205,7 +1206,7 @@ function renderMemberHistory(name, rank = "") {
         }, 1000);
     }
 
-    // [v7.51] 프로필 타이틀에 현재 필터링 상태 표시 추가
+    // [v7.53] 프로필 타이틀에 현재 필터링 상태 표시
     let html = `<div style="font-size:15px; font-weight:900; color:${getPlayerColor(name)}; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px dashed ${getPlayerColor(name)}50; padding-bottom:10px;">
                     <div>${playerThemes[name].emoji} ${name} 프로필 <span style="font-size:11px; color:#999;">(${filterVal === 'all' ? '전체' : filterVal + '인 게임'})</span></div>
                     <div style="font-size:13px; cursor:pointer;" onclick="closeMemberHistory()">닫기 ✕</div>
@@ -1835,6 +1836,7 @@ function searchRecords() {
     setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 }
 
+// [v7.53 변경 사항] 기존 addEventListener 제거로 HTML 인라인 onchange와 충돌 방지
 window.onload = () => { 
     try {
         searchFlatpickr = flatpickr("#searchDateRange", { 
@@ -1865,11 +1867,8 @@ window.onload = () => {
     }, 3000);
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
-    const filterEl = document.getElementById('statsFilterCount');
-if (filterEl) {
-    filterEl.addEventListener('change', () => { renderDefenseStats(); });
-}
 };
+
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
