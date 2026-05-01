@@ -275,20 +275,18 @@ body {
 }
 
 /* ==========================================================================
-   [v6.77] 타임라인(Timeline) 스타일 추가 섹션
+   [v6.77] 타임라인(Timeline) 스타일 추가 섹션 (스크롤 삭제 및 퍼플 톤 변경)
    ==========================================================================
 */
 .timeline-wrap {
     margin-top: 25px;
     padding: 15px 5px 5px 5px;
     display: flex;
-    overflow-x: auto;
+    flex-wrap: wrap; /* 가로 스크롤 삭제 후 줄바꿈 되도록 추가 */
+    justify-content: center; /* 가운데 정렬 추가 */
     gap: 15px;
-    scrollbar-width: none; 
-    -ms-overflow-style: none;  
     border-top: 1px dashed rgba(0,0,0,0.1);
 }
-.timeline-wrap::-webkit-scrollbar { display: none; }
 
 .timeline-item {
     display: flex;
@@ -319,14 +317,15 @@ body {
     justify-content: center;
 }
 
+/* 밝은 퍼플(#c39bd3) 컬러로 액티브 상태 일괄 변경 */
 .timeline-item.active .timeline-dot {
-    background: var(--accent) !important;
-    border-color: var(--accent) !important;
-    box-shadow: 0 0 10px var(--accent);
+    background: #c39bd3 !important;
+    border-color: #c39bd3 !important;
+    box-shadow: 0 0 10px #c39bd3;
 }
 
 .timeline-item.active .timeline-date {
-    color: var(--accent);
+    color: #c39bd3;
     font-weight: 900;
 }
 
@@ -349,9 +348,6 @@ select#playerCount, select#themeSelect {
     margin-left: auto; 
     border-radius: 8px !important; 
 }
-select#playerCount { width: 85px !important; }
-select#themeSelect { width: 120px !important; font-weight: 800; color: #4a148c; cursor: pointer; }
-
 .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; width: 100%; }
 .input-row label { width: 85px; min-width: 85px; max-width: 85px; font-size: 13px; font-weight: 800; color: var(--label-text); flex-shrink: 0; white-space: nowrap; }
 
