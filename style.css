@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v6.76 - Minimal Modern Calendar Update */
+/* Billiard World Style v6.77 - Timeline Feature Update */
 :root { 
     --main: #7f8c8d; 
     --bg: rgba(236, 238, 241, 0.4); 
@@ -183,9 +183,8 @@ body {
 .welcome-logo { width: 60px; height: auto; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
 .welcome-text { font-size: 14px; font-weight: 300; line-height: 1.6; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: "Apple Chancery", "Snell Roundhand", "Comic Sans MS", cursive; }
 
-/* 
-   ==========================================================================
-   [v6.76] 미니멀 모던 달력 스타일 섹션 (통째로 교체된 부분)
+/* ==========================================================================
+   [v6.76] 미니멀 모던 달력 스타일 섹션
    ==========================================================================
 */
 .calendar-card {
@@ -227,7 +226,7 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border-radius: 50%; /* 서클 포인트 디자인 */
+    border-radius: 50%; 
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -238,17 +237,14 @@ body {
     color: var(--text-color);
 }
 
-/* 휴일 및 주말 색상 */
 .sun-new .day-num { color: #ff7675; }
 .sat-new .day-num { color: #74b9ff; }
 
-/* 오늘 표시: 테두리로 강조 */
 .today-new {
     border: 1.5px solid var(--accent);
 }
 .today-new .day-num { color: var(--accent); }
 
-/* 선택된 날짜: 강조 컬러 서클 */
 .selected-new {
     background: var(--accent) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -256,13 +252,12 @@ body {
 }
 .selected-new .day-num { color: #ffffff !important; }
 
-/* 기록 표시: 숫자 아래 작은 점(Dot) */
 .record-dot {
     position: absolute;
     bottom: 6px;
     width: 4px;
     height: 4px;
-    background: #2e7d32; /* 세련된 민트그린 */
+    background: #2e7d32; 
     border-radius: 50%;
     z-index: 3;
 }
@@ -277,6 +272,70 @@ body {
 }
 [data-theme='dark'] .day-new:hover:not(.selected-new), [data-theme='navy'] .day-new:hover:not(.selected-new) {
     background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   [v6.77] 타임라인(Timeline) 스타일 추가 섹션
+   ==========================================================================
+*/
+.timeline-wrap {
+    margin-top: 25px;
+    padding: 15px 5px 5px 5px;
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    scrollbar-width: none; 
+    -ms-overflow-style: none;  
+    border-top: 1px dashed rgba(0,0,0,0.1);
+}
+.timeline-wrap::-webkit-scrollbar { display: none; }
+
+.timeline-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    cursor: pointer;
+    min-width: 40px;
+}
+
+.timeline-date {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--sub-text);
+}
+
+.timeline-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timeline-item.active .timeline-dot {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 10px var(--accent);
+}
+
+.timeline-item.active .timeline-date {
+    color: var(--accent);
+    font-weight: 900;
+}
+
+[data-theme='dark'] .timeline-wrap, [data-theme='navy'] .timeline-wrap {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme='dark'] .timeline-dot, [data-theme='navy'] .timeline-dot {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* ========================================================================== */
