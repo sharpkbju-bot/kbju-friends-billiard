@@ -218,7 +218,7 @@ function showInfoModal(type) {
     if (type === 'score') {
         icon = "📊"; 
         title = "인원별 차등 승점 기준";
-        // [v6.77 수정] 승점 기준 팝업은 무조건 한 줄로 나오도록 nowrap 적용
+        // [v6.77 수정] 승점 기준 팝업은 무조건 한 줄로 나오도록 nowrap 적용 (보존)
         desc = "<div style='white-space: nowrap; line-height: 1.5; text-align: left;'>• <b>2인</b>: 1위(+2), 꼴찌(0)<br>• <b>3인</b>: 1위(+3), 2위(+1), 꼴찌(0)<br>• <b>4인</b>: 1위(+4), 2위(+3), 3위(+2), 꼴찌(0)<br>• <b>5인</b>: 1위(+5), 2위(+4), 3위(+3), 4위(+1), 꼴찌(0)</div>";
     } else if (type === 'tier') {
         icon = "🏅"; 
@@ -273,6 +273,7 @@ function closeInfoModal() {
         infoModalCountdownInterval = null;
     }
 }
+
 function showLastGameResult() {
     if (!gameLogs || gameLogs.length === 0) { 
         if (document.getElementById('loading').style.display === 'none') return;
@@ -444,7 +445,6 @@ function closeOrderModal() {
         lastDrawnPlayers = []; 
     } 
 }
-
 function showPlayersGraph(players) {
     const container = document.getElementById('graph-container'); 
     const legendArea = document.getElementById('graph-legend');
@@ -767,6 +767,7 @@ async function saveGame() {
         showLoading(false); 
     }
 }
+
 function analyzeStrategy() {
     const me = document.getElementById('strategyPlayer').value; 
     const resArea = document.getElementById('strategyResultArea');
@@ -862,11 +863,21 @@ function renderStats() {
         subtitleEl.innerText = isPercentMode ? "(평균 승점 기준. 확률 %)" : "(평균 승점 기준. 횟수)";
     }
 
+    // [v7.00] 인원별 필터링 값 가져오기
+    const filterEl = document.getElementById('statsFilterCount');
+    const filterVal = filterEl ? filterEl.value : "all";
+
     let stats = {}; 
     players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0], score: 0 });
     
     gameLogs.forEach(g => {
         const actual = g.ranks.filter(n => n.trim() !== "");
+        
+        // [v7.00] 필터 조건에 맞지 않는 게임 건너뛰기
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) {
+            return;
+        }
+
         actual.forEach((name, idx) => { 
             if(stats[name]) { 
                 stats[name].played++; 
@@ -1098,7 +1109,6 @@ function renderDefenseStats() {
 function shareDefenseResult() {
     captureAndShare('defense-capture-area', 'defense-share-btn', 'defense_ranking.png', 'Defense 순위', '멤버별 전체 디펜스 랭킹입니다!');
 }
-
 function closeMemberHistory() {
     const area = document.getElementById('memberHistoryArea');
     area.style.display = 'none';
@@ -1830,6 +1840,7 @@ window.onload = () => {
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
+
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
