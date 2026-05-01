@@ -634,12 +634,46 @@ function renderCalendar() {
                 ${recordDot}
             </div>`;
     }
+
+    // --- [v6.77] 하단 타임라인 렌더링 로직 추가 ---
+    const timelineWrap = document.getElementById('monthRecordTimeline');
+    if (timelineWrap) {
+        timelineWrap.innerHTML = ""; 
+        const currentMonthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+        const monthGames = gameLogs.filter(g => g.dateStr.startsWith(currentMonthPrefix));
+        
+        // 중복 날짜 제거 및 오름차순 정렬
+        const uniqueDates = [...new Set(monthGames.map(g => g.dateStr))].sort();
+        
+        if (uniqueDates.length > 0) {
+            timelineWrap.style.display = 'flex';
+            let timelineHtml = '';
+            
+            uniqueDates.forEach(dStr => {
+                const dayParts = dStr.split('-');
+                const dayNum = parseInt(dayParts[2], 10); 
+                const isActive = (dStr === selectedDateStr) ? ' active' : '';
+                
+                timelineHtml += `
+                    <div class="timeline-item${isActive}" onclick="selectDate('${dStr}')">
+                        <div class="timeline-date">${dayNum}</div>
+                        <div class="timeline-dot"></div>
+                    </div>
+                `;
+            });
+            timelineWrap.innerHTML = timelineHtml;
+        } else {
+            timelineWrap.style.display = 'none';
+        }
+    }
 }
 
 function selectDate(dateStr) {
     if(editMode) cancelEdit();
     selectedDateStr = dateStr;
     document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`;
+    
+    // 달력 및 타임라인 상태 갱신
     renderCalendar();
     renderGameList();
     
@@ -651,7 +685,6 @@ function selectDate(dateStr) {
         }, 100);
     }
 }
-
 function checkDuplicates() { 
     const selects = Array.from(document.querySelectorAll('#inputArea select')); 
     const values = selects.map(s => s.value); 
@@ -1072,7 +1105,6 @@ function renderDefenseStats() {
 function shareDefenseResult() {
     captureAndShare('defense-capture-area', 'defense-share-btn', 'defense_ranking.png', 'Defense 순위', '멤버별 전체 디펜스 랭킹입니다!');
 }
-
 function closeMemberHistory() {
     const area = document.getElementById('memberHistoryArea');
     area.style.display = 'none';
@@ -1804,7 +1836,6 @@ window.onload = () => {
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
-
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
