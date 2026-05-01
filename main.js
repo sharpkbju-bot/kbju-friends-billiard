@@ -1037,11 +1037,22 @@ function closeMemberHistory() {
 
 function renderMemberHistory(name, rank = "") {
     const area = document.getElementById('memberHistoryArea');
-    const allPersonal = gameLogs.filter(g => g.ranks.includes(name)).sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || ((parseInt(b.round) || 0) - (parseInt(a.round) || 0)));
+    
+    // [v7.50 신규 로직] 콤보 박스에서 현재 선택된 필터 값 읽어오기
+    const filterEl = document.getElementById('statsFilterCount');
+    const filterVal = filterEl ? filterEl.value : "all";
+
+    // [v7.50 신규 로직] 선택된 인원수에 맞는 게임만 필터링하여 개인 전적 추출
+    const allPersonal = gameLogs.filter(g => {
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        if (!actual.includes(name)) return false; // 해당 선수가 참여하지 않은 게임 제외
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return false; // 선택한 인원수와 다르면 제외
+        return true;
+    }).sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || ((parseInt(b.round) || 0) - (parseInt(a.round) || 0)));
     
     if (allPersonal.length === 0) { 
         const toast = document.getElementById('toast'); 
-        toast.innerText = "기록 없음"; 
+        toast.innerText = "해당 인원으로 진행한 기록이 없습니다."; 
         toast.style.display = 'block'; 
         setTimeout(() => { toast.style.display = 'none'; }, 2000); 
         return; 
@@ -1097,7 +1108,7 @@ function renderMemberHistory(name, rank = "") {
     }
 
     let html = `<div style="font-size:15px; font-weight:900; color:${getPlayerColor(name)}; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px dashed ${getPlayerColor(name)}50; padding-bottom:10px;">
-                    <div>${playerThemes[name].emoji} ${name} 프로필</div>
+                    <div>${playerThemes[name].emoji} ${name} 프로필 <span style="font-size:11px; color:#999;">(${filterVal === 'all' ? '전체' : filterVal + '인 게임'})</span></div>
                     <div style="font-size:13px; cursor:pointer;" onclick="closeMemberHistory()">닫기 ✕</div>
                 </div>`;
                 
