@@ -182,7 +182,6 @@ body {
 
 .welcome-logo { width: 60px; height: auto; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
 .welcome-text { font-size: 14px; font-weight: 300; line-height: 1.6; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: "Apple Chancery", "Snell Roundhand", "Comic Sans MS", cursive; }
-
 /* ==========================================================================
    [v6.76] 미니멀 모던 달력 스타일 섹션
    ==========================================================================
@@ -566,7 +565,6 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 [data-theme='dark'] .btn-edit-p, [data-theme='navy'] .btn-edit-p { background: #2c3e50; color: #3498db; }
 [data-theme='dark'] .btn-del-p, [data-theme='navy'] .btn-del-p { background: #4b2323; color: #ff7675; }
 [data-theme='dark'] .btn-cancel-p, [data-theme='navy'] .btn-cancel-p { background: #3d3d3d; color: #b2bec3; }
-
 #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
 .modal-content { background: rgba(255, 255, 255, 0.8); padding: 35px; border-radius: 12px; text-align: center; width: 80%; max-width: 320px; }
 
@@ -846,4 +844,18 @@ span.flatpickr-weekday {
     display: block;
     margin-top: 5px;
     margin-left: 0 !important;
+}
+
+/* ==========================================================================
+   [v7.00] 인원별 필터링 박스(#statsFilterCount) 스타일 추가
+   ==========================================================================
+*/
+#statsFilterCount {
+    padding: 6px 8px; border-radius: 8px; font-size: 12px; font-weight: 800; 
+    color: #4a148c; background: rgba(236, 238, 241, 0.4); 
+    border: 2px solid transparent; box-shadow: var(--inner-shadow); 
+    flex: none; width: auto; transition: 0.3s; margin-left: auto;
+}
+[data-theme='dark'] #statsFilterCount, [data-theme='navy'] #statsFilterCount { 
+    color: #bb86fc !important; background: rgba(0, 0, 0, 0.3) !important; 
 }
