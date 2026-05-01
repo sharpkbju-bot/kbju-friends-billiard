@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v6.77 - Timeline Feature Update */
+/* Billiard World Style v6.77 - Timeline Feature Update (Fix) */
 :root { 
     --main: #7f8c8d; 
     --bg: rgba(236, 238, 241, 0.4); 
@@ -342,15 +342,21 @@ body {
 .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 12px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
 .setup-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; }
 
+/* 
+   이전 분할 과정에서 누락되었던 중요한 UI 설정 코드를 완벽하게 복구했습니다.
+   아래의 폭(width) 설정 덕분에 '테마 모드'와 '게임 인원' 선택창이 정상적으로 표시됩니다.
+*/
 select#playerCount, select#themeSelect { 
     flex: none !important; 
     padding: 8px !important; 
     margin-left: auto; 
     border-radius: 8px !important; 
 }
+select#playerCount { width: 85px !important; }
+select#themeSelect { width: 120px !important; font-weight: 800; color: #4a148c; cursor: pointer; }
+
 .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; width: 100%; }
 .input-row label { width: 85px; min-width: 85px; max-width: 85px; font-size: 13px; font-weight: 800; color: var(--label-text); flex-shrink: 0; white-space: nowrap; }
-
 select, input[type="date"], input[type="text"]#searchDateRange { 
     width: 0; flex: 1 1 auto; padding: 12px; border-radius: 8px; border: 2px solid transparent; font-size: 14px; 
     background: rgba(236, 238, 241, 0.4); box-shadow: var(--inner-shadow); color: var(--text-color); font-weight: 600; 
