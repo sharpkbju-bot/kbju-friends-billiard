@@ -851,10 +851,10 @@ async function executeReset() {
     } 
 }
 
-// [v7.53 신규 추가] 인원별 필터 콤보 박스 중앙 통제 사령탑 함수
+// [v7.53, v8.00] 콤보 박스 및 월별 선택 중앙 통제 사령탑 함수
 function onFilterChange() {
-    renderStats();           // 1. 누적 전적 테이블 갱신
-    renderDefenseStats();    // 2. 디펜스 순위표 갱신
+    renderStats();           // 1. 누적 전적 테이블 갱신 (월별 + 인원별)
+    renderDefenseStats();    // 2. 디펜스 순위표 갱신 (월별 + 인원별)
     closeMemberHistory();    // 3. 기존에 열려있던 개인 히스토리 창 닫기 (새 필터 적용을 위해 초기화)
 }
 
@@ -872,10 +872,16 @@ function renderStats() {
     const filterEl = document.getElementById('statsFilterCount');
     const filterVal = filterEl ? filterEl.value : "all";
 
+    const monthEl = document.getElementById('statsFilterMonth');
+    const monthVal = monthEl ? monthEl.value : "";
+
     let stats = {}; 
     players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0], score: 0 });
     
     gameLogs.forEach(g => {
+        // [v8.00 신규] 월별 필터 적용
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
+
         const actual = g.ranks.filter(n => n.trim() !== "");
         
         if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
@@ -893,7 +899,7 @@ function renderStats() {
         });
     });
     
-    // [v7.54 수정] 게임 기록이 없는 선수(played === 0)를 최하단으로 정렬
+    // [v7.54 수정 유지] 게임 기록이 없는 선수(played === 0)를 최하단으로 정렬
     const sortedByWin = [...players].sort((a,b) => {
         if (stats[a].played === 0 && stats[b].played > 0) return 1;
         if (stats[b].played === 0 && stats[a].played > 0) return -1;
@@ -954,9 +960,15 @@ function showDefenseDetail(playerName) {
     const filterEl = document.getElementById('statsFilterCount');
     const filterVal = filterEl ? filterEl.value : "all";
 
+    const monthEl = document.getElementById('statsFilterMonth');
+    const monthVal = monthEl ? monthEl.value : "";
+
     let victimStats = {}; 
 
     gameLogs.forEach(g => {
+        // [v8.00 신규] 월별 필터 적용
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
+
         if (g.startOrder && g.startOrder.includes(playerName)) {
             const actual = g.ranks.filter(n => n && n.trim() !== "");
             
@@ -984,11 +996,12 @@ function showDefenseDetail(playerName) {
     );
 
     let filterText = filterVal === "all" ? "" : `<span style="color:var(--accent); font-size:11px;">(${filterVal}인 게임 기준)</span>`;
+    let monthText = monthVal ? `<span style="color:var(--rank1); font-size:11px;">(${monthVal}월 기준)</span>` : "";
 
     let html = `<div id="defense-modal-capture-area" style="padding: 10px; border-radius: 15px; background: transparent; display: block;">
                 <div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">🛡️</div>
                 <div style="font-size:19px; font-weight:900; color:var(--text-color); margin-bottom:5px; line-height:1.4; display:block; text-align:center;">${playerName}의 방어 리포트</div>
-                <div style="font-size:13px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; line-height:1.4; display:block; text-align:center;">(내 바로 뒷주자 선수들의 성적 분석) ${filterText}</div>
+                <div style="font-size:13px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; line-height:1.4; display:block; text-align:center;">(내 바로 뒷주자 선수들의 성적 분석) ${filterText} ${monthText}</div>
                 <div style="display:block;">`;
 
     if (victims.length === 0) {
@@ -1052,10 +1065,16 @@ function renderDefenseStats() {
     const filterEl = document.getElementById('statsFilterCount');
     const filterVal = filterEl ? filterEl.value : "all";
 
+    const monthEl = document.getElementById('statsFilterMonth');
+    const monthVal = monthEl ? monthEl.value : "";
+
     let defenseStats = {};
     players.forEach(p => defenseStats[p] = { totalNextRank: 0, count: 0 });
 
     gameLogs.forEach(g => {
+        // [v8.00 신규] 월별 필터 적용
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
+
         if (g.startOrder && g.startOrder.length > 0) {
             const actual = g.ranks.filter(n => n && n.trim() !== "");
             
@@ -1087,7 +1106,7 @@ function renderDefenseStats() {
     if (!tbody) return;
 
     if (activePlayers.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">해당 인원의 데이터가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">해당 조건의 데이터가 없습니다.</td></tr>`;
         return;
     }
 
@@ -1131,6 +1150,7 @@ function renderDefenseStats() {
 function shareDefenseResult() {
     captureAndShare('defense-capture-area', 'defense-share-btn', 'defense_ranking.png', 'Defense 순위', '멤버별 전체 디펜스 랭킹입니다!');
 }
+
 function closeMemberHistory() {
     const area = document.getElementById('memberHistoryArea');
     area.style.display = 'none';
@@ -1143,12 +1163,16 @@ function closeMemberHistory() {
 function renderMemberHistory(name, rank = "") {
     const area = document.getElementById('memberHistoryArea');
     
-    // [v7.53] 사령탑 함수와 연동된 콤보 박스 필터 값 읽어오기
     const filterEl = document.getElementById('statsFilterCount');
     const filterVal = filterEl ? filterEl.value : "all";
 
-    // [v7.53] 선택된 인원수에 맞는 게임만 필터링하여 개인 전적 추출
+    const monthEl = document.getElementById('statsFilterMonth');
+    const monthVal = monthEl ? monthEl.value : "";
+
+    // [v8.00] 월별 필터 + 인원수 필터 동시 적용
     const allPersonal = gameLogs.filter(g => {
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return false;
+
         const actual = g.ranks.filter(n => n.trim() !== "");
         if (!actual.includes(name)) return false; 
         if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return false; 
@@ -1212,9 +1236,12 @@ function renderMemberHistory(name, rank = "") {
         }, 1000);
     }
 
-    // [v7.53] 프로필 타이틀에 현재 필터링 상태 표시
+    // [v8.00] 프로필 타이틀에 월별 및 인원수 필터 상태 표시
+    let filterText = filterVal === 'all' ? '전체 인원' : filterVal + '인 게임';
+    let monthText = monthVal ? monthVal + '월' : '전체 기간';
+
     let html = `<div style="font-size:15px; font-weight:900; color:${getPlayerColor(name)}; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px dashed ${getPlayerColor(name)}50; padding-bottom:10px;">
-                    <div>${playerThemes[name].emoji} ${name} 프로필 <span style="font-size:11px; color:#999;">(${filterVal === 'all' ? '전체' : filterVal + '인 게임'})</span></div>
+                    <div>${playerThemes[name].emoji} ${name} 프로필 <span style="font-size:11px; color:#999;">(${monthText}, ${filterText})</span></div>
                     <div style="font-size:13px; cursor:pointer;" onclick="closeMemberHistory()">닫기 ✕</div>
                 </div>`;
                 
@@ -1695,7 +1722,7 @@ function searchRecords() {
         });
     });
     
-    // [v7.54 수정] 검색 월에 게임 기록이 없는 선수(played === 0)를 최하단으로 정렬
+    // [v7.54 수정 유지] 검색 월에 게임 기록이 없는 선수(played === 0)를 최하단으로 정렬
     const monthlyRankedPlayers = [...players].sort((a,b) => {
         if (monthlyStatsAll[a].played === 0 && monthlyStatsAll[b].played > 0) return 1;
         if (monthlyStatsAll[b].played === 0 && monthlyStatsAll[a].played > 0) return -1;
@@ -1845,9 +1872,10 @@ function searchRecords() {
     setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 }
 
-// [v7.53 변경 사항] 기존 addEventListener 제거로 HTML 인라인 onchange와 충돌 방지
+// [v8.00 변경 사항] 월별 필터 달력 초기화 로직 추가 및 연동
 window.onload = () => { 
     try {
+        // 기존 월별 검색용 달력
         searchFlatpickr = flatpickr("#searchDateRange", { 
             plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
             locale: "ko", disableMobile: true,
@@ -1859,6 +1887,26 @@ window.onload = () => {
                         setTimeout(() => { toast.style.display = 'none'; setDefaultSearchDates(); }, 3000);
                     }
                 }
+            }
+        });
+
+        // [v8.00 신규] 누적 전적용 월별 필터 달력 (초기화 버튼 내장)
+        flatpickr("#statsFilterMonth", { 
+            plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
+            locale: "ko", disableMobile: true,
+            onChange: function(selectedDates, dateStr, instance) {
+                onFilterChange();
+            },
+            onReady: function(selectedDates, dateStr, instance) {
+                const clearBtnWrap = document.createElement("div");
+                clearBtnWrap.style.padding = "0 10px 10px 10px";
+                clearBtnWrap.innerHTML = "<button type='button' style='width:100%; padding:10px; background:var(--edit); color:white; border:none; border-radius:8px; font-weight:900; font-size:13px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1);'>전체 기간으로 리셋</button>";
+                clearBtnWrap.onclick = function() {
+                    instance.clear();
+                    instance.close();
+                    onFilterChange();
+                };
+                instance.calendarContainer.appendChild(clearBtnWrap);
             }
         });
     } catch(e) {
@@ -1877,6 +1925,7 @@ window.onload = () => {
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
+
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
