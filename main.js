@@ -1872,14 +1872,42 @@ function searchRecords() {
     setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 }
 
-// [v8.00 변경 사항] 월별 필터 달력 초기화 로직 추가 및 연동
+// [v8.00] 변경 사항: 월별 필터 달력 초기화 및 기록 있는 월 강조 추가
 window.onload = () => { 
     try {
+        function applyHighlight(instance) {
+            if (!instance || !instance.calendarContainer) return;
+            const year = instance.currentYear;
+            const monthEls = instance.calendarContainer.querySelectorAll('.flatpickr-monthSelect-month');
+            monthEls.forEach((el, index) => {
+                const monthStr = String(index + 1).padStart(2, '0');
+                const targetPrefix = `${year}-${monthStr}`;
+                const hasRecord = gameLogs.some(g => g.dateStr.startsWith(targetPrefix));
+                
+                if (hasRecord) {
+                    if (!el.classList.contains('selected')) {
+                        el.style.backgroundColor = '#5D4037';
+                        el.style.color = '#ffffff';
+                    } else {
+                        el.style.backgroundColor = '';
+                        el.style.color = '';
+                    }
+                } else {
+                    el.style.backgroundColor = '';
+                    el.style.color = '';
+                }
+            });
+        }
+
         // 기존 월별 검색용 달력
         searchFlatpickr = flatpickr("#searchDateRange", { 
             plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
             locale: "ko", disableMobile: true,
+            onReady: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
+            onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
+            onYearChange: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
             onChange: function(selectedDates, dateStr, instance) {
+                applyHighlight(instance);
                 if (dateStr) {
                     const hasRecord = gameLogs.some(g => g.dateStr.startsWith(dateStr));
                     if (!hasRecord) {
@@ -1894,9 +1922,6 @@ window.onload = () => {
         flatpickr("#statsFilterMonth", { 
             plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
             locale: "ko", disableMobile: true,
-            onChange: function(selectedDates, dateStr, instance) {
-                onFilterChange();
-            },
             onReady: function(selectedDates, dateStr, instance) {
                 const clearBtnWrap = document.createElement("div");
                 clearBtnWrap.style.padding = "0 10px 10px 10px";
@@ -1907,6 +1932,13 @@ window.onload = () => {
                     onFilterChange();
                 };
                 instance.calendarContainer.appendChild(clearBtnWrap);
+                applyHighlight(instance);
+            },
+            onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
+            onYearChange: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
+            onChange: function(selectedDates, dateStr, instance) {
+                applyHighlight(instance);
+                onFilterChange();
             }
         });
     } catch(e) {
@@ -1925,7 +1957,6 @@ window.onload = () => {
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
-
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
