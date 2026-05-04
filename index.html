@@ -91,20 +91,20 @@
 
 <div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">순위 데이터 동기화 중</div></div>
 
-<!-- [v9.00 신규] 당구 대시보드 카드 추가 (무결성 방어 레이아웃 적용) -->
-<div class="card" id="dashboardCard" style="display: none;">
+<!-- [v9.00 신규] 당구 대시보드 카드 추가 (무결성 방어 레이아웃 적용 및 테두리/여백 교정) -->
+<div class="card" id="dashboardCard" style="display: none; margin-top: 20px;">
     <div id="dashboard-capture-area" style="padding: 5px; border-radius: 20px; background: transparent;">
         <h2 style="font-size:16px; margin:0 0 15px 5px; color:#444; font-weight:800; text-align:left; letter-spacing:-0.5px;">🎛️ 당구 전적 대시보드 <span id="dashMonthLabel" style="font-size:12px; color:var(--rank1);"></span></h2>
         
         <!-- 1단: Grand Total -->
         <div style="display: flex; gap: 10px; margin-bottom: 10px; width: 100%; box-sizing: border-box;">
-            <div style="flex: 1; min-width: 0; background: rgba(255,255,255,0.5); padding: 12px 5px; border-radius: 10px; text-align: center; border: 1px solid rgba(0,0,0,0.05); box-sizing: border-box; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
+            <div style="flex: 1; min-width: 0; background: rgba(52, 152, 219, 0.05); padding: 12px 5px; border-radius: 10px; text-align: center; border: 2px solid rgba(52, 152, 219, 0.5); box-sizing: border-box; box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);">
                 <div style="font-size: 11px; color: var(--sub-text); font-weight: 800; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">총 게임 수</div>
                 <div id="dashTotalGames" style="font-size: 17px; font-weight: 900; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
             </div>
-            <div style="flex: 1; min-width: 0; background: rgba(255,255,255,0.5); padding: 12px 5px; border-radius: 10px; text-align: center; border: 1px solid rgba(0,0,0,0.05); box-sizing: border-box; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
-                <div style="font-size: 11px; color: var(--sub-text); font-weight: 800; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">총 누적 승점</div>
-                <div id="dashTotalScore" style="font-size: 17px; font-weight: 900; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
+            <div style="flex: 1; min-width: 0; background: rgba(46, 204, 113, 0.05); padding: 12px 5px; border-radius: 10px; text-align: center; border: 2px solid rgba(46, 204, 113, 0.5); box-sizing: border-box; box-shadow: 0 0 8px rgba(46, 204, 113, 0.2);">
+                <div style="font-size: 11px; color: var(--sub-text); font-weight: 800; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">총 게임 일수</div>
+                <div id="dashTotalDays" style="font-size: 17px; font-weight: 900; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
             </div>
         </div>
 
@@ -122,7 +122,7 @@
 
         <!-- 3단: Ticker (Status) -->
         <div style="display: flex; gap: 10px; width: 100%; box-sizing: border-box;">
-            <div style="flex: 1.2; min-width: 0; background: rgba(255,255,255,0.5); padding: 12px 5px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; border: 1px solid rgba(0,0,0,0.05); box-sizing: border-box; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
+            <div style="flex: 1.2; min-width: 0; background: rgba(230, 126, 34, 0.05); padding: 12px 5px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; border: 2px solid rgba(230, 126, 34, 0.5); box-sizing: border-box; box-shadow: 0 0 8px rgba(230, 126, 34, 0.2);">
                 <div style="font-size: 10px; color: var(--sub-text); font-weight: 800; margin-bottom: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">최근 2일 트렌드</div>
                 <div style="display: flex; justify-content: space-evenly; align-items: center; width: 100%;">
                     <div style="text-align: center; min-width: 0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -134,7 +134,7 @@
                     </div>
                 </div>
             </div>
-            <div style="flex: 0.8; min-width: 0; background: rgba(255,255,255,0.5); padding: 12px 5px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid rgba(0,0,0,0.05); box-sizing: border-box; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
+            <div style="flex: 0.8; min-width: 0; background: rgba(26, 188, 156, 0.05); padding: 12px 5px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px solid rgba(26, 188, 156, 0.5); box-sizing: border-box; box-shadow: 0 0 8px rgba(26, 188, 156, 0.2);">
                 <div style="font-size: 10px; color: var(--sub-text); font-weight: 800; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">철벽 방어 🛡️</div>
                 <div id="dashDefense" style="font-size: 14px; font-weight: 900; color: var(--rank1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
             </div>
@@ -323,7 +323,7 @@
 
     <div id="search-capture-area" style="padding: 5px; border-radius: 20px; margin-top: 10px; background: transparent;">
         <div style="display: flex; gap: 10px;">
-            <button class="save-btn" style="background: linear-gradient(145deg, #3498db, #2980b9); margin-top: 0; flex: 2; padding: 12px; font-size: 13px;" onclick="searchRecords()">기록 검색하기</button>
+            <button class="save-btn"A style="background: linear-gradient(145deg, #3498db, #2980b9); margin-top: 0; flex: 2; padding: 12px; font-size: 13px;" onclick="searchRecords()">기록 검색하기</button>
             <button class="save-btn" style="background: #bdc3c7; margin-top: 0; flex: 1; padding: 12px; font-size: 13px; color: #444;" onclick="resetSearch()">🔄 리셋</button>
         </div>
 
