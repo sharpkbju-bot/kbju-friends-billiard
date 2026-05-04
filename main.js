@@ -1,5 +1,5 @@
 let scoreModalTimeout = null;
-let hideScoreModalTimeout = null; 
+let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
 let genseiCountdownInterval = null; 
 let defenseModalTimeout = null; 
