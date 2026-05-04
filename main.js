@@ -46,7 +46,7 @@ function generateNamesHTML(names) {
     }).join('<span style="display:inline;">→</span>');
 }
 
-// [V9.02 캡처 무결성 픽스 유지] 고스트 래퍼(Ghost Wrapper)를 통한 캡처 시 글자 겹침 완벽 차단
+// [V9.03 캡처 무결성 유지] 고스트 래퍼(Ghost Wrapper)를 통한 캡처 시 글자 겹침 완벽 차단
 async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -844,7 +844,6 @@ async function executeReset() {
     } 
 }
 
-// [v9.01 신규] 무결성 대시보드 렌더링 함수 (데이터 0건 UI 고도화 및 타이틀 최상단 동기화)
 function renderDashboard() {
     const dCard = document.getElementById('dashboardCard');
     if (!dCard) return;
@@ -855,7 +854,6 @@ function renderDashboard() {
     const monthEl = document.getElementById('statsFilterMonth');
     const monthVal = monthEl ? monthEl.value : "";
 
-    // 1. 타이틀 즉각 갱신 (데이터 0건일 때도 표시되어야 함)
     let countText = filterVal === "all" ? "전체" : filterVal + "인";
     let monthText = monthVal ? monthVal : "전체 기간";
     const monthLabel = document.getElementById('dashMonthLabel');
@@ -868,9 +866,8 @@ function renderDashboard() {
         filtered = filtered.filter(g => g.ranks.filter(n => n.trim() !== "").length === count);
     }
 
-    dCard.style.display = 'block'; // 숨김 처리 완벽 해제
+    dCard.style.display = 'block';
 
-    // 2. 데이터 0건 시 기본값 표출 (필터 작동 시각적 증명)
     if (filtered.length === 0) {
         const els = ['dashTotalGames', 'dashTotalDays', 'dashMVP', 'dashVillain', 'dashHot', 'dashCold', 'dashDefense'];
         els.forEach(id => {
