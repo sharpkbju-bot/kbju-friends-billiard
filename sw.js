@@ -1,11 +1,11 @@
-// Billiard World Service Worker v9.02
-const CACHE_NAME = 'billiard-v9.02'; // 캐시 버전 업데이트로 강제 갱신 유도
+// Billiard World Service Worker v9.03
+const CACHE_NAME = 'billiard-v9.03'; // 캐시 버전 업데이트로 레이아웃 교정 사항 강제 갱신 유도
 const ASSETS = [
-    'index.html?v=9.01',
-    'style.css?v=9.01',
-    'main.js?v=9.01',
-    'manifest.json?v=9.01',
-    'image_0.png?v=9.01',
+    'index.html?v=9.03',
+    'style.css?v=9.03',
+    'main.js?v=9.03',
+    'manifest.json?v=9.03',
+    'image_0.png?v=9.03',
     'image_1.png'
 ];
 
@@ -24,7 +24,7 @@ self.addEventListener('activate', (e) => {
             return Promise.all(
                 keys.map((key) => {
                     if (key !== CACHE_NAME) {
-                        return caches.delete(key); // 과거 버전의 캐시를 삭제하여 용량 확보 및 충돌 방지
+                        return caches.delete(key); // 구버전 캐시 삭제를 통한 정합성 유지
                     }
                 })
             );
