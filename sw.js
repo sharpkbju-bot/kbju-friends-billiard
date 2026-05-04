@@ -1,5 +1,5 @@
-// 캐시 버전을 v8.00으로 갱신하여 이전 캐시를 초기화합니다.
-const CACHE_NAME = 'billiard-v8.00';
+// 캐시 버전을 v9.00으로 갱신하여 이전 캐시를 초기화합니다.
+const CACHE_NAME = 'billiard-v9.00';
 
 // 설치 시 캐시 저장
 self.addEventListener('install', (e) => {
