@@ -46,7 +46,7 @@ function generateNamesHTML(names) {
     }).join('<span style="display:inline;">→</span>');
 }
 
-// [V9.00 캡처 무결성 픽스 유지] 고스트 래퍼(Ghost Wrapper)를 통한 캡처 시 글자 겹침 완벽 차단
+// [V9.01 캡처 무결성 픽스 유지] 고스트 래퍼(Ghost Wrapper)를 통한 캡처 시 글자 겹침 완벽 차단
 async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -844,7 +844,7 @@ async function executeReset() {
     } 
 }
 
-// [v9.00 신규] 무결성 대시보드 렌더링 함수 (최근 2일 트렌드, 동적 타이틀 및 총 일수 집계)
+// [v9.01 신규] 무결성 대시보드 렌더링 함수 (데이터 0건 UI 고도화 및 타이틀 최상단 동기화)
 function renderDashboard() {
     const dCard = document.getElementById('dashboardCard');
     if (!dCard) return;
@@ -855,6 +855,12 @@ function renderDashboard() {
     const monthEl = document.getElementById('statsFilterMonth');
     const monthVal = monthEl ? monthEl.value : "";
 
+    // 1. 타이틀 즉각 갱신 (데이터 0건일 때도 표시되어야 함)
+    let countText = filterVal === "all" ? "전체" : filterVal + "인";
+    let monthText = monthVal ? monthVal : "전체 기간";
+    const monthLabel = document.getElementById('dashMonthLabel');
+    if (monthLabel) monthLabel.innerText = `(${monthText}, ${countText})`;
+
     let filtered = gameLogs;
     if (monthVal) filtered = filtered.filter(g => g.dateStr.startsWith(monthVal));
     if (filterVal !== "all") {
@@ -862,18 +868,21 @@ function renderDashboard() {
         filtered = filtered.filter(g => g.ranks.filter(n => n.trim() !== "").length === count);
     }
 
+    dCard.style.display = 'block'; // 숨김 처리 완벽 해제
+
+    // 2. 데이터 0건 시 기본값 표출 (필터 작동 시각적 증명)
     if (filtered.length === 0) {
-        dCard.style.display = 'none';
+        const els = ['dashTotalGames', 'dashTotalDays', 'dashMVP', 'dashVillain', 'dashHot', 'dashCold', 'dashDefense'];
+        els.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (id === 'dashTotalGames') el.innerText = '0G';
+                else if (id === 'dashTotalDays') el.innerText = '0일';
+                else el.innerText = '-';
+            }
+        });
         return;
     }
-    
-    dCard.style.display = 'block';
-
-    // [v9.00 수정] 대시보드 타이틀 동적 연산 적용
-    let countText = filterVal === "all" ? "전체" : filterVal + "인";
-    let monthText = monthVal ? monthVal : "전체 기간";
-    const monthLabel = document.getElementById('dashMonthLabel');
-    if (monthLabel) monthLabel.innerText = `(${monthText}, ${countText})`;
 
     let totalGames = filtered.length;
     let pStats = {};
@@ -882,7 +891,7 @@ function renderDashboard() {
     let datesSet = new Set();
 
     filtered.forEach(g => {
-        datesSet.add(g.dateStr); // 게임 일수 집계를 위한 고유 날짜 추출
+        datesSet.add(g.dateStr); 
         const actual = g.ranks.filter(n => n.trim() !== "");
         actual.forEach((p, idx) => {
             if (pStats[p]) {
@@ -899,7 +908,6 @@ function renderDashboard() {
     const dashTotalGames = document.getElementById('dashTotalGames');
     if (dashTotalGames) dashTotalGames.innerText = `${totalGames}G`;
     
-    // [v9.00 수정] 총 게임 일수 적용
     const dashTotalDays = document.getElementById('dashTotalDays');
     if (dashTotalDays) dashTotalDays.innerText = `${datesSet.size}일`;
 
@@ -926,7 +934,6 @@ function renderDashboard() {
     const dashVillain = document.getElementById('dashVillain');
     if (dashVillain) dashVillain.innerText = villain;
 
-    // 최근 2일(기록된 날짜 기준) 추출
     let sortedDates = Array.from(datesSet).sort((a, b) => b.localeCompare(a));
     let recentDates = sortedDates.slice(0, 2);
     let recentFiltered = filtered.filter(g => recentDates.includes(g.dateStr));
@@ -948,19 +955,16 @@ function renderDashboard() {
     let maxRise = -Infinity, maxDrop = -Infinity;
 
     activePlayers.forEach(p => {
-        // 기준: 전체 참여 3경기 이상 & 최근 2일 내 경기가 존재할 때만 평가
         if (pStats[p].played >= 3 && rStats[p].played > 0) {
             const seasonAvgRank = pStats[p].totalRank / pStats[p].played;
             const recentAvgRank = rStats[p].totalRank / rStats[p].played;
 
-            // 순위가 하락(수치가 작아짐) -> 상승세(Hot)
             const risePercent = ((seasonAvgRank - recentAvgRank) / seasonAvgRank) * 100;
             if (risePercent >= 15 && risePercent > maxRise) {
                 maxRise = risePercent;
                 hotCandidate = p;
             }
             
-            // 순위가 상승(수치가 커짐) -> 하락세(Cold)
             const dropPercent = ((recentAvgRank - seasonAvgRank) / seasonAvgRank) * 100;
             if (dropPercent >= 15 && dropPercent > maxDrop) {
                 maxDrop = dropPercent;
@@ -1008,12 +1012,11 @@ function renderDashboard() {
     if (dashDefense) dashDefense.innerText = defCandidate !== "-" ? `${defCandidate} (${maxDefAvg.toFixed(1)}위)` : "-";
 }
 
-// [v9.00] 콤보 박스 및 월별 선택 중앙 통제 사령탑 함수 (대시보드 동기화 추가)
 function onFilterChange() {
-    renderDashboard();       // 1. 대시보드 갱신 (가장 먼저 실행)
-    renderStats();           // 2. 누적 전적 테이블 갱신 (월별 + 인원별)
-    renderDefenseStats();    // 3. 디펜스 순위표 갱신 (월별 + 인원별)
-    closeMemberHistory();    // 4. 기존에 열려있던 개인 히스토리 창 닫기 (새 필터 적용을 위해 초기화)
+    renderDashboard();       
+    renderStats();           
+    renderDefenseStats();    
+    closeMemberHistory();    
 }
 
 function toggleAllMode() { 
@@ -2097,6 +2100,7 @@ window.onload = () => {
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
+
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
