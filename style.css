@@ -634,12 +634,70 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
 }
 
-.flatpickr-current-month .flatpickr-monthhand-title,
-.flatpickr-current-month input.cur-year {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-    font-weight: 900 !important;
-    background: transparent !important;
+/* [v9.03] 달력 헤더 수평 라인 무결성 교정 코드 */
+.flatpickr-months {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    height: 50px !important;
 }
+
+.flatpickr-months .flatpickr-month {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+    margin: 0 !important;
+    flex: 1 !important;
+}
+
+.flatpickr-current-month {
+    position: static !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 100% !important;
+    width: auto !important;
+    left: auto !important;
+    font-size: 1.35rem !important;
+}
+
+.flatpickr-current-month .flatpickr-monthhand-title {
+    display: flex !important;
+    align-items: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.flatpickr-current-month input.cur-year {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    line-height: 1 !important;
+    vertical-align: middle !important;
+    display: inline-block !important;
+}
+
+.flatpickr-prev-month, .flatpickr-next-month {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+    padding: 0 10px !important;
+    top: 0 !important;
+    z-index: 5 !important;
+}
+
+.flatpickr-prev-month { order: 0 !important; }
+.flatpickr-month { order: 1 !important; }
+.flatpickr-next-month { order: 2 !important; }
+
+/* ------------------------------------------ */
 
 .flatpickr-calendar {
     background: rgba(255, 255, 255, 0.95) !important;
@@ -649,18 +707,6 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
     border: 1px solid rgba(255, 255, 255, 0.6) !important;
     padding: 15px !important;
     width: 320px !important; 
-}
-.flatpickr-months .flatpickr-month {
-    height: 40px !important;
-}
-.flatpickr-current-month {
-    font-size: 135% !important;
-    font-weight: 900 !important;
-    padding-top: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: 100% !important;
 }
 span.flatpickr-weekday {
     font-weight: 900 !important;
