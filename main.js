@@ -46,7 +46,7 @@ function generateNamesHTML(names) {
     }).join('<span style="display:inline;">→</span>');
 }
 
-// [V9.01 캡처 무결성 픽스 유지] 고스트 래퍼(Ghost Wrapper)를 통한 캡처 시 글자 겹침 완벽 차단
+// [V9.02 캡처 무결성 픽스 유지] 고스트 래퍼(Ghost Wrapper)를 통한 캡처 시 글자 겹침 완벽 차단
 async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -2049,7 +2049,7 @@ window.onload = () => {
             locale: "ko", disableMobile: true,
             onReady: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
             onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
-            onYearChange: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
+            onYearChange: function(selectedDates, dateStr, instance) { setTimeout(() => applyHighlight(instance), 50); },
             onChange: function(selectedDates, dateStr, instance) {
                 applyHighlight(instance);
                 if (dateStr) {
@@ -2078,7 +2078,7 @@ window.onload = () => {
                 applyHighlight(instance);
             },
             onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
-            onYearChange: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
+            onYearChange: function(selectedDates, dateStr, instance) { setTimeout(() => applyHighlight(instance), 50); },
             onChange: function(selectedDates, dateStr, instance) {
                 applyHighlight(instance);
                 onFilterChange();
@@ -2100,7 +2100,6 @@ window.onload = () => {
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
-
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
