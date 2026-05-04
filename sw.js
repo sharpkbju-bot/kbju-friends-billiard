@@ -1,37 +1,41 @@
-// 캐시 버전을 v9.00으로 갱신하여 이전 캐시를 초기화합니다.
-const CACHE_NAME = 'billiard-v9.00';
+// Billiard World Service Worker v9.01
+const CACHE_NAME = 'billiard-v9.01'; // 캐시 버전 업데이트로 강제 갱신 유도
+const ASSETS = [
+    'index.html?v=9.01',
+    'style.css?v=9.01',
+    'main.js?v=9.01',
+    'manifest.json?v=9.01',
+    'image_0.png?v=9.01',
+    'image_1.png'
+];
 
-// 설치 시 캐시 저장
 self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll([
-        './',
-        './index.html',
-        './style.css',
-        './main.js',
-        './manifest.json',
-        './image_0.png',
-        './image_1.png'
-      ]);
-    })
-  );
-  self.skipWaiting();
+    self.skipWaiting(); // 새로운 서비스 워커가 즉시 활성화되도록 설정
+    e.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(ASSETS);
+        })
+    );
 });
 
 self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keyList) => {
-      return Promise.all(keyList.map((key) => {
-        // 현재 캐시 버전과 다르면 기존 캐시 삭제 (최신 업데이트 강제 적용)
-        if (key !== CACHE_NAME) return caches.delete(key);
-      }));
-    })
-  );
+    e.waitUntil(
+        caches.keys().then((keys) => {
+            return Promise.all(
+                keys.map((key) => {
+                    if (key !== CACHE_NAME) {
+                        return caches.delete(key); // 과거 버전의 캐시를 삭제하여 용량 확보 및 충돌 방지
+                    }
+                })
+            );
+        })
+    );
 });
 
 self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
-  );
+    e.respondWith(
+        caches.match(e.request).then((res) => {
+            return res || fetch(e.request);
+        })
+    );
 });
