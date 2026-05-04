@@ -4,7 +4,7 @@ let graphCountdownInterval = null;
 let genseiCountdownInterval = null; 
 let defenseModalTimeout = null; 
 let infoModalCountdownInterval = null; 
-let scoreCountdownInterval = null; // [v6.76] 개인 전적 팝업용 타이머 변수 추가
+let scoreCountdownInterval = null; 
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
 const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
@@ -46,21 +46,19 @@ function generateNamesHTML(names) {
     }).join('<span style="display:inline;">→</span>');
 }
 
-// [V6.20 캡처 버그 최종 완벽 픽스] Ghost Wrapper 기법 유지 & 보호
+// [V9.00 캡처 무결성 픽스 유지] 고스트 래퍼(Ghost Wrapper)를 통한 캡처 시 글자 겹침 완벽 차단
 async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
     const target = document.getElementById(targetId);
     if (!target) return;
     const shareBtn = document.getElementById(btnId);
     if (shareBtn) shareBtn.style.display = 'none';
 
-    // 1. 현재 확대(Zoom) 상태 임시 해제
     const wasZoomActive = document.body.classList.contains('zoom-active');
     if (wasZoomActive) {
         document.body.style.zoom = '1';
         document.body.classList.remove('zoom-active');
     }
 
-    // 2. 화면 밖 고스트 래퍼(Ghost Wrapper) 생성
     const ghostWrapper = document.createElement('div');
     ghostWrapper.style.position = 'absolute';
     ghostWrapper.style.top = '-9999px';
@@ -73,7 +71,6 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
     ghostWrapper.style.letterSpacing = 'normal';
     ghostWrapper.style.wordBreak = 'keep-all';
     
-    // 3. 실제 콘텐츠 복제 및 조립
     const clone = target.cloneNode(true);
     clone.style.width = '100%';
     clone.style.margin = '0 auto';
@@ -81,7 +78,6 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
     clone.style.animation = 'none';
     clone.style.boxSizing = 'border-box';
     
-    // 4. select, input 폼 요소를 일반 div 텍스트로 변환
     const originalForms = target.querySelectorAll('select, input');
     const clonedForms = clone.querySelectorAll('select, input');
     originalForms.forEach((el, i) => {
@@ -134,7 +130,6 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
     } catch (err) {
         alert("캡처 중 오류가 발생했습니다.");
     } finally {
-        // 5. 작업이 끝나면 고스트 래퍼 파괴 및 원래 상태 완벽 복구
         document.body.removeChild(ghostWrapper);
         if (shareBtn) shareBtn.style.display = 'block';
         if (wasZoomActive) {
@@ -211,14 +206,12 @@ function showInfoModal(type) {
     let desc = ""; 
     let icon = "";
     
-    // [v6.76 업데이트] 팝업 글자 돌출 방지를 위한 공통 텍스트 래퍼
     const wrapStart = "<div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.5; text-align: left;'>";
     const wrapEnd = "</div>";
 
     if (type === 'score') {
         icon = "📊"; 
         title = "인원별 차등 승점 기준";
-        // [v6.77 수정] 승점 기준 팝업은 무조건 한 줄로 나오도록 nowrap 적용
         desc = "<div style='white-space: nowrap; line-height: 1.5; text-align: left;'>• <b>2인</b>: 1위(+2), 꼴찌(0)<br>• <b>3인</b>: 1위(+3), 2위(+1), 꼴찌(0)<br>• <b>4인</b>: 1위(+4), 2위(+3), 3위(+2), 꼴찌(0)<br>• <b>5인</b>: 1위(+5), 2위(+4), 3위(+3), 4위(+1), 꼴찌(0)</div>";
     } else if (type === 'tier') {
         icon = "🏅"; 
@@ -228,7 +221,7 @@ function showInfoModal(type) {
         icon = "🌡️"; 
         title = "최근 컨디션 분석 기준";
         desc = wrapStart + "• ☀️<b>최상</b>: 1위 비율 30%↑<br>• ⛅<b>보통</b>: 1위 비율 30% 미만. 안정적인 보통 순위<br>• ⚡<b>도깨비</b>: 1위 30%↑ & 꼴찌 30%↑<br>• 🌧️<b>비상</b>: 꼴찌 비율 30%↑" + wrapEnd;
-    } else if (type === 'style') { // [v6.76 신규 추가] 당구 성향 분석 팝업
+    } else if (type === 'style') { 
         icon = "🎱";
         title = "당구 성향 분석 기준";
         desc = wrapStart + "<b>[승률 35% & 생존율 80% 기준]</b><br><br>• 👑 <b>전략적 지배자</b>: 승률↑ & 생존율↑<br>• 🐅 <b>폭격형 호랑이</b>: 승률↑ & 생존율↓<br>• 🐢 <b>철벽 거북이</b>: 승률↓ & 생존율↑<br>• 🐣 <b>성장하는 꿈나무</b>: 승률↓ & 생존율↓" + wrapEnd;
@@ -250,11 +243,10 @@ function showInfoModal(type) {
         descEl.style.color = ''; 
     }
 
-    // [v6.76 업데이트] 확대 모드(Zoom)에서도 팝업창 크기를 기본 모드처럼 원상 복구
     const popupBox = document.getElementById('info-modal-title').parentElement;
     if (popupBox) {
         if (document.body.classList.contains('zoom-active')) {
-            popupBox.style.zoom = '0.85'; // 1.2배 확대를 약 85%로 상쇄시켜 원래 크기 유지
+            popupBox.style.zoom = '0.85'; 
         } else {
             popupBox.style.zoom = '1';
         }
@@ -273,6 +265,7 @@ function closeInfoModal() {
         infoModalCountdownInterval = null;
     }
 }
+
 function showLastGameResult() {
     if (!gameLogs || gameLogs.length === 0) { 
         if (document.getElementById('loading').style.display === 'none') return;
@@ -571,7 +564,9 @@ async function fetchData() {
     }
 }
 
+// [v9.00 업데이트] 대시보드 렌더링 호출 추가 (데이터 갱신 시 가장 먼저 실행)
 function renderAll() { 
+    renderDashboard();
     renderCalendar(); 
     renderStats(); 
     renderDefenseStats(); 
@@ -630,7 +625,6 @@ function renderCalendar() {
             </div>`;
     }
 
-    // --- [v6.77] 하단 타임라인 렌더링 로직 유지 ---
     const timelineWrap = document.getElementById('monthRecordTimeline');
     if (timelineWrap) {
         timelineWrap.innerHTML = ""; 
@@ -851,11 +845,173 @@ async function executeReset() {
     } 
 }
 
-// [v7.53, v8.00] 콤보 박스 및 월별 선택 중앙 통제 사령탑 함수
+// [v9.00 신규] 무결성 대시보드 렌더링 함수 (최근 2일 트렌드 및 동기화 구현)
+function renderDashboard() {
+    const dCard = document.getElementById('dashboardCard');
+    if (!dCard) return;
+
+    const filterEl = document.getElementById('statsFilterCount');
+    const filterVal = filterEl ? filterEl.value : "all";
+
+    const monthEl = document.getElementById('statsFilterMonth');
+    const monthVal = monthEl ? monthEl.value : "";
+
+    let filtered = gameLogs;
+    if (monthVal) filtered = filtered.filter(g => g.dateStr.startsWith(monthVal));
+    if (filterVal !== "all") {
+        const count = parseInt(filterVal);
+        filtered = filtered.filter(g => g.ranks.filter(n => n.trim() !== "").length === count);
+    }
+
+    if (filtered.length === 0) {
+        dCard.style.display = 'none';
+        return;
+    }
+    
+    dCard.style.display = 'block';
+
+    const monthLabel = document.getElementById('dashMonthLabel');
+    if (monthLabel) monthLabel.innerText = monthVal ? `(${monthVal})` : "(전체 기간)";
+
+    let totalGames = filtered.length;
+    let totalScore = 0;
+    let pStats = {};
+    players.forEach(p => pStats[p] = { played: 0, wins: 0, lasts: 0, score: 0, totalRank: 0 });
+
+    let datesSet = new Set();
+
+    filtered.forEach(g => {
+        datesSet.add(g.dateStr);
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        actual.forEach((p, idx) => {
+            if (pStats[p]) {
+                pStats[p].played++;
+                const s = getEarnedScore(idx, actual.length);
+                pStats[p].score += s;
+                totalScore += s;
+                pStats[p].totalRank += (idx + 1);
+                if (idx === 0) pStats[p].wins++;
+                if (idx === actual.length - 1 && actual.length > 1) pStats[p].lasts++;
+            }
+        });
+    });
+
+    const dashTotalGames = document.getElementById('dashTotalGames');
+    if (dashTotalGames) dashTotalGames.innerText = `${totalGames}G`;
+    const dashTotalScore = document.getElementById('dashTotalScore');
+    if (dashTotalScore) dashTotalScore.innerText = `${totalScore}점`;
+
+    let activePlayers = players.filter(p => pStats[p].played > 0);
+    let mvp = "-", villain = "-";
+    
+    if (activePlayers.length > 0) {
+        mvp = activePlayers.reduce((a, b) => {
+            const wrA = pStats[a].wins / pStats[a].played;
+            const wrB = pStats[b].wins / pStats[b].played;
+            if (wrA !== wrB) return wrA > wrB ? a : b;
+            return (pStats[a].score / pStats[a].played) > (pStats[b].score / pStats[b].played) ? a : b;
+        });
+        villain = activePlayers.reduce((a, b) => {
+            const lrA = pStats[a].lasts / pStats[a].played;
+            const lrB = pStats[b].lasts / pStats[b].played;
+            if (lrA !== lrB) return lrA > lrB ? a : b;
+            return pStats[a].lasts > pStats[b].lasts ? a : b;
+        });
+    }
+    
+    const dashMVP = document.getElementById('dashMVP');
+    if (dashMVP) dashMVP.innerText = mvp;
+    const dashVillain = document.getElementById('dashVillain');
+    if (dashVillain) dashVillain.innerText = villain;
+
+    // 최근 2일(기록된 날짜 기준) 추출
+    let sortedDates = Array.from(datesSet).sort((a, b) => b.localeCompare(a));
+    let recentDates = sortedDates.slice(0, 2);
+    let recentFiltered = filtered.filter(g => recentDates.includes(g.dateStr));
+    
+    let rStats = {};
+    players.forEach(p => rStats[p] = { played: 0, totalRank: 0 });
+
+    recentFiltered.forEach(g => {
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        actual.forEach((p, idx) => {
+            if (rStats[p]) {
+                rStats[p].played++;
+                rStats[p].totalRank += (idx + 1);
+            }
+        });
+    });
+
+    let hotCandidate = "-", coldCandidate = "-";
+    let maxRise = -Infinity, maxDrop = -Infinity;
+
+    activePlayers.forEach(p => {
+        // 기준: 전체 참여 3경기 이상 & 최근 2일 내 경기가 존재할 때만 평가
+        if (pStats[p].played >= 3 && rStats[p].played > 0) {
+            const seasonAvgRank = pStats[p].totalRank / pStats[p].played;
+            const recentAvgRank = rStats[p].totalRank / rStats[p].played;
+
+            // 순위가 하락(수치가 작아짐) -> 상승세(Hot)
+            const risePercent = ((seasonAvgRank - recentAvgRank) / seasonAvgRank) * 100;
+            if (risePercent >= 15 && risePercent > maxRise) {
+                maxRise = risePercent;
+                hotCandidate = p;
+            }
+            
+            // 순위가 상승(수치가 커짐) -> 하락세(Cold)
+            const dropPercent = ((recentAvgRank - seasonAvgRank) / seasonAvgRank) * 100;
+            if (dropPercent >= 15 && dropPercent > maxDrop) {
+                maxDrop = dropPercent;
+                coldCandidate = p;
+            }
+        }
+    });
+
+    const dashHot = document.getElementById('dashHot');
+    if (dashHot) dashHot.innerText = hotCandidate !== "-" ? hotCandidate : "대기";
+    const dashCold = document.getElementById('dashCold');
+    if (dashCold) dashCold.innerText = coldCandidate !== "-" ? coldCandidate : "대기";
+
+    let defStats = {};
+    players.forEach(p => defStats[p] = { count: 0, totalNextRank: 0 });
+    filtered.forEach(g => {
+        if (g.startOrder && g.startOrder.length > 0) {
+            const actual = g.ranks.filter(n => n.trim() !== "");
+            const order = g.startOrder;
+            for (let i = 0; i < order.length; i++) {
+                const preP = order[i];
+                const nextP = order[(i + 1) % order.length];
+                const nextIdx = actual.indexOf(nextP);
+                if (nextIdx !== -1 && defStats[preP]) {
+                    defStats[preP].count++;
+                    defStats[preP].totalNextRank += (nextIdx + 1);
+                }
+            }
+        }
+    });
+
+    let defCandidate = "-";
+    let maxDefAvg = -1;
+    activePlayers.forEach(p => {
+        if (defStats[p] && defStats[p].count > 0) {
+            const avg = defStats[p].totalNextRank / defStats[p].count;
+            if (avg > maxDefAvg) {
+                maxDefAvg = avg;
+                defCandidate = p;
+            }
+        }
+    });
+    
+    const dashDefense = document.getElementById('dashDefense');
+    if (dashDefense) dashDefense.innerText = defCandidate !== "-" ? `${defCandidate} (${maxDefAvg.toFixed(1)}위)` : "-";
+}
+
+// [v9.00] 콤보 박스 및 월별 선택 중앙 통제 사령탑 함수 (대시보드 동기화 추가)
 function onFilterChange() {
-    renderStats();           // 1. 누적 전적 테이블 갱신 (월별 + 인원별)
-    renderDefenseStats();    // 2. 디펜스 순위표 갱신 (월별 + 인원별)
-    closeMemberHistory();    // 3. 기존에 열려있던 개인 히스토리 창 닫기 (새 필터 적용을 위해 초기화)
+    renderDashboard();       // 1. 대시보드 갱신 (가장 먼저 실행)
+    renderStats();           // 2. 누적 전적 테이블 갱신 (월별 + 인원별)
+    renderDefenseStats();    // 3. 디펜스 순위표 갱신 (월별 + 인원별)
+    closeMemberHistory();    // 4. 기존에 열려있던 개인 히스토리 창 닫기 (새 필터 적용을 위해 초기화)
 }
 
 function toggleAllMode() { 
@@ -879,7 +1035,6 @@ function renderStats() {
     players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0], score: 0 });
     
     gameLogs.forEach(g => {
-        // [v8.00 신규] 월별 필터 적용
         if (monthVal && !g.dateStr.startsWith(monthVal)) return;
 
         const actual = g.ranks.filter(n => n.trim() !== "");
@@ -899,7 +1054,6 @@ function renderStats() {
         });
     });
     
-    // [v7.54 수정 유지] 게임 기록이 없는 선수(played === 0)를 최하단으로 정렬
     const sortedByWin = [...players].sort((a,b) => {
         if (stats[a].played === 0 && stats[b].played > 0) return 1;
         if (stats[b].played === 0 && stats[a].played > 0) return -1;
@@ -966,7 +1120,6 @@ function showDefenseDetail(playerName) {
     let victimStats = {}; 
 
     gameLogs.forEach(g => {
-        // [v8.00 신규] 월별 필터 적용
         if (monthVal && !g.dateStr.startsWith(monthVal)) return;
 
         if (g.startOrder && g.startOrder.includes(playerName)) {
@@ -1072,7 +1225,6 @@ function renderDefenseStats() {
     players.forEach(p => defenseStats[p] = { totalNextRank: 0, count: 0 });
 
     gameLogs.forEach(g => {
-        // [v8.00 신규] 월별 필터 적용
         if (monthVal && !g.dateStr.startsWith(monthVal)) return;
 
         if (g.startOrder && g.startOrder.length > 0) {
@@ -1169,7 +1321,6 @@ function renderMemberHistory(name, rank = "") {
     const monthEl = document.getElementById('statsFilterMonth');
     const monthVal = monthEl ? monthEl.value : "";
 
-    // [v8.00] 월별 필터 + 인원수 필터 동시 적용
     const allPersonal = gameLogs.filter(g => {
         if (monthVal && !g.dateStr.startsWith(monthVal)) return false;
 
@@ -1236,7 +1387,6 @@ function renderMemberHistory(name, rank = "") {
         }, 1000);
     }
 
-    // [v8.00] 프로필 타이틀에 월별 및 인원수 필터 상태 표시
     let filterText = filterVal === 'all' ? '전체 인원' : filterVal + '인 게임';
     let monthText = monthVal ? monthVal + '월' : '전체 기간';
 
@@ -1657,7 +1807,6 @@ function importData(event) {
 
 function setDefaultSearchDates() { if (searchFlatpickr) searchFlatpickr.setDate(new Date()); }
 
-// [v5.60 Fix] 월별 검색 결과를 초기화하는 리셋 함수
 function resetSearch() {
     const dateInput = document.getElementById('searchDateRange');
     const playerInput = document.getElementById('searchPlayer');
@@ -1722,7 +1871,6 @@ function searchRecords() {
         });
     });
     
-    // [v7.54 수정 유지] 검색 월에 게임 기록이 없는 선수(played === 0)를 최하단으로 정렬
     const monthlyRankedPlayers = [...players].sort((a,b) => {
         if (monthlyStatsAll[a].played === 0 && monthlyStatsAll[b].played > 0) return 1;
         if (monthlyStatsAll[b].played === 0 && monthlyStatsAll[a].played > 0) return -1;
@@ -1751,10 +1899,9 @@ function searchRecords() {
     let cond = (wRatio >= 0.3 && lRatio >= 0.3) ? ["⚡", "도깨비", "var(--rank3)"] : (wRatio >= 0.3 ? ["☀️", "최상", "var(--rankL)"] : (lRatio >= 0.3 ? ["🌧️", "비상", "var(--rank1)"] : ["⛅", "보통", "var(--rank2)"]));
   
     let winRateVal = Math.round(winRateFloat);
-    let avgScoreVal = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); // [v6.76] 변수명 오타 수정 완료
+    let avgScoreVal = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); 
     let safetyVal = safetyRate;
 
-    // --- [v6.76 신규] 스포트라이트용 랜덤 컬러셋 (파스텔톤 8종) ---
     const spotlightColors = [
         { bg: 'rgba(255, 173, 173, 0.25)', shadow: 'rgba(255, 173, 173, 0.5)', border: '#FFADAD' },
         { bg: 'rgba(255, 214, 165, 0.25)', shadow: 'rgba(255, 214, 165, 0.5)', border: '#FFD6A5' },
@@ -1767,14 +1914,11 @@ function searchRecords() {
     ];
     const pick = spotlightColors[Math.floor(Math.random() * spotlightColors.length)];
 
-    // [v6.76] 네온 사인 효과가 적용된 스포트라이트 카드 생성 함수
     function createSpotlightCard(label, value, subValue = "") {
-        // pick.border 색상을 기반으로 더 진한 네온 광채 색상 계산
         const neonColor = pick.border; 
         
         return `<div style="background: ${pick.bg}; padding: 15px 10px; border-radius: 14px; text-align: center; 
                             border: 2.5px solid ${neonColor}; 
-                            /* 네온 사인 핵심: 이중 box-shadow (내부광 + 외부 강력 광채) */
                             box-shadow: 0 0 10px ${neonColor}, 
                                         0 0 20px ${pick.shadow}, 
                                         inset 0 0 8px rgba(255,255,255,0.3);
@@ -1784,14 +1928,12 @@ function searchRecords() {
                     <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 8px;
                                 text-shadow: 0 0 5px rgba(255,255,255,0.5);">${label}</div>
                     <div style="font-size: 18px; font-weight: 900; color: var(--text-color);
-                                /* 텍스트에도 은은한 네온 효과 추가 */
                                 text-shadow: 1px 1px 2px rgba(0,0,0,0.1), 0 0 8px ${pick.shadow};">
                         ${value} ${subValue}
                     </div>
                 </div>`;
     }
 
-    // --- [v6.76 당구 성향 분석(Billiards Style) 로직 유지] ---
     let billiardsStyle = "";
     let styleDesc = "";
     let styleColor = "";
@@ -1847,7 +1989,6 @@ function searchRecords() {
                                ${createSpotlightCard("컨디션", `<span style="color: ${cond[2]};">${cond[0]}${cond[1]}</span>`)}
                            </div>
                        </div>`;
-    // --- [v6.76 로직 끝] ---
                       
     lArea.innerHTML = `<div style="max-height:250px; overflow-y:auto; padding-right:5px; margin-top:15px;">
                            ${filtered.map(g => {
@@ -1872,7 +2013,6 @@ function searchRecords() {
     setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 }
 
-// [v8.00] 변경 사항: 월별 필터 달력 초기화 및 기록 있는 월 강조 추가
 window.onload = () => { 
     try {
         function applyHighlight(instance) {
@@ -1899,7 +2039,6 @@ window.onload = () => {
             });
         }
 
-        // 기존 월별 검색용 달력
         searchFlatpickr = flatpickr("#searchDateRange", { 
             plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
             locale: "ko", disableMobile: true,
@@ -1918,7 +2057,6 @@ window.onload = () => {
             }
         });
 
-        // [v8.00 신규] 누적 전적용 월별 필터 달력 (초기화 버튼 내장)
         flatpickr("#statsFilterMonth", { 
             plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
             locale: "ko", disableMobile: true,
