@@ -564,7 +564,6 @@ async function fetchData() {
     }
 }
 
-// [v9.00 업데이트] 대시보드 렌더링 호출 추가 (데이터 갱신 시 가장 먼저 실행)
 function renderAll() { 
     renderDashboard();
     renderCalendar(); 
@@ -845,7 +844,7 @@ async function executeReset() {
     } 
 }
 
-// [v9.00 신규] 무결성 대시보드 렌더링 함수 (최근 2일 트렌드 및 동기화 구현)
+// [v9.00 신규] 무결성 대시보드 렌더링 함수 (최근 2일 트렌드, 동적 타이틀 및 총 일수 집계)
 function renderDashboard() {
     const dCard = document.getElementById('dashboardCard');
     if (!dCard) return;
@@ -870,25 +869,26 @@ function renderDashboard() {
     
     dCard.style.display = 'block';
 
+    // [v9.00 수정] 대시보드 타이틀 동적 연산 적용
+    let countText = filterVal === "all" ? "전체" : filterVal + "인";
+    let monthText = monthVal ? monthVal : "전체 기간";
     const monthLabel = document.getElementById('dashMonthLabel');
-    if (monthLabel) monthLabel.innerText = monthVal ? `(${monthVal})` : "(전체 기간)";
+    if (monthLabel) monthLabel.innerText = `(${monthText}, ${countText})`;
 
     let totalGames = filtered.length;
-    let totalScore = 0;
     let pStats = {};
     players.forEach(p => pStats[p] = { played: 0, wins: 0, lasts: 0, score: 0, totalRank: 0 });
 
     let datesSet = new Set();
 
     filtered.forEach(g => {
-        datesSet.add(g.dateStr);
+        datesSet.add(g.dateStr); // 게임 일수 집계를 위한 고유 날짜 추출
         const actual = g.ranks.filter(n => n.trim() !== "");
         actual.forEach((p, idx) => {
             if (pStats[p]) {
                 pStats[p].played++;
                 const s = getEarnedScore(idx, actual.length);
                 pStats[p].score += s;
-                totalScore += s;
                 pStats[p].totalRank += (idx + 1);
                 if (idx === 0) pStats[p].wins++;
                 if (idx === actual.length - 1 && actual.length > 1) pStats[p].lasts++;
@@ -898,8 +898,10 @@ function renderDashboard() {
 
     const dashTotalGames = document.getElementById('dashTotalGames');
     if (dashTotalGames) dashTotalGames.innerText = `${totalGames}G`;
-    const dashTotalScore = document.getElementById('dashTotalScore');
-    if (dashTotalScore) dashTotalScore.innerText = `${totalScore}점`;
+    
+    // [v9.00 수정] 총 게임 일수 적용
+    const dashTotalDays = document.getElementById('dashTotalDays');
+    if (dashTotalDays) dashTotalDays.innerText = `${datesSet.size}일`;
 
     let activePlayers = players.filter(p => pStats[p].played > 0);
     let mvp = "-", villain = "-";
