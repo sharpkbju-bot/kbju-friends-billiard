@@ -656,7 +656,11 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 .flatpickr-current-month {
     font-size: 135% !important;
     font-weight: 900 !important;
-    padding-top: 5px !important;
+    padding-top: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
 }
 span.flatpickr-weekday {
     font-weight: 900 !important;
