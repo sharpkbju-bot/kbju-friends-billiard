@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=7.54">
+    <link rel="manifest" href="manifest.json?v=8.00">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=7.54">
-    <link rel="apple-touch-icon" href="image_0.png?v=7.54">
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=8.00">
+    <link rel="apple-touch-icon" href="image_0.png?v=8.00">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 
-    <link rel="stylesheet" href="style.css?v=7.54">
+    <link rel="stylesheet" href="style.css?v=8.00">
 
     <title>우리들의 Billiard World</title>
 </head>
@@ -26,7 +26,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;7.54
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;8.00
     </div>
 </div>
 
@@ -172,10 +172,13 @@
 
 <div class="card stats-card">
     <div id="stats-capture-area" style="padding: 5px; border-radius: 20px; background: transparent;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin:5px 0 14px 5px;">
-            <h2 style="font-size:15px; margin:0; color:#444; font-weight:800; letter-spacing:-0.5px;">📊 멤버별 누적 전적 <span class="stats-subtitle" style="font-size:12px; color:var(--rank1);">(평균 승점 기준. 횟수)</span></h2>
+        <div style="margin:5px 0 10px 5px; text-align: left;">
+            <h2 style="font-size:15px; margin:0; color:#444; font-weight:800; letter-spacing:-0.5px; display:block;">📊 멤버별 누적 전적 <span class="stats-subtitle" style="font-size:12px; color:var(--rank1);">(평균 승점 기준. 횟수)</span></h2>
+        </div>
+        <div style="display: flex; gap: 10px; margin-bottom: 14px; margin-left: 5px; align-items: center; justify-content: space-between;">
+            <input type="text" id="statsFilterMonth" style="padding: 6px 8px; border-radius: 8px; font-size: 12px; font-weight: 800; color: #4a148c; background: rgba(236, 238, 241, 0.4); border: 2px solid transparent; box-shadow: var(--inner-shadow); flex: 1; cursor: pointer; text-align: center;" placeholder="전체 기간 (터치하여 월 선택)" readonly>
             <select id="statsFilterCount" onchange="onFilterChange()" style="padding: 6px 8px; border-radius: 8px; font-size: 12px; font-weight: 800; color: #4a148c; background: rgba(236, 238, 241, 0.4); border: 2px solid transparent; box-shadow: var(--inner-shadow); flex: none; width: auto;">
-                <option value="all">전체</option>
+                <option value="all">전체 인원</option>
                 <option value="2">2인</option>
                 <option value="3">3인</option>
                 <option value="4">4인</option>
@@ -299,7 +302,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-<script src="main.js?v=7.54"></script>
+<script src="main.js?v=8.00"></script>
 
 </body>
 </html>
