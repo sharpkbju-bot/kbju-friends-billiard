@@ -893,7 +893,13 @@ function renderStats() {
         });
     });
     
-    const sortedByWin = [...players].sort((a,b) => (stats[b].score/stats[b].played || 0) - (stats[a].score/stats[a].played || 0) || stats[b].ranks[0] - stats[a].ranks[0]);
+    // [v7.54 수정] 게임 기록이 없는 선수(played === 0)를 최하단으로 정렬
+    const sortedByWin = [...players].sort((a,b) => {
+        if (stats[a].played === 0 && stats[b].played > 0) return 1;
+        if (stats[b].played === 0 && stats[a].played > 0) return -1;
+        return (stats[b].score/stats[b].played || 0) - (stats[a].score/stats[a].played || 0) || stats[b].ranks[0] - stats[a].ranks[0];
+    });
+
     const maxC = { r0: 0, r4: 0 }; 
     
     players.forEach(p => { 
@@ -1689,9 +1695,12 @@ function searchRecords() {
         });
     });
     
-    const monthlyRankedPlayers = [...players].sort((a,b) =>
-        (monthlyStatsAll[b].score/monthlyStatsAll[b].played || 0) - (monthlyStatsAll[a].score/monthlyStatsAll[a].played || 0) || monthlyStatsAll[b].win - monthlyStatsAll[a].win
-    );
+    // [v7.54 수정] 검색 월에 게임 기록이 없는 선수(played === 0)를 최하단으로 정렬
+    const monthlyRankedPlayers = [...players].sort((a,b) => {
+        if (monthlyStatsAll[a].played === 0 && monthlyStatsAll[b].played > 0) return 1;
+        if (monthlyStatsAll[b].played === 0 && monthlyStatsAll[a].played > 0) return -1;
+        return (monthlyStatsAll[b].score/monthlyStatsAll[b].played || 0) - (monthlyStatsAll[a].score/monthlyStatsAll[a].played || 0) || monthlyStatsAll[b].win - monthlyStatsAll[a].win;
+    });
     
     let myMonthlyRank = 1;
     let currentRank = 1;
@@ -1868,7 +1877,6 @@ window.onload = () => {
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
-
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
