@@ -5,6 +5,8 @@ let genseiCountdownInterval = null;
 let defenseModalTimeout = null; 
 let infoModalCountdownInterval = null; 
 let scoreCountdownInterval = null; 
+// [v9.04] 대시보드 팝업 타이머 변수 추가
+let dashInfoCountdownInterval = null; 
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
 const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
@@ -46,7 +48,7 @@ function generateNamesHTML(names) {
     }).join('<span style="display:inline;">→</span>');
 }
 
-// [V9.03 캡처 무결성 유지] 고스트 래퍼(Ghost Wrapper)를 통한 캡처 시 글자 겹침 완벽 차단
+// [V9.04 캡처 무결성 유지] 
 async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -165,6 +167,87 @@ function getTier(score) {
     return { name: "브론즈", icon: "🥉", color: "#cd7f32" };
 }
 
+// [v9.04] 대시보드 위젯 클릭 시 호출되는 팝업 함수
+function showDashInfo(type) {
+    let title = "";
+    let desc = "";
+    let icon = "";
+
+    const wrapStart = "<div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.5; text-align: left;'>";
+    const wrapEnd = "</div>";
+
+    if (type === 'totalGames') {
+        icon = "🎱";
+        title = "총 게임 수";
+        desc = wrapStart + "현재 선택된 기간과 게임 인원 조건에 부합하여 실제로 진행된 <b>총 경기 횟수</b>를 나타냅니다." + wrapEnd;
+    } else if (type === 'totalDays') {
+        icon = "📅";
+        title = "총 게임 일수";
+        desc = wrapStart + "단순 경기 횟수가 아닌, 우리가 실제로 당구장에 모여서 <b>게임을 즐긴 고유한 날짜의 총합</b>을 의미합니다." + wrapEnd;
+    } else if (type === 'mvp') {
+        icon = "👑";
+        title = "월간 MVP 기준";
+        desc = wrapStart + "승률(1위 횟수)을 최우선으로 고려하며, 승률이 같을 경우 평균 승점을 합산하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정합니다." + wrapEnd;
+    } else if (type === 'villain') {
+        icon = "💸";
+        title = "지갑 전사 기준";
+        desc = wrapStart + "해당 월에 참여한 경기 수 대비 <b>꼴찌를 가장 높은 비율로 기록한 선수</b>입니다. 게임비를 가장 많이 지출했을 것으로 추정되는 명예로운(?) 타이틀입니다." + wrapEnd;
+    } else if (type === 'trend') {
+        icon = "📈";
+        title = "최근 2일 트렌드 분석";
+        desc = wrapStart + "시즌 전체 평균 성적과 비교하여, <b>최근 2일간의 평균 성적이 15% 이상 급등(🔥Hot) 하거나 급락(❄️Cold)</b> 한 선수를 시스템이 자동으로 감지하여 알려줍니다." + wrapEnd;
+    } else if (type === 'defense') {
+        icon = "🛡️";
+        title = "철벽 방어 기준";
+        desc = wrapStart + "추첨된 순번 상 <b>내 바로 다음 순서인 선수의 멘탈을 붕괴시켜 평균 등수를 가장 낮게(숫자가 높게) 만든</b> 디펜스 최고의 지배자를 찾습니다." + wrapEnd;
+    }
+
+    const descEl = document.getElementById('info-modal-desc');
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    if (currentTheme === 'navy') {
+        descEl.style.color = '#5D4037';
+    } else {
+        descEl.style.color = ''; 
+    }
+
+    const popupBox = document.getElementById('info-modal-title').parentElement;
+    if (popupBox) {
+        if (document.body.classList.contains('zoom-active')) {
+            popupBox.style.zoom = '0.85'; 
+        } else {
+            popupBox.style.zoom = '1';
+        }
+    }
+
+    // 기존 타이머 요소가 없다면 생성하여 주입
+    let timerEl = document.getElementById('dash-info-timer');
+    if (!timerEl) {
+        timerEl = document.createElement('div');
+        timerEl.id = 'dash-info-timer';
+        timerEl.style.cssText = 'margin-top:15px; font-size:12px; color:var(--sub-text); font-weight:800; text-align:center; display:block; width:100%;';
+        descEl.parentNode.insertBefore(timerEl, descEl.nextSibling);
+    }
+    
+    document.getElementById('info-modal-icon').innerHTML = icon;
+    document.getElementById('info-modal-title').innerHTML = title;
+    descEl.innerHTML = desc;
+    
+    document.getElementById('info-modal').style.display = 'flex';
+
+    let timeLeft = 10;
+    timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
+
+    if (dashInfoCountdownInterval) clearInterval(dashInfoCountdownInterval);
+    dashInfoCountdownInterval = setInterval(() => {
+        timeLeft--;
+        if (timerEl) timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
+        if (timeLeft <= 0) {
+            clearInterval(dashInfoCountdownInterval);
+            closeInfoModal();
+        }
+    }, 1000);
+}
+
 function showRingCriteria(type) {
     let title = "", desc = "";
     if (type === 'win') {
@@ -264,6 +347,13 @@ function closeInfoModal() {
         clearInterval(infoModalCountdownInterval);
         infoModalCountdownInterval = null;
     }
+    // [v9.04] 대시보드 팝업 타이머도 닫을 때 정리
+    if (dashInfoCountdownInterval) {
+        clearInterval(dashInfoCountdownInterval);
+        dashInfoCountdownInterval = null;
+    }
+    const timerEl = document.getElementById('dash-info-timer');
+    if (timerEl) timerEl.remove();
 }
 
 function showLastGameResult() {
@@ -2097,6 +2187,7 @@ window.onload = () => {
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
+
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
