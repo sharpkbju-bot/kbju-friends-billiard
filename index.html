@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=9.03">
+    <link rel="manifest" href="manifest.json?v=9.04">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=9.03">
-    <link rel="apple-touch-icon" href="image_0.png?v=9.03">
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=9.04">
+    <link rel="apple-touch-icon" href="image_0.png?v=9.04">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 
-    <link rel="stylesheet" href="style.css?v=9.03">
+    <link rel="stylesheet" href="style.css?v=9.04">
 
     <title>우리들의 Billiard World</title>
 </head>
@@ -26,7 +26,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;9.03
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;9.04
     </div>
 </div>
 
@@ -91,18 +91,18 @@
 
 <div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">순위 데이터 동기화 중</div></div>
 
-<!-- [v9.03 업데이트] 캐시 파괴 및 레이아웃 무결성 방어 -->
+<!-- [v9.04 업데이트] 대시보드 위젯 클릭 팝업 이벤트 연결 및 타이틀 축약 -->
 <div class="card" id="dashboardCard" style="display: none; margin-top: 20px;">
     <div id="dashboard-capture-area" style="padding: 5px; border-radius: 20px; background: transparent;">
         <h2 style="font-size:16px; margin:0 0 15px 5px; color:#444; font-weight:800; text-align:left; letter-spacing:-0.5px;">🎛️ 대시보드 <span id="dashMonthLabel" style="font-size:12px; color:var(--rank1);"></span></h2>
         
         <!-- 1단: Grand Total -->
         <div style="display: flex; gap: 10px; margin-bottom: 10px; width: 100%; box-sizing: border-box;">
-            <div style="flex: 1; min-width: 0; background: rgba(52, 152, 219, 0.05); padding: 12px 5px; border-radius: 10px; text-align: center; border: 2px solid rgba(52, 152, 219, 0.5); box-sizing: border-box; box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);">
+            <div style="flex: 1; min-width: 0; background: rgba(52, 152, 219, 0.05); padding: 12px 5px; border-radius: 10px; text-align: center; border: 2px solid rgba(52, 152, 219, 0.5); box-sizing: border-box; box-shadow: 0 0 8px rgba(52, 152, 219, 0.2); cursor: pointer;" onclick="showDashInfo('totalGames')">
                 <div style="font-size: 11px; color: var(--sub-text); font-weight: 800; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">총 게임 수</div>
                 <div id="dashTotalGames" style="font-size: 17px; font-weight: 900; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
             </div>
-            <div style="flex: 1; min-width: 0; background: rgba(46, 204, 113, 0.05); padding: 12px 5px; border-radius: 10px; text-align: center; border: 2px solid rgba(46, 204, 113, 0.5); box-sizing: border-box; box-shadow: 0 0 8px rgba(46, 204, 113, 0.2);">
+            <div style="flex: 1; min-width: 0; background: rgba(46, 204, 113, 0.05); padding: 12px 5px; border-radius: 10px; text-align: center; border: 2px solid rgba(46, 204, 113, 0.5); box-sizing: border-box; box-shadow: 0 0 8px rgba(46, 204, 113, 0.2); cursor: pointer;" onclick="showDashInfo('totalDays')">
                 <div style="font-size: 11px; color: var(--sub-text); font-weight: 800; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">총 게임 일수</div>
                 <div id="dashTotalDays" style="font-size: 17px; font-weight: 900; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
             </div>
@@ -110,11 +110,11 @@
 
         <!-- 2단: Spotlight -->
         <div style="display: flex; gap: 10px; margin-bottom: 10px; width: 100%; box-sizing: border-box;">
-            <div style="flex: 1; min-width: 0; background: rgba(241, 196, 15, 0.1); padding: 12px 5px; border-radius: 10px; border: 2px solid rgba(241, 196, 15, 0.5); text-align: center; box-sizing: border-box; box-shadow: 0 0 8px rgba(241,196,15,0.2);">
+            <div style="flex: 1; min-width: 0; background: rgba(241, 196, 15, 0.1); padding: 12px 5px; border-radius: 10px; border: 2px solid rgba(241, 196, 15, 0.5); text-align: center; box-sizing: border-box; box-shadow: 0 0 8px rgba(241,196,15,0.2); cursor: pointer;" onclick="showDashInfo('mvp')">
                 <div style="font-size: 11px; color: #b7950b; font-weight: 800; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">월간 MVP 👑</div>
                 <div id="dashMVP" style="font-size: 15px; font-weight: 900; color: #d4ac0d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
             </div>
-            <div style="flex: 1; min-width: 0; background: rgba(155, 89, 182, 0.1); padding: 12px 5px; border-radius: 10px; border: 2px solid rgba(155, 89, 182, 0.5); text-align: center; box-sizing: border-box; box-shadow: 0 0 8px rgba(155,89,182,0.2);">
+            <div style="flex: 1; min-width: 0; background: rgba(155, 89, 182, 0.1); padding: 12px 5px; border-radius: 10px; border: 2px solid rgba(155, 89, 182, 0.5); text-align: center; box-sizing: border-box; box-shadow: 0 0 8px rgba(155,89,182,0.2); cursor: pointer;" onclick="showDashInfo('villain')">
                 <div style="font-size: 11px; color: #76448a; font-weight: 800; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">지갑 전사 💸</div>
                 <div id="dashVillain" style="font-size: 15px; font-weight: 900; color: #8e44ad; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
             </div>
@@ -122,7 +122,7 @@
 
         <!-- 3단: Ticker (Status) -->
         <div style="display: flex; gap: 10px; width: 100%; box-sizing: border-box;">
-            <div style="flex: 1.2; min-width: 0; background: rgba(230, 126, 34, 0.05); padding: 12px 5px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; border: 2px solid rgba(230, 126, 34, 0.5); box-sizing: border-box; box-shadow: 0 0 8px rgba(230, 126, 34, 0.2);">
+            <div style="flex: 1.2; min-width: 0; background: rgba(230, 126, 34, 0.05); padding: 12px 5px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; border: 2px solid rgba(230, 126, 34, 0.5); box-sizing: border-box; box-shadow: 0 0 8px rgba(230, 126, 34, 0.2); cursor: pointer;" onclick="showDashInfo('trend')">
                 <div style="font-size: 10px; color: var(--sub-text); font-weight: 800; margin-bottom: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">최근 2일 트렌드</div>
                 <div style="display: flex; justify-content: space-evenly; align-items: center; width: 100%;">
                     <div style="text-align: center; min-width: 0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -134,7 +134,7 @@
                     </div>
                 </div>
             </div>
-            <div style="flex: 0.8; min-width: 0; background: rgba(26, 188, 156, 0.05); padding: 12px 5px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px solid rgba(26, 188, 156, 0.5); box-sizing: border-box; box-shadow: 0 0 8px rgba(26, 188, 156, 0.2);">
+            <div style="flex: 0.8; min-width: 0; background: rgba(26, 188, 156, 0.05); padding: 12px 5px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px solid rgba(26, 188, 156, 0.5); box-sizing: border-box; box-shadow: 0 0 8px rgba(26, 188, 156, 0.2); cursor: pointer;" onclick="showDashInfo('defense')">
                 <div style="font-size: 10px; color: var(--sub-text); font-weight: 800; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">철벽 방어 🛡️</div>
                 <div id="dashDefense" style="font-size: 14px; font-weight: 900; color: var(--rank1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
             </div>
@@ -353,7 +353,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-<script src="main.js?v=9.03"></script>
+<script src="main.js?v=9.04"></script>
 
 </body>
 </html>
