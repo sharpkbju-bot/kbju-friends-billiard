@@ -48,7 +48,7 @@ function generateNamesHTML(names) {
     }).join('<span style="display:inline;">→</span>');
 }
 
-// [V9.04 캡처 무결성 유지] 
+// [V9.05 캡처 무결성 유지] 
 async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -167,7 +167,7 @@ function getTier(score) {
     return { name: "브론즈", icon: "🥉", color: "#cd7f32" };
 }
 
-// [v9.04] 대시보드 위젯 클릭 시 호출되는 팝업 함수
+// [v9.05] 대시보드 위젯 클릭 시 호출되는 팝업 함수 (멘트 교정)
 function showDashInfo(type) {
     let title = "";
     let desc = "";
@@ -187,7 +187,7 @@ function showDashInfo(type) {
     } else if (type === 'mvp') {
         icon = "👑";
         title = "월간 MVP 기준";
-        desc = wrapStart + "승률(1위 횟수)을 최우선으로 고려하며, 승률이 같을 경우 평균 승점을 합산하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정." + wrapEnd;
+        desc = wrapStart + "<b>평균 승점</b>을 최우선으로 고려하며, 평균 승점이 같을 경우 승률(1위 횟수)을 비교하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정." + wrapEnd;
     } else if (type === 'villain') {
         icon = "💸";
         title = "지갑 전사 기준";
@@ -219,7 +219,6 @@ function showDashInfo(type) {
         }
     }
 
-    // 기존 타이머 요소가 없다면 생성하여 주입
     let timerEl = document.getElementById('dash-info-timer');
     if (!timerEl) {
         timerEl = document.createElement('div');
@@ -347,7 +346,6 @@ function closeInfoModal() {
         clearInterval(infoModalCountdownInterval);
         infoModalCountdownInterval = null;
     }
-    // [v9.04] 대시보드 팝업 타이머도 닫을 때 정리
     if (dashInfoCountdownInterval) {
         clearInterval(dashInfoCountdownInterval);
         dashInfoCountdownInterval = null;
@@ -1002,11 +1000,12 @@ function renderDashboard() {
     let mvp = "-", villain = "-";
     
     if (activePlayers.length > 0) {
+        // [v9.05 업데이트] 월간 MVP 1순위: 평균승점, 2순위: 승률 통일 스와핑
         mvp = activePlayers.reduce((a, b) => {
-            const wrA = pStats[a].wins / pStats[a].played;
-            const wrB = pStats[b].wins / pStats[b].played;
-            if (wrA !== wrB) return wrA > wrB ? a : b;
-            return (pStats[a].score / pStats[a].played) > (pStats[b].score / pStats[b].played) ? a : b;
+            const avgA = pStats[a].score / pStats[a].played;
+            const avgB = pStats[b].score / pStats[b].played;
+            if (avgA !== avgB) return avgA > avgB ? a : b;
+            return (pStats[a].wins / pStats[a].played) > (pStats[b].wins / pStats[b].played) ? a : b;
         });
         villain = activePlayers.reduce((a, b) => {
             const lrA = pStats[a].lasts / pStats[a].played;
