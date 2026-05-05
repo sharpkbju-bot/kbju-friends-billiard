@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v9.06 - Toast UI Fix */
+/* Billiard World Style v9.07 - Dashboard UI & Dynamic Touch Update */
 :root { 
     --main: #7f8c8d; 
     --bg: rgba(236, 238, 241, 0.4); 
@@ -936,3 +936,7 @@ span.flatpickr-weekday {
 .zoom-active #dashMVP, .zoom-active #dashVillain { font-size: 12.5px !important; }
 .zoom-active #dashHot, .zoom-active #dashCold { font-size: 11px !important; }
 .zoom-active #dashDefense { font-size: 11.5px !important; }
+
+/* [v9.07] 대시보드 프리미엄 위젯 다이내믹 터치 애니메이션 */
+.dash-btn { transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s ease !important; }
+.dash-btn:active { transform: scale(0.94) !important; box-shadow: inset 0 3px 6px rgba(0,0,0,0.1) !important; }
