@@ -179,27 +179,27 @@ function showDashInfo(type) {
     if (type === 'totalGames') {
         icon = "🎱";
         title = "총 게임 수";
-        desc = wrapStart + "현재 선택된 기간과 게임 인원 조건에 부합하여 실제로 진행된 <b>총 경기 횟수</b>를 나타냅니다." + wrapEnd;
+        desc = wrapStart + "현재 선택된 기간과 게임 인원 조건에 부합하여 실제로 진행된 <b>총 경기 횟수</b>를 의미함." + wrapEnd;
     } else if (type === 'totalDays') {
         icon = "📅";
         title = "총 게임 일수";
-        desc = wrapStart + "단순 경기 횟수가 아닌, 우리가 실제로 당구장에 모여서 <b>게임을 즐긴 고유한 날짜의 총합</b>을 의미합니다." + wrapEnd;
+        desc = wrapStart + "단순 경기 횟수가 아닌, 실제로 당구 클럽에 모여서 <b>게임을 즐긴 날짜의 총합</b>을 의미." + wrapEnd;
     } else if (type === 'mvp') {
         icon = "👑";
         title = "월간 MVP 기준";
-        desc = wrapStart + "승률(1위 횟수)을 최우선으로 고려하며, 승률이 같을 경우 평균 승점을 합산하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정합니다." + wrapEnd;
+        desc = wrapStart + "승률(1위 횟수)을 최우선으로 고려하며, 승률이 같을 경우 평균 승점을 합산하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정." + wrapEnd;
     } else if (type === 'villain') {
         icon = "💸";
         title = "지갑 전사 기준";
-        desc = wrapStart + "해당 월에 참여한 경기 수 대비 <b>꼴찌를 가장 높은 비율로 기록한 선수</b>입니다. 게임비를 가장 많이 지출했을 것으로 추정되는 명예로운(?) 타이틀입니다." + wrapEnd;
+        desc = wrapStart + "해당 월에 참여한 경기 수 대비 <b>꼴찌를 가장 높은 비율로 기록한 선수</b>. 게임비를 가장 많이 지출했을 것으로 추정되는 명예로운(?) 타이틀." + wrapEnd;
     } else if (type === 'trend') {
         icon = "📈";
         title = "최근 2일 트렌드 분석";
-        desc = wrapStart + "시즌 전체 평균 성적과 비교하여, <b>최근 2일간의 평균 성적이 15% 이상 급등(🔥Hot) 하거나 급락(❄️Cold)</b> 한 선수를 시스템이 자동으로 감지하여 알려줍니다." + wrapEnd;
+        desc = wrapStart + "시즌 전체 평균 성적과 비교하여, <b>최근 2일간의 평균 성적이 15% 이상 급등(🔥Hot) 하거나 급락(❄️Cold)</b> 한 선수를 자동으로 감지하여 선정." + wrapEnd;
     } else if (type === 'defense') {
         icon = "🛡️";
         title = "철벽 방어 기준";
-        desc = wrapStart + "추첨된 순번 상 <b>내 바로 다음 순서인 선수의 멘탈을 붕괴시켜 평균 등수를 가장 낮게(숫자가 높게) 만든</b> 디펜스 최고의 지배자를 찾습니다." + wrapEnd;
+        desc = wrapStart + "추첨된 순번 상 <b>내 바로 다음 순서인 선수의 멘탈을 붕괴시켜 평균 등수를 가장 낮게(숫자가 높게) 만든</b> 디펜스 최고의 지배자." + wrapEnd;
     }
 
     const descEl = document.getElementById('info-modal-desc');
