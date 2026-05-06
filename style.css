@@ -48,19 +48,19 @@
 [data-theme='pink'] { --card-bg: rgba(255, 235, 240, 0.8); }
 [data-theme='gray'] { --card-bg: rgba(240, 240, 240, 0.8); }
 
-/* 네이비 테마 설정 */
+/* 네이비 테마 설정 (딥 네이비로 다크 모드와 차별화) */
 [data-theme='navy'] {
     --main: #bdc3c7;
-    --bg: rgba(10, 25, 47, 0.9);
+    --bg: #06142e;
     --today-bg: #1a237e;
     --today-border: #448aff;
     --select-bg: #1a237e;
     --select-border: #5c6bc0;
     --record-bg: #1a237e;
     --record-border: #3f51b5;
-    --shadow: 8px 8px 16px rgba(0, 0, 0, 0.5), -4px -4px 10px rgba(255, 255, 255, 0.05);
-    --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.6), inset -2px -2px 5px rgba(255, 255, 255, 0.05);
-    --card-bg: rgba(20, 35, 75, 0.9);  
+    --shadow: 8px 8px 16px rgba(0, 0, 0, 0.6), -4px -4px 10px rgba(255, 255, 255, 0.05);
+    --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.7), inset -2px -2px 5px rgba(255, 255, 255, 0.05);
+    --card-bg: rgba(14, 28, 54, 0.95);  
     --dup-bg: #2c1a1a;
     --dup-border: #ff5252;
     --dup-text: #ffccbc;
@@ -78,19 +78,19 @@
     --graph-line: #4dd0e1;
 }
 
-/* 다크 테마 설정 */
+/* 다크 테마 설정 (퓨어 블랙으로 대비감 극대화) */
 [data-theme='dark'] {
     --main: #bdc3c7;
-    --bg: rgba(30, 30, 30, 0.9);
+    --bg: #121212;
     --today-bg: #1a237e;
     --today-border: #448aff;
     --select-bg: #4a148c;
     --select-border: #e91e63;
     --record-bg: #1b5e20;
     --record-border: #81c784;
-    --shadow: 8px 8px 16px rgba(0, 0, 0, 0.6), -4px -4px 10px rgba(60, 60, 60, 0.2);
-    --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.7), inset -2px -2px 5px rgba(60, 60, 60, 0.2);
-    --card-bg: rgba(60, 60, 65, 0.9);  
+    --shadow: 8px 8px 16px rgba(0, 0, 0, 0.8), -4px -4px 10px rgba(40, 40, 40, 0.4);
+    --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.8), inset -2px -2px 5px rgba(40, 40, 40, 0.4);
+    --card-bg: rgba(30, 30, 30, 0.95);  
     --dup-bg: #3e2723;
     --dup-border: #ff5252;
     --dup-text: #ffccbc;
@@ -114,12 +114,12 @@
 [data-theme='dark'] .stats-table td[style*="color:#8e44ad;"], [data-theme='navy'] .stats-table td[style*="color:#8e44ad;"] { color: #eeeeee !important; } 
 [data-theme='dark'] .stats-table td[style*="color:#5D4037;"], [data-theme='navy'] .stats-table td[style*="color:#5D4037;"] { color: #eeeeee !important; } 
 
+/* [결함 해결] 다크/네이비 모드 강제 텍스트 색상 반전 (모든 h2 포함) */
+[data-theme='dark'] h2, [data-theme='navy'] h2,
 [data-theme='dark'] #monthDisplay, [data-theme='navy'] #monthDisplay,
-[data-theme='dark'] #selectedDateTitle, [data-theme='navy'] #selectedDateTitle,
-[data-theme='dark'] .stats-card h2, [data-theme='navy'] .stats-card h2,
-[data-theme='dark'] #searchCard h2, [data-theme='navy'] #searchCard h2,
-[data-theme='dark'] #strategyCard h2, [data-theme='navy'] #strategyCard h2,
-[data-theme='dark'] #defenseCard h2, [data-theme='navy'] #defenseCard h2 { color: #ffffff !important; }
+[data-theme='dark'] #selectedDateTitle, [data-theme='navy'] #selectedDateTitle { 
+    color: #ffffff !important; 
+}
 
 [data-theme='dark'] .weekday, [data-theme='navy'] .weekday { color: #95a5a6 !important; }
 
