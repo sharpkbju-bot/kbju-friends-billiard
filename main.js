@@ -8,6 +8,18 @@ let scoreCountdownInterval = null;
 // [v9.04] 대시보드 팝업 타이머 변수 추가
 let dashInfoCountdownInterval = null; 
 
+// [결함 해결 1] 모든 팝업 타이머를 통합 제어하여 꼬임 현상 원천 차단
+function clearAllPopups() {
+    if (scoreModalTimeout) { clearTimeout(scoreModalTimeout); scoreModalTimeout = null; }
+    if (hideScoreModalTimeout) { clearTimeout(hideScoreModalTimeout); hideScoreModalTimeout = null; }
+    if (graphCountdownInterval) { clearInterval(graphCountdownInterval); graphCountdownInterval = null; }
+    if (genseiCountdownInterval) { clearInterval(genseiCountdownInterval); genseiCountdownInterval = null; }
+    if (defenseModalTimeout) { clearTimeout(defenseModalTimeout); defenseModalTimeout = null; }
+    if (infoModalCountdownInterval) { clearInterval(infoModalCountdownInterval); infoModalCountdownInterval = null; }
+    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; }
+    if (dashInfoCountdownInterval) { clearInterval(dashInfoCountdownInterval); dashInfoCountdownInterval = null; }
+}
+
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
 const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
 let gameLogs = [];
@@ -167,8 +179,10 @@ function getTier(score) {
     return { name: "브론즈", icon: "🥉", color: "#cd7f32" };
 }
 
-// [v9.05] 대시보드 위젯 클릭 시 호출되는 팝업 함수 (멘트 교정)
+// [v9.05] 대시보드 위젯 클릭 시 호출되는 팝업 함수
 function showDashInfo(type) {
+    clearAllPopups(); // 타이머 충돌 픽스
+
     let title = "";
     let desc = "";
     let icon = "";
@@ -236,7 +250,6 @@ function showDashInfo(type) {
     let timeLeft = 10;
     timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
 
-    if (dashInfoCountdownInterval) clearInterval(dashInfoCountdownInterval);
     dashInfoCountdownInterval = setInterval(() => {
         timeLeft--;
         if (timerEl) timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
@@ -248,6 +261,8 @@ function showDashInfo(type) {
 }
 
 function showRingCriteria(type) {
+    clearAllPopups(); // 타이머 충돌 픽스
+
     let title = "", desc = "";
     if (type === 'win') {
         title = "승률 산출 기준";
@@ -266,7 +281,6 @@ function showRingCriteria(type) {
         let timeLeft = 10;
         timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
 
-        if (infoModalCountdownInterval) clearInterval(infoModalCountdownInterval);
         infoModalCountdownInterval = setInterval(() => {
             timeLeft--;
             if (timerEl) timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
@@ -284,6 +298,8 @@ function showRingCriteria(type) {
 }
 
 function showInfoModal(type) {
+    clearAllPopups(); // 타이머 충돌 픽스
+
     let title = ""; 
     let desc = ""; 
     let icon = "";
@@ -313,11 +329,6 @@ function showInfoModal(type) {
     const timerEl = document.getElementById('info-modal-timer');
     if(timerEl) timerEl.style.display = 'none'; 
 
-    if (infoModalCountdownInterval) {
-        clearInterval(infoModalCountdownInterval);
-        infoModalCountdownInterval = null;
-    }
-
     const currentTheme = document.documentElement.getAttribute('data-theme');
     if (currentTheme === 'navy') {
         descEl.style.color = '#5D4037';
@@ -342,19 +353,14 @@ function showInfoModal(type) {
 
 function closeInfoModal() { 
     document.getElementById('info-modal').style.display = 'none'; 
-    if (infoModalCountdownInterval) {
-        clearInterval(infoModalCountdownInterval);
-        infoModalCountdownInterval = null;
-    }
-    if (dashInfoCountdownInterval) {
-        clearInterval(dashInfoCountdownInterval);
-        dashInfoCountdownInterval = null;
-    }
+    clearAllPopups();
     const timerEl = document.getElementById('dash-info-timer');
     if (timerEl) timerEl.remove();
 }
 
 function showLastGameResult() {
+    clearAllPopups(); // 타이머 충돌 픽스
+
     if (!gameLogs || gameLogs.length === 0) { 
         if (document.getElementById('loading').style.display === 'none') return;
         setTimeout(showLastGameResult, 500); 
@@ -391,15 +397,16 @@ function showLastGameResult() {
     modal.style.display = 'flex'; 
     content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
     
-    setTimeout(() => { 
+    scoreModalTimeout = setTimeout(() => { 
         if(modal.style.display !== 'none') { 
             content.style.animation = 'scaleDownPopup 0.4s ease-in forwards'; 
-            setTimeout(() => { modal.style.display = 'none'; }, 400); 
+            hideScoreModalTimeout = setTimeout(() => { modal.style.display = 'none'; }, 400); 
         } 
     }, 3000);
 }
 
 function focusOnDrawCard() { 
+    // [결함 해결 3] 모바일 스크롤 튐(Jumping) 방지 딜레이 안정화
     setTimeout(() => { 
         const el = document.getElementById('drawCardArea'); 
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
@@ -424,14 +431,15 @@ function togglePlayerSelection(el, name) {
 
 function resetPlayerSelection() { 
     selectedPlayersForLottery = []; 
-    document.querySelectorAll('.player-chip').forEach(el => el.classList.remove('active')); 
-    if(!editMode) updateInputFields(); 
+    if(!editMode) updateInputFields(); // 동기화 로직에 상태 반영 위임
     
     const saveBtn = document.getElementById('mainBtn');
     if (saveBtn) saveBtn.classList.remove('flash-save-active');
 }
 
 function pickRandomOrder() {
+    clearAllPopups(); // 타이머 충돌 픽스
+
     const realTodayStr = formatDate(new Date()); 
     if (selectedDateStr > realTodayStr) return alert("미래에서 온거야? 날짜를 잘 확인혀!"); 
     
@@ -527,6 +535,8 @@ function closeOrderModal() {
 }
 
 function showPlayersGraph(players) {
+    clearAllPopups(); // 타이머 충돌 픽스
+
     const container = document.getElementById('graph-container'); 
     const legendArea = document.getElementById('graph-legend');
     
@@ -582,7 +592,6 @@ function showPlayersGraph(players) {
     const countdownEl = document.getElementById('graph-countdown-text');
     if (countdownEl) countdownEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
 
-    if (graphCountdownInterval) clearInterval(graphCountdownInterval);
     graphCountdownInterval = setInterval(() => {
         timeLeft--;
         if (countdownEl) countdownEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
@@ -595,10 +604,7 @@ function showPlayersGraph(players) {
 
 function closeGraphModal() { 
     document.getElementById('graph-modal').style.display = 'none'; 
-    if (graphCountdownInterval) { 
-        clearInterval(graphCountdownInterval); 
-        graphCountdownInterval = null; 
-    } 
+    clearAllPopups();
     
     const countdownEl = document.getElementById('graph-countdown-text');
     if (countdownEl) countdownEl.innerText = "10초 후 자동으로 닫힙니다.";
@@ -613,9 +619,8 @@ function closePlayerScoreModal() {
     const modal = document.getElementById('player-score-modal'); 
     const content = document.getElementById('player-score-content');
     
-    if (scoreModalTimeout) clearTimeout(scoreModalTimeout); 
-    if (hideScoreModalTimeout) clearTimeout(hideScoreModalTimeout);
-    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; } 
+    clearAllPopups(); // 타이머 충돌 픽스
+
     if(!modal || !content) return; 
     
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards'; 
@@ -753,10 +758,11 @@ function selectDate(dateStr) {
     
     const hasRecord = gameLogs.some(g => g.dateStr === dateStr);
     if (hasRecord) {
+        // [결함 해결 3] 모바일 스크롤 튐(Jumping) 방지 딜레이 안정화
         setTimeout(() => {
             const recordTarget = document.getElementById('record-header-wrap');
             if (recordTarget) recordTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
+        }, 150);
     }
 }
 
@@ -790,8 +796,16 @@ function updateInputFields(preFill = null) {
     }
     inputArea.innerHTML = html; 
     
-    if(!preFill && !editMode && selectedPlayersForLottery.length === 0) {
-        document.querySelectorAll('.player-chip').forEach(el => el.classList.remove('active'));
+    // [결함 해결 4] 선수 칩 상태 100% 동기화 방어 로직 적용
+    if (!preFill && !editMode) {
+        document.querySelectorAll('.player-chip').forEach(el => {
+            const playerName = el.innerText.trim();
+            if (selectedPlayersForLottery.includes(playerName)) {
+                el.classList.add('active');
+            } else {
+                el.classList.remove('active');
+            }
+        });
     }
 }
 
@@ -1202,6 +1216,8 @@ function renderStats() {
 }
 
 function showDefenseDetail(playerName) {
+    clearAllPopups(); // 타이머 충돌 픽스
+
     const filterEl = document.getElementById('statsFilterCount');
     const filterVal = filterEl ? filterEl.value : "all";
 
@@ -1288,14 +1304,14 @@ function showDefenseDetail(playerName) {
     modal.style.display = 'flex';
     content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
 
-    if (defenseModalTimeout) clearTimeout(defenseModalTimeout);
     defenseModalTimeout = setTimeout(() => { closeDefenseDetail(); }, 15000); 
 }
 
 function closeDefenseDetail() {
     const modal = document.getElementById('defense-detail-modal');
     const content = document.getElementById('defense-detail-content');
-    if (defenseModalTimeout) { clearTimeout(defenseModalTimeout); defenseModalTimeout = null; }
+    clearAllPopups(); // 타이머 충돌 픽스
+    
     if (!modal || !content) return;
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards';
     setTimeout(() => { modal.style.display = 'none'; content.style.animation = 'none'; }, 300);
@@ -1404,6 +1420,8 @@ function closeMemberHistory() {
 }
 
 function renderMemberHistory(name, rank = "") {
+    clearAllPopups(); // 타이머 충돌 픽스
+
     const area = document.getElementById('memberHistoryArea');
     
     const filterEl = document.getElementById('statsFilterCount');
@@ -1438,10 +1456,6 @@ function renderMemberHistory(name, rank = "") {
     
     const scoreModal = document.getElementById('player-score-modal'); 
     const scoreContent = document.getElementById('player-score-content');
-    
-    if (scoreModalTimeout) clearTimeout(scoreModalTimeout); 
-    if (hideScoreModalTimeout) clearTimeout(hideScoreModalTimeout);
-    if (scoreCountdownInterval) { clearInterval(scoreCountdownInterval); scoreCountdownInterval = null; } 
     
     if(scoreModal && scoreContent) { 
         scoreContent.innerHTML = `<div style="font-size:clamp(45px, 10vw, 55px); margin-bottom:5px; display:block; text-align:center;">${playerThemes[name].emoji}</div>
@@ -1532,7 +1546,9 @@ function renderMemberHistory(name, rank = "") {
     area.innerHTML = html; 
     area.style.display = 'block'; 
     area.style.border = `2.5px solid ${getPlayerColor(name)}`; 
-    setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+    
+    // [결함 해결 3] 스크롤 튐 방지 딜레이 안정화
+    setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
 }
 
 function getCaptureBgColor() { 
@@ -1561,6 +1577,8 @@ function changeZoom(v) {
 }
 
 function showGenseiModal(playerName) {
+    clearAllPopups(); // 타이머 충돌 픽스
+
     const gamesToday = gameLogs.filter(g => g.dateStr === selectedDateStr);
     let victims = [];
 
@@ -1618,7 +1636,6 @@ function showGenseiModal(playerName) {
     modal.style.display = 'flex';
     content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
 
-    if (genseiCountdownInterval) clearInterval(genseiCountdownInterval);
     let gLeft = 10;
     genseiCountdownInterval = setInterval(() => {
         gLeft--;
@@ -1634,7 +1651,8 @@ function showGenseiModal(playerName) {
 function closeGenseiModal() {
     const modal = document.getElementById('gensei-modal');
     const content = document.getElementById('gensei-modal-content');
-    if (genseiCountdownInterval) { clearInterval(genseiCountdownInterval); genseiCountdownInterval = null; }
+    clearAllPopups(); // 타이머 충돌 픽스
+    
     if(!modal || !content) return;
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards';
     setTimeout(() => { modal.style.display = 'none'; content.style.animation = 'none'; }, 300);
@@ -1801,7 +1819,11 @@ function enterEditMode(round, rankStr) {
     const btn = document.getElementById('mainBtn'); 
     btn.innerText = "수정 완료"; 
     btn.classList.add('edit-btn'); 
-    document.getElementById('inputArea').scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+    
+    // [결함 해결 3] 스크롤 튐 방지 딜레이 안정화
+    setTimeout(() => {
+        document.getElementById('inputArea').scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+    }, 150);
     closeAllOverlays(); 
 }
 
@@ -2101,10 +2123,16 @@ function searchRecords() {
                        
     sArea.style.display = 'block'; lArea.style.display = 'block'; 
     document.getElementById('search-share-btn').style.display = 'block';
-    setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+    
+    // [결함 해결 3] 스크롤 튐 방지 딜레이 안정화
+    setTimeout(() => { 
+        const target = document.getElementById('search-capture-area'); 
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+    }, 150);
 }
 
-window.onload = () => { 
+// [결함 해결 2] 비동기 데이터 렌더링(깜빡임) 픽스 및 흐름 통제
+window.onload = async () => { 
     try {
         function applyHighlight(instance) {
             if (!instance || !instance.calendarContainer) return;
@@ -2178,15 +2206,24 @@ window.onload = () => {
     document.documentElement.setAttribute('data-theme', savedTheme); 
     document.getElementById('themeSelect').value = savedTheme;
     
-    setTimeout(() => { 
-        const ws = document.getElementById('welcome-screen'); 
-        if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); } 
-        showLastGameResult(); 
-    }, 3000);
+    const ws = document.getElementById('welcome-screen'); 
+    if(ws) { 
+        setTimeout(() => { 
+            ws.style.opacity = '0'; 
+            setTimeout(() => { ws.style.display = 'none'; }, 800); 
+        }, 3000); 
+    } 
     
-    updateInputFields(); setDefaultSearchDates(); fetchData(); 
+    updateInputFields(); 
+    setDefaultSearchDates(); 
+    
+    // 비동기 통신이 완료된 후에만 렌더링이 이루어지도록 락(Lock)을 걺
+    await fetchData(); 
+    
+    setTimeout(() => {
+        showLastGameResult(); 
+    }, 500);
 };
-
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
