@@ -904,6 +904,11 @@ span.flatpickr-weekday {
     zoom: 0.833333; 
 }
 
+/* [v9.10] 방어 리포트 팝업 확대 모드 버튼 잘림 결함 픽스 (역 줌 적용) */
+.zoom-active #defense-detail-modal {
+    zoom: 0.833333;
+}
+
 #info-modal .modal-content {
     padding: 30px 20px; text-align: center; width: max-content; max-width: 95%; 
     background: rgba(255, 255, 255, 0.95); border-radius: 12px;
