@@ -76,7 +76,7 @@
     --bg: rgba(236, 238, 241, 0.4);
 }
 
-/* 🌑 네이비 테마 설정 (Deep Sea Blue - 다크와 명확한 분리) */
+/* 🌑 네이비 테마 설정 (Deep Sea Blue) */
 [data-theme='navy'] {
     --main: #bdc3c7;
     --bg: #06142e;
@@ -106,7 +106,6 @@
     --graph-line: #4dd0e1;
 }
 
-/* 네이비 모드 강제 요소별 컬러 보정 (묶음 최적화 해제) */
 [data-theme='navy'] h2 { color: #ffffff !important; }
 [data-theme='navy'] #monthDisplay { color: #ffffff !important; }
 [data-theme='navy'] #selectedDateTitle { color: #ffffff !important; }
@@ -130,7 +129,6 @@
 [data-theme='navy'] select { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; }
 [data-theme='navy'] input[type="date"] { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; }
 [data-theme='navy'] input[type="text"]#searchDateRange { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; }
-[data-theme='navy'] #statsFilterMonth { color: #ffffff !important; }
 
 [data-theme='navy'] .game-item { background: linear-gradient(145deg, #2c2c2c, #333333); }
 [data-theme='navy'] .game-info { color: #eee; }
@@ -161,7 +159,12 @@
 [data-theme='navy'] .graph-box { background:rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.05); }
 [data-theme='navy'] .mvp-container { background: rgba(0, 0, 0, 0.3); }
 [data-theme='navy'] .mvp-badge { background: rgba(60,60,65,0.8); }
+
+/* [v9.10 필터 버튼/입력창 가독성 픽스] - 네이비 모드 */
 [data-theme='navy'] #statsFilterCount { color: #bb86fc !important; background: rgba(0, 0, 0, 0.3) !important; border-color: #00e676 !important; }
+[data-theme='navy'] #statsFilterMonth { color: #ffffff !important; background: rgba(0, 0, 0, 0.3) !important; }
+[data-theme='navy'] #statsFilterMonth::placeholder { color: #ffffff !important; opacity: 1 !important; }
+
 
 /* 🌑 다크 테마 설정 (Midnight Black) */
 [data-theme='dark'] {
@@ -193,7 +196,6 @@
     --graph-line: #4dd0e1;
 }
 
-/* 다크 테마 요소별 텍스트 색상 강제 보정 (묶음 최적화 해제) */
 [data-theme='dark'] h2 { color: #ffffff !important; }
 [data-theme='dark'] #monthDisplay { color: #ffffff !important; }
 [data-theme='dark'] #selectedDateTitle { color: #ffffff !important; }
@@ -217,7 +219,6 @@
 [data-theme='dark'] select { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; }
 [data-theme='dark'] input[type="date"] { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; }
 [data-theme='dark'] input[type="text"]#searchDateRange { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; }
-[data-theme='dark'] #statsFilterMonth { color: #ffffff !important; }
 
 [data-theme='dark'] .game-item { background: linear-gradient(145deg, #2c2c2c, #333333); }
 [data-theme='dark'] .game-info { color: #eee; }
@@ -248,7 +249,11 @@
 [data-theme='dark'] .graph-box { background:rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.05); }
 [data-theme='dark'] .mvp-container { background: rgba(0, 0, 0, 0.3); }
 [data-theme='dark'] .mvp-badge { background: rgba(60,60,65,0.8); }
+
+/* [v9.10 필터 버튼/입력창 가독성 픽스] - 다크 모드 */
 [data-theme='dark'] #statsFilterCount { color: #bb86fc !important; background: rgba(0, 0, 0, 0.3) !important; border-color: #00e676 !important; }
+[data-theme='dark'] #statsFilterMonth { color: #ffffff !important; background: rgba(0, 0, 0, 0.3) !important; }
+[data-theme='dark'] #statsFilterMonth::placeholder { color: #ffffff !important; opacity: 1 !important; }
 
 * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
@@ -575,7 +580,6 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 
 .game-info { font-size: 20px; font-weight: 900; color: var(--text-color); width: 100%; display: flex; justify-content: center; align-items: center; white-space: nowrap; transition: font-size 0.2s; }
 .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
-
 
 /* =========================================================
    [v9.10] 확대 모드 당구공 이모지(🎱) 중앙 정렬 결함 픽스
