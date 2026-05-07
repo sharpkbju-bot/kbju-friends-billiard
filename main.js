@@ -8,6 +8,13 @@ let scoreCountdownInterval = null;
 // [v9.04] 대시보드 팝업 타이머 변수 추가
 let dashInfoCountdownInterval = null; 
 
+// [프리미엄 UX 추가] 햅틱(진동) 피드백 글로벌 함수 추가
+function triggerHaptic(pattern) {
+    if (navigator.vibrate) {
+        navigator.vibrate(pattern);
+    }
+}
+
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwUNoKWNmos1-kmkBoL1WDhSuJv80JDe0hINOpDM9KkEgLug6WK8vUpsk_pottrTj7dOA/exec"; 
 const players = ["경배", "원석", "정석", "진웅", "창한", "경석"];
 let gameLogs = [];
@@ -169,6 +176,7 @@ function getTier(score) {
 
 // [v9.05] 대시보드 위젯 클릭 시 호출되는 팝업 함수 (멘트 교정)
 function showDashInfo(type) {
+    triggerHaptic(10); // [프리미엄 추가] 햅틱 피드백 연동
     let title = "";
     let desc = "";
     let icon = "";
@@ -407,6 +415,7 @@ function focusOnDrawCard() {
 }
 
 function togglePlayerSelection(el, name) {
+    triggerHaptic(15); // [프리미엄 추가] 햅틱 피드백 연동
     if (selectedPlayersForLottery.includes(name)) { 
         selectedPlayersForLottery = selectedPlayersForLottery.filter(p => p !== name); 
         el.classList.remove('active'); 
@@ -432,6 +441,7 @@ function resetPlayerSelection() {
 }
 
 function pickRandomOrder() {
+    triggerHaptic([20, 30, 20]); // [프리미엄 추가] 햅틱 피드백 연동
     const realTodayStr = formatDate(new Date()); 
     if (selectedDateStr > realTodayStr) return alert("미래에서 온거야? 날짜를 잘 확인혀!"); 
     
@@ -531,7 +541,19 @@ function showPlayersGraph(players) {
     const legendArea = document.getElementById('graph-legend');
     
     let legendHtml = ""; 
-    let svg = `<svg width="100%" height="100%" viewBox="-15 -10 130 120" preserveAspectRatio="none" style="overflow: visible; font-family: inherit;">`;
+    
+    // [프리미엄 추가] Bezier 곡선 하단 그라데이션 필링을 위한 defs 동적 생성
+    let svg = `<svg width="100%" height="100%" viewBox="-15 -10 130 120" preserveAspectRatio="none" style="overflow: visible; font-family: inherit;">
+               <defs>`;
+    players.forEach((p, i) => {
+        const c = getGraphColor(p);
+        svg += `<linearGradient id="grad-${i}" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="${c}" stop-opacity="0.4"/>
+                    <stop offset="100%" stop-color="${c}" stop-opacity="0.0"/>
+                </linearGradient>`;
+    });
+    svg += `</defs>`;
+    
     const yLabels = ["1위", "2위", "3위", "4위", "꼴찌"];
     
     for(let i=0; i<=4; i++) { 
@@ -540,7 +562,7 @@ function showPlayersGraph(players) {
                 <text x="-4" y="${y + 3}" font-size="7" font-weight="900" fill="var(--sub-text)" text-anchor="end">${yLabels[i]}</text>`; 
     }
     
-    players.forEach(playerName => {
+    players.forEach((playerName, playerIndex) => {
         const pColor = getGraphColor(playerName); 
         legendHtml += `<div style="display:flex; align-items:center; gap:4px;">
                            <span style="display:inline-block; width:10px; height:3px; background-color:${pColor}; border-radius:2px;"></span>
@@ -567,6 +589,11 @@ function showPlayersGraph(players) {
             for(let i=0; i<points.length - 1; i++) {
                 pathD += ` C ${points[i].x + (points[i+1].x - points[i].x) / 2} ${points[i].y}, ${points[i].x + (points[i+1].x - points[i].x) / 2} ${points[i+1].y}, ${points[i+1].x} ${points[i+1].y}`;
             }
+            
+            // [프리미엄 추가] 곡선 하단 채우기 패스 생성
+            let fillPathD = pathD + ` L ${points[points.length - 1].x} 100 L ${points[0].x} 100 Z`;
+            svg += `<path d="${fillPathD}" fill="url(#grad-${playerIndex})" />`;
+            
             svg += `<path d="${pathD}" fill="none" stroke="${pColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85" />`;
             points.forEach((p) => { 
                 svg += `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="${pColor}" stroke="var(--card-bg)" stroke-width="1.5" />`; 
@@ -703,7 +730,8 @@ function renderCalendar() {
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
         
-        const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
+        // [프리미엄 추가] 캘린더 당구공 아이콘으로 교체 (기존 점 마커 대체)
+        const recordDot = hasRecord ? `<div class="record-dot" style="background:transparent; box-shadow:none; bottom:2px; left:50%; transform:translateX(-50%); font-size:10px; width:auto; height:auto; z-index:3;">🎱</div>` : "";
 
         grid.innerHTML += `
             <div class="${dayClass}" onclick="selectDate('${dStr}')">
@@ -744,6 +772,7 @@ function renderCalendar() {
 }
 
 function selectDate(dateStr) {
+    triggerHaptic(10); // [프리미엄 추가] 햅틱 피드백 연동
     if(editMode) cancelEdit();
     selectedDateStr = dateStr;
     document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`;
@@ -808,6 +837,7 @@ function resetInputs() {
 }
 
 async function saveGame() {
+    triggerHaptic(20); // [프리미엄 추가] 햅틱 피드백 연동
     const saveBtn = document.getElementById('mainBtn');
     if (saveBtn) saveBtn.classList.remove('flash-save-active');
 
@@ -2186,7 +2216,6 @@ window.onload = () => {
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
-
 document.addEventListener('click', (e) => { 
     if(!e.target.closest('.game-item')) closeAllOverlays(); 
 });
