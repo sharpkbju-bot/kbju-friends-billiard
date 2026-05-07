@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v9.07 - Dashboard UI & Dynamic Touch Update */
+/* Billiard World Style v9.07 - Grand Master Lounge Premium Edition */
 :root { 
     --main: #7f8c8d; 
     --bg: rgba(236, 238, 241, 0.4); 
@@ -40,7 +40,7 @@
     --graph-line: #2980b9;
 }
 
-/* 테마별 카드 배경 설정 */
+/* 테마별 카드 배경 설정 (개별 블록 100% 보존) */
 [data-theme='yellow'] { --card-bg: rgba(255, 252, 225, 0.8); }
 [data-theme='yellowgreen'] { --card-bg: rgba(240, 255, 230, 0.8); }
 [data-theme='purple'] { --card-bg: rgba(243, 230, 255, 0.8); }
@@ -48,10 +48,10 @@
 [data-theme='pink'] { --card-bg: rgba(255, 235, 240, 0.8); }
 [data-theme='gray'] { --card-bg: rgba(240, 240, 240, 0.8); }
 
-/* 네이비 테마 설정 */
+/* 네이비 테마 설정 (결함 픽스: 딥 네이비로 다크 모드와 명도/채도 완벽 분리) */
 [data-theme='navy'] {
     --main: #bdc3c7;
-    --bg: rgba(10, 25, 47, 0.9);
+    --bg: #06142e;
     --today-bg: #1a237e;
     --today-border: #448aff;
     --select-bg: #1a237e;
@@ -60,7 +60,7 @@
     --record-border: #3f51b5;
     --shadow: 8px 8px 16px rgba(0, 0, 0, 0.5), -4px -4px 10px rgba(255, 255, 255, 0.05);
     --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.6), inset -2px -2px 5px rgba(255, 255, 255, 0.05);
-    --card-bg: rgba(20, 35, 75, 0.9);  
+    --card-bg: rgba(14, 28, 54, 0.95);  
     --dup-bg: #2c1a1a;
     --dup-border: #ff5252;
     --dup-text: #ffccbc;
@@ -78,10 +78,10 @@
     --graph-line: #4dd0e1;
 }
 
-/* 다크 테마 설정 */
+/* 다크 테마 설정 (결함 픽스: 퓨어 블랙에 가까운 차콜로 네이비와 완벽 분리) */
 [data-theme='dark'] {
     --main: #bdc3c7;
-    --bg: rgba(30, 30, 30, 0.9);
+    --bg: #121212;
     --today-bg: #1a237e;
     --today-border: #448aff;
     --select-bg: #4a148c;
@@ -90,7 +90,7 @@
     --record-border: #81c784;
     --shadow: 8px 8px 16px rgba(0, 0, 0, 0.6), -4px -4px 10px rgba(60, 60, 60, 0.2);
     --inner-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.7), inset -2px -2px 5px rgba(60, 60, 60, 0.2);
-    --card-bg: rgba(60, 60, 65, 0.9);  
+    --card-bg: rgba(30, 30, 30, 0.95);  
     --dup-bg: #3e2723;
     --dup-border: #ff5252;
     --dup-text: #ffccbc;
@@ -113,6 +113,9 @@
 [data-theme='dark'] .stats-table td[style*="color:darkred;"], [data-theme='navy'] .stats-table td[style*="color:darkred;"] { color: #ff5252 !important; } 
 [data-theme='dark'] .stats-table td[style*="color:#8e44ad;"], [data-theme='navy'] .stats-table td[style*="color:#8e44ad;"] { color: #eeeeee !important; } 
 [data-theme='dark'] .stats-table td[style*="color:#5D4037;"], [data-theme='navy'] .stats-table td[style*="color:#5D4037;"] { color: #eeeeee !important; } 
+
+/* 다크/네이비 모드 강제 텍스트 색상 반전 (가독성 보장 글로벌 오버라이드) */
+[data-theme='dark'] h2, [data-theme='navy'] h2 { color: #ffffff !important; }
 
 [data-theme='dark'] #monthDisplay, [data-theme='navy'] #monthDisplay,
 [data-theme='dark'] #selectedDateTitle, [data-theme='navy'] #selectedDateTitle,
@@ -138,7 +141,20 @@
 [data-theme='dark'] .game-info, [data-theme='navy'] .game-info { color: #eee; }
 [data-theme='dark'] .nav-btn, [data-theme='navy'] .nav-btn { background: rgba(60, 60, 60, 0.6); color: #ffffff !important; box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5), -2px -2px 6px rgba(70, 70, 70, 0.3); }
 
-* { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
+/* 글로벌 글자 튀어나옴 방지 (UX 결함 원천 차단) */
+* { 
+    -webkit-tap-highlight-color: transparent; 
+    outline: none; 
+    box-sizing: border-box; 
+    word-break: keep-all; 
+    overflow-wrap: break-word;
+}
+
+/* 캡처 시 글자 겹침 방지 (결함 해결) */
+[id*="capture-area"], .capture-area {
+    letter-spacing: normal !important;
+    line-height: 1.5 !important;
+}
 
 body { 
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
@@ -452,7 +468,6 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 .search-result-card { background: rgba(255, 255, 255, 0.6) !important; }
 [data-theme='dark'] .search-result-card, [data-theme='navy'] .search-result-card { background: rgba(50, 50, 55, 0.9) !important; border-color: #ff4d6d !important; }
 
-/* [v9.06] 토스트 메시지 한 줄 고정 패치 */
 .toast-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.85); color: white; padding: 12px 25px; border-radius: 20px; font-weight: 800; font-size: 14px; z-index: 10002; display: none; white-space: nowrap; width: max-content; }
 
 .danger-zone { margin-top: 50px; padding: 25px; border-radius: 12px; background: var(--card-bg); backdrop-filter: blur(5px); box-shadow: var(--shadow); text-align: center; }
@@ -937,6 +952,6 @@ span.flatpickr-weekday {
 .zoom-active #dashHot, .zoom-active #dashCold { font-size: 11px !important; }
 .zoom-active #dashDefense { font-size: 11.5px !important; }
 
-/* [v9.07] 대시보드 프리미엄 위젯 다이내믹 터치 애니메이션 */
+/* [v9.07] 대시보드 프리미엄 위젯 다이내믹 터치 애니메이션 추가 */
 .dash-btn { transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s ease !important; }
 .dash-btn:active { transform: scale(0.94) !important; box-shadow: inset 0 3px 6px rgba(0,0,0,0.1) !important; }
