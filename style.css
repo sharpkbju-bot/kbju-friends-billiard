@@ -130,6 +130,7 @@
 [data-theme='navy'] select { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; }
 [data-theme='navy'] input[type="date"] { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; }
 [data-theme='navy'] input[type="text"]#searchDateRange { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; }
+[data-theme='navy'] #statsFilterMonth { color: #ffffff !important; }
 
 [data-theme='navy'] .game-item { background: linear-gradient(145deg, #2c2c2c, #333333); }
 [data-theme='navy'] .game-info { color: #eee; }
@@ -216,6 +217,7 @@
 [data-theme='dark'] select { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; }
 [data-theme='dark'] input[type="date"] { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; }
 [data-theme='dark'] input[type="text"]#searchDateRange { background: rgba(60, 60, 60, 0.5); color: #ffffff !important; color-scheme: dark; }
+[data-theme='dark'] #statsFilterMonth { color: #ffffff !important; }
 
 [data-theme='dark'] .game-item { background: linear-gradient(145deg, #2c2c2c, #333333); }
 [data-theme='dark'] .game-info { color: #eee; }
