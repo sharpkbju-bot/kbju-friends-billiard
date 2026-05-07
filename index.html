@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <link rel="manifest" href="manifest.json?v=9.07">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -91,12 +91,10 @@
 
 <div id="loading"><div class="spinner"></div><div id="loadingText" style="font-weight:800; color:var(--main);">순위 데이터 동기화 중</div></div>
 
-<!-- [v9.07 업데이트] 대시보드 프리미엄 글래스모피즘 및 다이내믹 터치 피드백 적용 -->
 <div class="card" id="dashboardCard" style="display: none; margin-top: 20px;">
-    <div id="dashboard-capture-area" style="padding: 5px; border-radius: 20px; background: transparent;">
+    <div id="dashboard-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
         <h2 style="font-size:16px; margin:0 0 15px 5px; color:#444; font-weight:800; text-align:left; letter-spacing:-0.5px;">🎛️ 대시보드 <span id="dashMonthLabel" style="font-size:12px; color:var(--rank1);"></span></h2>
         
-        <!-- 1단: Grand Total -->
         <div style="display: flex; gap: 10px; margin-bottom: 10px; width: 100%; box-sizing: border-box;">
             <div class="dash-btn" style="flex: 1; min-width: 0; background: linear-gradient(135deg, rgba(52, 152, 219, 0.15), rgba(52, 152, 219, 0.02)); padding: 12px 5px; border-radius: 14px; text-align: center; border: 1.5px solid rgba(52, 152, 219, 0.5); box-sizing: border-box; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.3); backdrop-filter: blur(4px); cursor: pointer;" onclick="showDashInfo('totalGames')">
                 <div style="font-size: 11px; color: var(--sub-text); font-weight: 800; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">총 게임 수</div>
@@ -108,7 +106,6 @@
             </div>
         </div>
 
-        <!-- 2단: Spotlight -->
         <div style="display: flex; gap: 10px; margin-bottom: 10px; width: 100%; box-sizing: border-box;">
             <div class="dash-btn" style="flex: 1; min-width: 0; background: linear-gradient(135deg, rgba(241, 196, 15, 0.15), rgba(241, 196, 15, 0.02)); padding: 12px 5px; border-radius: 14px; text-align: center; border: 1.5px solid rgba(241, 196, 15, 0.5); box-sizing: border-box; box-shadow: 0 4px 10px rgba(241, 196, 15, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.3); backdrop-filter: blur(4px); cursor: pointer;" onclick="showDashInfo('mvp')">
                 <div style="font-size: 11px; color: #b7950b; font-weight: 800; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">월간 MVP 👑</div>
@@ -120,7 +117,6 @@
             </div>
         </div>
 
-        <!-- 3단: Ticker (Status) -->
         <div style="display: flex; gap: 10px; width: 100%; box-sizing: border-box;">
             <div class="dash-btn" style="flex: 1.2; min-width: 0; background: linear-gradient(135deg, rgba(230, 126, 34, 0.15), rgba(230, 126, 34, 0.02)); padding: 12px 5px; border-radius: 14px; display: flex; flex-direction: column; justify-content: center; border: 1.5px solid rgba(230, 126, 34, 0.5); box-sizing: border-box; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.3); backdrop-filter: blur(4px); cursor: pointer;" onclick="showDashInfo('trend')">
                 <div style="font-size: 10px; color: var(--sub-text); font-weight: 800; margin-bottom: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">최근 2일 트렌드</div>
@@ -215,14 +211,14 @@
         <button class="save-btn btn-cancel" onclick="resetInputs()">취소</button>
     </div>
     
-    <div id="capture-area" style="padding: 5px; border-radius: 20px;">
+    <div id="capture-area" style="padding: 5px; border-radius: 20px; box-sizing: border-box; overflow: hidden;">
         <div id="mvpArea" class="mvp-container"></div>
         <div id="dayGameList"></div>
     </div>
 </div>
 
 <div class="card stats-card">
-    <div id="stats-capture-area" style="padding: 5px; border-radius: 20px; background: transparent;">
+    <div id="stats-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
         <div style="margin:5px 0 10px 5px; text-align: left;">
             <h2 style="font-size:15px; margin:0; color:#444; font-weight:800; letter-spacing:-0.5px; display:block;">📊 멤버별 누적 전적 <span class="stats-subtitle" style="font-size:12px; color:var(--rank1);">(평균 승점 기준. 횟수)</span></h2>
         </div>
@@ -255,14 +251,14 @@
     
     <button id="stats-share-btn" class="share-btn-common" style="margin-top: 10px; margin-bottom: 15px;" onclick="shareStatsResult()">📸 누적 전적 스크린샷 공유</button>
 
-    <div id="memberHistory-capture-area" style="padding: 5px; border-radius: 20px;">
+    <div id="memberHistory-capture-area" style="padding: 5px; border-radius: 20px; box-sizing: border-box; overflow: hidden;">
         <div id="memberHistoryArea" class="history-area"></div>
     </div>
     <div id="richFriendArea" style="display:none; background: var(--bg); padding: 20px; border-radius: 22px; text-align: center; margin-top: 20px; color: #7f8c8d; font-weight: 800;"></div>
 </div>
 
 <div class="card" id="defenseCard">
-    <div id="defense-capture-area" style="padding: 5px; border-radius: 20px; background: transparent;">
+    <div id="defense-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
         <h2 style="font-size:16px; margin:5px 0 15px 0; color:#444; font-weight:800; text-align:center;">🛡️ Defense 순위</h2>
         <div style="font-size:12px; color:var(--sub-text); font-weight:800; text-align:center; margin-bottom: 15px;">(본인 바로 뒷순서 선수의 평균 순위)</div>
         <table class="stats-table defense-table">
@@ -281,7 +277,7 @@
 </div>
 
 <div class="card" id="strategyCard">
-    <div id="strategy-capture-area" style="padding: 5px; border-radius: 20px; background: transparent;">
+    <div id="strategy-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
         <h2 style="font-size:16px; margin:5px 0 15px 10px; color:#444; font-weight:800;">🎯 순번별 상성 분석 <span class="strategy-subtitle" style="font-size:12px; color:var(--rank1);">(특정 선수 뒤에서의 결과)</span></h2>
         <div class="input-row">
             <label>분석 선수</label>
@@ -321,7 +317,7 @@
         </select>
     </div>
 
-    <div id="search-capture-area" style="padding: 5px; border-radius: 20px; margin-top: 10px; background: transparent;">
+    <div id="search-capture-area" style="padding: 5px; border-radius: 20px; margin-top: 10px; background: transparent; box-sizing: border-box; overflow: hidden;">
         <div style="display: flex; gap: 10px;">
             <button class="save-btn" style="background: linear-gradient(145deg, #3498db, #2980b9); margin-top: 0; flex: 2; padding: 12px; font-size: 13px;" onclick="searchRecords()">기록 검색하기</button>
             <button class="save-btn" style="background: #bdc3c7; margin-top: 0; flex: 1; padding: 12px; font-size: 13px; color: #444;" onclick="resetSearch()">🔄 리셋</button>
