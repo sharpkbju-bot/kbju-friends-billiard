@@ -1,4 +1,4 @@
-// share.js - 버튼 중복 생성 방지 및 위치 최적화 버전 (v5.60) / [v9.10] 곡선 모서리 무결성 캡처 패치 적용
+// share.js - 버튼 중복 생성 방지 및 위치 최적화 버전 (v5.60) / [v9.11] 오리지널 도화지 캡처 기법(여백+배경) 적용
 (function() {
     const script = document.createElement('script');
     script.src = "https://html2canvas.hertzen.com/dist/html2canvas.min.js";
@@ -29,43 +29,45 @@
                 `;
 
                 shareBtn.onclick = async () => {
-                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.documentElement.getAttribute('data-theme') === 'navy';
+                    const theme = document.documentElement.getAttribute('data-theme') || 'yellow'; 
+                    const isDark = (theme === 'dark' || theme === 'navy');
+                    
+                    // 1. 현재 테마에 맞는 배경색 추출 (main.js의 getCaptureBgColor 로직과 동일)
+                    let captureBgColor = '#fdfbe7';
+                    if (theme === 'dark') captureBgColor = '#3c3c41';
+                    else if (theme === 'navy') captureBgColor = '#0a192f';
+                    else if (theme === 'yellowgreen') captureBgColor = '#f0ffe6'; 
+                    else if (theme === 'purple') captureBgColor = '#f3e6ff'; 
+                    else if (theme === 'green') captureBgColor = '#e1faeb'; 
+                    else if (theme === 'pink') captureBgColor = '#ffebeb'; 
+                    else if (theme === 'gray') captureBgColor = '#f0f0f0';
+
                     shareBtn.style.display = 'none';
 
-                    // 1. 투명한 최외곽 컨테이너 생성
+                    // 2. 다른 카드들처럼 '앱 배경색'으로 채워진 넉넉한 도화지 생성
                     const ghostWrapper = document.createElement('div');
                     ghostWrapper.style.position = 'absolute';
                     ghostWrapper.style.top = '-9999px';
                     ghostWrapper.style.left = '0';
                     ghostWrapper.style.width = '360px'; 
-                    ghostWrapper.style.background = 'transparent'; 
-                    ghostWrapper.style.padding = '0';
+                    ghostWrapper.style.background = captureBgColor;
+                    ghostWrapper.style.padding = '20px'; // 여백 20px 부여
+                    ghostWrapper.style.borderRadius = '15px'; // 도화지 자체의 모서리 둥글게
                     ghostWrapper.style.zIndex = '-9999';
-                    
-                    // 2. 모서리를 깎아줄 배경 컨테이너 생성
-                    const innerWrapper = document.createElement('div');
-                    const t = document.documentElement.getAttribute('data-theme') || 'yellow'; 
-                    let captureBg = '#fdfbe7';
-                    if (t === 'dark' || t === 'navy') captureBg = t === 'dark' ? '#3c3c41' : '#0a192f'; 
-                    else if (t === 'yellowgreen') captureBg = '#f0ffe6'; 
-                    else if (t === 'purple') captureBg = '#f3e6ff'; 
-                    else if (t === 'green') captureBg = '#e1faeb'; 
-                    else if (t === 'pink') captureBg = '#ffebeb'; 
-                    else if (t === 'gray') captureBg = '#f0f0f0'; 
+                    ghostWrapper.style.letterSpacing = 'normal';
+                    ghostWrapper.style.wordBreak = 'keep-all';
+                    ghostWrapper.style.boxSizing = 'border-box';
 
-                    innerWrapper.style.background = captureBg;
-                    innerWrapper.style.padding = '20px';
-                    innerWrapper.style.borderRadius = '20px'; // 둥근 모서리 보정
-                    innerWrapper.style.overflow = 'hidden'; // 곡선 밖으로 튀어나가는 배경 숨김
-                    innerWrapper.style.boxSizing = 'border-box';
-
-                    // 3. 캡처 대상 복제 및 기존 onclone 로직 직접 적용
+                    // 3. 전적 카드 복제 및 기존 onclone 로직 직접 적용
                     const clone = statsCard.cloneNode(true);
                     clone.style.width = '100%';
-                    clone.style.margin = '0';
+                    clone.style.margin = '0 auto';
                     clone.style.transform = 'none';
+                    clone.style.animation = 'none';
                     clone.style.boxSizing = 'border-box';
                     clone.style.backgroundColor = isDark ? '#1e1e1e' : '#ffffff';
+                    clone.style.borderRadius = '28px'; // 카드의 곡률 설정
+                    clone.style.overflow = 'hidden';
 
                     const clonedBtn = clone.querySelector('#custom-share-btn');
                     if(clonedBtn) clonedBtn.style.display = 'none';
@@ -84,17 +86,16 @@
                         row.style.backgroundColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)';
                     });
 
-                    // 4. DOM 조립
-                    innerWrapper.appendChild(clone);
-                    ghostWrapper.appendChild(innerWrapper);
+                    // 4. DOM 조립 (도화지 위에 카드 올리기)
+                    ghostWrapper.appendChild(clone);
                     document.body.appendChild(ghostWrapper);
 
                     try {
                         await new Promise(r => setTimeout(r, 300));
                         
-                        // 5. 배경을 투명(null)으로 처리하여 둥근 캡처본 생성
+                        // 5. 배경색 옵션을 명시하여 캡처 진행 (투명 버그 원천 차단)
                         const canvas = await html2canvas(ghostWrapper, {
-                            backgroundColor: null, 
+                            backgroundColor: captureBgColor, 
                             scale: 2,
                             useCORS: true,
                             logging: false
