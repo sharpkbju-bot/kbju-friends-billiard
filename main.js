@@ -406,7 +406,6 @@ function showLastGameResult() {
         } 
     }, 3000);
 }
-
 function focusOnDrawCard() { 
     setTimeout(() => { 
         const el = document.getElementById('drawCardArea'); 
@@ -1307,8 +1306,8 @@ function showDefenseDetail(playerName) {
     }
 
     html += `</div></div>
-             <button id="defense-modal-share-btn" class="share-btn-common" style="margin-top: 20px; width:100%;" onclick="shareDefenseDetail('${playerName}')">📸 디펜스 상세 기록 스크린샷 공유</button>
-             <button class="save-btn" style="background:#bdc3c7; margin-top:10px; width:100%; color:#444;" onclick="closeDefenseDetail()">닫기</button>`;
+             <button id="defense-modal-share-btn" class="share-btn-common" style="margin-top: 20px; width:100%; height:48px; display:flex; align-items:center; justify-content:center;" onclick="shareDefenseDetail('${playerName}')">📸 디펜스 상세 기록 스크린샷 공유</button>
+             <button class="save-btn" style="background:#bdc3c7; margin-top:12px; width:100%; height:48px; display:flex; align-items:center; justify-content:center; color:#444;" onclick="closeDefenseDetail()">닫기</button>`;
 
     const modal = document.getElementById('defense-detail-modal');
     const content = document.getElementById('defense-detail-content');
@@ -1423,7 +1422,6 @@ function renderDefenseStats() {
 function shareDefenseResult() {
     captureAndShare('defense-capture-area', 'defense-share-btn', 'defense_ranking.png', 'Defense 순위', '멤버별 전체 디펜스 랭킹입니다!');
 }
-
 function closeMemberHistory() {
     const area = document.getElementById('memberHistoryArea');
     area.style.display = 'none';
