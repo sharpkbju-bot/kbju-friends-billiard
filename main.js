@@ -55,7 +55,7 @@ function generateNamesHTML(names) {
     }).join('<span style="display:inline;">→</span>');
 }
 
-// [V9.05 캡처 무결성 유지 및 모서리 곡선 투명화 처리] 
+// [불사조님 지시 반영] 오리지널 도화지 기법으로 원상 복구 (여백과 테마 배경을 통한 곡선 유지)
 async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -73,18 +73,12 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
     ghostWrapper.style.top = '-9999px';
     ghostWrapper.style.left = '0';
     ghostWrapper.style.width = '360px'; 
-    ghostWrapper.style.background = 'transparent'; 
-    ghostWrapper.style.padding = '0';
+    ghostWrapper.style.background = getCaptureBgColor();
+    ghostWrapper.style.padding = '20px';
+    ghostWrapper.style.borderRadius = '15px';
     ghostWrapper.style.zIndex = '-9999';
-    
-    const innerWrapper = document.createElement('div');
-    innerWrapper.style.background = getCaptureBgColor();
-    innerWrapper.style.padding = '20px';
-    innerWrapper.style.borderRadius = '20px'; 
-    innerWrapper.style.overflow = 'hidden'; 
-    innerWrapper.style.letterSpacing = 'normal';
-    innerWrapper.style.wordBreak = 'keep-all';
-    innerWrapper.style.boxSizing = 'border-box';
+    ghostWrapper.style.letterSpacing = 'normal';
+    ghostWrapper.style.wordBreak = 'keep-all';
     
     const clone = target.cloneNode(true);
     clone.style.width = '100%';
@@ -114,15 +108,14 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
         cEl.parentNode.replaceChild(div, cEl);
     });
 
-    innerWrapper.appendChild(clone);
-    ghostWrapper.appendChild(innerWrapper);
+    ghostWrapper.appendChild(clone);
     document.body.appendChild(ghostWrapper);
 
     try {
         await new Promise(r => setTimeout(r, 300));
         
         const canvas = await html2canvas(ghostWrapper, { 
-            backgroundColor: null, 
+            backgroundColor: getCaptureBgColor(), 
             scale: 2, 
             logging: false, 
             useCORS: true 
@@ -272,7 +265,7 @@ function showRingCriteria(type) {
         desc = "<div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;'>해당 선수의 월간 평균 승점입니다. 5점 기준.</div>";
     } else if (type === 'safety') {
         title = "생존율 산출 기준";
-        desc = "<b>((경기수 - 꼴찌수) / 경기수) × 100</b><br><br><div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;'>참参与 경기 중 꼴찌를 하지 않고 살아남은 비율입니다. 무너지지 않는 수비적 안정감을 보여주는 지표입니다.</div>";
+        desc = "<b>((경기수 - 꼴찌수) / 경기수) × 100</b><br><br><div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;'>참여 경기 중 꼴찌를 하지 않고 살아남은 비율입니다. 무너지지 않는 수비적 안정감을 보여주는 지표입니다.</div>";
     }
 
     const timerEl = document.getElementById('info-modal-timer');
@@ -1312,6 +1305,7 @@ function showDefenseDetail(playerName) {
         });
     }
 
+    /* [이전 작업 유지] 버튼의 높이(48px)를 통일하여 시각적 불균형 해소 */
     html += `</div></div>
              <button id="defense-modal-share-btn" class="share-btn-common" style="margin-top: 20px; width:100%; height:48px; display:flex; align-items:center; justify-content:center;" onclick="shareDefenseDetail('${playerName}')">📸 디펜스 상세 기록 스크린샷 공유</button>
              <button class="save-btn" style="background:#bdc3c7; margin-top:12px; width:100%; height:48px; display:flex; align-items:center; justify-content:center; color:#444;" onclick="closeDefenseDetail()">닫기</button>`;
