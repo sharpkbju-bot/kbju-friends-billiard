@@ -415,7 +415,7 @@ function focusOnDrawCard() {
 }
 
 function togglePlayerSelection(el, name) {
-    triggerHaptic(15); // [프리미엄 추가] 햅틱 피드백 연동
+    triggerHaptic(15); 
     if (selectedPlayersForLottery.includes(name)) { 
         selectedPlayersForLottery = selectedPlayersForLottery.filter(p => p !== name); 
         el.classList.remove('active'); 
@@ -441,7 +441,7 @@ function resetPlayerSelection() {
 }
 
 function pickRandomOrder() {
-    triggerHaptic([20, 30, 20]); // [프리미엄 추가] 햅틱 피드백 연동
+    triggerHaptic([20, 30, 20]); 
     const realTodayStr = formatDate(new Date()); 
     if (selectedDateStr > realTodayStr) return alert("미래에서 온거야? 날짜를 잘 확인혀!"); 
     
@@ -542,7 +542,6 @@ function showPlayersGraph(players) {
     
     let legendHtml = ""; 
     
-    // [프리미엄 추가] Bezier 곡선 하단 그라데이션 필링을 위한 defs 동적 생성
     let svg = `<svg width="100%" height="100%" viewBox="-15 -10 130 120" preserveAspectRatio="none" style="overflow: visible; font-family: inherit;">
                <defs>`;
     players.forEach((p, i) => {
@@ -590,7 +589,6 @@ function showPlayersGraph(players) {
                 pathD += ` C ${points[i].x + (points[i+1].x - points[i].x) / 2} ${points[i].y}, ${points[i].x + (points[i+1].x - points[i].x) / 2} ${points[i+1].y}, ${points[i+1].x} ${points[i+1].y}`;
             }
             
-            // [프리미엄 추가] 곡선 하단 채우기 패스 생성
             let fillPathD = pathD + ` L ${points[points.length - 1].x} 100 L ${points[0].x} 100 Z`;
             svg += `<path d="${fillPathD}" fill="url(#grad-${playerIndex})" />`;
             
@@ -730,7 +728,6 @@ function renderCalendar() {
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
         
-        // [프리미엄 추가] 캘린더 당구공 아이콘으로 교체 (기존 점 마커 대체)
         const recordDot = hasRecord ? `<div class="record-dot" style="background:transparent; box-shadow:none; bottom:2px; left:50%; transform:translateX(-50%); font-size:10px; width:auto; height:auto; z-index:3;">🎱</div>` : "";
 
         grid.innerHTML += `
@@ -772,7 +769,7 @@ function renderCalendar() {
 }
 
 function selectDate(dateStr) {
-    triggerHaptic(10); // [프리미엄 추가] 햅틱 피드백 연동
+    triggerHaptic(10); 
     if(editMode) cancelEdit();
     selectedDateStr = dateStr;
     document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`;
@@ -837,7 +834,7 @@ function resetInputs() {
 }
 
 async function saveGame() {
-    triggerHaptic(20); // [프리미엄 추가] 햅틱 피드백 연동
+    triggerHaptic(20); 
     const saveBtn = document.getElementById('mainBtn');
     if (saveBtn) saveBtn.classList.remove('flash-save-active');
 
@@ -1030,7 +1027,6 @@ function renderDashboard() {
     let mvp = "-", villain = "-";
     
     if (activePlayers.length > 0) {
-        // [v9.05 업데이트] 월간 MVP 1순위: 평균승점, 2순위: 승률 통일 스와핑
         mvp = activePlayers.reduce((a, b) => {
             const avgA = pStats[a].score / pStats[a].played;
             const avgB = pStats[b].score / pStats[b].played;
@@ -1231,6 +1227,7 @@ function renderStats() {
     }
 }
 
+// [v9.11 픽스] 방어 리포트 팝업 하단 버튼 잘림 및 버튼 디자인 불균형 해소
 function showDefenseDetail(playerName) {
     const filterEl = document.getElementById('statsFilterCount');
     const filterVal = filterEl ? filterEl.value : "all";
@@ -1272,11 +1269,12 @@ function showDefenseDetail(playerName) {
     let filterText = filterVal === "all" ? "" : `<span style="color:var(--accent); font-size:11px;">(${filterVal}인 게임 기준)</span>`;
     let monthText = monthVal ? `<span style="color:var(--rank1); font-size:11px;">(${monthVal}월 기준)</span>` : "";
 
+    // 팝업 내부 목록에 max-height 와 overflow-y 적용 (잘림 방지)
     let html = `<div id="defense-modal-capture-area" style="padding: 10px; border-radius: 15px; background: transparent; display: block;">
                 <div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">🛡️</div>
                 <div style="font-size:19px; font-weight:900; color:var(--text-color); margin-bottom:5px; line-height:1.4; display:block; text-align:center;">${playerName}의 방어 리포트</div>
                 <div style="font-size:13px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; line-height:1.4; display:block; text-align:center;">(내 바로 뒷주자 선수들의 성적 분석) ${filterText} ${monthText}</div>
-                <div style="display:block;">`;
+                <div style="display:block; max-height: 45vh; overflow-y: auto; padding-right: 5px;">`;
 
     if (victims.length === 0) {
         html += `<div style="padding:30px; color:var(--sub-text); font-weight:800; text-align:center; display:block;">해당 조건의 분석 가능한 데이터가 없습니다.</div>`;
@@ -1306,9 +1304,10 @@ function showDefenseDetail(playerName) {
         });
     }
 
+    // 닫기 버튼을 share-btn-common 클래스로 통일하여 패딩/사이즈 완벽 일치화
     html += `</div></div>
              <button id="defense-modal-share-btn" class="share-btn-common" style="margin-top: 20px; width:100%;" onclick="shareDefenseDetail('${playerName}')">📸 디펜스 상세 기록 스크린샷 공유</button>
-             <button class="save-btn" style="background:#bdc3c7; margin-top:10px; width:100%; color:#444;" onclick="closeDefenseDetail()">닫기</button>`;
+             <button class="share-btn-common" style="background:#bdc3c7; margin-top:10px; width:100%; color:#444;" onclick="closeDefenseDetail()">닫기</button>`;
 
     const modal = document.getElementById('defense-detail-modal');
     const content = document.getElementById('defense-detail-content');
@@ -1619,7 +1618,7 @@ function showGenseiModal(playerName) {
     let html = `<div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">😈</div>
                 <div style="font-size:18px; font-weight:900; color:var(--text-color); margin-bottom:5px; display:block; text-align:center;">${playerName}의 겐세이 희생양들</div>
                 <div style="font-size:14px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; display:block; text-align:center;">[ ${selectedDateStr} ] 뒷주자 성적</div>
-                <div style="display:block; font-weight:900;">`;
+                <div style="display:block; font-weight:900; max-height: 45vh; overflow-y: auto; padding-right: 5px;">`;
 
     victims.forEach((v) => {
         const rankColor = v.victimRank === 1 ? 'var(--rank1)' : (v.victimRank === v.actual.length ? 'var(--rankL)' : 'var(--text-color)');
