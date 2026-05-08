@@ -55,7 +55,7 @@ function generateNamesHTML(names) {
     }).join('<span style="display:inline;">→</span>');
 }
 
-// [V9.05 캡처 무결성 유지] 
+// [V9.05 캡처 무결성 유지 및 모서리 곡선 투명화 처리] 
 async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -73,12 +73,18 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
     ghostWrapper.style.top = '-9999px';
     ghostWrapper.style.left = '0';
     ghostWrapper.style.width = '360px'; 
-    ghostWrapper.style.background = getCaptureBgColor();
-    ghostWrapper.style.padding = '20px';
-    ghostWrapper.style.borderRadius = '15px';
+    ghostWrapper.style.background = 'transparent'; 
+    ghostWrapper.style.padding = '0';
     ghostWrapper.style.zIndex = '-9999';
-    ghostWrapper.style.letterSpacing = 'normal';
-    ghostWrapper.style.wordBreak = 'keep-all';
+    
+    const innerWrapper = document.createElement('div');
+    innerWrapper.style.background = getCaptureBgColor();
+    innerWrapper.style.padding = '20px';
+    innerWrapper.style.borderRadius = '20px'; 
+    innerWrapper.style.overflow = 'hidden'; 
+    innerWrapper.style.letterSpacing = 'normal';
+    innerWrapper.style.wordBreak = 'keep-all';
+    innerWrapper.style.boxSizing = 'border-box';
     
     const clone = target.cloneNode(true);
     clone.style.width = '100%';
@@ -108,14 +114,15 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
         cEl.parentNode.replaceChild(div, cEl);
     });
 
-    ghostWrapper.appendChild(clone);
+    innerWrapper.appendChild(clone);
+    ghostWrapper.appendChild(innerWrapper);
     document.body.appendChild(ghostWrapper);
 
     try {
         await new Promise(r => setTimeout(r, 300));
         
         const canvas = await html2canvas(ghostWrapper, { 
-            backgroundColor: getCaptureBgColor(), 
+            backgroundColor: null, 
             scale: 2, 
             logging: false, 
             useCORS: true 
@@ -265,7 +272,7 @@ function showRingCriteria(type) {
         desc = "<div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;'>해당 선수의 월간 평균 승점입니다. 5점 기준.</div>";
     } else if (type === 'safety') {
         title = "생존율 산출 기준";
-        desc = "<b>((경기수 - 꼴찌수) / 경기수) × 100</b><br><br><div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;'>참여 경기 중 꼴찌를 하지 않고 살아남은 비율입니다. 무너지지 않는 수비적 안정감을 보여주는 지표입니다.</div>";
+        desc = "<b>((경기수 - 꼴찌수) / 경기수) × 100</b><br><br><div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;'>참参与 경기 중 꼴찌를 하지 않고 살아남은 비율입니다. 무너지지 않는 수비적 안정감을 보여주는 지표입니다.</div>";
     }
 
     const timerEl = document.getElementById('info-modal-timer');
@@ -2161,7 +2168,18 @@ window.onload = () => {
         searchFlatpickr = flatpickr("#searchDateRange", { 
             plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
             locale: "ko", disableMobile: true,
-            onReady: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
+            onReady: function(selectedDates, dateStr, instance) {
+                const clearBtnWrap = document.createElement("div");
+                clearBtnWrap.style.padding = "0 10px 10px 10px";
+                clearBtnWrap.innerHTML = "<button type='button' style='width:100%; padding:10px; background:var(--edit); color:white; border:none; border-radius:8px; font-weight:900; font-size:13px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1);'>전체 기간으로 리셋</button>";
+                clearBtnWrap.onclick = function() {
+                    instance.clear();
+                    instance.close();
+                    onFilterChange();
+                };
+                instance.calendarContainer.appendChild(clearBtnWrap);
+                applyHighlight(instance);
+            },
             onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
             onYearChange: function(selectedDates, dateStr, instance) { setTimeout(() => applyHighlight(instance), 50); },
             onChange: function(selectedDates, dateStr, instance) {
