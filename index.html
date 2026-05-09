@@ -221,7 +221,7 @@
         </div>
         <div style="display: flex; gap: 10px; margin-bottom: 14px; width: 100%; box-sizing: border-box; align-items: center;">
             <input type="text" id="statsFilterMonth" style="padding: 6px 8px; border-radius: 8px; font-size: 12px; font-family: inherit; font-weight: 800; color: #4a148c; background: rgba(236, 238, 241, 0.4); border: 2px solid #e67e22 !important; box-shadow: var(--inner-shadow); flex: 1 !important; min-width: 0 !important; cursor: pointer; text-align: center; box-sizing: border-box; -webkit-appearance: none;" placeholder="월별 순위" readonly>
-            <select id="statsFilterCount" onchange="onFilterChange()" style="padding: 6px 8px; border-radius: 8px; font-size: 12px; font-family: inherit; font-weight: 800; color: #4a148c; background: rgba(236, 238, 241, 0.4); border: 2px solid #bb86fc !important; box-shadow: var(--inner-shadow); flex: 1 !important; min-width: 0 !important; margin-left: 0 !important; text-align: center; text-align-last: center; box-sizing: border-box; -webkit-appearance: none;">
+            <select id="statsFilterCount" onchange="onFilterChange()" style="padding: 6px 8px; border-radius: 8px; font-size: 12px; font-family: inherit; font-weight: 800; color: #4a148c; background: rgba(236, 238, 241, 0.4); border: 2px solid transparent; box-shadow: var(--inner-shadow); flex: 1 !important; min-width: 0 !important; margin-left: 0 !important; text-align: center; text-align-last: center; box-sizing: border-box; -webkit-appearance: none;">
                 <option value="all">전체 인원</option>
                 <option value="2">2인</option>
                 <option value="3">3인</option>
@@ -253,27 +253,6 @@
     </div>
     <div id="richFriendArea" style="display:none; background: var(--bg); padding: 20px; border-radius: 22px; text-align: center; margin-top: 20px; color: #7f8c8d; font-weight: 800;"></div>
 </div>
-
-<div class="card" id="cumulativeRankCard">
-    <div id="rank-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
-        <h2 style="font-size:16px; margin:5px 0 15px 5px; color:#444; font-weight:800; text-align:left; letter-spacing:-0.5px;">🏆 멤버별 누적 순위 <span id="rankFilterLabel" style="font-size:12px; color:var(--rank1);"></span></h2>
-        <table class="stats-table">
-            <thead>
-                <tr>
-                    <th style="text-align:center; width:15%;">순위</th>
-                    <th style="text-align:center; width:20%;">이름</th>
-                    <th style="width:15%;">참여</th>
-                    <th style="width:15%;">승점</th>
-                    <th style="width:15%;">평균</th>
-                    <th style="width:20%; color:var(--accent);">승점차</th>
-                </tr>
-            </thead>
-            <tbody id="cumulativeRankBody"></tbody>
-        </table>
-    </div>
-    <button id="rank-share-btn" class="share-btn-common" style="margin-top: 10px;" onclick="shareRankResult()">📸 누적 순위 스크린샷 공유</button>
-</div>
-
 
 <div class="card" id="scoreRankCard">
     <div id="scoreRank-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
