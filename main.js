@@ -2207,17 +2207,17 @@ function analyzeStrategy() {
 
         html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <div style="font-size:16px; font-weight:900; color:${getPlayerColor(t)};">${t}</div>
-                        <div style="font-size:13px; font-weight:800; color:var(--sub-text);">${s.games}전 / 평균 ${avg}위</div>
+                        <div style="font-size:19px; font-weight:900; color:${getPlayerColor(t)};">${t}</div>
+                        <div style="font-size:15px; font-weight:800; color:var(--sub-text);">${s.games}전 / 평균 ${avg}위</div>
                     </div>
                     <div style="display:flex; gap:10px;">
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:8px; border-radius:8px; text-align:center;">
-                            <div style="font-size:11px; color:var(--sub-text); margin-bottom:4px; font-weight:800;">1위 확률</div>
-                            <div style="font-size:14px; font-weight:900; color:var(--rank1);">${winP}%</div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 8px; border-radius:8px; text-align:center;">
+                            <div style="font-size:13px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">1위 확률</div>
+                            <div style="font-size:18px; font-weight:900; color:var(--rank1);">${winP}%</div>
                         </div>
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:8px; border-radius:8px; text-align:center;">
-                            <div style="font-size:11px; color:var(--sub-text); margin-bottom:4px; font-weight:800;">꼴찌 확률</div>
-                            <div style="font-size:14px; font-weight:900; color:var(--rankL);">${lastP}%</div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 8px; border-radius:8px; text-align:center;">
+                            <div style="font-size:13px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">꼴찌 확률</div>
+                            <div style="font-size:18px; font-weight:900; color:var(--rankL);">${lastP}%</div>
                         </div>
                     </div>
                  </div>`;
