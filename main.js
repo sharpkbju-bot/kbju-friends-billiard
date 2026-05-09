@@ -2145,6 +2145,94 @@ function searchRecords() {
     setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 }
 
+function analyzeStrategy() {
+    const player = document.getElementById('strategyPlayer').value;
+    const area = document.getElementById('strategyResultArea');
+    const shareBtn = document.getElementById('strategy-share-btn');
+    
+    if (!player) {
+        area.style.display = 'none';
+        if (shareBtn) shareBtn.style.display = 'none';
+        return;
+    }
+
+    const filterEl = document.getElementById('statsFilterCount');
+    const filterVal = filterEl ? filterEl.value : "all";
+
+    const monthEl = document.getElementById('statsFilterMonth');
+    const monthVal = monthEl ? monthEl.value : "";
+
+    let stats = {};
+
+    gameLogs.forEach(g => {
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
+
+        if (g.startOrder && g.startOrder.includes(player)) {
+            const actual = g.ranks.filter(n => n && n.trim() !== "");
+            if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+
+            const order = g.startOrder;
+            const pIdx = order.indexOf(player);
+            // 내 바로 다음 순서인 선수 찾기
+            const nextP = order[(pIdx + 1) % order.length];
+            
+            const nextPRankIdx = actual.indexOf(nextP);
+            if (nextPRankIdx !== -1) {
+                if (!stats[nextP]) stats[nextP] = { games: 0, totalRank: 0, wins: 0, lasts: 0 };
+                stats[nextP].games++;
+                stats[nextP].totalRank += (nextPRankIdx + 1);
+                if (nextPRankIdx === 0) stats[nextP].wins++;
+                if (nextPRankIdx === actual.length - 1 && actual.length > 1) stats[nextP].lasts++;
+            }
+        }
+    });
+
+    // 평균 순위가 높은(등수가 낮은, 숫자가 큰) 순으로 내림차순 정렬 (최대 피해자 순)
+    const targets = Object.keys(stats).sort((a, b) => (stats[b].totalRank / stats[b].games) - (stats[a].totalRank / stats[a].games));
+
+    if (targets.length === 0) {
+        area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">분석 가능한 데이터가 없습니다.</div>`;
+        area.style.display = 'block';
+        if (shareBtn) shareBtn.style.display = 'none';
+        return;
+    }
+
+    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수의 다음 순서로 플레이한 멤버들의 성적입니다.</div>`;
+
+    targets.forEach(t => {
+        const s = stats[t];
+        const avg = (s.totalRank / s.games).toFixed(1);
+        const winP = ((s.wins / s.games) * 100).toFixed(0);
+        const lastP = ((s.lasts / s.games) * 100).toFixed(0);
+
+        html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="font-size:16px; font-weight:900; color:${getPlayerColor(t)};">${t}</div>
+                        <div style="font-size:13px; font-weight:800; color:var(--sub-text);">${s.games}전 / 평균 ${avg}위</div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:8px; border-radius:8px; text-align:center;">
+                            <div style="font-size:11px; color:var(--sub-text); margin-bottom:4px; font-weight:800;">1위 확률</div>
+                            <div style="font-size:14px; font-weight:900; color:var(--rank1);">${winP}%</div>
+                        </div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:8px; border-radius:8px; text-align:center;">
+                            <div style="font-size:11px; color:var(--sub-text); margin-bottom:4px; font-weight:800;">꼴찌 확률</div>
+                            <div style="font-size:14px; font-weight:900; color:var(--rankL);">${lastP}%</div>
+                        </div>
+                    </div>
+                 </div>`;
+    });
+
+    area.innerHTML = html;
+    area.style.display = 'block';
+    if (shareBtn) shareBtn.style.display = 'block';
+}
+
+function shareStrategyResult() {
+    const player = document.getElementById('strategyPlayer').value;
+    captureAndShare('strategy-capture-area', 'strategy-share-btn', `strategy_${player}.png`, '상성 분석', `${player} 선수의 상성 분석 결과입니다!`);
+}
+
 window.onload = () => { 
     try {
         function applyHighlight(instance) {
