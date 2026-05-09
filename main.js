@@ -5,10 +5,8 @@ let genseiCountdownInterval = null;
 let defenseModalTimeout = null; 
 let infoModalCountdownInterval = null; 
 let scoreCountdownInterval = null; 
-// [v9.04] 대시보드 팝업 타이머 변수 추가
 let dashInfoCountdownInterval = null; 
 
-// [프리미엄 UX 추가] 햅틱(진동) 피드백 글로벌 함수 추가
 function triggerHaptic(pattern) {
     if (navigator.vibrate) {
         navigator.vibrate(pattern);
@@ -55,7 +53,6 @@ function generateNamesHTML(names) {
     }).join('<span style="display:inline;">→</span>');
 }
 
-// [V9.05 캡처 무결성 유지] 
 async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -174,9 +171,8 @@ function getTier(score) {
     return { name: "브론즈", icon: "🥉", color: "#cd7f32" };
 }
 
-// [v9.05] 대시보드 위젯 클릭 시 호출되는 팝업 함수 (멘트 교정)
 function showDashInfo(type) {
-    triggerHaptic(10); // [프리미엄 추가] 햅틱 피드백 연동
+    triggerHaptic(10); 
     let title = "";
     let desc = "";
     let icon = "";
@@ -414,7 +410,7 @@ function focusOnDrawCard() {
 }
 
 function togglePlayerSelection(el, name) {
-    triggerHaptic(15); // [프리미엄 추가] 햅틱 피드백 연동
+    triggerHaptic(15); 
     if (selectedPlayersForLottery.includes(name)) { 
         selectedPlayersForLottery = selectedPlayersForLottery.filter(p => p !== name); 
         el.classList.remove('active'); 
@@ -440,7 +436,7 @@ function resetPlayerSelection() {
 }
 
 function pickRandomOrder() {
-    triggerHaptic([20, 30, 20]); // [프리미엄 추가] 햅틱 피드백 연동
+    triggerHaptic([20, 30, 20]); 
     const realTodayStr = formatDate(new Date()); 
     if (selectedDateStr > realTodayStr) return alert("미래에서 온거야? 날짜를 잘 확인혀!"); 
     
@@ -541,7 +537,6 @@ function showPlayersGraph(players) {
     
     let legendHtml = ""; 
     
-    // [프리미엄 추가] Bezier 곡선 하단 그라데이션 필링을 위한 defs 동적 생성
     let svg = `<svg width="100%" height="100%" viewBox="-15 -10 130 120" preserveAspectRatio="none" style="overflow: visible; font-family: inherit;">
                <defs>`;
     players.forEach((p, i) => {
@@ -589,7 +584,6 @@ function showPlayersGraph(players) {
                 pathD += ` C ${points[i].x + (points[i+1].x - points[i].x) / 2} ${points[i].y}, ${points[i].x + (points[i+1].x - points[i].x) / 2} ${points[i+1].y}, ${points[i+1].x} ${points[i+1].y}`;
             }
             
-            // [프리미엄 추가] 곡선 하단 채우기 패스 생성
             let fillPathD = pathD + ` L ${points[points.length - 1].x} 100 L ${points[0].x} 100 Z`;
             svg += `<path d="${fillPathD}" fill="url(#grad-${playerIndex})" />`;
             
@@ -682,6 +676,7 @@ function renderAll() {
     renderDashboard();
     renderCalendar(); 
     renderStats(); 
+    renderCumulativeRank(); 
     renderDefenseStats(); 
     renderGameList(); 
     analyzeStrategy(); 
@@ -729,11 +724,12 @@ function renderCalendar() {
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
         
-        // [프리미엄 추가] 캘린더 당구공 아이콘으로 교체 (기존 점 마커 대체)
-        const recordDot = hasRecord ? `<div class="record-dot" style="background:transparent; box-shadow:none; bottom:2px; left:50%; transform:translateX(-50%); font-size:10px; width:auto; height:auto; z-index:3;">🎱</div>` : "";
+        // [v9.21 수정] 핑크 하트(🩷) 이모지로 변경 및 absolute 포지션(bottom) 중앙 정렬 복구
+        const recordDot = hasRecord ? `<div class="record-dot" style="position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); font-size: 11px; z-index: 3;">🩷</div>` : "";
 
+        // 무결성을 위해 style="position: relative;" 강제 추가
         grid.innerHTML += `
-            <div class="${dayClass}" onclick="selectDate('${dStr}')">
+            <div class="${dayClass}" style="position: relative;" onclick="selectDate('${dStr}')">
                 <span class="day-num">${d}</span>
                 ${recordDot}
             </div>`;
@@ -771,7 +767,7 @@ function renderCalendar() {
 }
 
 function selectDate(dateStr) {
-    triggerHaptic(10); // [프리미엄 추가] 햅틱 피드백 연동
+    triggerHaptic(10); 
     if(editMode) cancelEdit();
     selectedDateStr = dateStr;
     document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`;
@@ -836,7 +832,7 @@ function resetInputs() {
 }
 
 async function saveGame() {
-    triggerHaptic(20); // [프리미엄 추가] 햅틱 피드백 연동
+    triggerHaptic(20); 
     const saveBtn = document.getElementById('mainBtn');
     if (saveBtn) saveBtn.classList.remove('flash-save-active');
 
@@ -848,7 +844,7 @@ async function saveGame() {
     
     for(let i=1; i<=count; i++) { 
         const val = document.getElementById('rank'+i).value; 
-        if(!val) return alert("참 참여 친구의 순위를 모두 선택해줘!"); 
+        if(!val) return alert("참여 친구의 순위를 모두 선택해줘!"); 
         ranks.push(val); 
     }
     
@@ -877,6 +873,7 @@ async function saveGame() {
         showLoading(false); 
     }
 }
+
 function analyzeStrategy() {
     const me = document.getElementById('strategyPlayer').value; 
     const resArea = document.getElementById('strategyResultArea');
@@ -960,7 +957,6 @@ async function executeReset() {
         showLoading(false); 
     } 
 }
-
 function renderDashboard() {
     const dCard = document.getElementById('dashboardCard');
     if (!dCard) return;
@@ -1029,7 +1025,6 @@ function renderDashboard() {
     let mvp = "-", villain = "-";
     
     if (activePlayers.length > 0) {
-        // [v9.05 업데이트] 월간 MVP 1순위: 평균승점, 2순위: 승률 통일 스와핑
         mvp = activePlayers.reduce((a, b) => {
             const avgA = pStats[a].score / pStats[a].played;
             const avgB = pStats[b].score / pStats[b].played;
@@ -1130,6 +1125,7 @@ function renderDashboard() {
 function onFilterChange() {
     renderDashboard();       
     renderStats();           
+    renderCumulativeRank(); 
     renderDefenseStats();    
     closeMemberHistory();    
 }
@@ -1228,6 +1224,96 @@ function renderStats() {
     } else {
         rich.style.display = 'none';
     }
+}
+
+// [v9.21 수정] 정렬 기준을 1차: 평균 승점, 2차: 총 승점으로 변경 및 승점차도 평균 승점 기준으로 표기
+function renderCumulativeRank() {
+    const filterEl = document.getElementById('statsFilterCount');
+    const filterVal = filterEl ? filterEl.value : "all";
+
+    const monthEl = document.getElementById('statsFilterMonth');
+    const monthVal = monthEl ? monthEl.value : "";
+
+    const labelEl = document.getElementById('rankFilterLabel');
+    let countText = filterVal === "all" ? "전체" : filterVal + "인";
+    let monthText = monthVal ? monthVal : "전체 기간";
+    if (labelEl) labelEl.innerText = `(${monthText}, ${countText})`;
+
+    let stats = {};
+    players.forEach(p => stats[p] = { played: 0, score: 0 });
+
+    gameLogs.forEach(g => {
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
+
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+
+        actual.forEach((name, idx) => {
+            if(stats[name]) {
+                stats[name].played++;
+                stats[name].score += getEarnedScore(idx, actual.length);
+            }
+        });
+    });
+
+    const activePlayers = players.filter(p => stats[p].played > 0);
+    
+    // 평균 승점 내림차순 정렬 (동점일 경우 총 승점 비교)
+    activePlayers.sort((a, b) => {
+        const avgA = stats[a].score / stats[a].played;
+        const avgB = stats[b].score / stats[b].played;
+        if (avgB !== avgA) return avgB - avgA;
+        return stats[b].score - stats[a].score;
+    });
+
+    const tbody = document.getElementById('cumulativeRankBody');
+    if (!tbody) return;
+
+    if (activePlayers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">해당 조건의 데이터가 없습니다.</td></tr>`;
+        return;
+    }
+
+    // 1위의 평균 승점 기준
+    const maxAvg = stats[activePlayers[0]].score / stats[activePlayers[0]].played;
+    let html = '';
+    let currentRank = 1;
+
+    activePlayers.forEach((p, index) => {
+        const avg = stats[p].score / stats[p].played;
+
+        if (index > 0) {
+            const prevP = activePlayers[index - 1];
+            const prevAvg = stats[prevP].score / stats[prevP].played;
+            if (avg !== prevAvg) {
+                currentRank = index + 1;
+            }
+        }
+
+        let diff = avg - maxAvg;
+        let diffStr = diff === 0 ? "-" : diff.toFixed(2);
+        let diffColor = diff === 0 ? "var(--text-color)" : "var(--rankL)";
+
+        let rankLabel = currentRank + '위';
+        let rankColor = 'var(--text-color)';
+        if (currentRank === 1) { rankLabel = '1위🥇'; rankColor = 'var(--rank1)'; }
+        else if (currentRank === 2) { rankColor = 'var(--rank2)'; }
+        else if (currentRank === 3) { rankColor = 'var(--rank3)'; }
+
+        html += `<tr onclick="renderMemberHistory('${p}', '${currentRank}')" style="cursor:pointer;">
+                    <td style="color:${rankColor}; font-weight:900;">${rankLabel}</td>
+                    <td style="color:${getPlayerColor(p)}; font-weight:900; text-decoration:underline;">${p}</td>
+                    <td style="color:#5D4037;">${stats[p].played}전</td>
+                    <td style="color:var(--rank1); font-weight:900;">${stats[p].score}점</td>
+                    <td style="color:var(--accent); font-weight:900;">${avg.toFixed(2)}점</td>
+                    <td style="color:${diffColor}; font-weight:900;">${diffStr}</td>
+                 </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+function shareRankResult() {
+    captureAndShare('rank-capture-area', 'rank-share-btn', 'cumulative_rank.png', '멤버별 누적 순위', '멤버별 누적 순위 및 평균 승점차 결과입니다!');
 }
 
 function showDefenseDetail(playerName) {
@@ -1422,6 +1508,7 @@ function renderDefenseStats() {
 function shareDefenseResult() {
     captureAndShare('defense-capture-area', 'defense-share-btn', 'defense_ranking.png', 'Defense 순위', '멤버별 전체 디펜스 랭킹입니다!');
 }
+
 function closeMemberHistory() {
     const area = document.getElementById('memberHistoryArea');
     area.style.display = 'none';
@@ -2159,24 +2246,6 @@ window.onload = () => {
         }
 
         searchFlatpickr = flatpickr("#searchDateRange", { 
-            plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
-            locale: "ko", disableMobile: true,
-            onReady: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
-            onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
-            onYearChange: function(selectedDates, dateStr, instance) { setTimeout(() => applyHighlight(instance), 50); },
-            onChange: function(selectedDates, dateStr, instance) {
-                applyHighlight(instance);
-                if (dateStr) {
-                    const hasRecord = gameLogs.some(g => g.dateStr.startsWith(dateStr));
-                    if (!hasRecord) {
-                        const toast = document.getElementById('toast'); toast.innerText = "게임 기록 없음"; toast.style.display = 'block';
-                        setTimeout(() => { toast.style.display = 'none'; setDefaultSearchDates(); }, 3000);
-                    }
-                }
-            }
-        });
-
-        flatpickr("#statsFilterMonth", { 
             plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
             locale: "ko", disableMobile: true,
             onReady: function(selectedDates, dateStr, instance) {
