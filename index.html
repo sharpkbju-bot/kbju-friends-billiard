@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=9.10">
+    <link rel="manifest" href="manifest.json?v=9.20">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=9.10">
-    <link rel="apple-touch-icon" href="image_0.png?v=9.10">
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=9.20">
+    <link rel="apple-touch-icon" href="image_0.png?v=9.20">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 
-    <link rel="stylesheet" href="style.css?v=9.10">
+    <link rel="stylesheet" href="style.css?v=9.20">
 
     <title>우리들의 Billiard World</title>
 </head>
@@ -26,7 +26,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;9.10
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;9.20
     </div>
 </div>
 
@@ -254,6 +254,47 @@
     <div id="richFriendArea" style="display:none; background: var(--bg); padding: 20px; border-radius: 22px; text-align: center; margin-top: 20px; color: #7f8c8d; font-weight: 800;"></div>
 </div>
 
+<div class="card" id="cumulativeRankCard">
+    <div id="rank-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
+        <h2 style="font-size:16px; margin:5px 0 15px 5px; color:#444; font-weight:800; text-align:left; letter-spacing:-0.5px;">🏆 멤버별 누적 순위 <span id="rankFilterLabel" style="font-size:12px; color:var(--rank1);"></span></h2>
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th style="text-align:center; width:15%;">순위</th>
+                    <th style="text-align:center; width:20%;">이름</th>
+                    <th style="width:15%;">참여</th>
+                    <th style="width:15%;">승점</th>
+                    <th style="width:15%;">평균</th>
+                    <th style="width:20%; color:var(--accent);">승점차</th>
+                </tr>
+            </thead>
+            <tbody id="cumulativeRankBody"></tbody>
+        </table>
+    </div>
+    <button id="rank-share-btn" class="share-btn-common" style="margin-top: 10px;" onclick="shareRankResult()">📸 누적 순위 스크린샷 공유</button>
+</div>
+
+
+<div class="card" id="scoreRankCard">
+    <div id="scoreRank-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
+        <h2 style="font-size:16px; margin:5px 0 15px 5px; color:#444; font-weight:800; text-align:left; letter-spacing:-0.5px;">🏆 멤버별 승점 순위 <span id="scoreRankFilterLabel" style="font-size:12px; color:var(--rank1);"></span></h2>
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th style="text-align:center; width:15%;">순위</th>
+                    <th style="text-align:center; width:20%;">이름</th>
+                    <th style="width:15%;">참여</th>
+                    <th style="width:15%;">승점</th>
+                    <th style="width:15%;">평균</th>
+                    <th style="width:20%; color:var(--accent);">승점차</th>
+                </tr>
+            </thead>
+            <tbody id="scoreRankBody"></tbody>
+        </table>
+    </div>
+    <button id="scoreRank-share-btn" class="share-btn-common" style="margin-top: 10px;" onclick="shareScoreRankResult()">📸 멤버별 승점 순위 스크린샷 공유</button>
+</div>
+
 <div class="card" id="defenseCard">
     <div id="defense-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
         <h2 style="font-size:16px; margin:5px 0 15px 0; color:#444; font-weight:800; text-align:center;">🛡️ Defense 순위</h2>
@@ -346,7 +387,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-<script src="main.js?v=9.10"></script>
+<script src="main.js?v=9.20"></script>
 
 </body>
 </html>
