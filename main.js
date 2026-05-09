@@ -729,7 +729,7 @@ function renderCalendar() {
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
         
-        const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
+        const recordDot = hasRecord ? `<div class="record-dot">🩷</div>` : "";
 
         grid.innerHTML += `
             <div class="${dayClass}" onclick="selectDate('${dStr}')">
