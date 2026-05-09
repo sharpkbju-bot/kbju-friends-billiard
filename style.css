@@ -375,12 +375,14 @@ body {
 
 .record-dot {
     position: absolute;
-    bottom: 6px;
-    width: 4px;
-    height: 4px;
-    background: #2e7d32; 
-    border-radius: 50%;
+    bottom: 2px; /* 날짜 숫자 아래 적당한 위치 */
+    left: 50%;
+    transform: translateX(-50%); /* 정확히 정중앙 정렬 */
+    font-size: 11px; /* 이모지 크기 */
     z-index: 3;
+    background: transparent !important; /* 기존 녹색 점 배경 제거 */
+    width: auto !important; /* 점 크기 제한 해제 */
+    height: auto !important;
 }
 .selected-new .record-dot { background: #ffffff; }
 
