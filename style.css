@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v9.10 - Grand Master Lounge Premium Edition */
+/* Billiard World Style v9.21 - Grand Master Lounge Premium Edition */
 /* [절대 원칙 준수]: 최적화 전면 금지, 모든 클래스와 테마를 개별적으로 분리 전개함 */
 
 :root { 
@@ -254,7 +254,6 @@
 [data-theme='dark'] #statsFilterCount { color: #bb86fc !important; background: rgba(0, 0, 0, 0.3) !important; border-color: #00e676 !important; }
 [data-theme='dark'] #statsFilterMonth { color: #ffffff !important; background: rgba(0, 0, 0, 0.3) !important; }
 [data-theme='dark'] #statsFilterMonth::placeholder { color: #ffffff !important; opacity: 1 !important; }
-
 * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
 
 /* 캡처 시 글자 튀어나옴 방지 (글로벌 고정) */
