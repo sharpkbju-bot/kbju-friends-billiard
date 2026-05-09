@@ -2269,7 +2269,6 @@ window.onload = () => {
                 clearBtnWrap.onclick = function() {
                     instance.clear();
                     instance.close();
-                    onFilterChange();
                 };
                 instance.calendarContainer.appendChild(clearBtnWrap);
                 applyHighlight(instance);
@@ -2278,7 +2277,6 @@ window.onload = () => {
             onYearChange: function(selectedDates, dateStr, instance) { setTimeout(() => applyHighlight(instance), 50); },
             onChange: function(selectedDates, dateStr, instance) {
                 applyHighlight(instance);
-                onFilterChange();
             }
         });
        flatpickr("#statsFilterMonth", { 
