@@ -191,7 +191,7 @@ function showDashInfo(type) {
     } else if (type === 'totalDays') {
         icon = "📅";
         title = "총 게임 일수";
-        desc = wrapStart + "단순 경기 횟수가 아닌, 실제로 당구 클럽에 모여서 <b>게임을 즐긴 날짜의 총합</b>을 의미." + wrapEnd;
+        desc = wrapStart + "단순 게임 횟수가 아닌, 실제로 당구 클럽에 모여서 <b>게임을 즐긴 날짜의 총합</b>을 의미." + wrapEnd;
     } else if (type === 'mvp') {
         icon = "👑";
         title = "월간 MVP 기준";
