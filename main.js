@@ -195,11 +195,11 @@ function showDashInfo(type) {
     } else if (type === 'mvp') {
         icon = "👑";
         title = "월간 MVP 기준";
-        desc = wrapStart + "<b>평균 승점</b>을 최우선으로 고려하며, 평균 승점이 같을 경우 승률(1위 횟수)을 비교하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정." + wrapEnd;
+        desc = wrapStart + "<b>평균 승점</b>을 최우선으로 고려. 평균 승점이 같을 경우 승률(1위 횟수)을 비교하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정." + wrapEnd;
     } else if (type === 'villain') {
         icon = "💸";
         title = "지갑 전사 기준";
-        desc = wrapStart + "해당 월에 참여한 경기 수 대비 <b>꼴찌를 가장 높은 비율로 기록한 선수</b>. 게임비를 가장 많이 지출했을 것으로 추정되는 명예로운(?) 타이틀." + wrapEnd;
+        desc = wrapStart + "해당 월에 참여한 게임 수 대비 <b>꼴찌를 가장 높은 비율로 기록한 선수</b>. 게임비를 가장 많이 지출했을 것으로 추정되는 안타까운(?) 타이틀." + wrapEnd;
     } else if (type === 'trend') {
         icon = "📈";
         title = "최근 2일 트렌드 분석";
@@ -207,7 +207,7 @@ function showDashInfo(type) {
     } else if (type === 'defense') {
         icon = "🛡️";
         title = "철벽 방어 기준";
-        desc = wrapStart + "추첨된 순번 상 <b>내 바로 다음 순서인 선수의 멘탈을 붕괴시켜 평균 등수를 가장 낮게(숫자가 높게) 만든</b> 디펜스 최고의 지배자." + wrapEnd;
+        desc = wrapStart + "추첨된 순번 상 <b>내 바로 다음 순서인 선수의 멘탈을 붕괴시켜 평균 순위를 가장 낮게(숫자가 높게) 만든</b> 디펜스 최고의 지배자." + wrapEnd;
     }
 
     const descEl = document.getElementById('info-modal-desc');
