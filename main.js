@@ -2193,6 +2193,25 @@ window.onload = () => {
                 onFilterChange();
             }
         });
+        flatpickr("#statsFilterMonth", { 
+            plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
+            locale: "ko", 
+            disableMobile: true,
+            onReady: function(selectedDates, dateStr, instance) {
+                const clearBtnWrap = document.createElement("div");
+                clearBtnWrap.style.padding = "0 10px 10px 10px";
+                clearBtnWrap.innerHTML = "<button type='button' style='width:100%; padding:10px; background:var(--edit); color:white; border:none; border-radius:8px; font-weight:900; font-size:13px; cursor:pointer;'>전체 기간으로 리셋</button>";
+                clearBtnWrap.onclick = function() {
+                    instance.clear();
+                    instance.close();
+                    onFilterChange(); 
+                };
+                instance.calendarContainer.appendChild(clearBtnWrap);
+            },
+            onChange: function() {
+                onFilterChange(); 
+            }
+        });
     } catch(e) {
         console.error("Flatpickr initialization failed", e);
     }
