@@ -682,11 +682,11 @@ function renderAll() {
     renderDashboard();
     renderCalendar(); 
     renderStats(); 
+    renderScoreRank(); // [v9.20 추가] 멤버별 승점 순위 호출
     renderDefenseStats(); 
     renderGameList(); 
     analyzeStrategy(); 
 }
-
 function isHoliday(year, month, day) {
     const dStr = `${month + 1}-${day}`; 
     const fixed = ["1-1", "3-1", "5-1", "5-5", "6-6", "7-17", "8-15", "10-3", "10-9", "12-25"];
@@ -729,8 +729,7 @@ function renderCalendar() {
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
         
-        // [프리미엄 추가] 캘린더 당구공 아이콘으로 교체 (기존 점 마커 대체)
-        const recordDot = hasRecord ? `<div class="record-dot" style="background:transparent; box-shadow:none; bottom:2px; left:50%; transform:translateX(-50%); font-size:10px; width:auto; height:auto; z-index:3;">🎱</div>` : "";
+        const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
 
         grid.innerHTML += `
             <div class="${dayClass}" onclick="selectDate('${dStr}')">
@@ -848,7 +847,7 @@ async function saveGame() {
     
     for(let i=1; i<=count; i++) { 
         const val = document.getElementById('rank'+i).value; 
-        if(!val) return alert("참 참여 친구의 순위를 모두 선택해줘!"); 
+        if(!val) return alert("참여 친구의 순위를 모두 선택해줘!"); 
         ranks.push(val); 
     }
     
@@ -876,89 +875,6 @@ async function saveGame() {
         alert("오류 발생!"); 
         showLoading(false); 
     }
-}
-function analyzeStrategy() {
-    const me = document.getElementById('strategyPlayer').value; 
-    const resArea = document.getElementById('strategyResultArea');
-    const shareBtn = document.getElementById('strategy-share-btn');
-    
-    if(!me) { 
-        resArea.style.display = 'none'; 
-        shareBtn.style.display = 'none'; 
-        return; 
-    }
-    
-    let stats = {};
-    gameLogs.forEach(g => {
-        if(!g.startOrder || !g.startOrder.includes(me)) return;
-        const order = g.startOrder; 
-        const myIdx = order.indexOf(me); 
-        const preP = order[(myIdx - 1 + order.length) % order.length];
-        const actual = g.ranks.filter(n => n.trim() !== ""); 
-        const myRank = actual.indexOf(me); 
-        
-        if(myRank === -1) return;
-        if(!stats[preP]) stats[preP] = {c:0, w:0, l:0, s:0}; 
-        
-        stats[preP].c++; 
-        if(myRank === 0) stats[preP].w++; 
-        if(myRank === actual.length - 1 && actual.length > 1) stats[preP].l++; 
-        stats[preP].s += (myRank + 1);
-    });
-    
-    const sorted = Object.keys(stats).sort((a,b) => (stats[a].s/stats[a].c) - (stats[b].s/stats[b].c));
-    
-    if(sorted.length === 0) { 
-        resArea.innerHTML = `<div class="empty-search-msg" style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">분석 가능한 추첨 기록이 없습니다.</div>`; 
-        shareBtn.style.display = 'none'; 
-    } else {
-        let html = "<table class='stats-table strategy-table'><thead><tr><th>앞 주자</th><th>경기</th><th>평균</th><th style='color:var(--rank1);'>1위</th><th style='color:var(--rankL);'>꼴찌</th></tr></thead><tbody>";
-        sorted.forEach(p => { 
-            const s = stats[p]; 
-            html += `<tr>
-                        <td style='color:${getPlayerColor(p)}; font-weight:900;'>${p}</td>
-                        <td>${s.c}전</td>
-                        <td>${(s.s/s.c).toFixed(1)}위</td>
-                        <td style='color:var(--rank1);'>${((s.w/s.c)*100).toFixed(0)}%</td>
-                        <td style='color:var(--rankL);'>${((s.l/s.c)*100).toFixed(0)}%</td>
-                     </tr>`; 
-        });
-        resArea.innerHTML = html + "</tbody></table><div class='strategy-footer-text' style='color:var(--sub-text); margin-top:10px; font-weight:800; text-align:center;'>※ 특정 선수 뒤에서의 게임 순위 분석입니다.</div>";
-        shareBtn.style.display = 'block';
-    }
-    resArea.style.display = 'block';
-}
-
-function shareStrategyResult() {
-    const player = document.getElementById('strategyPlayer').value;
-    captureAndShare('strategy-capture-area', 'strategy-share-btn', `${player}_strategy.png`, `${player}의 상성 분석`, `${player} 선수의 순번별 성적 분석 결과입니다!`);
-}
-
-function confirmReset(step) {
-    const el = document.getElementById('resetSteps');
-    if(step === 1) { 
-        el.innerHTML = `<div style="color:#e67e22; font-weight:900; margin-bottom:10px;">[1단계] 정말 삭제할거야?</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:var(--edit);" onclick="confirmReset(2)">OK</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button></div>`; 
-        document.getElementById('exitBtn').style.display = 'none'; 
-    } else if(step === 2) {
-        el.innerHTML = `<div style="color:var(--accent); font-weight:900; margin-bottom:10px;">[2단계] 데이터가 모두 삭제돼!</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:var(--accent);" onclick="confirmReset(3)">OK</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button></div>`;
-    } else {
-        el.innerHTML = `<div style="color:#000; font-weight:900; margin-bottom:10px;">[최종 확인] 복구 불가! 진짜 삭제!</div><div id="confirm-buttons-wrap"><button class="save-btn" style="background:#000; color:#fff;" onclick="executeReset()">OK</button><button class="save-btn btn-cancel" onclick="cancelReset()">취소</button></div>`;
-    }
-}
-
-function cancelReset() { 
-    document.getElementById('resetSteps').innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`; 
-    document.getElementById('exitBtn').style.display = 'block'; 
-}
-
-async function executeReset() { 
-    showLoading(true, "초기화 중"); 
-    try { 
-        await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) }); 
-        location.reload(); 
-    } catch(e) { 
-        showLoading(false); 
-    } 
 }
 
 function renderDashboard() {
@@ -1130,6 +1046,7 @@ function renderDashboard() {
 function onFilterChange() {
     renderDashboard();       
     renderStats();           
+    renderScoreRank();
     renderDefenseStats();    
     closeMemberHistory();    
 }
@@ -1137,6 +1054,101 @@ function onFilterChange() {
 function toggleAllMode() { 
     isPercentMode = !isPercentMode; 
     renderStats(); 
+}
+
+function renderScoreRank() {
+    const filterEl = document.getElementById('statsFilterCount');
+    const filterVal = filterEl ? filterEl.value : "all";
+
+    const monthEl = document.getElementById('statsFilterMonth');
+    const monthVal = monthEl ? monthEl.value : "";
+
+    const labelEl = document.getElementById('scoreRankFilterLabel');
+    let countText = filterVal === "all" ? "전체" : filterVal + "인";
+    let monthText = monthVal ? monthVal : "전체 기간";
+    if (labelEl) labelEl.innerText = `(${monthText}, ${countText})`;
+
+    let stats = {};
+    players.forEach(p => stats[p] = { played: 0, score: 0, wins: 0 });
+
+    gameLogs.forEach(g => {
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
+
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+
+        actual.forEach((name, idx) => {
+            if(stats[name]) {
+                stats[name].played++;
+                stats[name].score += getEarnedScore(idx, actual.length);
+                if (idx === 0) stats[name].wins++;
+            }
+        });
+    });
+
+    const activePlayers = players.filter(p => stats[p].played > 0);
+    
+    activePlayers.sort((a, b) => {
+        const avgA = stats[a].score / stats[a].played;
+        const avgB = stats[b].score / stats[b].played;
+        if (avgB !== avgA) return avgB - avgA;
+        
+        const winRateA = stats[a].wins / stats[a].played;
+        const winRateB = stats[b].wins / stats[b].played;
+        if (winRateB !== winRateA) return winRateB - winRateA;
+        
+        return stats[b].wins - stats[a].wins;
+    });
+
+    const tbody = document.getElementById('scoreRankBody');
+    if (!tbody) return;
+
+    if (activePlayers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">해당 조건의 데이터가 없습니다.</td></tr>`;
+        return;
+    }
+
+    const maxAvg = stats[activePlayers[0]].score / stats[activePlayers[0]].played;
+    let html = '';
+    let currentRank = 1;
+
+    activePlayers.forEach((p, index) => {
+        const avg = stats[p].score / stats[p].played;
+        const winRate = stats[p].wins / stats[p].played;
+
+        if (index > 0) {
+            const prevP = activePlayers[index - 1];
+            const prevAvg = stats[prevP].score / stats[prevP].played;
+            const prevWinRate = stats[prevP].wins / stats[prevP].played;
+            if (avg !== prevAvg || winRate !== prevWinRate || stats[p].wins !== stats[prevP].wins) {
+                currentRank = index + 1;
+            }
+        }
+
+        let diff = avg - maxAvg;
+        let diffStr = diff === 0 ? "-" : diff.toFixed(2);
+        let diffColor = diff === 0 ? "var(--text-color)" : "var(--rankL)";
+
+        let rankLabel = currentRank + '위';
+        let rankColor = 'var(--text-color)';
+        if (currentRank === 1) { rankLabel = '1위🥇'; rankColor = 'var(--rank1)'; }
+        else if (currentRank === 2) { rankColor = 'var(--rank2)'; }
+        else if (currentRank === 3) { rankColor = 'var(--rank3)'; }
+
+        html += `<tr onclick="renderMemberHistory('${p}', '${currentRank}')" style="cursor:pointer;">
+                    <td style="color:${rankColor}; font-weight:900;">${rankLabel}</td>
+                    <td style="color:${getPlayerColor(p)}; font-weight:900; text-decoration:underline;">${p}</td>
+                    <td style="color:#5D4037;">${stats[p].played}전</td>
+                    <td style="color:var(--rank1); font-weight:900;">${stats[p].score}점</td>
+                    <td style="color:var(--accent); font-weight:900;">${avg.toFixed(2)}점</td>
+                    <td style="color:${diffColor}; font-weight:900;">${diffStr}</td>
+                 </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+function shareScoreRankResult() {
+    captureAndShare('scoreRank-capture-area', 'scoreRank-share-btn', 'score_rank.png', '멤버별 승점 순위', '멤버별 승점 순위 및 평균 승점차 결과입니다!');
 }
 
 function renderStats() {
@@ -1422,6 +1434,7 @@ function renderDefenseStats() {
 function shareDefenseResult() {
     captureAndShare('defense-capture-area', 'defense-share-btn', 'defense_ranking.png', 'Defense 순위', '멤버별 전체 디펜스 랭킹입니다!');
 }
+
 function closeMemberHistory() {
     const area = document.getElementById('memberHistoryArea');
     area.style.display = 'none';
@@ -2159,24 +2172,6 @@ window.onload = () => {
         }
 
         searchFlatpickr = flatpickr("#searchDateRange", { 
-            plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
-            locale: "ko", disableMobile: true,
-            onReady: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
-            onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
-            onYearChange: function(selectedDates, dateStr, instance) { setTimeout(() => applyHighlight(instance), 50); },
-            onChange: function(selectedDates, dateStr, instance) {
-                applyHighlight(instance);
-                if (dateStr) {
-                    const hasRecord = gameLogs.some(g => g.dateStr.startsWith(dateStr));
-                    if (!hasRecord) {
-                        const toast = document.getElementById('toast'); toast.innerText = "게임 기록 없음"; toast.style.display = 'block';
-                        setTimeout(() => { toast.style.display = 'none'; setDefaultSearchDates(); }, 3000);
-                    }
-                }
-            }
-        });
-
-        flatpickr("#statsFilterMonth", { 
             plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
             locale: "ko", disableMobile: true,
             onReady: function(selectedDates, dateStr, instance) {
