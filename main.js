@@ -2193,23 +2193,31 @@ window.onload = () => {
                 onFilterChange();
             }
         });
-        flatpickr("#statsFilterMonth", { 
+       flatpickr("#statsFilterMonth", { 
             plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
             locale: "ko", 
             disableMobile: true,
             onReady: function(selectedDates, dateStr, instance) {
                 const clearBtnWrap = document.createElement("div");
                 clearBtnWrap.style.padding = "0 10px 10px 10px";
-                clearBtnWrap.innerHTML = "<button type='button' style='width:100%; padding:10px; background:var(--edit); color:white; border:none; border-radius:8px; font-weight:900; font-size:13px; cursor:pointer;'>전체 기간으로 리셋</button>";
+                clearBtnWrap.innerHTML = "<button type='button' style='width:100%; padding:10px; background:var(--edit); color:white; border:none; border-radius:8px; font-weight:900; font-size:13px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1);'>전체 기간으로 리셋</button>";
                 clearBtnWrap.onclick = function() {
                     instance.clear();
                     instance.close();
                     onFilterChange(); 
                 };
                 instance.calendarContainer.appendChild(clearBtnWrap);
+                applyHighlight(instance); // 기록 있는 월 브라운 컬러 칠하기
             },
-            onChange: function() {
-                onFilterChange(); 
+            onOpen: function(selectedDates, dateStr, instance) { 
+                applyHighlight(instance); // 달력 열 때 색상 칠하기
+            },
+            onYearChange: function(selectedDates, dateStr, instance) { 
+                setTimeout(() => applyHighlight(instance), 50); // 연도 바꿀 때 색상 칠하기
+            },
+            onChange: function(selectedDates, dateStr, instance) {
+                applyHighlight(instance); // 선택 변경 시 색상 칠하기
+                onFilterChange(); // 데이터 갱신
             }
         });
     } catch(e) {
