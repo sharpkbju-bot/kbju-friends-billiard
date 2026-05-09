@@ -682,6 +682,7 @@ function renderAll() {
     renderDashboard();
     renderCalendar(); 
     renderStats(); 
+    renderCumulativeRank(); // [v9.20 추가] 누적 순위 렌더링 호출
     renderDefenseStats(); 
     renderGameList(); 
     analyzeStrategy(); 
@@ -960,7 +961,6 @@ async function executeReset() {
         showLoading(false); 
     } 
 }
-
 function renderDashboard() {
     const dCard = document.getElementById('dashboardCard');
     if (!dCard) return;
@@ -1130,6 +1130,7 @@ function renderDashboard() {
 function onFilterChange() {
     renderDashboard();       
     renderStats();           
+    renderCumulativeRank(); // [v9.20 추가] 필터 변경 시 누적 순위 동기화
     renderDefenseStats();    
     closeMemberHistory();    
 }
@@ -1228,6 +1229,89 @@ function renderStats() {
     } else {
         rich.style.display = 'none';
     }
+}
+
+// [v9.20 추가] 누적 순위 렌더링 함수
+function renderCumulativeRank() {
+    const filterEl = document.getElementById('statsFilterCount');
+    const filterVal = filterEl ? filterEl.value : "all";
+
+    const monthEl = document.getElementById('statsFilterMonth');
+    const monthVal = monthEl ? monthEl.value : "";
+
+    const labelEl = document.getElementById('rankFilterLabel');
+    let countText = filterVal === "all" ? "전체" : filterVal + "인";
+    let monthText = monthVal ? monthVal : "전체 기간";
+    if (labelEl) labelEl.innerText = `(${monthText}, ${countText})`;
+
+    let stats = {};
+    players.forEach(p => stats[p] = { played: 0, score: 0 });
+
+    gameLogs.forEach(g => {
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
+
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+
+        actual.forEach((name, idx) => {
+            if(stats[name]) {
+                stats[name].played++;
+                stats[name].score += getEarnedScore(idx, actual.length);
+            }
+        });
+    });
+
+    const activePlayers = players.filter(p => stats[p].played > 0);
+    // 총 승점 내림차순 정렬 (동점일 경우 평균 승점으로 2차 정렬)
+    activePlayers.sort((a, b) => {
+        if (stats[b].score !== stats[a].score) return stats[b].score - stats[a].score;
+        return (stats[b].score / stats[b].played) - (stats[a].score / stats[a].played);
+    });
+
+    const tbody = document.getElementById('cumulativeRankBody');
+    if (!tbody) return;
+
+    if (activePlayers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">해당 조건의 데이터가 없습니다.</td></tr>`;
+        return;
+    }
+
+    const maxScore = stats[activePlayers[0]].score;
+    let html = '';
+    let currentRank = 1;
+
+    activePlayers.forEach((p, index) => {
+        if (index > 0 && stats[p].score !== stats[activePlayers[index - 1]].score) {
+            currentRank = index + 1;
+        }
+
+        let diff = stats[p].score - maxScore;
+        let diffStr = diff === 0 ? "-" : String(diff);
+        let diffColor = diff === 0 ? "var(--text-color)" : "var(--rankL)";
+
+        let rankLabel = currentRank + '위';
+        let rankColor = 'var(--text-color)';
+        if (currentRank === 1) { rankLabel = '1위🥇'; rankColor = 'var(--rank1)'; }
+        else if (currentRank === 2) { rankColor = 'var(--rank2)'; }
+        else if (currentRank === 3) { rankColor = 'var(--rank3)'; }
+
+        const avg = (stats[p].score / stats[p].played).toFixed(2);
+
+        html += `<tr onclick="renderMemberHistory('${p}', '${currentRank}')" style="cursor:pointer;">
+                    <td style="color:${rankColor}; font-weight:900;">${rankLabel}</td>
+                    <td style="color:${getPlayerColor(p)}; font-weight:900; text-decoration:underline;">${p}</td>
+                    <td style="color:#5D4037;">${stats[p].played}전</td>
+                    <td style="color:var(--rank1); font-weight:900;">${stats[p].score}점</td>
+                    <td style="color:var(--accent); font-weight:900;">${avg}점</td>
+                    <td style="color:${diffColor}; font-weight:900;">${diffStr}</td>
+                 </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+// [v9.20 추가] 누적 순위 스크린샷 캡처 기능
+function shareRankResult() {
+    captureAndShare('rank-capture-area', 'rank-share-btn', 'cumulative_rank.png', '멤버별 누적 순위', '멤버별 누적 총 승점 및 순위 결과입니다!');
 }
 
 function showDefenseDetail(playerName) {
