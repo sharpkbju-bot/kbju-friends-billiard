@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v9.10 - Grand Master Lounge Premium Edition */
+/* Billiard World Style v9.20 - Grand Master Lounge Premium Edition */
 /* [절대 원칙 준수]: 최적화 전면 금지, 모든 클래스와 테마를 개별적으로 분리 전개함 */
 
 :root { 
@@ -160,7 +160,7 @@
 [data-theme='navy'] .mvp-container { background: rgba(0, 0, 0, 0.3); }
 [data-theme='navy'] .mvp-badge { background: rgba(60,60,65,0.8); }
 
-/* [v9.10 필터 버튼/입력창 가독성 픽스] - 네이비 모드 */
+/* [v9.20 필터 버튼/입력창 가독성 픽스] - 네이비 모드 */
 [data-theme='navy'] #statsFilterCount { color: #bb86fc !important; background: rgba(0, 0, 0, 0.3) !important; border-color: #00e676 !important; }
 [data-theme='navy'] #statsFilterMonth { color: #ffffff !important; background: rgba(0, 0, 0, 0.3) !important; }
 [data-theme='navy'] #statsFilterMonth::placeholder { color: #ffffff !important; opacity: 1 !important; }
@@ -250,7 +250,7 @@
 [data-theme='dark'] .mvp-container { background: rgba(0, 0, 0, 0.3); }
 [data-theme='dark'] .mvp-badge { background: rgba(60,60,65,0.8); }
 
-/* [v9.10 필터 버튼/입력창 가독성 픽스] - 다크 모드 */
+/* [v9.20 필터 버튼/입력창 가독성 픽스] - 다크 모드 */
 [data-theme='dark'] #statsFilterCount { color: #bb86fc !important; background: rgba(0, 0, 0, 0.3) !important; border-color: #00e676 !important; }
 [data-theme='dark'] #statsFilterMonth { color: #ffffff !important; background: rgba(0, 0, 0, 0.3) !important; }
 [data-theme='dark'] #statsFilterMonth::placeholder { color: #ffffff !important; opacity: 1 !important; }
@@ -584,7 +584,7 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 .game-info span { color: #888; margin-right: 8px; font-size: 13px; }
 
 /* =========================================================
-   [v9.10] 확대 모드 당구공 이모지(🎱) 중앙 정렬 결함 픽스
+   [v9.20] 확대 모드 당구공 이모지(🎱) 중앙 정렬 결함 픽스
    ========================================================= */
 
 .zoom-active #calendarGrid { gap: 4px !important; }
@@ -912,7 +912,7 @@ span.flatpickr-weekday {
     zoom: 0.833333; 
 }
 
-/* [v9.10] 방어 리포트 팝업 확대 모드 버튼 잘림 결함 픽스 (역 줌 적용) */
+/* [v9.20] 방어 리포트 팝업 확대 모드 버튼 잘림 결함 픽스 (역 줌 적용) */
 .zoom-active #defense-detail-modal {
     zoom: 0.833333;
 }
