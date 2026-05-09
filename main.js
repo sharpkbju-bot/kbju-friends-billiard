@@ -187,7 +187,7 @@ function showDashInfo(type) {
     if (type === 'totalGames') {
         icon = "🎱";
         title = "총 게임 수";
-        desc = wrapStart + "현재 선택된 기간과 게임 인원 조건에 부합하여 실제로 진행된 <b>총 경기 횟수</b>를 의미함." + wrapEnd;
+        desc = wrapStart + "현재 선택된 기간과 인원 조건에 부합하여 실제로 진행된 <b>총 게임 횟수</b>를 의미함." + wrapEnd;
     } else if (type === 'totalDays') {
         icon = "📅";
         title = "총 게임 일수";
