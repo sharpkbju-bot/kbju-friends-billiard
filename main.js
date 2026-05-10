@@ -2175,7 +2175,7 @@ function analyzeStrategy() {
             const order = g.startOrder;
             const myOrderIdx = order.indexOf(player);
             
-            // 🎯 핵심 로직: 내 바로 앞 순번인 선수(prevP)를 찾음
+            // 내 바로 앞 순번인 선수(prevP)를 찾음
             const prevP = order[(myOrderIdx - 1 + order.length) % order.length];
             
             const myRankIdx = actual.indexOf(player);
@@ -2206,28 +2206,33 @@ function analyzeStrategy() {
         const s = stats[t];
         const avg = (s.totalRank / s.games).toFixed(1);
         
-        // 🎯 1위, 기타, 꼴찌 확률 계산 (소수점 없이 반올림)
+        // 🎯 1위, 기타, 꼴찌 확률 및 횟수 계산
         const winP = Math.round((s.wins / s.games) * 100);
         const lastP = Math.round((s.lasts / s.games) * 100);
         const otherP = 100 - winP - lastP; // 나머지를 기타 확률로 배정
+        
+        // 실제 횟수 변수
+        const winCnt = s.wins;
+        const lastCnt = s.lasts;
+        const otherCnt = s.games - s.wins - s.lasts;
 
         html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                         <div style="font-size:15px; font-weight:800; color:var(--sub-text);">앞 순서: <span style="font-size:19px; font-weight:900; color:${getPlayerColor(t)};">${t}</span></div>
                         <div style="font-size:15px; font-weight:800; color:var(--text-color);">${player}의 성적: 평균 ${avg}위</div>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 4px; border-radius:8px; text-align:center;">
+                    <div style="display:flex; gap:6px;">
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;">
                             <div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">1위 확률</div>
-                            <div style="font-size:17px; font-weight:900; color:var(--rank1);">${winP}%</div>
+                            <div style="font-size:15px; font-weight:900; color:var(--rank1);">${winP}%, <span style="font-size:12px; color:var(--sub-text);">${winCnt}회</span></div>
                         </div>
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 4px; border-radius:8px; text-align:center;">
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;">
                             <div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">기타 확률</div>
-                            <div style="font-size:17px; font-weight:900; color:var(--rank2);">${otherP}%</div>
+                            <div style="font-size:15px; font-weight:900; color:var(--rank2);">${otherP}%, <span style="font-size:12px; color:var(--sub-text);">${otherCnt}회</span></div>
                         </div>
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 4px; border-radius:8px; text-align:center;">
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;">
                             <div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">꼴찌 확률</div>
-                            <div style="font-size:17px; font-weight:900; color:var(--rankL);">${lastP}%</div>
+                            <div style="font-size:15px; font-weight:900; color:var(--rankL);">${lastP}%, <span style="font-size:12px; color:var(--sub-text);">${lastCnt}회</span></div>
                         </div>
                     </div>
                  </div>`;
