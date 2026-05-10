@@ -2167,23 +2167,21 @@ function analyzeStrategy() {
     gameLogs.forEach(g => {
         if (monthVal && !g.dateStr.startsWith(monthVal)) return;
 
-        if (g.startOrder && g.startOrder.includes(player)) {
-            const actual = g.ranks.filter(n => n && n.trim() !== "");
-            if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+        const actual = g.ranks.filter(n => n && n.trim() !== "");
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
 
-            const order = g.startOrder;
-            const pIdx = order.indexOf(player);
-            // 내 바로 다음 순서인 선수 찾기
-            const nextP = order[(pIdx + 1) % order.length];
-            
-            const nextPRankIdx = actual.indexOf(nextP);
-            if (nextPRankIdx !== -1) {
-                if (!stats[nextP]) stats[nextP] = { games: 0, totalRank: 0, wins: 0, lasts: 0 };
-                stats[nextP].games++;
-                stats[nextP].totalRank += (nextPRankIdx + 1);
-                if (nextPRankIdx === 0) stats[nextP].wins++;
-                if (nextPRankIdx === actual.length - 1 && actual.length > 1) stats[nextP].lasts++;
-            }
+        // 🎯 핵심 롤백: 선택한 선수가 해당 게임에 '동반 출전' 했을 때만 분석
+        if (actual.includes(player)) {
+            actual.forEach((p, idx) => {
+                if (p === player) return; // 본인 성적은 제외하고 나머지 멤버들만 집계
+
+                if (!stats[p]) stats[p] = { games: 0, totalRank: 0, wins: 0, lasts: 0 };
+                stats[p].games++;
+                stats[p].totalRank += (idx + 1);
+                
+                if (idx === 0) stats[p].wins++;
+                if (idx === actual.length - 1 && actual.length > 1) stats[p].lasts++;
+            });
         }
     });
 
@@ -2197,27 +2195,34 @@ function analyzeStrategy() {
         return;
     }
 
-    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수의 다음 순서로 플레이한 멤버들의 성적입니다.</div>`;
+    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수와 동반 출전한 멤버들의 성적입니다.</div>`;
 
     targets.forEach(t => {
         const s = stats[t];
         const avg = (s.totalRank / s.games).toFixed(1);
-        const winP = ((s.wins / s.games) * 100).toFixed(0);
-        const lastP = ((s.lasts / s.games) * 100).toFixed(0);
+        
+        // 🎯 1위, 꼴찌, 기타 확률 계산 (항상 합이 100%가 되도록 보정)
+        const winP = Math.round((s.wins / s.games) * 100);
+        const lastP = Math.round((s.lasts / s.games) * 100);
+        const otherP = 100 - winP - lastP;
 
         html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                         <div style="font-size:19px; font-weight:900; color:${getPlayerColor(t)};">${t}</div>
                         <div style="font-size:15px; font-weight:800; color:var(--sub-text);">${s.games}전 / 평균 ${avg}위</div>
                     </div>
-                    <div style="display:flex; gap:10px;">
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 8px; border-radius:8px; text-align:center;">
-                            <div style="font-size:13px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">1위 확률</div>
-                            <div style="font-size:18px; font-weight:900; color:var(--rank1);">${winP}%</div>
+                    <div style="display:flex; gap:8px;">
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 4px; border-radius:8px; text-align:center;">
+                            <div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">1위 확률</div>
+                            <div style="font-size:17px; font-weight:900; color:var(--rank1);">${winP}%</div>
                         </div>
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 8px; border-radius:8px; text-align:center;">
-                            <div style="font-size:13px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">꼴찌 확률</div>
-                            <div style="font-size:18px; font-weight:900; color:var(--rankL);">${lastP}%</div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 4px; border-radius:8px; text-align:center;">
+                            <div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">기타 확률</div>
+                            <div style="font-size:17px; font-weight:900; color:var(--rank2);">${otherP}%</div>
+                        </div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 4px; border-radius:8px; text-align:center;">
+                            <div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">꼴찌 확률</div>
+                            <div style="font-size:17px; font-weight:900; color:var(--rankL);">${lastP}%</div>
                         </div>
                     </div>
                  </div>`;
@@ -2226,6 +2231,8 @@ function analyzeStrategy() {
     area.innerHTML = html;
     area.style.display = 'block';
     if (shareBtn) shareBtn.style.display = 'block';
+    
+    // 자동 스크롤 기능 유지
     setTimeout(() => { 
         area.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
     }, 100);
