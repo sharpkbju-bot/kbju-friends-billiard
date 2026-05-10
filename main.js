@@ -2162,54 +2162,59 @@ function analyzeStrategy() {
     const monthEl = document.getElementById('statsFilterMonth');
     const monthVal = monthEl ? monthEl.value : "";
 
-    let stats = {};
+    let stats = {}; // Key: 나보다 먼저 친 선수 (앞 순번)
 
     gameLogs.forEach(g => {
         if (monthVal && !g.dateStr.startsWith(monthVal)) return;
 
-        const actual = g.ranks.filter(n => n && n.trim() !== "");
-        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+        // 초구 추첨 순서(startOrder)가 있어야 분석 가능
+        if (g.startOrder && g.startOrder.includes(player)) {
+            const actual = g.ranks.filter(n => n && n.trim() !== "");
+            if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
 
-        // 🎯 핵심 롤백: 선택한 선수가 해당 게임에 '동반 출전' 했을 때만 분석
-        if (actual.includes(player)) {
-            actual.forEach((p, idx) => {
-                if (p === player) return; // 본인 성적은 제외하고 나머지 멤버들만 집계
-
-                if (!stats[p]) stats[p] = { games: 0, totalRank: 0, wins: 0, lasts: 0 };
-                stats[p].games++;
-                stats[p].totalRank += (idx + 1);
+            const order = g.startOrder;
+            const myOrderIdx = order.indexOf(player);
+            
+            // 🎯 핵심 로직: 내 바로 앞 순번인 선수(prevP)를 찾음
+            const prevP = order[(myOrderIdx - 1 + order.length) % order.length];
+            
+            const myRankIdx = actual.indexOf(player);
+            if (myRankIdx !== -1) {
+                if (!stats[prevP]) stats[prevP] = { games: 0, totalRank: 0, wins: 0, lasts: 0 };
+                stats[prevP].games++;
+                stats[prevP].totalRank += (myRankIdx + 1);
                 
-                if (idx === 0) stats[p].wins++;
-                if (idx === actual.length - 1 && actual.length > 1) stats[p].lasts++;
-            });
+                if (myRankIdx === 0) stats[prevP].wins++;
+                if (myRankIdx === actual.length - 1 && actual.length > 1) stats[prevP].lasts++;
+            }
         }
     });
 
-    // 평균 순위가 높은(등수가 낮은, 숫자가 큰) 순으로 내림차순 정렬 (최대 피해자 순)
-    const targets = Object.keys(stats).sort((a, b) => (stats[b].totalRank / stats[b].games) - (stats[a].totalRank / stats[a].games));
+    // 선택한 선수(나)의 평균 순위가 가장 좋았던(숫자가 작은) 상대 순으로 정렬
+    const targets = Object.keys(stats).sort((a, b) => (stats[a].totalRank / stats[a].games) - (stats[b].totalRank / stats[b].games));
 
     if (targets.length === 0) {
-        area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">분석 가능한 데이터가 없습니다.</div>`;
+        area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">분석 가능한 데이터가 없습니다. (추첨 순서 필요)</div>`;
         area.style.display = 'block';
         if (shareBtn) shareBtn.style.display = 'none';
         return;
     }
 
-    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수와 동반 출전한 멤버들의 성적입니다.</div>`;
+    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 다음 선수들의 <b>바로 뒤 순서</b>일 때 기록한 성적입니다.</div>`;
 
     targets.forEach(t => {
         const s = stats[t];
         const avg = (s.totalRank / s.games).toFixed(1);
         
-        // 🎯 1위, 꼴찌, 기타 확률 계산 (항상 합이 100%가 되도록 보정)
+        // 🎯 1위, 기타, 꼴찌 확률 계산 (소수점 없이 반올림)
         const winP = Math.round((s.wins / s.games) * 100);
         const lastP = Math.round((s.lasts / s.games) * 100);
-        const otherP = 100 - winP - lastP;
+        const otherP = 100 - winP - lastP; // 나머지를 기타 확률로 배정
 
         html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <div style="font-size:19px; font-weight:900; color:${getPlayerColor(t)};">${t}</div>
-                        <div style="font-size:15px; font-weight:800; color:var(--sub-text);">${s.games}전 / 평균 ${avg}위</div>
+                        <div style="font-size:15px; font-weight:800; color:var(--sub-text);">앞 순서: <span style="font-size:19px; font-weight:900; color:${getPlayerColor(t)};">${t}</span></div>
+                        <div style="font-size:15px; font-weight:800; color:var(--text-color);">${player}의 성적: 평균 ${avg}위</div>
                     </div>
                     <div style="display:flex; gap:8px;">
                         <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 4px; border-radius:8px; text-align:center;">
@@ -2232,7 +2237,6 @@ function analyzeStrategy() {
     area.style.display = 'block';
     if (shareBtn) shareBtn.style.display = 'block';
     
-    // 자동 스크롤 기능 유지
     setTimeout(() => { 
         area.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
     }, 100);
