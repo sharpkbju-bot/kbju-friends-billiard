@@ -849,7 +849,7 @@ async function saveGame() {
     
     for(let i=1; i<=count; i++) { 
         const val = document.getElementById('rank'+i).value; 
-        if(!val) return alert("참여 친구의 순위를 모두 선택해줘!"); 
+        if(!val) return alert("참 참여 친구의 순위를 모두 선택해줘!"); 
         ranks.push(val); 
     }
     
@@ -2247,15 +2247,30 @@ function shareStrategyResult() {
     captureAndShare('strategy-capture-area', 'strategy-share-btn', `strategy_${player}.png`, '상성 분석', `${player} 선수의 상성 분석 결과입니다!`);
 }
 
-// [추가] 토스트 메시지 호출 함수 신설
+// [추가] 토스트 메시지 호출 함수 신설 (완벽 보완판)
 function showToastMsg(msg) {
     const toast = document.getElementById('toast');
     if (!toast) return;
     toast.innerText = msg;
+    
+    // [핵심 보완] 강제 노출 및 최상단 배치
+    toast.style.display = 'block';
+    toast.style.zIndex = '999999';
+    
+    // 브라우저 렌더링 큐업을 위한 리플로우 유도 (애니메이션 적용을 위함)
+    void toast.offsetWidth;
+    
     toast.classList.add('show');
+    
     if (globalToastTimeout) clearTimeout(globalToastTimeout);
     globalToastTimeout = setTimeout(() => {
         toast.classList.remove('show');
+        // 애니메이션(opacity, bottom) 끝난 후 완벽하게 display none 처리
+        setTimeout(() => {
+            if(!toast.classList.contains('show')) {
+                toast.style.display = 'none';
+            }
+        }, 300);
     }, 3000);
 }
 
