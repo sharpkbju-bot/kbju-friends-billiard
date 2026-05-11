@@ -2200,7 +2200,7 @@ function analyzeStrategy() {
         return;
     }
 
-    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 다음 선수들의 <b>뒤에서</b>기록한 성적.</div>`;
+    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 다음 선수들의 <b>뒤에서<b>기록한 성적.</div>`;
 
     targets.forEach(t => {
         const s = stats[t];
