@@ -7,6 +7,8 @@ let infoModalCountdownInterval = null;
 let scoreCountdownInterval = null; 
 // [v9.04] 대시보드 팝업 타이머 변수 추가
 let dashInfoCountdownInterval = null; 
+// [추가] 토스트 메시지 타이머 변수
+let globalToastTimeout = null; 
 
 // [프리미엄 UX 추가] 햅틱(진동) 피드백 글로벌 함수 추가
 function triggerHaptic(pattern) {
@@ -876,7 +878,6 @@ async function saveGame() {
         showLoading(false); 
     }
 }
-
 function renderDashboard() {
     const dCard = document.getElementById('dashboardCard');
     if (!dCard) return;
@@ -1586,7 +1587,6 @@ function getCaptureBgColor() {
     if (t === 'gray') return '#f0f0f0'; 
     return '#fdfbe7'; 
 }
-
 function shareStatsResult() { 
     captureAndShare('stats-capture-area', 'stats-share-btn', `stats_record.png`, '멤버별 누적 전적', '멤버별 누적 전적 결과입니다!'); 
 }
@@ -2162,12 +2162,11 @@ function analyzeStrategy() {
     const monthEl = document.getElementById('statsFilterMonth');
     const monthVal = monthEl ? monthEl.value : "";
 
-    let stats = {}; // Key: 나보다 먼저 친 선수 (앞 순번)
+    let stats = {}; 
 
     gameLogs.forEach(g => {
         if (monthVal && !g.dateStr.startsWith(monthVal)) return;
 
-        // 초구 추첨 순서(startOrder)가 있어야 분석 가능
         if (g.startOrder && g.startOrder.includes(player)) {
             const actual = g.ranks.filter(n => n && n.trim() !== "");
             if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
@@ -2175,7 +2174,6 @@ function analyzeStrategy() {
             const order = g.startOrder;
             const myOrderIdx = order.indexOf(player);
             
-            // 내 바로 앞 순번인 선수(prevP)를 찾음
             const prevP = order[(myOrderIdx - 1 + order.length) % order.length];
             
             const myRankIdx = actual.indexOf(player);
@@ -2190,7 +2188,6 @@ function analyzeStrategy() {
         }
     });
 
-    // 선택한 선수(나)의 평균 순위가 가장 좋았던(숫자가 작은) 상대 순으로 정렬
     const targets = Object.keys(stats).sort((a, b) => (stats[a].totalRank / stats[a].games) - (stats[b].totalRank / stats[b].games));
 
     if (targets.length === 0) {
@@ -2206,12 +2203,10 @@ function analyzeStrategy() {
         const s = stats[t];
         const avg = (s.totalRank / s.games).toFixed(1);
         
-        // 🎯 1위, 기타, 꼴찌 확률 및 횟수 계산
         const winP = Math.round((s.wins / s.games) * 100);
         const lastP = Math.round((s.lasts / s.games) * 100);
-        const otherP = 100 - winP - lastP; // 나머지를 기타 확률로 배정
+        const otherP = 100 - winP - lastP; 
         
-        // 실제 횟수 변수
         const winCnt = s.wins;
         const lastCnt = s.lasts;
         const otherCnt = s.games - s.wins - s.lasts;
@@ -2250,6 +2245,18 @@ function analyzeStrategy() {
 function shareStrategyResult() {
     const player = document.getElementById('strategyPlayer').value;
     captureAndShare('strategy-capture-area', 'strategy-share-btn', `strategy_${player}.png`, '상성 분석', `${player} 선수의 상성 분석 결과입니다!`);
+}
+
+// [추가] 토스트 메시지 호출 함수 신설
+function showToastMsg(msg) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.innerText = msg;
+    toast.classList.add('show');
+    if (globalToastTimeout) clearTimeout(globalToastTimeout);
+    globalToastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
 }
 
 window.onload = () => { 
@@ -2296,6 +2303,13 @@ window.onload = () => {
             onYearChange: function(selectedDates, dateStr, instance) { setTimeout(() => applyHighlight(instance), 50); },
             onChange: function(selectedDates, dateStr, instance) {
                 applyHighlight(instance);
+                // [추가] 검색월 버튼 클릭 시 기록 검사 로직
+                if (dateStr) {
+                    const hasRecord = gameLogs.some(g => g.dateStr.startsWith(dateStr));
+                    if (!hasRecord) {
+                        showToastMsg("게임 기록 없음");
+                    }
+                }
             }
         });
        flatpickr("#statsFilterMonth", { 
@@ -2312,17 +2326,24 @@ window.onload = () => {
                     onFilterChange(); 
                 };
                 instance.calendarContainer.appendChild(clearBtnWrap);
-                applyHighlight(instance); // 기록 있는 월 브라운 컬러 칠하기
+                applyHighlight(instance); 
             },
             onOpen: function(selectedDates, dateStr, instance) { 
-                applyHighlight(instance); // 달력 열 때 색상 칠하기
+                applyHighlight(instance); 
             },
             onYearChange: function(selectedDates, dateStr, instance) { 
-                setTimeout(() => applyHighlight(instance), 50); // 연도 바꿀 때 색상 칠하기
+                setTimeout(() => applyHighlight(instance), 50); 
             },
             onChange: function(selectedDates, dateStr, instance) {
-                applyHighlight(instance); // 선택 변경 시 색상 칠하기
-                onFilterChange(); // 데이터 갱신
+                applyHighlight(instance); 
+                onFilterChange(); 
+                // [추가] 월별 순위 버튼 클릭 시 기록 검사 로직
+                if (dateStr) {
+                    const hasRecord = gameLogs.some(g => g.dateStr.startsWith(dateStr));
+                    if (!hasRecord) {
+                        showToastMsg("게임 기록 없음");
+                    }
+                }
             }
         });
     } catch(e) {
