@@ -1947,7 +1947,7 @@ function confirmReset(step) {
 }
 
 async function executeReset() {
-    showLoading(true, "모든 데이터 소각 중");
+    showLoading(true, "모든 데이터 삭제 중");
     try {
         // 서버(GAS)에 RESET 명령 전송
         await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
