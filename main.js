@@ -5,12 +5,9 @@ let genseiCountdownInterval = null;
 let defenseModalTimeout = null; 
 let infoModalCountdownInterval = null; 
 let scoreCountdownInterval = null; 
-// [v9.04] 대시보드 팝업 타이머 변수 추가
 let dashInfoCountdownInterval = null; 
-// [v9.30] 토스트 메시지 타이머 변수
 let globalToastTimeout = null; 
 
-// [프리미엄 UX 추가] 햅틱(진동) 피드백 글로벌 함수 추가
 function triggerHaptic(pattern) {
     if (navigator.vibrate) {
         navigator.vibrate(pattern);
@@ -57,7 +54,6 @@ function generateNamesHTML(names) {
     }).join('<span style="display:inline;">→</span>');
 }
 
-// [V9.05 캡처 무결성 유지] 
 async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText) {
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -115,23 +111,12 @@ async function captureAndShare(targetId, btnId, fileName, shareTitle, shareText)
 
     try {
         await new Promise(r => setTimeout(r, 300));
-        
-        const canvas = await html2canvas(ghostWrapper, { 
-            backgroundColor: getCaptureBgColor(), 
-            scale: 2, 
-            logging: false, 
-            useCORS: true 
-        });
-        
+        const canvas = await html2canvas(ghostWrapper, { backgroundColor: getCaptureBgColor(), scale: 2, logging: false, useCORS: true });
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         const file = new File([blob], fileName, { type: 'image/png' });
         
         if (navigator.share) {
-            try { 
-                await navigator.share({ files: [file], title: shareTitle, text: shareText }); 
-            } catch (e) { 
-                console.log('Share canceled', e); 
-            }
+            try { await navigator.share({ files: [file], title: shareTitle, text: shareText }); } catch (e) { console.log('Share canceled', e); }
         } else {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -176,7 +161,6 @@ function getTier(score) {
     return { name: "브론즈", icon: "🥉", color: "#cd7f32" };
 }
 
-// [v9.40 업데이트] 대시보드 위젯 클릭 시 호출되는 팝업 함수 (최근 7게임 레코드 로직 추가)
 function showDashInfo(type) {
     triggerHaptic(10); 
     let title = "";
@@ -187,21 +171,17 @@ function showDashInfo(type) {
     const wrapEnd = "</div>";
 
     if (type === 'totalGames') {
-        icon = "🎱";
-        title = "총 게임 수";
+        icon = "🎱"; title = "총 게임 수";
         desc = wrapStart + "현재 선택된 기간과 인원 조건에 부합하여 실제로 진행된 <b>총 게임 횟수</b>를 의미함." + wrapEnd;
     } else if (type === 'totalDays') {
-        icon = "📅";
-        title = "총 게임 일수";
+        icon = "📅"; title = "총 게임 일수";
         desc = wrapStart + "단순 게임 횟수가 아닌, 실제로 당구 클럽에 모여서 <b>게임을 즐긴 날짜의 총합</b>을 의미." + wrapEnd;
     } else if (type === 'mvp') {
-        icon = "👑";
-        title = "월간 MVP 기준";
-        desc = wrapStart + "<b>평균 승점</b>을 최우선으로 고려. 평균 승점이 같을 경우 승률(1위 횟수)을 비교하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정." + wrapEnd;
+        icon = "👑"; title = "월간 MVP 기준";
+        desc = wrapStart + "<b>평균 승점</b>을 최우선으로 고려. 평균 승점이 같을 경우 승률(1위 횟수)을 비교하여 선정." + wrapEnd;
     } else if (type === 'villain') {
-        icon = "💸";
-        title = "지갑 전사 기준";
-        desc = wrapStart + "해당 월에 참여한 게임 수 대비 <b>꼴찌를 가장 높은 비율로 기록한 선수</b>. 게임비를 가장 많이 지출했을 것으로 추정되는 안타까운(?) 타이틀." + wrapEnd;
+        icon = "💸"; title = "지갑 전사 기준";
+        desc = wrapStart + "참여 게임 수 대비 <b>꼴찌를 가장 높은 비율로 기록한 선수</b>." + wrapEnd;
     } else if (type === 'trend') {
         icon = "📈";
         title = "최근 7게임 레코드";
@@ -219,10 +199,8 @@ function showDashInfo(type) {
             filteredGames = filteredGames.filter(g => g.ranks.filter(n => n.trim() !== "").length === count);
         }
 
-        // 과거 기록부터 최신 기록 순으로 정렬 (역순)
         let sortedGamesAsc = [...filteredGames].sort((a, b) => {
-            const dateA = new Date(a.dateStr);
-            const dateB = new Date(b.dateStr);
+            const dateA = new Date(a.dateStr); const dateB = new Date(b.dateStr);
             if (dateA - dateB !== 0) return dateA - dateB;
             return (parseInt(a.round) || 0) - (parseInt(b.round) || 0);
         });
@@ -230,225 +208,65 @@ function showDashInfo(type) {
         players.forEach(p => {
             const pGames = sortedGamesAsc.filter(g => g.ranks.filter(n => n.trim() !== "").includes(p));
             if (pGames.length === 0) return;
-            
             const recent7 = pGames.slice(-7);
-            let scoreSum = 0;
-            let wins = 0;
-            let ranksList = [];
-            
+            let scoreSum = 0; let wins = 0; let ranksList = [];
             recent7.forEach(g => {
                 const actual = g.ranks.filter(n => n.trim() !== "");
                 const rIdx = actual.indexOf(p);
                 scoreSum += getEarnedScore(rIdx, actual.length);
                 if (rIdx === 0) wins++;
-                
                 let rankStr = rIdx === 0 ? "1" : (rIdx === actual.length - 1 && actual.length > 1 ? "꼴" : (rIdx + 1).toString());
                 ranksList.push(rankStr);
             });
-            
-            playerStats.push({
-                name: p,
-                avgScore: scoreSum / recent7.length,
-                winRate: wins / recent7.length,
-                wins: wins,
-                ranksList: ranksList
-            });
+            playerStats.push({ name: p, avgScore: scoreSum / recent7.length, winRate: wins / recent7.length, wins: wins, ranksList: ranksList });
         });
 
-        // 정렬 기준: 1순위(평균승점), 2순위(승률), 3순위(1위 횟수)
-        playerStats.sort((a, b) => {
-            if (b.avgScore !== a.avgScore) return b.avgScore - a.avgScore;
-            if (b.winRate !== a.winRate) return b.winRate - a.winRate;
-            return b.wins - a.wins;
-        });
+        playerStats.sort((a, b) => (b.avgScore - a.avgScore) || (b.winRate - a.winRate) || (b.wins - a.wins));
 
-        // 모달 테이블 UI 렌더링
-        let trendHtml = `<div style="font-size:11.5px; color:var(--sub-text); margin-bottom:12px; text-align:center; font-weight:800;">(순위표의 가장 오른쪽 사각형이 최신 게임)</div>`;
+        let trendHtml = `<div style="font-size:12px; color:var(--sub-text); margin-bottom:15px; text-align:center; font-weight:800;">(가장 오른쪽 사각형이 최신 게임 결과)</div>`;
         trendHtml += `<table class="trend-table">
             <thead>
-                <tr>
-                    <th style="width: 20%; text-align: center;">이름</th>
-                    <th style="width: 25%; text-align: center;">평균 승점</th>
-                    <th style="width: 55%; text-align: center;">7게임 순위표</th>
-                </tr>
-            </thead>
-            <tbody>`;
-            
+                <tr><th style="width: 22%; text-align: center;">이름</th><th style="width: 28%; text-align: center;">평균 승점</th><th style="width: 50%; text-align: center;">7게임 순위표</th></tr>
+            </thead><tbody>`;
         playerStats.forEach(stat => {
             let rankHtml = "";
             stat.ranksList.forEach((r, idx) => {
-                if (idx === stat.ranksList.length - 1) {
-                    rankHtml += `<span class="recent-rank-box">${r}</span>`;
-                } else {
-                    rankHtml += `<span class="trend-rank-text">${r}</span>-`;
-                }
+                if (idx === stat.ranksList.length - 1) rankHtml += `<span class="recent-rank-box">${r}</span>`;
+                else rankHtml += `<span class="trend-rank-text">${r}</span>-`;
             });
             trendHtml += `<tr>
-                <td style="color:${getPlayerColor(stat.name)}; text-align: center; font-weight: 900;">${stat.name}</td>
-                <td style="color:var(--accent); text-align: center; font-weight: 900;">${stat.avgScore.toFixed(2)}</td>
+                <td style="color:${getPlayerColor(stat.name)}; text-align: center; font-weight: 900; font-size:16px;">${stat.name}</td>
+                <td style="color:var(--accent); text-align: center; font-weight: 900; font-size:16px;">${stat.avgScore.toFixed(2)}</td>
                 <td style="text-align: center; white-space: nowrap;">${rankHtml}</td>
             </tr>`;
         });
         trendHtml += `</tbody></table>`;
-        
         desc = trendHtml;
         
     } else if (type === 'defense') {
-        icon = "🛡️";
-        title = "철벽 방어 기준";
-        desc = wrapStart + "추첨된 순번 상 <b>내 바로 다음 순서인 선수의 멘탈을 붕괴시켜 평균 순위를 가장 낮게(숫자가 높게) 만든</b> 디펜스 최고의 지배자." + wrapEnd;
+        icon = "🛡️"; title = "철벽 방어 기준";
+        desc = wrapStart + "내 바로 다음 순서인 선수의 평균 순위를 가장 낮게 만든 디펜스의 지배자." + wrapEnd;
     }
 
     const descEl = document.getElementById('info-modal-desc');
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    if (currentTheme === 'navy') {
-        descEl.style.color = '#5D4037';
-    } else {
-        descEl.style.color = ''; 
-    }
-
-    const popupBox = document.getElementById('info-modal-title').parentElement;
-    if (popupBox) {
-        if (document.body.classList.contains('zoom-active')) {
-            popupBox.style.zoom = '0.85'; 
-        } else {
-            popupBox.style.zoom = '1';
-        }
-    }
-
-    let timerEl = document.getElementById('dash-info-timer');
-    if (!timerEl) {
-        timerEl = document.createElement('div');
-        timerEl.id = 'dash-info-timer';
-        timerEl.style.cssText = 'margin-top:15px; font-size:12px; color:var(--sub-text); font-weight:800; text-align:center; display:block; width:100%;';
-        descEl.parentNode.insertBefore(timerEl, descEl.nextSibling);
-    }
-    
     document.getElementById('info-modal-icon').innerHTML = icon;
     document.getElementById('info-modal-title').innerHTML = title;
     descEl.innerHTML = desc;
-    
     document.getElementById('info-modal').style.display = 'flex';
-
-    let timeLeft = 10;
-    timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
 
     if (dashInfoCountdownInterval) clearInterval(dashInfoCountdownInterval);
+    let timeLeft = 10;
+    let timerEl = document.getElementById('dash-info-timer');
+    if (!timerEl) {
+        timerEl = document.createElement('div'); timerEl.id = 'dash-info-timer';
+        timerEl.style.cssText = 'margin-top:15px; font-size:12px; color:var(--sub-text); font-weight:800; text-align:center;';
+        descEl.parentNode.insertBefore(timerEl, descEl.nextSibling);
+    }
+    timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
     dashInfoCountdownInterval = setInterval(() => {
-        timeLeft--;
-        if (timerEl) timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
-        if (timeLeft <= 0) {
-            clearInterval(dashInfoCountdownInterval);
-            closeInfoModal();
-        }
+        timeLeft--; timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
+        if (timeLeft <= 0) { clearInterval(dashInfoCountdownInterval); closeInfoModal(); }
     }, 1000);
-}
-
-function showRingCriteria(type) {
-    let title = "", desc = "";
-    if (type === 'win') {
-        title = "승률 산출 기준";
-        desc = "<b>(1위 횟수 / 참여 경기수) × 100</b><br><br><div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;'>해당 월에 참여한 전체 경기 중 1위를 차지한 비율입니다. 공격적인 결정력을 보여주는 지표입니다.</div>";
-    } else if (type === 'score') {
-        title = "평균득점 산출 기준";
-        desc = "<div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;'>해당 선수의 월간 평균 승점입니다. 5점 기준.</div>";
-    } else if (type === 'safety') {
-        title = "생존율 산출 기준";
-        desc = "<b>((경기수 - 꼴찌수) / 경기수) × 100</b><br><br><div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;'>참여 경기 중 꼴찌를 하지 않고 살아남은 비율입니다. 무너지지 않는 수비적 안정감을 보여주는 지표입니다.</div>";
-    }
-
-    const timerEl = document.getElementById('info-modal-timer');
-    if(timerEl) {
-        timerEl.style.display = 'block';
-        let timeLeft = 10;
-        timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
-
-        if (infoModalCountdownInterval) clearInterval(infoModalCountdownInterval);
-        infoModalCountdownInterval = setInterval(() => {
-            timeLeft--;
-            if (timerEl) timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
-            if (timeLeft <= 0) {
-                clearInterval(infoModalCountdownInterval);
-                closeInfoModal();
-            }
-        }, 1000);
-    }
-
-    document.getElementById('info-modal-icon').innerHTML = "ℹ️";
-    document.getElementById('info-modal-title').innerHTML = title;
-    document.getElementById('info-modal-desc').innerHTML = desc;
-    document.getElementById('info-modal').style.display = 'flex';
-}
-
-function showInfoModal(type) {
-    let title = ""; 
-    let desc = ""; 
-    let icon = "";
-    
-    const wrapStart = "<div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.5; text-align: left;'>";
-    const wrapEnd = "</div>";
-
-    if (type === 'score') {
-        icon = "📊"; 
-        title = "인원별 차등 승점 기준";
-        desc = "<div style='white-space: nowrap; line-height: 1.5; text-align: left;'>• <b>2인</b>: 1위(+2), 꼴찌(0)<br>• <b>3인</b>: 1위(+3), 2위(+1), 꼴찌(0)<br>• <b>4인</b>: 1위(+4), 2위(+3), 3위(+2), 꼴찌(0)<br>• <b>5인</b>: 1위(+5), 2위(+4), 3위(+3), 4위(+1), 꼴찌(0)</div>";
-    } else if (type === 'tier') {
-        icon = "🏅"; 
-        title = "랭킹 티어(계급) 기준";
-        desc = wrapStart + "👑<b>챌린저</b>: 60+ &nbsp;💎<b>플래티넘</b>: 50+<br>🥇<b>골드</b>: 40+ &nbsp;&nbsp;🥈<b>실버</b>: 30+ &nbsp;🥉<b>브론즈</b>: 30미만" + wrapEnd;
-    } else if (type === 'condition') {
-        icon = "🌡️"; 
-        title = "최근 컨디션 분석 기준";
-        desc = wrapStart + "• ☀️<b>최상</b>: 1위 비율 30%↑<br>• ⛅<b>보통</b>: 1위 비율 30% 미만. 안정적인 보통 순위<br>• ⚡<b>도깨비</b>: 1위 30%↑ & 꼴찌 30%↑<br>• 🌧️<b>비상</b>: 꼴찌 비율 30%↑" + wrapEnd;
-    } else if (type === 'style') { 
-        icon = "🎱";
-        title = "당구 성향 분석 기준";
-        desc = wrapStart + "<b>[승률 35% & 생존율 80% 기준]</b><br><br>• 👑 <b>전략적 지배자</b>: 승률↑ & 생존율↑<br>• 🐅 <b>폭격형 호랑이</b>: 승률↑ & 생존율↓<br>• 🐢 <b>철벽 거북이</b>: 승률↓ & 생존율↑<br>• 🐣 <b>성장하는 꿈나무</b>: 승률↓ & 생존율↓" + wrapEnd;
-    }
-    
-    const descEl = document.getElementById('info-modal-desc');
-    const timerEl = document.getElementById('info-modal-timer');
-    if(timerEl) timerEl.style.display = 'none'; 
-
-    if (infoModalCountdownInterval) {
-        clearInterval(infoModalCountdownInterval);
-        infoModalCountdownInterval = null;
-    }
-
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    if (currentTheme === 'navy') {
-        descEl.style.color = '#5D4037';
-    } else {
-        descEl.style.color = ''; 
-    }
-
-    const popupBox = document.getElementById('info-modal-title').parentElement;
-    if (popupBox) {
-        if (document.body.classList.contains('zoom-active')) {
-            popupBox.style.zoom = '0.85'; 
-        } else {
-            popupBox.style.zoom = '1';
-        }
-    }
-    
-    document.getElementById('info-modal-icon').innerHTML = icon;
-    document.getElementById('info-modal-title').innerHTML = title;
-    descEl.innerHTML = desc;
-    document.getElementById('info-modal').style.display = 'flex';
-}
-
-function closeInfoModal() { 
-    document.getElementById('info-modal').style.display = 'none'; 
-    if (infoModalCountdownInterval) {
-        clearInterval(infoModalCountdownInterval);
-        infoModalCountdownInterval = null;
-    }
-    if (dashInfoCountdownInterval) {
-        clearInterval(dashInfoCountdownInterval);
-        dashInfoCountdownInterval = null;
-    }
-    const timerEl = document.getElementById('dash-info-timer');
-    if (timerEl) timerEl.remove();
 }
 function showLastGameResult() {
     if (!gameLogs || gameLogs.length === 0) { 
@@ -521,7 +339,8 @@ function togglePlayerSelection(el, name) {
 
 function resetPlayerSelection() { 
     selectedPlayersForLottery = []; 
-    currentStartOrder = [];
+    // [v9.42 핫픽스 방어코드 유지] 선택 취소 시 메모리에 남은 초구 추첨 데이터 영구 삭제
+    currentStartOrder = []; 
     
     document.querySelectorAll('.player-chip').forEach(el => el.classList.remove('active')); 
     if(!editMode) updateInputFields(); 
@@ -1561,7 +1380,7 @@ function renderMemberHistory(name, rank = "") {
         return true;
     }).sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || ((parseInt(b.round) || 0) - (parseInt(a.round) || 0)));
     
-    // [v9.41 수정] 파편화되었던 토스트 로직을 글로벌 함수 단 1줄로 통합
+    // [글로벌 토스트 최적화 적용 유지]
     if (allPersonal.length === 0) { 
         showToastMsg("해당 조건의 기록이 없습니다.");
         return; 
@@ -1930,11 +1749,10 @@ function closeAllOverlays() {
     document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active')); 
 }
 
-// [v9.41 수정] 기록 수정 시 기존 추첨 순서(startOrder) 데이터 유실 방어 완벽 반영
+// [데이터 보호] 수정 진입 시 기존 초구 추첨 데이터 메모리에 원상 복구
 function enterEditMode(round, rankStr) { 
     editMode = true; 
     editRound = round; 
-    
     const targetGame = gameLogs.find(g => g.dateStr === selectedDateStr && g.round === round);
     currentStartOrder = (targetGame && targetGame.startOrder) ? [...targetGame.startOrder] : [];
 
@@ -1948,10 +1766,11 @@ function enterEditMode(round, rankStr) {
     closeAllOverlays(); 
 }
 
+// [데이터 보호] 수정 취소 시 메모리에 불러왔던 초구 추첨 데이터 영구 삭제
 function cancelEdit() { 
     editMode = false; 
     editRound = null; 
-    currentStartOrder = [];
+    currentStartOrder = []; 
     
     document.getElementById('editBadge').style.display = 'none'; 
     document.getElementById('inputCard').classList.remove('edit-active'); 
