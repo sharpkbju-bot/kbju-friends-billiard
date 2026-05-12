@@ -855,17 +855,34 @@ function renderScoreRank() {
 function shareScoreRankResult() { captureAndShare('scoreRank-capture-area', 'scoreRank-share-btn', 'score_rank.png', '멤버별 승점 순위', '멤버별 승점 순위 결과입니다!'); }
 
 function renderStats() {
+    // [누락 복구] 모드에 따라 횟수/확률 텍스트 변경 로직
+    const subtitleEl = document.querySelector('.stats-subtitle');
+    if (subtitleEl) {
+        subtitleEl.innerText = isPercentMode ? "(평균 승점 기준. 확률 %)" : "(평균 승점 기준. 횟수)";
+    }
+
     const filterVal = document.getElementById('statsFilterCount')?.value || "all";
     const monthVal = document.getElementById('statsFilterMonth')?.value || "";
     let stats = {}; players.forEach(p => stats[p] = { played: 0, ranks: [0,0,0,0,0], score: 0 });
+    
     gameLogs.forEach(g => {
         if (monthVal && !g.dateStr.startsWith(monthVal)) return;
         const act = g.ranks.filter(n => n.trim() !== "");
         if (filterVal !== "all" && act.length !== parseInt(filterVal)) return;
-        act.forEach((name, idx) => { if(stats[name]) { stats[name].played++; stats[name].score += getEarnedScore(idx, act.length); if (idx === act.length - 1 && act.length > 1) stats[name].ranks[4]++; else if (idx < 4) stats[name].ranks[idx]++; } });
+        act.forEach((name, idx) => { 
+            if(stats[name]) { 
+                stats[name].played++; 
+                stats[name].score += getEarnedScore(idx, act.length); 
+                if (idx === act.length - 1 && act.length > 1) stats[name].ranks[4]++; 
+                else if (idx < 4) stats[name].ranks[idx]++; 
+            } 
+        });
     });
+    
     const sorted = [...players].sort((a,b) => (stats[b].score/stats[b].played || 0) - (stats[a].score/stats[a].played || 0));
-    const maxC = { r0: 0, r4: 0 }; players.forEach(p => { maxC.r0 = Math.max(maxC.r0, stats[p].ranks[0]); maxC.r4 = Math.max(maxC.r4, stats[p].ranks[4]); });
+    const maxC = { r0: 0, r4: 0 }; 
+    players.forEach(p => { maxC.r0 = Math.max(maxC.r0, stats[p].ranks[0]); maxC.r4 = Math.max(maxC.r4, stats[p].ranks[4]); });
+    
     let cRank = 1;
     document.getElementById('statsBody').innerHTML = sorted.map((p, i) => {
         if (i > 0 && (stats[p].score/stats[p].played !== stats[sorted[i-1]].score/stats[sorted[i-1]].played)) cRank = i + 1;
@@ -873,11 +890,15 @@ function renderStats() {
         const getVal = (v, t) => isPercentMode ? (t === 0 ? '0' : ((v/t)*100).toFixed(0)) : v;
         return `<tr><td style="font-weight:900; text-decoration:underline; cursor:pointer;" onclick="renderMemberHistory('${p}', '${cRank}')">${getTier(stats[p].score).icon} ${p}</td><td>${stats[p].played}</td><td style="color:var(--rank1);">${getVal(stats[p].ranks[0], stats[p].played)}</td><td style="color:var(--rank2);">${getVal(stats[p].ranks[1], stats[p].played)}</td><td style="color:var(--rank3);">${getVal(stats[p].ranks[2], stats[p].played)}</td><td style="color:var(--rank4);">${getVal(stats[p].ranks[3], stats[p].played)}</td><td style="color:var(--rankL);">${getVal(stats[p].ranks[4], stats[p].played)}</td><td><span class="win-rate-pill">${winRate}%</span></td></tr>`;
     }).join('');
+    
     const rich = document.getElementById('richFriendArea'); 
     if(maxC.r4 > 0) { 
         const losers = players.filter(p => stats[p].ranks[4] === maxC.r4); 
-        rich.style.display = 'block'; rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:16px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; 
-    } else { rich.style.display = 'none'; }
+        rich.style.display = 'block'; 
+        rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:16px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; 
+    } else { 
+        rich.style.display = 'none'; 
+    }
 }
 function showDefenseDetail(playerName) {
     const filterVal = document.getElementById('statsFilterCount')?.value || "all";
