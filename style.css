@@ -728,7 +728,7 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
 .dash-btn { transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s ease !important; }
 .dash-btn:active { transform: scale(0.94) !important; box-shadow: inset 0 3px 6px rgba(0,0,0,0.1) !important; }
 
-/* [v9.43 수정] 최근 7게임 레코드 팝업 글자 및 순위 숫자 강조(Bold) */
+/* [v9.44 수정] 최근 7게임 레코드 팝업 글자 및 순위 숫자 강조(Bold) & 글꼴 통일 */
 .trend-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
 .trend-table th { padding: 10px 2px; border-bottom: 1.5px solid rgba(0,0,0,0.1); color: var(--sub-text); font-weight: 900; font-size: 13px; white-space: nowrap; }
 .trend-table td { padding: 14px 2px; border-bottom: 1px solid rgba(0,0,0,0.05); text-align: center; font-weight: 800; color: var(--text-color); font-size: 15px; }
@@ -738,21 +738,22 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
     display: inline-flex; 
     align-items: center; 
     justify-content: center; 
-    width: 26px;          /* 박스 크기 확대 */
+    width: 26px;          
     height: 26px; 
     border: 2.5px solid var(--accent); 
     border-radius: 6px; 
-    font-weight: 900;     /* 볼드 처리 */
+    font-weight: 900;     
     color: var(--text-color); 
     margin-left: 3px; 
-    font-size: 17px;      /* 글자 크기 확대 */
+    font-size: 17px;      
+    font-family: 'Pretendard', sans-serif; /* 글꼴 통일 */
     background: rgba(255, 71, 87, 0.15);
 }
 
 /* 이전 게임들 (하이픈 연결 숫자) */
 .trend-rank-text { 
     letter-spacing: 1px; 
-    font-family: "Courier New", Courier, monospace; 
-    font-size: 18px;      /* 글자 크기 대폭 확대 */
-    font-weight: 900;     /* 볼드 처리 */
+    font-family: 'Pretendard', sans-serif; /* 글꼴 통일 */
+    font-size: 18px;      
+    font-weight: 900;     
 }
