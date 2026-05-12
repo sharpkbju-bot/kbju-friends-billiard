@@ -268,6 +268,114 @@ function showDashInfo(type) {
         if (timeLeft <= 0) { clearInterval(dashInfoCountdownInterval); closeInfoModal(); }
     }, 1000);
 }
+
+// 🚨 [v9.44 복원 완료] 설명 팝업 및 타이머 종료를 관리하는 핵심 제어 함수 3종 복구 🚨
+function showRingCriteria(type) {
+    let title = "", desc = "";
+    if (type === 'win') {
+        title = "승률 산출 기준";
+        desc = "<b>(1위 횟수 / 참여 경기수) × 100</b><br><br><div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;'>해당 월에 참여한 전체 경기 중 1위를 차지한 비율입니다. 공격적인 결정력을 보여주는 지표입니다.</div>";
+    } else if (type === 'score') {
+        title = "평균득점 산출 기준";
+        desc = "<div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;'>해당 선수의 월간 평균 승점입니다. 5점 기준.</div>";
+    } else if (type === 'safety') {
+        title = "생존율 산출 기준";
+        desc = "<b>((경기수 - 꼴찌수) / 경기수) × 100</b><br><br><div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;'>참여 경기 중 꼴찌를 하지 않고 살아남은 비율입니다. 무너지지 않는 수비적 안정감을 보여주는 지표입니다.</div>";
+    }
+
+    const timerEl = document.getElementById('info-modal-timer');
+    if(timerEl) {
+        timerEl.style.display = 'block';
+        let timeLeft = 10;
+        timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
+
+        if (infoModalCountdownInterval) clearInterval(infoModalCountdownInterval);
+        infoModalCountdownInterval = setInterval(() => {
+            timeLeft--;
+            if (timerEl) timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
+            if (timeLeft <= 0) {
+                clearInterval(infoModalCountdownInterval);
+                closeInfoModal();
+            }
+        }, 1000);
+    }
+
+    document.getElementById('info-modal-icon').innerHTML = "ℹ️";
+    document.getElementById('info-modal-title').innerHTML = title;
+    document.getElementById('info-modal-desc').innerHTML = desc;
+    document.getElementById('info-modal').style.display = 'flex';
+}
+
+function showInfoModal(type) {
+    let title = ""; 
+    let desc = ""; 
+    let icon = "";
+    
+    const wrapStart = "<div style='white-space: normal; word-break: keep-all; overflow-wrap: break-word; line-height: 1.5; text-align: left;'>";
+    const wrapEnd = "</div>";
+
+    if (type === 'score') {
+        icon = "📊"; 
+        title = "인원별 차등 승점 기준";
+        desc = "<div style='white-space: nowrap; line-height: 1.5; text-align: left;'>• <b>2인</b>: 1위(+2), 꼴찌(0)<br>• <b>3인</b>: 1위(+3), 2위(+1), 꼴찌(0)<br>• <b>4인</b>: 1위(+4), 2위(+3), 3위(+2), 꼴찌(0)<br>• <b>5인</b>: 1위(+5), 2위(+4), 3위(+3), 4위(+1), 꼴찌(0)</div>";
+    } else if (type === 'tier') {
+        icon = "🏅"; 
+        title = "랭킹 티어(계급) 기준";
+        desc = wrapStart + "👑<b>챌린저</b>: 60+ &nbsp;💎<b>플래티넘</b>: 50+<br>🥇<b>골드</b>: 40+ &nbsp;&nbsp;🥈<b>실버</b>: 30+ &nbsp;🥉<b>브론즈</b>: 30미만" + wrapEnd;
+    } else if (type === 'condition') {
+        icon = "🌡️"; 
+        title = "최근 컨디션 분석 기준";
+        desc = wrapStart + "• ☀️<b>최상</b>: 1위 비율 30%↑<br>• ⛅<b>보통</b>: 1위 비율 30% 미만. 안정적인 보통 순위<br>• ⚡<b>도깨비</b>: 1위 30%↑ & 꼴찌 30%↑<br>• 🌧️<b>비상</b>: 꼴찌 비율 30%↑" + wrapEnd;
+    } else if (type === 'style') { 
+        icon = "🎱";
+        title = "당구 성향 분석 기준";
+        desc = wrapStart + "<b>[승률 35% & 생존율 80% 기준]</b><br><br>• 👑 <b>전략적 지배자</b>: 승률↑ & 생존율↑<br>• 🐅 <b>폭격형 호랑이</b>: 승률↑ & 생존율↓<br>• 🐢 <b>철벽 거북이</b>: 승률↓ & 생존율↑<br>• 🐣 <b>성장하는 꿈나무</b>: 승률↓ & 생존율↓" + wrapEnd;
+    }
+    
+    const descEl = document.getElementById('info-modal-desc');
+    const timerEl = document.getElementById('info-modal-timer');
+    if(timerEl) timerEl.style.display = 'none'; 
+
+    if (infoModalCountdownInterval) {
+        clearInterval(infoModalCountdownInterval);
+        infoModalCountdownInterval = null;
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    if (currentTheme === 'navy') {
+        descEl.style.color = '#5D4037';
+    } else {
+        descEl.style.color = ''; 
+    }
+
+    const popupBox = document.getElementById('info-modal-title').parentElement;
+    if (popupBox) {
+        if (document.body.classList.contains('zoom-active')) {
+            popupBox.style.zoom = '0.85'; 
+        } else {
+            popupBox.style.zoom = '1';
+        }
+    }
+    
+    document.getElementById('info-modal-icon').innerHTML = icon;
+    document.getElementById('info-modal-title').innerHTML = title;
+    descEl.innerHTML = desc;
+    document.getElementById('info-modal').style.display = 'flex';
+}
+
+function closeInfoModal() { 
+    document.getElementById('info-modal').style.display = 'none'; 
+    if (infoModalCountdownInterval) {
+        clearInterval(infoModalCountdownInterval);
+        infoModalCountdownInterval = null;
+    }
+    if (dashInfoCountdownInterval) {
+        clearInterval(dashInfoCountdownInterval);
+        dashInfoCountdownInterval = null;
+    }
+    const timerEl = document.getElementById('dash-info-timer');
+    if (timerEl) timerEl.remove();
+}
 function showLastGameResult() {
     if (!gameLogs || gameLogs.length === 0) { 
         if (document.getElementById('loading').style.display === 'none') return;
@@ -339,7 +447,7 @@ function togglePlayerSelection(el, name) {
 
 function resetPlayerSelection() { 
     selectedPlayersForLottery = []; 
-    // [v9.42 핫픽스 방어코드 유지] 선택 취소 시 메모리에 남은 초구 추첨 데이터 영구 삭제
+    // [데이터 보호] 선택 취소 시 메모리에 남은 초구 추첨 데이터 영구 삭제
     currentStartOrder = []; 
     
     document.querySelectorAll('.player-chip').forEach(el => el.classList.remove('active')); 
@@ -1380,7 +1488,7 @@ function renderMemberHistory(name, rank = "") {
         return true;
     }).sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || ((parseInt(b.round) || 0) - (parseInt(a.round) || 0)));
     
-    // [글로벌 토스트 최적화 적용 유지]
+    // [v9.42 핫픽스 유지] 글로벌 토스트 알림으로 교체하여 애니메이션 꼬임 완벽 해소
     if (allPersonal.length === 0) { 
         showToastMsg("해당 조건의 기록이 없습니다.");
         return; 
@@ -1749,10 +1857,11 @@ function closeAllOverlays() {
     document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active')); 
 }
 
-// [데이터 보호] 수정 진입 시 기존 초구 추첨 데이터 메모리에 원상 복구
+// 🚨 [v9.44 완벽복구본] 수정 진입 시 원본 데이터 복원 (데이터 오염 방지)
 function enterEditMode(round, rankStr) { 
     editMode = true; 
     editRound = round; 
+    
     const targetGame = gameLogs.find(g => g.dateStr === selectedDateStr && g.round === round);
     currentStartOrder = (targetGame && targetGame.startOrder) ? [...targetGame.startOrder] : [];
 
@@ -1766,7 +1875,7 @@ function enterEditMode(round, rankStr) {
     closeAllOverlays(); 
 }
 
-// [데이터 보호] 수정 취소 시 메모리에 불러왔던 초구 추첨 데이터 영구 삭제
+// 🚨 [v9.44 완벽복구본] 수정 취소 시 남은 데이터 파기 (데이터 오염 방지)
 function cancelEdit() { 
     editMode = false; 
     editRound = null; 
