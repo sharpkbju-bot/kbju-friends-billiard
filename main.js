@@ -1927,7 +1927,41 @@ function changeMonth(v) {
     currentViewDate.setMonth(currentViewDate.getMonth() + v); 
     renderCalendar(); 
 }
+// [데이터 초기화 3단계 안전 잠금 및 실행 로직]
+function confirmReset(step) {
+    const btnWrap = document.getElementById('resetSteps');
+    if (!btnWrap) return;
+    
+    if (step === 1) {
+        triggerHaptic(10);
+        btnWrap.innerHTML = `<button class="reset-btn" style="background: linear-gradient(145deg, #e74c3c, #c0392b);" onclick="confirmReset(2)">⚠️ 진짜 초기화 할거야? (1/3)</button>`;
+    } else if (step === 2) {
+        triggerHaptic(20);
+        btnWrap.innerHTML = `<button class="reset-btn" style="background: linear-gradient(145deg, #c0392b, #922b21);" onclick="confirmReset(3)">🚨 진심이지? 절대 복구 안돼! (2/3)</button>`;
+    } else if (step === 3) {
+        triggerHaptic([20, 30, 20]);
+        executeReset();
+        // 실행 후 버튼 상태 원상 복구
+        btnWrap.innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ [최종 확인] 모든 데이터 초기화(복구 불가)</button>`;
+    }
+}
 
+async function executeReset() {
+    showLoading(true, "모든 데이터 소각 중");
+    try {
+        // 서버(GAS)에 RESET 명령 전송
+        await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
+        
+        // 로컬 메모리 초기화 및 화면 새로고침
+        gameLogs = []; 
+        renderAll(); 
+        alert("모든 데이터가 영구적으로 초기화되었습니다.");
+    } catch (e) {
+        alert("초기화 진행 중 오류가 발생했습니다.");
+    } finally {
+        showLoading(false);
+    }
+}
 function exportData() { 
     if (gameLogs.length === 0) return alert("데이터 없음"); 
     const link = document.createElement('a'); 
