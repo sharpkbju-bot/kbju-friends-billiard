@@ -453,15 +453,36 @@ body {
 
 .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 12px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
 
-.theme-wrap { display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
-.zoom-wrap { display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); }
-.setup-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 5px; }
+/* [v9.45] 설정 영역(테마, 화면크기, 게임인원) UI 규격 및 정렬 완벽 통일 */
+.theme-wrap, .zoom-wrap, .setup-row { 
+    display: flex; 
+    align-items: center; 
+    margin-bottom: 15px; 
+    padding-bottom: 10px; 
+    border-bottom: 1px solid rgba(0,0,0,0.04); 
+}
 
-select#playerCount { padding: 8px 12px; border-radius: 8px; font-weight: 800; }
-select#themeSelect { margin-left: 10px; padding: 6px 10px; border-radius: 8px; font-weight: 800; color: #4a148c; cursor: pointer; }
+/* 앞부분 텍스트 라벨 가로 너비 고정 (버튼 시작 위치 수직 정렬) */
+.theme-wrap > span, .zoom-wrap > span, .setup-row > span {
+    width: 70px;
+    min-width: 70px;
+    white-space: nowrap;
+}
 
-.zoom-options { margin-left: auto; display: flex; gap: 12px; }
-.zoom-options label { display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 14px; }
+/* 버튼 높이(padding) 및 여백(margin) 일치화 */
+select#playerCount, select#themeSelect { 
+    padding: 8px 12px; 
+    border-radius: 8px; 
+    font-weight: 800; 
+    margin-left: 10px; 
+}
+
+select#themeSelect { 
+    color: #4a148c; 
+    cursor: pointer; 
+}
+
+.zoom-options { margin-left: auto; display: flex; gap: 12px; }.zoom-options label { display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 14px; }
 
 .input-row { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; width: 100%; }
 .input-row label { width: 85px; min-width: 85px; max-width: 85px; font-size: 13px; font-weight: 800; color: var(--label-text); flex-shrink: 0; white-space: nowrap; }
