@@ -453,7 +453,7 @@ body {
 
 .card { background: var(--card-bg); backdrop-filter: blur(5px); border-radius: 12px; padding: 22px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.4); }
 
-/* [v9.45] 설정 영역(테마, 화면크기, 게임인원) UI 규격 및 정렬 완벽 통일 */
+/* [v9.44] 설정 영역(테마, 화면크기, 게임인원) UI 규격 및 정렬 완벽 통일 */
 .theme-wrap, .zoom-wrap, .setup-row { 
     display: flex; 
     align-items: center; 
