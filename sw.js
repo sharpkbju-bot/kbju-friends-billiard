@@ -1,11 +1,11 @@
-// Billiard World Service Worker v9.42
-const CACHE_NAME = 'billiard-v9.42'; // 캐시 버전 업데이트로 강제 갱신 유도
+// Billiard World Service Worker v9.43
+const CACHE_NAME = 'billiard-v9.43'; // 캐시 버전 업데이트로 강제 갱신 유도
 const ASSETS = [
-    'index.html?v=9.42',
-    'style.css?v=9.42',
-    'main.js?v=9.42',
-    'manifest.json?v=9.42',
-    'image_0.png?v=9.42',
+    'index.html?v=9.43',
+    'style.css?v=9.43',
+    'main.js?v=9.43',
+    'manifest.json?v=9.43',
+    'image_0.png?v=9.43',
     'image_1.png'
 ];
 
