@@ -985,7 +985,17 @@ function shareDefenseDetail(name) {
 function renderDefenseStats() {
     const filterVal = document.getElementById('statsFilterCount')?.value || "all";
     const monthVal = document.getElementById('statsFilterMonth')?.value || "";
+
+    // [추가된 부분] 디펜스 카드 필터 라벨 업데이트
+    const labelEl = document.getElementById('defenseFilterLabel');
+    if (labelEl) {
+        let countText = filterVal === "all" ? "전체" : filterVal + "인";
+        let monthText = monthVal ? monthVal : "전체";
+        labelEl.innerText = `(${monthText}, ${countText})`;
+    }
+
     let defenseStats = {}; players.forEach(p => defenseStats[p] = { totalNextRank: 0, count: 0 });
+    
     gameLogs.forEach(g => {
         if (monthVal && !g.dateStr.startsWith(monthVal)) return;
         if (g.startOrder && g.startOrder.length > 0) {
