@@ -855,11 +855,8 @@ function renderScoreRank() {
 function shareScoreRankResult() { captureAndShare('scoreRank-capture-area', 'scoreRank-share-btn', 'score_rank.png', '멤버별 승점 순위', '멤버별 승점 순위 결과입니다!'); }
 
 function renderStats() {
-    // [누락 복구] 모드에 따라 횟수/확률 텍스트 변경 로직
     const subtitleEl = document.querySelector('.stats-subtitle');
-    if (subtitleEl) {
-        subtitleEl.innerText = isPercentMode ? "(평균 승점 기준. 확률 %)" : "(평균 승점 기준. 횟수)";
-    }
+    if (subtitleEl) { subtitleEl.innerText = isPercentMode ? "(평균 승점 기준. 확률 %)" : "(평균 승점 기준. 횟수)"; }
 
     const filterVal = document.getElementById('statsFilterCount')?.value || "all";
     const monthVal = document.getElementById('statsFilterMonth')?.value || "";
@@ -871,8 +868,7 @@ function renderStats() {
         if (filterVal !== "all" && act.length !== parseInt(filterVal)) return;
         act.forEach((name, idx) => { 
             if(stats[name]) { 
-                stats[name].played++; 
-                stats[name].score += getEarnedScore(idx, act.length); 
+                stats[name].played++; stats[name].score += getEarnedScore(idx, act.length); 
                 if (idx === act.length - 1 && act.length > 1) stats[name].ranks[4]++; 
                 else if (idx < 4) stats[name].ranks[idx]++; 
             } 
@@ -894,11 +890,8 @@ function renderStats() {
     const rich = document.getElementById('richFriendArea'); 
     if(maxC.r4 > 0) { 
         const losers = players.filter(p => stats[p].ranks[4] === maxC.r4); 
-        rich.style.display = 'block'; 
-        rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:16px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; 
-    } else { 
-        rich.style.display = 'none'; 
-    }
+        rich.style.display = 'block'; rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:16px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; 
+    } else { rich.style.display = 'none'; }
 }
 function showDefenseDetail(playerName) {
     const filterVal = document.getElementById('statsFilterCount')?.value || "all";
@@ -1312,7 +1305,6 @@ function toggleActionOverlay(el) {
 
 function closeAllOverlays() { document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active')); }
 
-// 🚨 [데이터 오염 방지 로직 유지] 수정 진입 시 원본 데이터 메모리 복원
 function enterEditMode(round, rankStr) { 
     editMode = true; editRound = round; 
     const targetGame = gameLogs.find(g => g.dateStr === selectedDateStr && g.round === round);
@@ -1324,7 +1316,6 @@ function enterEditMode(round, rankStr) {
     closeAllOverlays(); 
 }
 
-// 🚨 [데이터 오염 방지 로직 유지] 수정 취소 시 임시 데이터 찌꺼기 완벽 파기
 function cancelEdit() { 
     editMode = false; editRound = null; currentStartOrder = []; 
     document.getElementById('editBadge').style.display = 'none'; document.getElementById('inputCard').classList.remove('edit-active'); 
@@ -1448,10 +1439,17 @@ function searchRecords() {
         });
     });
     
+    // 🚨 [v9.45 완벽 반영본] 1순위: 평균 승점 ➡️ 2순위: 1위 '승률(%)' ➡️ 3순위: 1위 횟수
     const monthlyRankedPlayers = [...players].sort((a,b) => {
         if (monthlyStatsAll[a].played === 0 && monthlyStatsAll[b].played > 0) return 1;
         if (monthlyStatsAll[b].played === 0 && monthlyStatsAll[a].played > 0) return -1;
-        return (monthlyStatsAll[b].score/monthlyStatsAll[b].played || 0) - (monthlyStatsAll[a].score/monthlyStatsAll[a].played || 0) || monthlyStatsAll[b].win - monthlyStatsAll[a].win;
+        
+        const avgA = monthlyStatsAll[a].score / monthlyStatsAll[a].played || 0;
+        const avgB = monthlyStatsAll[b].score / monthlyStatsAll[b].played || 0;
+        const wrA = monthlyStatsAll[a].win / monthlyStatsAll[a].played || 0;
+        const wrB = monthlyStatsAll[b].win / monthlyStatsAll[b].played || 0;
+        
+        return (avgB - avgA) || (wrB - wrA) || (monthlyStatsAll[b].win - monthlyStatsAll[a].win);
     });
     
     let myMonthlyRank = 1; let currentRank = 1;
@@ -1459,7 +1457,13 @@ function searchRecords() {
         const p = monthlyRankedPlayers[i];
         if (i > 0) {
             const prevP = monthlyRankedPlayers[i - 1];
-            if ((monthlyStatsAll[p].score/monthlyStatsAll[p].played || 0) !== (monthlyStatsAll[prevP].score/monthlyStatsAll[prevP].played || 0) || monthlyStatsAll[p].win !== monthlyStatsAll[prevP].win) { currentRank = i + 1; }
+            const avgP = monthlyStatsAll[p].score / monthlyStatsAll[p].played || 0;
+            const avgPrev = monthlyStatsAll[prevP].score / monthlyStatsAll[prevP].played || 0;
+            const wrP = monthlyStatsAll[p].win / monthlyStatsAll[p].played || 0;
+            const wrPrev = monthlyStatsAll[prevP].win / monthlyStatsAll[prevP].played || 0;
+            
+            // 승점과 승률(%)이 모두 똑같을 때만 공동 순위
+            if (avgP !== avgPrev || wrP !== wrPrev) { currentRank = i + 1; }
         }
         if (p === player) { myMonthlyRank = currentRank; break; }
     }
@@ -1602,21 +1606,21 @@ function showToastMsg(msg) {
     }, 3000);
 }
 
-// 🚨 [v9.44 추가] 데이터 초기화 3단계 안전 잠금 및 취소 로직
+// 🚨 [데이터 초기화 3단계 안전 잠금 로직]
 function confirmReset(step) {
     const btnWrap = document.getElementById('resetSteps');
     if (!btnWrap) return;
-    const cancelBtn = `<button class="save-btn" style="background:#bdc3c7; color:#444; margin-top:10px; width:100%; box-shadow: none;" onclick="cancelReset()">아니, 취소할게.(데이터 유지)</button>`;
+    const cancelBtn = `<button class="save-btn" style="background:#bdc3c7; color:#444; margin-top:10px; width:100%; box-shadow: none;" onclick="cancelReset()">아니, 취소할게 (데이터 유지)</button>`;
 
     if (step === 1) {
         triggerHaptic(10);
-        btnWrap.innerHTML = `<button class="reset-btn" style="background: linear-gradient(145deg, #f39c12, #e67e22);" onclick="confirmReset(2)">⚠️[1/3] 진짜 초기화 할거야?</button>${cancelBtn}`;
+        btnWrap.innerHTML = `<button class="reset-btn" style="background: linear-gradient(145deg, #f39c12, #e67e22);" onclick="confirmReset(2)">⚠️ 진짜 초기화 할거야? (1/3)</button>${cancelBtn}`;
     } else if (step === 2) {
         triggerHaptic(20);
-        btnWrap.innerHTML = `<button class="reset-btn" style="background: linear-gradient(145deg, #e74c3c, #c0392b);" onclick="confirmReset(3)">🚨[2/3] 진심이지? 절대 복구 안돼!</button>${cancelBtn}`;
+        btnWrap.innerHTML = `<button class="reset-btn" style="background: linear-gradient(145deg, #e74c3c, #c0392b);" onclick="confirmReset(3)">🚨 진심이지? 절대 복구 안돼! (2/3)</button>${cancelBtn}`;
     } else if (step === 3) {
         triggerHaptic(30);
-        btnWrap.innerHTML = `<button class="reset-btn" style="background: #000000; color:#fff;" onclick="confirmReset(4)">💀[3/3] 마지막 경고: 데이터 영구 삭제</button>${cancelBtn}`;
+        btnWrap.innerHTML = `<button class="reset-btn" style="background: #000000; color:#fff;" onclick="confirmReset(4)">💀 마지막 경고: 데이터 영구 소각 (3/3)</button>${cancelBtn}`;
     } else if (step === 4) {
         triggerHaptic([20, 30, 20]);
         executeReset();
