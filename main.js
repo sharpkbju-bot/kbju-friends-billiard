@@ -1672,7 +1672,7 @@ function analyzeStrategy() {
         const winP = Math.round((s.wins / s.games) * 100); const lastP = Math.round((s.lasts / s.games) * 100); const otherP = 100 - winP - lastP; 
         html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <div style="font-size:15px; font-weight:800; color:var(--sub-text);">앞 순서: <span style="font-size:19px; font-weight:900; color:${getPlayerColor(t)};">${t}</span> <span style="font-size:14px; font-weight:900; color:var(--accent); margin-left:4px;">${s.games}게임</span></div>
+                        <div style="font-size:15px; font-weight:800; color:var(--sub-text);">앞 순서: <span style="font-size:19px; font-weight:900; color:${getPlayerColor(t)};">${t}</span> <span style="font-size:14px; font-weight:900; color:var(--accent); margin-left:4px;">${s.games}G</span></div>
                         <div style="font-size:15px; font-weight:800; color:var(--text-color);">${player}의 성적: 평균 ${avg}위</div>
                     </div>
                     <div style="display:flex; gap:6px;">
