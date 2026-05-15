@@ -813,9 +813,13 @@ function renderLiveTimeline(filteredGames) {
                 tag = "⚡ 짜릿한 역전승"; color = "var(--accent)";
             }
         }
+
+        // [추가된 핵심 로직] 해당 날짜의 전체 게임을 불러와 현재 게임이 몇 번째(n G)인지 역산
+        const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr);
+        const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
         
         html += `<div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.5); padding: 8px 12px; border-radius: 10px; font-size: 12px; border-left: 4px solid ${color};">
-                    <div style="font-weight: 800; color: #555;">${g.dateStr.slice(5)} <span style="color:${color}; margin-left:5px;">[${tag}]</span></div>
+                    <div style="font-weight: 800; color: #555;">${g.dateStr.slice(5)} <span style="color:var(--rank1); margin-left:4px;">${gameNumber}G</span> <span style="color:${color}; margin-left:4px;">[${tag}]</span></div>
                     <div style="font-weight: 900; color:var(--text-color);">${winner}🥇 <span style="font-size:10px; color:#999; font-weight:400;">vs</span> ${loser}💀</div>
                  </div>`;
     });
