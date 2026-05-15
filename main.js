@@ -219,9 +219,14 @@ function showDashInfo(type) {
     } else if (type === 'lucky') {
         icon = "🍀"; title = "최고의 럭키 가이 기준";
         desc = wrapStart + "<b>평균 승점</b>과 <b>평균 순위</b>를 기반으로 산출. 게임 참여 대비 승점을 효율적으로 쌓은 '최고 가성비 선수'를 의미." + wrapEnd;
-    } else if (type === 'timeline') {
-        icon = "⏱️"; title = "실시간 게임 타임라인 기준";
-        desc = wrapStart + "최근 진행된 <b>최대 10게임</b>의 기록을 분석하여, 압도적 선공승, 짜릿한 역전승, 치열한 승부 등 <b>게임의 흐름과 성격</b>을 실시간으로 시각화한 타임라인입니다." + wrapEnd;
+    } else if (type === 'timeline') { 
+        icon = "⏱️"; title = "실시간 타임라인 분석 기준";
+        desc = wrapStart + 
+               "최근 <b>최대 10게임</b>의 흐름을 다음 기준으로 자동 분석합니다.<br><br>" +
+               "🔥 <b>압도적 선공승</b>: 3인 이상 게임에서 <b>초구(1번)</b>가 1위 (주도권 완승)<br><br>" +
+               "⚡ <b>짜릿한 역전승</b>: 3인 이상 게임에서 <b>말구(마지막)</b>가 1위 (불리함 극복)<br><br>" +
+               "⚔️ <b>치열한 승부</b>: 그 외 중간 순서가 1위이거나 2인 게임 (예측불허 접전)" + 
+               wrapEnd;
     } else if (type === 'mvp') {
         icon = "👑"; title = "월간 MVP 기준";
         desc = wrapStart + "<b>평균 승점</b>을 최우선으로 고려. 평균 승점이 같을 경우 승률(1위 횟수)을 비교하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정." + wrapEnd;
