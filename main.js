@@ -216,9 +216,12 @@ function showDashInfo(type) {
     } else if (type === 'totalDays') {
         icon = "📅"; title = "총 게임 일수";
         desc = wrapStart + "단순 게임 횟수가 아닌, 실제로 당구 클럽에 모여서 <b>게임을 즐긴 날짜의 총합</b>을 의미." + wrapEnd;
-    } else if (type === 'lucky') { // [V9.45] 럭키 가이 설명 추가
+    } else if (type === 'lucky') {
         icon = "🍀"; title = "최고의 럭키 가이 기준";
         desc = wrapStart + "<b>평균 승점</b>과 <b>평균 순위</b>를 기반으로 산출. 게임 참여 대비 승점을 효율적으로 쌓은 '최고 가성비 선수'를 의미." + wrapEnd;
+    } else if (type === 'timeline') { // [V9.45 수정] 누락된 타임라인 케이스 복구
+        icon = "⏱️"; title = "실시간 게임 타임라인 기준";
+        desc = wrapStart + "최근 진행된 <b>최대 10게임</b>의 기록을 분석하여, 압도적 선공승, 짜릿한 역전승, 치열한 승부 등 <b>게임의 흐름과 성격</b>을 실시간으로 시각화한 타임라인입니다." + wrapEnd;
     } else if (type === 'mvp') {
         icon = "👑"; title = "월간 MVP 기준";
         desc = wrapStart + "<b>평균 승점</b>을 최우선으로 고려. 평균 승점이 같을 경우 승률(1위 횟수)을 비교하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정." + wrapEnd;
@@ -794,7 +797,6 @@ async function saveGame() {
     } catch (e) { alert("오류 발생!"); showLoading(false); }
 }
 
-// [V9.45] 럭키 가이(Lucky Guy) 알고리즘 로직
 function calculateLuckyGuy(filteredGames) {
     if (filteredGames.length === 0) return "-";
     
@@ -807,7 +809,7 @@ function calculateLuckyGuy(filteredGames) {
             if (stats[p]) {
                 stats[p].played++;
                 stats[p].score += getEarnedScore(idx, actual.length);
-                stats[p].rankSum += (idx + 1); // 순위는 1위면 1, 4위면 4로 계산됨
+                stats[p].rankSum += (idx + 1);
             }
         });
     });
@@ -815,7 +817,6 @@ function calculateLuckyGuy(filteredGames) {
     let candidates = players.filter(p => stats[p].played > 0);
     if (candidates.length === 0) return "-";
     
-    // 평균 순위가 낮을수록(숫자가 클수록), 그리고 평균 승점이 높을수록 럭키 지수가 높음
     const luckyWinner = candidates.reduce((a, b) => {
         const luckA = (stats[a].score / stats[a].played) * (stats[a].rankSum / stats[a].played);
         const luckB = (stats[b].score / stats[b].played) * (stats[b].rankSum / stats[b].played);
@@ -825,13 +826,12 @@ function calculateLuckyGuy(filteredGames) {
     return luckyWinner;
 }
 
-// [V9.45] 실시간 타임라인(Live Timeline) 렌더링 로직
+// [V9.45 수정] 실시간 타임라인 10게임으로 스캔 대상 상향 조정 (.slice(0, 10))
 function renderLiveTimeline(filteredGames) {
     const container = document.getElementById('dashTimeline');
     if (!container) return;
     
-    // 최신 순 정렬
-    const recentGames = [...filteredGames].sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || (parseInt(b.round) - parseInt(a.round))).slice(0, 5);
+    const recentGames = [...filteredGames].sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || (parseInt(b.round) - parseInt(a.round))).slice(0, 10);
     
     if (recentGames.length === 0) {
         container.innerHTML = `<div style="font-size: 11px; color: #999; text-align: center; padding: 10px;">데이터가 없습니다.</div>`;
@@ -882,7 +882,6 @@ function renderDashboard() {
     }
     dCard.style.display = 'block';
     
-    // [V9.45] 럭키가이 & 타임라인 렌더링 호출
     const luckyEl = document.getElementById('dashLuckyGuy');
     if (luckyEl) luckyEl.innerText = calculateLuckyGuy(filtered);
     renderLiveTimeline(filtered);
