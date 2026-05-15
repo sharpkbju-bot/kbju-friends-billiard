@@ -216,9 +216,12 @@ function showDashInfo(type) {
     } else if (type === 'totalDays') {
         icon = "📅"; title = "총 게임 일수";
         desc = wrapStart + "단순 게임 횟수가 아닌, 실제로 당구 클럽에 모여서 <b>게임을 즐긴 날짜의 총합</b>을 의미." + wrapEnd;
-    } else if (type === 'lucky') { // [V9.45] 럭키 가이 설명 추가
+    } else if (type === 'lucky') { 
         icon = "🍀"; title = "최고의 럭키 가이 기준";
-        desc = wrapStart + "<b>평균 승점</b>과 <b>평균 순위</b>를 기반으로 산출합니다. 낮은 순위(높은 숫자)를 기록했음에도 불구하고 가성비 좋게 승점을 쏠쏠하게 챙긴 '최고 가성비 선수'를 의미합니다." + wrapEnd;
+        desc = wrapStart + "<b>평균 승점</b>과 <b>평균 순위</b>를 기반으로 산출합니다. 낮은 순위(높은 숫자)를 기록했음에도 불구하고 가성비 좋게 승점을 쏠쏠하게 챙긴 '운수 좋은 사람'을 의미합니다." + wrapEnd;
+    } else if (type === 'timeline') { 
+        icon = "⏱️"; title = "실시간 게임 타임라인 기준";
+        desc = wrapStart + "최근 진행된 <b>최대 7게임</b>의 기록을 분석하여, 압도적 선공승, 짜릿한 역전승, 치열한 승부 등 <b>게임의 흐름과 성격</b>을 실시간으로 시각화한 타임라인입니다." + wrapEnd;
     } else if (type === 'mvp') {
         icon = "👑"; title = "월간 MVP 기준";
         desc = wrapStart + "<b>평균 승점</b>을 최우선으로 고려. 평균 승점이 같을 경우 승률(1위 횟수)을 비교하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정." + wrapEnd;
@@ -226,8 +229,7 @@ function showDashInfo(type) {
         icon = "💸"; title = "지갑 전사 기준";
         desc = wrapStart + "해당 월에 참여한 게임 수 대비 <b>꼴찌를 가장 높은 비율로 기록한 선수</b>. 게임비를 가장 많이 지출했을 것으로 추정되는 안타까운(?) 타이틀." + wrapEnd;
     } else if (type === 'trend') {
-        icon = "📈";
-        title = "최근 7게임 레코드";
+        icon = "📈"; title = "최근 7게임 레코드";
         
         let playerStats = [];
         const filterEl = document.getElementById('statsFilterCount');
@@ -335,10 +337,7 @@ function showRingCriteria(type) {
         infoModalCountdownInterval = setInterval(() => {
             timeLeft--;
             if (timerEl) timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
-            if (timeLeft <= 0) {
-                clearInterval(infoModalCountdownInterval);
-                closeInfoModal();
-            }
+            if (timeLeft <= 0) { clearInterval(infoModalCountdownInterval); closeInfoModal(); }
         }, 1000);
     }
 
@@ -357,20 +356,16 @@ function showInfoModal(type) {
     const wrapEnd = "</div>";
 
     if (type === 'score') {
-        icon = "📊"; 
-        title = "인원별 차등 승점 기준";
+        icon = "📊"; title = "인원별 차등 승점 기준";
         desc = "<div style='white-space: nowrap; line-height: 1.5; text-align: left;'>• <b>2인</b>: 1위(+2), 꼴찌(0)<br>• <b>3인</b>: 1위(+3), 2위(+1), 꼴찌(0)<br>• <b>4인</b>: 1위(+4), 2위(+3), 3위(+2), 꼴찌(0)<br>• <b>5인</b>: 1위(+5), 2위(+4), 3위(+3), 4위(+1), 꼴찌(0)</div>";
     } else if (type === 'tier') {
-        icon = "🏅"; 
-        title = "랭킹 티어(계급) 기준";
+        icon = "🏅"; title = "랭킹 티어(계급) 기준";
         desc = wrapStart + "👑<b>챌린저</b>: 60+ &nbsp;💎<b>플래티넘</b>: 50+<br>🥇<b>골드</b>: 40+ &nbsp;&nbsp;🥈<b>실버</b>: 30+ &nbsp;🥉<b>브론즈</b>: 30미만" + wrapEnd;
     } else if (type === 'condition') {
-        icon = "🌡️"; 
-        title = "최근 컨디션 분석 기준";
+        icon = "🌡️"; title = "최근 컨디션 분석 기준";
         desc = wrapStart + "• ☀️<b>최상</b>: 1위 비율 30%↑<br>• ⛅<b>보통</b>: 1위 비율 30% 미만. 안정적인 보통 순위<br>• ⚡<b>도깨비</b>: 1위 30%↑ & 꼴찌 30%↑<br>• 🌧️<b>비상</b>: 꼴찌 비율 30%↑" + wrapEnd;
     } else if (type === 'style') { 
-        icon = "🎱";
-        title = "당구 성향 분석 기준";
+        icon = "🎱"; title = "당구 성향 분석 기준";
         desc = wrapStart + "<b>[승률 35% & 생존율 80% 기준]</b><br><br>• 👑 <b>전략적 지배자</b>: 승률↑ & 생존율↑<br>• 🐅 <b>폭격형 호랑이</b>: 승률↑ & 생존율↓<br>• 🐢 <b>철벽 거북이</b>: 승률↓ & 생존율↑<br>• 🐣 <b>성장하는 꿈나무</b>: 승률↓ & 생존율↓" + wrapEnd;
     }
     
@@ -378,26 +373,13 @@ function showInfoModal(type) {
     const timerEl = document.getElementById('info-modal-timer');
     if(timerEl) timerEl.style.display = 'none'; 
 
-    if (infoModalCountdownInterval) {
-        clearInterval(infoModalCountdownInterval);
-        infoModalCountdownInterval = null;
-    }
+    if (infoModalCountdownInterval) { clearInterval(infoModalCountdownInterval); infoModalCountdownInterval = null; }
 
     const currentTheme = document.documentElement.getAttribute('data-theme');
-    if (currentTheme === 'navy') {
-        descEl.style.color = '#5D4037';
-    } else {
-        descEl.style.color = ''; 
-    }
+    if (currentTheme === 'navy') { descEl.style.color = '#5D4037'; } else { descEl.style.color = ''; }
 
     const popupBox = document.getElementById('info-modal-title').parentElement;
-    if (popupBox) {
-        if (document.body.classList.contains('zoom-active')) {
-            popupBox.style.zoom = '0.85'; 
-        } else {
-            popupBox.style.zoom = '1';
-        }
-    }
+    if (popupBox) { if (document.body.classList.contains('zoom-active')) { popupBox.style.zoom = '0.85'; } else { popupBox.style.zoom = '1'; } }
     
     document.getElementById('info-modal-icon').innerHTML = icon;
     document.getElementById('info-modal-title').innerHTML = title;
@@ -407,14 +389,8 @@ function showInfoModal(type) {
 
 function closeInfoModal() { 
     document.getElementById('info-modal').style.display = 'none'; 
-    if (infoModalCountdownInterval) {
-        clearInterval(infoModalCountdownInterval);
-        infoModalCountdownInterval = null;
-    }
-    if (dashInfoCountdownInterval) {
-        clearInterval(dashInfoCountdownInterval);
-        dashInfoCountdownInterval = null;
-    }
+    if (infoModalCountdownInterval) { clearInterval(infoModalCountdownInterval); infoModalCountdownInterval = null; }
+    if (dashInfoCountdownInterval) { clearInterval(dashInfoCountdownInterval); dashInfoCountdownInterval = null; }
     const timerEl = document.getElementById('dash-info-timer');
     if (timerEl) timerEl.remove();
 }
@@ -422,10 +398,8 @@ function closeInfoModal() {
 function showLastGameResult() {
     if (!gameLogs || gameLogs.length === 0) { 
         if (document.getElementById('loading').style.display === 'none') return;
-        setTimeout(showLastGameResult, 500); 
-        return; 
+        setTimeout(showLastGameResult, 500); return; 
     }
-    
     const latestDate = gameLogs.reduce((max, game) => (game.dateStr > max ? game.dateStr : max), gameLogs[0].dateStr);
     const gamesOnLatestDate = gameLogs.filter(g => g.dateStr === latestDate);
     const lastGame = gamesOnLatestDate[gamesOnLatestDate.length - 1];
@@ -452,8 +426,7 @@ function showLastGameResult() {
     
     if(!modal || !content) return;
     
-    content.innerHTML = html; 
-    modal.style.display = 'flex'; 
+    content.innerHTML = html; modal.style.display = 'flex'; 
     content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
     
     setTimeout(() => { 
@@ -464,12 +437,7 @@ function showLastGameResult() {
     }, 3000);
 }
 
-function focusOnDrawCard() { 
-    setTimeout(() => { 
-        const el = document.getElementById('drawCardArea'); 
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
-    }, 150); 
-}
+function focusOnDrawCard() { setTimeout(() => { const el = document.getElementById('drawCardArea'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150); }
 
 function togglePlayerSelection(el, name) {
     triggerHaptic(15); 
@@ -478,19 +446,14 @@ function togglePlayerSelection(el, name) {
         el.classList.remove('active'); 
     } else {
         const limit = parseInt(document.getElementById('playerCount').value);
-        if (selectedPlayersForLottery.length >= limit) { 
-            alert(`게임 가능 인원 ${limit}명. 초과 불가`); 
-            return; 
-        }
-        selectedPlayersForLottery.push(name); 
-        el.classList.add('active');
+        if (selectedPlayersForLottery.length >= limit) { alert(`게임 가능 인원 ${limit}명. 초과 불가`); return; }
+        selectedPlayersForLottery.push(name); el.classList.add('active');
     }
     if(!editMode) updateInputFields();
 }
 
 function resetPlayerSelection() { 
-    selectedPlayersForLottery = []; 
-    currentStartOrder = []; 
+    selectedPlayersForLottery = []; currentStartOrder = []; 
     document.querySelectorAll('.player-chip').forEach(el => el.classList.remove('active')); 
     if(!editMode) updateInputFields(); 
     const saveBtn = document.getElementById('mainBtn');
@@ -546,9 +509,7 @@ function pickRandomOrder() {
             let elapsed = Date.now() - start;
             if (elapsed < 3000) { 
                 const p = selectedPlayersForLottery[counter % selectedPlayersForLottery.length]; 
-                slotName.innerText = p; 
-                slotName.style.color = getPlayerColor(p); 
-                counter++; 
+                slotName.innerText = p; slotName.style.color = getPlayerColor(p); counter++; 
                 setTimeout(runSlot, 50 + Math.pow(elapsed / 3000, 3) * 400); 
             } else { finishAnimation(); }
         }
@@ -562,8 +523,7 @@ function pickRandomOrder() {
                                     </div>
                                 </div>`;
         setTimeout(() => { 
-            const gauge = document.getElementById('billiardGauge'); 
-            const ball = document.getElementById('billiardBall'); 
+            const gauge = document.getElementById('billiardGauge'); const ball = document.getElementById('billiardBall'); 
             if(gauge && ball) { gauge.style.width = '100%'; ball.style.left = '100%'; ball.style.transform = 'translateX(-50%) rotate(1080deg)'; } 
         }, 50);
         setTimeout(finishAnimation, 3000);
@@ -583,8 +543,7 @@ function closeOrderModal() {
 }
 
 function showPlayersGraph(players) {
-    const container = document.getElementById('graph-container'); 
-    const legendArea = document.getElementById('graph-legend');
+    const container = document.getElementById('graph-container'); const legendArea = document.getElementById('graph-legend');
     let legendHtml = ""; 
     let svg = `<svg width="100%" height="100%" viewBox="-15 -10 130 120" preserveAspectRatio="none" style="overflow: visible; font-family: inherit;"><defs>`;
     players.forEach((p, i) => {
@@ -605,10 +564,8 @@ function showPlayersGraph(players) {
         const recent10Games = allPersonalGames.slice(0, 10).reverse();
         let points = []; let stepX = recent10Games.length > 1 ? 100 / (recent10Games.length - 1) : 50;
         recent10Games.forEach((g, i) => { 
-            const actual = g.ranks.filter(n => n.trim() !== ""); 
-            const rIdx = actual.indexOf(playerName); 
-            let isLast = (rIdx === actual.length - 1 && actual.length > 1); 
-            let yRank = isLast ? 5 : (rIdx + 1); 
+            const actual = g.ranks.filter(n => n.trim() !== ""); const rIdx = actual.indexOf(playerName); 
+            let isLast = (rIdx === actual.length - 1 && actual.length > 1); let yRank = isLast ? 5 : (rIdx + 1); 
             points.push({x: recent10Games.length === 1 ? 50 : i * stepX, y: (yRank - 1) * 25}); 
         });
         if (points.length > 0) {
@@ -734,12 +691,7 @@ function selectDate(dateStr) {
     selectedDateStr = dateStr; document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`;
     renderCalendar(); renderGameList();
     const hasRecord = gameLogs.some(g => g.dateStr === dateStr);
-    if (hasRecord) {
-        setTimeout(() => {
-            const recordTarget = document.getElementById('record-header-wrap');
-            if (recordTarget) recordTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
-    }
+    if (hasRecord) { setTimeout(() => { const recordTarget = document.getElementById('record-header-wrap'); if (recordTarget) recordTarget.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100); }
 }
 
 function checkDuplicates() { 
@@ -794,7 +746,6 @@ async function saveGame() {
     } catch (e) { alert("오류 발생!"); showLoading(false); }
 }
 
-// [V9.45] 럭키 가이(Lucky Guy) 알고리즘 로직
 function calculateLuckyGuy(filteredGames) {
     if (filteredGames.length === 0) return "-";
     
@@ -807,7 +758,7 @@ function calculateLuckyGuy(filteredGames) {
             if (stats[p]) {
                 stats[p].played++;
                 stats[p].score += getEarnedScore(idx, actual.length);
-                stats[p].rankSum += (idx + 1); // 순위는 1위면 1, 4위면 4로 계산됨
+                stats[p].rankSum += (idx + 1);
             }
         });
     });
@@ -815,7 +766,6 @@ function calculateLuckyGuy(filteredGames) {
     let candidates = players.filter(p => stats[p].played > 0);
     if (candidates.length === 0) return "-";
     
-    // 평균 순위가 낮을수록(숫자가 클수록), 그리고 평균 승점이 높을수록 럭키 지수가 높음
     const luckyWinner = candidates.reduce((a, b) => {
         const luckA = (stats[a].score / stats[a].played) * (stats[a].rankSum / stats[a].played);
         const luckB = (stats[b].score / stats[b].played) * (stats[b].rankSum / stats[b].played);
@@ -825,13 +775,11 @@ function calculateLuckyGuy(filteredGames) {
     return luckyWinner;
 }
 
-// [V9.45] 실시간 타임라인(Live Timeline) 렌더링 로직
 function renderLiveTimeline(filteredGames) {
     const container = document.getElementById('dashTimeline');
     if (!container) return;
     
-    // 최신 순 정렬
-    const recentGames = [...filteredGames].sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || (parseInt(b.round) - parseInt(a.round))).slice(0, 5);
+    const recentGames = [...filteredGames].sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || (parseInt(b.round) - parseInt(a.round))).slice(0, 7);
     
     if (recentGames.length === 0) {
         container.innerHTML = `<div style="font-size: 11px; color: #999; text-align: center; padding: 10px;">데이터가 없습니다.</div>`;
@@ -841,11 +789,8 @@ function renderLiveTimeline(filteredGames) {
     let html = "";
     recentGames.forEach(g => {
         const actual = g.ranks.filter(n => n.trim() !== "");
-        const winner = actual[0];
-        const loser = actual[actual.length - 1];
-        
-        let tag = "치열한 승부";
-        let color = "var(--sub-text)";
+        const winner = actual[0]; const loser = actual[actual.length - 1];
+        let tag = "치열한 승부"; let color = "var(--sub-text)";
         
         if (actual.length >= 3) {
             if (g.startOrder && g.startOrder[0] === winner) {
@@ -882,7 +827,6 @@ function renderDashboard() {
     }
     dCard.style.display = 'block';
     
-    // [V9.45] 럭키가이 & 타임라인 렌더링 호출
     const luckyEl = document.getElementById('dashLuckyGuy');
     if (luckyEl) luckyEl.innerText = calculateLuckyGuy(filtered);
     renderLiveTimeline(filtered);
@@ -948,7 +892,6 @@ function renderDashboard() {
     });
     document.getElementById('dashDefense').innerText = defCandidate !== "-" ? `${defCandidate} (${maxDefAvg.toFixed(1)}위)` : "-";
 }
-
 function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); }
 function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
 
@@ -1020,6 +963,7 @@ function renderStats() {
         rich.style.display = 'block'; rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:16px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; 
     } else { rich.style.display = 'none'; }
 }
+
 function showDefenseDetail(playerName) {
     const filterVal = document.getElementById('statsFilterCount')?.value || "all";
     const monthVal = document.getElementById('statsFilterMonth')?.value || "";
@@ -1036,8 +980,7 @@ function showDefenseDetail(playerName) {
             const vRankIdx = actual.indexOf(victimName);
             if (vRankIdx !== -1) {
                 if (!victimStats[victimName]) victimStats[victimName] = { games: 0, totalRank: 0, wins: 0, lasts: 0 };
-                victimStats[victimName].games++;
-                victimStats[victimName].totalRank += (vRankIdx + 1);
+                victimStats[victimName].games++; victimStats[victimName].totalRank += (vRankIdx + 1);
                 if (vRankIdx === 0) victimStats[victimName].wins++;
                 if (vRankIdx === actual.length - 1 && actual.length > 1) victimStats[victimName].lasts++;
             }
@@ -1054,14 +997,11 @@ function showDefenseDetail(playerName) {
                 <div style="font-size:13px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; line-height:1.4; display:block; text-align:center;">(내 바로 뒷주자 선수들의 성적 분석) ${filterText} ${monthText}</div>
                 <div style="display:block;">`;
 
-    if (victims.length === 0) {
-        html += `<div style="padding:30px; color:var(--sub-text); font-weight:800; text-align:center; display:block;">해당 조건의 분석 가능한 데이터가 없습니다.</div>`;
-    } else {
+    if (victims.length === 0) { html += `<div style="padding:30px; color:var(--sub-text); font-weight:800; text-align:center; display:block;">해당 조건의 분석 가능한 데이터가 없습니다.</div>`; } 
+    else {
         victims.forEach(v => {
-            const s = victimStats[v];
-            const avg = (s.totalRank / s.games).toFixed(1);
-            const winP = ((s.wins / s.games) * 100).toFixed(0);
-            const lastP = ((s.lasts / s.games) * 100).toFixed(0);
+            const s = victimStats[v]; const avg = (s.totalRank / s.games).toFixed(1);
+            const winP = ((s.wins / s.games) * 100).toFixed(0); const lastP = ((s.lasts / s.games) * 100).toFixed(0);
 
             html += `<div style="background:rgba(255,255,255,0.4); padding:12px 15px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); text-align:left; margin-bottom: 10px; display:block;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -1086,28 +1026,23 @@ function showDefenseDetail(playerName) {
              <button id="defense-modal-share-btn" class="share-btn-common" style="margin-top: 20px; width:100%; height:48px; display:flex; align-items:center; justify-content:center;" onclick="shareDefenseDetail('${playerName}')">📸 디펜스 상세 기록 스크린샷 공유</button>
              <button class="save-btn" style="background:#bdc3c7; margin-top:12px; width:100%; height:48px; display:flex; align-items:center; justify-content:center; color:#444;" onclick="closeDefenseDetail()">닫기</button>`;
 
-    const modal = document.getElementById('defense-detail-modal');
-    const content = document.getElementById('defense-detail-content');
+    const modal = document.getElementById('defense-detail-modal'); const content = document.getElementById('defense-detail-content');
     if (!modal || !content) return;
-    content.innerHTML = html;
-    modal.style.display = 'flex';
+    content.innerHTML = html; modal.style.display = 'flex';
     content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
     if (defenseModalTimeout) clearTimeout(defenseModalTimeout);
     defenseModalTimeout = setTimeout(() => { closeDefenseDetail(); }, 15000); 
 }
 
 function closeDefenseDetail() {
-    const modal = document.getElementById('defense-detail-modal');
-    const content = document.getElementById('defense-detail-content');
+    const modal = document.getElementById('defense-detail-modal'); const content = document.getElementById('defense-detail-content');
     if (defenseModalTimeout) { clearTimeout(defenseModalTimeout); defenseModalTimeout = null; }
     if (!modal || !content) return;
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards';
     setTimeout(() => { modal.style.display = 'none'; content.style.animation = 'none'; }, 300);
 }
 
-function shareDefenseDetail(name) {
-    captureAndShare('defense-modal-capture-area', 'defense-modal-share-btn', `${name}_defense_detail.png`, `${name}의 디펜스 리포트`, `${name} 선수가 방어한 다른 멤버들의 성적 분석 결과입니다!`);
-}
+function shareDefenseDetail(name) { captureAndShare('defense-modal-capture-area', 'defense-modal-share-btn', `${name}_defense_detail.png`, `${name}의 디펜스 리포트`, `${name} 선수가 방어한 다른 멤버들의 성적 분석 결과입니다!`); }
 
 function renderDefenseStats() {
     const filterVal = document.getElementById('statsFilterCount')?.value || "all";
@@ -1129,13 +1064,9 @@ function renderDefenseStats() {
             if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
             const order = g.startOrder;
             for (let i = 0; i < order.length; i++) {
-                const preP = order[i];
-                const nextP = order[(i + 1) % order.length];
+                const preP = order[i]; const nextP = order[(i + 1) % order.length];
                 const nextPRankIdx = actual.indexOf(nextP);
-                if (nextPRankIdx !== -1 && defenseStats[preP]) {
-                    defenseStats[preP].totalNextRank += (nextPRankIdx + 1);
-                    defenseStats[preP].count++;
-                }
+                if (nextPRankIdx !== -1 && defenseStats[preP]) { defenseStats[preP].totalNextRank += (nextPRankIdx + 1); defenseStats[preP].count++; }
             }
         }
     });
@@ -1163,10 +1094,8 @@ function renderDefenseStats() {
 function shareDefenseResult() { captureAndShare('defense-capture-area', 'defense-share-btn', 'defense_ranking.png', 'Defense 순위', '멤버별 전체 디펜스 랭킹입니다!'); }
 
 function closeMemberHistory() {
-    const area = document.getElementById('memberHistoryArea');
-    area.style.display = 'none';
-    const statsCard = document.querySelector('.stats-card');
-    if (statsCard) statsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const area = document.getElementById('memberHistoryArea'); area.style.display = 'none';
+    const statsCard = document.querySelector('.stats-card'); if (statsCard) statsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function renderMemberHistory(name, rank = "") {
@@ -1182,17 +1111,13 @@ function renderMemberHistory(name, rank = "") {
         return true;
     }).sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || ((parseInt(b.round) || 0) - (parseInt(a.round) || 0)));
     
-    if (allPersonal.length === 0) { 
-        showToastMsg("해당 조건의 기록이 없습니다.");
-        return; 
-    }
+    if (allPersonal.length === 0) { showToastMsg("해당 조건의 기록이 없습니다."); return; }
     
     let totalScore = 0; 
     allPersonal.forEach(g => { const actual = g.ranks.filter(n => n.trim() !== ""); totalScore += getEarnedScore(actual.indexOf(name), actual.length); });
     const avg = allPersonal.length > 0 ? (totalScore / allPersonal.length).toFixed(2) : "0.00";
     
-    const scoreModal = document.getElementById('player-score-modal'); 
-    const scoreContent = document.getElementById('player-score-content');
+    const scoreModal = document.getElementById('player-score-modal'); const scoreContent = document.getElementById('player-score-content');
     
     if (scoreModalTimeout) clearTimeout(scoreModalTimeout); 
     if (hideScoreModalTimeout) clearTimeout(hideScoreModalTimeout);
@@ -1213,8 +1138,7 @@ function renderMemberHistory(name, rank = "") {
                                       </div>
                                   </div>
                                   <div id="score-timer" style="margin-top:15px; font-size:12px; color:var(--sub-text); font-weight:800; text-align:center; display:block;">10초 후 자동으로 닫힙니다.</div>`; 
-        scoreModal.style.display = 'flex'; 
-        scoreContent.style.animation = 'scaleUpPopup 0.4s forwards'; 
+        scoreModal.style.display = 'flex'; scoreContent.style.animation = 'scaleUpPopup 0.4s forwards'; 
         let sLeft = 10;
         scoreCountdownInterval = setInterval(() => {
             sLeft--; const timerEl = document.getElementById('score-timer');
@@ -1258,12 +1182,10 @@ function renderMemberHistory(name, rank = "") {
     html += `<button id="member-share-btn" class="share-btn-common" style="margin:15px 0;" onclick="shareMemberResult('${name}')">📸 개인 전적 스크린샷 공유</button>`;
     
     recent.forEach(g => { 
-        const actual = g.ranks.filter(n => n.trim() !== ""); 
-        const rIdx = actual.indexOf(name); 
+        const actual = g.ranks.filter(n => n.trim() !== ""); const rIdx = actual.indexOf(name); 
         const rColor = rIdx === 0 ? 'var(--rank1)' : (rIdx === actual.length - 1 ? 'var(--rankL)' : '#5D4037');
         const rLabel = rIdx === 0 ? '1위🥇' : (rIdx === actual.length - 1 ? '꼴찌💀' : (rIdx + 1) + '위');
-        const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr);
-        const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
+        const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr); const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
         html += `<div class="history-item"><div style="font-size:14px; color:#5D4037;">${g.dateStr} <span style="font-size:12px; font-weight:900; color:var(--rank1); margin-left:6px;">${gameNumber}G</span></div><div style="font-size:15px; color:${rColor};">${rLabel}</div></div>`; 
     });
     
@@ -1271,24 +1193,8 @@ function renderMemberHistory(name, rank = "") {
     setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 }
 
-function getCaptureBgColor() { 
-    const t = document.documentElement.getAttribute('data-theme') || 'yellow'; 
-    if (t === 'dark' || t === 'navy') return t === 'dark' ? '#3c3c41' : '#0a192f'; 
-    if (t === 'yellowgreen') return '#f0ffe6'; 
-    if (t === 'purple') return '#f3e6ff'; 
-    if (t === 'green') return '#e1faeb'; 
-    if (t === 'pink') return '#ffebeb'; 
-    if (t === 'gray') return '#f0f0f0'; 
-    return '#fdfbe7'; 
-}
-
 function shareStatsResult() { captureAndShare('stats-capture-area', 'stats-share-btn', `stats_record.png`, '멤버별 누적 전적', '멤버별 누적 전적 결과입니다!'); }
 function shareMemberResult(name) { captureAndShare('memberHistory-capture-area', 'member-share-btn', `${name}_history.png`, `${name}의 전적`, `${name} 선수의 경기 결과입니다!`); }
-
-function changeZoom(v) { 
-    document.body.style.zoom = v; 
-    if(v === '1.2') document.body.classList.add('zoom-active'); else document.body.classList.remove('zoom-active'); 
-}
 
 function showGenseiModal(playerName) {
     const gamesToday = gameLogs.filter(g => g.dateStr === selectedDateStr);
@@ -1405,6 +1311,7 @@ function renderTodayMVP() {
     area.innerHTML = html; area.style.display = 'flex';
 }
 
+// 덮어씌워졌던 원래 renderGameList 함수 위치
 function renderGameList() {
     const games = gameLogs.filter(g => g.dateStr === selectedDateStr); 
     const area = document.getElementById('dayGameList');
@@ -1431,96 +1338,6 @@ function renderGameList() {
 
 function shareTodayResult() { captureAndShare('capture-area', 'today-share-btn', `today_record_${selectedDateStr}.png`, '오늘의 전적', `${selectedDateStr} 경기 결과!`); }
 function shareSearchResult() { captureAndShare('search-capture-area', 'search-share-btn', `search_record.png`, '월별 검색 결과', '당구 전적 검색 결과!'); }
-
-function toggleActionOverlay(el) { 
-    const overlay = el.querySelector('.action-overlay'); 
-    if(!overlay.classList.contains('active')) { document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active')); overlay.classList.add('active'); } 
-    else { overlay.classList.remove('active'); }
-}
-
-function closeAllOverlays() { document.querySelectorAll('.action-overlay').forEach(o => o.classList.remove('active')); }
-
-function enterEditMode(round, rankStr) { 
-    editMode = true; editRound = round; 
-    const targetGame = gameLogs.find(g => g.dateStr === selectedDateStr && g.round === round);
-    currentStartOrder = (targetGame && targetGame.startOrder) ? [...targetGame.startOrder] : [];
-    updateInputFields(rankStr.split(',')); 
-    document.getElementById('editBadge').style.display = 'block'; document.getElementById('inputCard').classList.add('edit-active'); 
-    const btn = document.getElementById('mainBtn'); btn.innerText = "수정 완료"; btn.classList.add('edit-btn'); 
-    document.getElementById('inputArea').scrollIntoView({ behavior: 'smooth', block: 'center' }); 
-    closeAllOverlays(); 
-}
-
-function cancelEdit() { 
-    editMode = false; editRound = null; currentStartOrder = []; 
-    document.getElementById('editBadge').style.display = 'none'; document.getElementById('inputCard').classList.remove('edit-active'); 
-    const btn = document.getElementById('mainBtn'); btn.innerText = "순위 저장"; btn.classList.remove('edit-btn'); 
-    document.getElementById('playerCount').value = "3"; resetPlayerSelection(); updateInputFields(); 
-    if (btn) btn.classList.remove('flash-save-active');
-}
-
-async function deleteGame(round) { 
-    if(!confirm("정말 삭제할거야?")) return; 
-    showLoading(true, "삭제 중"); 
-    try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "DELETE", round: round }) }); fetchData(); } 
-    catch (e) { showLoading(false); } 
-}
-
-function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
-function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-function closeAppWindow() { 
-    window.close(); 
-    setTimeout(() => { 
-        document.body.innerHTML = `<div style="background:linear-gradient(135deg, #4a90e2, #9370db); height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-family: 'Pretendard', sans-serif;">
-                                       <div style="font-size:60px; margin-bottom:20px;">👋</div><div style="font-size:20px; font-weight:900; line-height:1.6;">앱 종료</div><div style="font-size:14px; margin-top:30px; opacity:0.8;">다음에 또 봐!</div>
-                                   </div>`; 
-        document.body.style.backgroundImage = 'none'; document.body.style.padding = '0'; 
-    }, 300); 
-}
-
-function showLoading(v, t) { 
-    document.getElementById('loadingText').innerText = t; 
-    document.getElementById('loading').style.display = v ? 'flex' : 'none'; 
-}
-
-function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
-
-function exportData() { 
-    if (gameLogs.length === 0) return alert("데이터 없음"); 
-    const link = document.createElement('a'); 
-    link.href = 'data:application/json;charset=utf-8,'+ encodeURIComponent(JSON.stringify(gameLogs, null, 2)); 
-    link.download = `billiard_backup_${new Date().toLocaleDateString('sv-SE')}.json`; 
-    link.click(); 
-}
-
-function triggerImport() { document.getElementById('importFile').click(); }
-
-function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        try {
-            const importedData = JSON.parse(e.target.result);
-            if (!Array.isArray(importedData)) throw new Error("Invalid format");
-            if (!confirm(`백업 파일에서 ${importedData.length}개의 데이터를 발견했습니다.\n전체 복구를 진행하시겠습니까?`)) { event.target.value = ''; return; }
-            showLoading(true, "기존 데이터 초기화 중...");
-            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
-            for (let i = 0; i < importedData.length; i++) {
-                showLoading(true, `데이터 복구 중... (${i + 1} / ${importedData.length})`);
-                const game = importedData[i]; const ranks = game.ranks || [];
-                const payload = { action: "SAVE", date: game.dateStr, ranks: [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""], startOrder: game.startOrder || null };
-                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-            }
-            alert("데이터 복구가 성공적으로 완료되었습니다!");
-            event.target.value = ''; showLoading(true, "최신 데이터 불러오는 중..."); await fetchData();
-        } catch (err) {
-            alert("복구 중 오류가 발생했습니다.\n오류 내용: " + err.message);
-            showLoading(false); event.target.value = '';
-        }
-    };
-    reader.readAsText(file);
-}
 
 function setDefaultSearchDates() { if (searchFlatpickr) searchFlatpickr.setDate(new Date()); }
 
@@ -1560,7 +1377,6 @@ function searchRecords() {
     let monthlyAvgScore = filtered.length > 0 ? (monthlyTotalScore / filtered.length).toFixed(2) : "0.00";
     let winRateFloat = filtered.length > 0 ? ((r[0] / filtered.length) * 100).toFixed(1) : "0.0";
     let safetyRate = filtered.length > 0 ? Math.round(((filtered.length - r[4]) / filtered.length) * 100) : 0;
-    let othersCount = filtered.length - r[0] - r[4];
     
     let monthlyStatsAll = {}; players.forEach(p => monthlyStatsAll[p] = { played: 0, score: 0, win: 0 });
     const allGamesThisMonth = gameLogs.filter(g => g.dateStr.startsWith(mon));
@@ -1577,12 +1393,10 @@ function searchRecords() {
     const monthlyRankedPlayers = [...players].sort((a,b) => {
         if (monthlyStatsAll[a].played === 0 && monthlyStatsAll[b].played > 0) return 1;
         if (monthlyStatsAll[b].played === 0 && monthlyStatsAll[a].played > 0) return -1;
-        
         const avgA = monthlyStatsAll[a].score / monthlyStatsAll[a].played || 0;
         const avgB = monthlyStatsAll[b].score / monthlyStatsAll[b].played || 0;
         const wrA = monthlyStatsAll[a].win / monthlyStatsAll[a].played || 0;
         const wrB = monthlyStatsAll[b].win / monthlyStatsAll[b].played || 0;
-        
         return (avgB - avgA) || (wrB - wrA) || (monthlyStatsAll[b].win - monthlyStatsAll[a].win);
     });
     
@@ -1595,7 +1409,6 @@ function searchRecords() {
             const avgPrev = monthlyStatsAll[prevP].score / monthlyStatsAll[prevP].played || 0;
             const wrP = monthlyStatsAll[p].win / monthlyStatsAll[p].played || 0;
             const wrPrev = monthlyStatsAll[prevP].win / monthlyStatsAll[prevP].played || 0;
-            
             if (avgP !== avgPrev || wrP !== wrPrev) { currentRank = i + 1; }
         }
         if (p === player) { myMonthlyRank = currentRank; break; }
@@ -1611,12 +1424,7 @@ function searchRecords() {
     const spotlightColors = [
         { bg: 'rgba(255, 173, 173, 0.25)', shadow: 'rgba(255, 173, 173, 0.5)', border: '#FFADAD' },
         { bg: 'rgba(255, 214, 165, 0.25)', shadow: 'rgba(255, 214, 165, 0.5)', border: '#FFD6A5' },
-        { bg: 'rgba(253, 255, 182, 0.25)', shadow: 'rgba(253, 255, 182, 0.5)', border: '#FDFFB6' },
-        { bg: 'rgba(202, 255, 191, 0.25)', shadow: 'rgba(202, 255, 191, 0.5)', border: '#CAFFBF' },
-        { bg: 'rgba(155, 246, 255, 0.25)', shadow: 'rgba(155, 246, 255, 0.5)', border: '#9BF6FF' },
-        { bg: 'rgba(160, 196, 255, 0.25)', shadow: 'rgba(160, 196, 255, 0.5)', border: '#A0C4FF' },
-        { bg: 'rgba(189, 178, 255, 0.25)', shadow: 'rgba(189, 178, 255, 0.5)', border: '#BDB2FF' },
-        { bg: 'rgba(255, 198, 255, 0.25)', shadow: 'rgba(255, 198, 255, 0.5)', border: '#FFC6FF' }
+        { bg: 'rgba(253, 255, 182, 0.25)', shadow: 'rgba(253, 255, 182, 0.5)', border: '#FDFFB6' }
     ];
     const pick = spotlightColors[Math.floor(Math.random() * spotlightColors.length)];
 
@@ -1704,7 +1512,7 @@ function analyzeStrategy() {
         area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'none'; return;
     }
 
-    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 다음 선수들의 <b>뒤에서 <b>기록한 성적</div>`;
+    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 다음 선수들의 <b>뒤에서</b> 기록한 성적</div>`;
     targets.forEach(t => {
         const s = stats[t]; const avg = (s.totalRank / s.games).toFixed(1);
         const winP = Math.round((s.wins / s.games) * 100); const lastP = Math.round((s.lasts / s.games) * 100); const otherP = 100 - winP - lastP; 
@@ -1726,17 +1534,41 @@ function analyzeStrategy() {
 
 function shareStrategyResult() { const player = document.getElementById('strategyPlayer').value; captureAndShare('strategy-capture-area', 'strategy-share-btn', `strategy_${player}.png`, '상성 분석', `${player} 선수의 상성 분석 결과입니다!`); }
 
-function showToastMsg(msg) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-    toast.innerText = msg;
-    toast.style.display = 'block'; toast.style.zIndex = '999999';
-    void toast.offsetWidth; toast.classList.add('show');
-    if (globalToastTimeout) clearTimeout(globalToastTimeout);
-    globalToastTimeout = setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => { if(!toast.classList.contains('show')) toast.style.display = 'none'; }, 300);
-    }, 3000);
+function exportData() { 
+    if (gameLogs.length === 0) return alert("데이터 없음"); 
+    const link = document.createElement('a'); 
+    link.href = 'data:application/json;charset=utf-8,'+ encodeURIComponent(JSON.stringify(gameLogs, null, 2)); 
+    link.download = `billiard_backup_${new Date().toLocaleDateString('sv-SE')}.json`; 
+    link.click(); 
+}
+
+function triggerImport() { document.getElementById('importFile').click(); }
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            if (!Array.isArray(importedData)) throw new Error("Invalid format");
+            if (!confirm(`백업 파일에서 ${importedData.length}개의 데이터를 발견했습니다.\n전체 복구를 진행하시겠습니까?`)) { event.target.value = ''; return; }
+            showLoading(true, "기존 데이터 초기화 중...");
+            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
+            for (let i = 0; i < importedData.length; i++) {
+                showLoading(true, `데이터 복구 중... (${i + 1} / ${importedData.length})`);
+                const game = importedData[i]; const ranks = game.ranks || [];
+                const payload = { action: "SAVE", date: game.dateStr, ranks: [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""], startOrder: game.startOrder || null };
+                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+            }
+            alert("데이터 복구가 성공적으로 완료되었습니다!");
+            event.target.value = ''; showLoading(true, "최신 데이터 불러오는 중..."); await fetchData();
+        } catch (err) {
+            alert("복구 중 오류가 발생했습니다.\n오류 내용: " + err.message);
+            showLoading(false); event.target.value = '';
+        }
+    };
+    reader.readAsText(file);
 }
 
 function confirmReset(step) {
@@ -1778,6 +1610,18 @@ async function executeReset() {
     }
 }
 
+function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
+function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
+function closeAppWindow() { 
+    window.close(); 
+    setTimeout(() => { 
+        document.body.innerHTML = `<div style="background:linear-gradient(135deg, #4a90e2, #9370db); height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-family: 'Pretendard', sans-serif;">
+                                       <div style="font-size:60px; margin-bottom:20px;">👋</div><div style="font-size:20px; font-weight:900; line-height:1.6;">앱 종료</div><div style="font-size:14px; margin-top:30px; opacity:0.8;">다음에 또 봐!</div>
+                                   </div>`; 
+        document.body.style.backgroundImage = 'none'; document.body.style.padding = '0'; 
+    }, 300); 
+}
+
 window.onload = () => { 
     try {
         function applyHighlight(instance) {
@@ -1814,7 +1658,8 @@ window.onload = () => {
                 }
             }
         });
-       flatpickr("#statsFilterMonth", { 
+
+        flatpickr("#statsFilterMonth", { 
             plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
             locale: "ko", disableMobile: true,
             onReady: function(selectedDates, dateStr, instance) {
