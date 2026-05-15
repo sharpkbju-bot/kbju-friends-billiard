@@ -1,3 +1,4 @@
+// main.js - V9.45 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -7,10 +8,49 @@ let infoModalCountdownInterval = null;
 let scoreCountdownInterval = null; 
 let dashInfoCountdownInterval = null; 
 let globalToastTimeout = null; 
+let audioCtx = null; // V9.45 Web Audio API Context
 
 function triggerHaptic(pattern) {
     if (navigator.vibrate) {
         navigator.vibrate(pattern);
+    }
+}
+
+// [V9.45] 효과음 합성 함수 (Web Audio API)
+function playSystemSound(type) {
+    try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        if (type === 'success') {
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+            oscillator.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.3); // C6
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.4);
+        } else if (type === 'pop') {
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.1);
+        }
+    } catch (e) { console.log("Audio play failed", e); }
+}
+
+// [V9.45] 화면 플래시 효과
+function triggerSuccessFlash() {
+    const flash = document.getElementById('success-flash');
+    if (flash) {
+        flash.style.opacity = '0.5';
+        setTimeout(() => { flash.style.opacity = '0'; }, 150);
     }
 }
 
@@ -176,6 +216,9 @@ function showDashInfo(type) {
     } else if (type === 'totalDays') {
         icon = "📅"; title = "총 게임 일수";
         desc = wrapStart + "단순 게임 횟수가 아닌, 실제로 당구 클럽에 모여서 <b>게임을 즐긴 날짜의 총합</b>을 의미." + wrapEnd;
+    } else if (type === 'lucky') { // [V9.45] 럭키 가이 설명 추가
+        icon = "🍀"; title = "오늘의 럭키 가이 기준";
+        desc = wrapStart + "<b>평균 승점</b>과 <b>평균 순위</b>를 기반으로 산출합니다. 낮은 순위(높은 숫자)를 기록했음에도 불구하고 가성비 좋게 승점을 쏠쏠하게 챙긴 '운수 좋은 사람'을 의미합니다." + wrapEnd;
     } else if (type === 'mvp') {
         icon = "👑"; title = "월간 MVP 기준";
         desc = wrapStart + "<b>평균 승점</b>을 최우선으로 고려. 평균 승점이 같을 경우 승률(1위 횟수)을 비교하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정." + wrapEnd;
@@ -375,6 +418,7 @@ function closeInfoModal() {
     const timerEl = document.getElementById('dash-info-timer');
     if (timerEl) timerEl.remove();
 }
+
 function showLastGameResult() {
     if (!gameLogs || gameLogs.length === 0) { 
         if (document.getElementById('loading').style.display === 'none') return;
@@ -736,6 +780,11 @@ async function saveGame() {
         if(!val) return alert("참여 친구의 순위를 모두 선택해줘!"); ranks.push(val); 
     }
     if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
+    
+    // [V9.45] 성공 이펙트 및 사운드 발생
+    triggerSuccessFlash();
+    playSystemSound('success');
+
     showLoading(true, "저장 중");
     const payload = { action: "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound, startOrder: currentStartOrder.length > 0 ? currentStartOrder : null };
     if(editMode) payload.action = "UPDATE";
@@ -743,6 +792,78 @@ async function saveGame() {
         await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); 
         cancelEdit(); currentStartOrder = []; document.getElementById('playerCount').value = "3"; resetPlayerSelection(); updateInputFields(); await fetchData(); 
     } catch (e) { alert("오류 발생!"); showLoading(false); }
+}
+
+// [V9.45] 럭키 가이(Lucky Guy) 알고리즘 로직
+function calculateLuckyGuy(filteredGames) {
+    if (filteredGames.length === 0) return "-";
+    
+    let stats = {};
+    players.forEach(p => stats[p] = { played: 0, score: 0, rankSum: 0 });
+    
+    filteredGames.forEach(g => {
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        actual.forEach((p, idx) => {
+            if (stats[p]) {
+                stats[p].played++;
+                stats[p].score += getEarnedScore(idx, actual.length);
+                stats[p].rankSum += (idx + 1); // 순위는 1위면 1, 4위면 4로 계산됨
+            }
+        });
+    });
+    
+    let candidates = players.filter(p => stats[p].played > 0);
+    if (candidates.length === 0) return "-";
+    
+    // 평균 순위가 낮을수록(숫자가 클수록), 그리고 평균 승점이 높을수록 럭키 지수가 높음
+    const luckyWinner = candidates.reduce((a, b) => {
+        const luckA = (stats[a].score / stats[a].played) * (stats[a].rankSum / stats[a].played);
+        const luckB = (stats[b].score / stats[b].played) * (stats[b].rankSum / stats[b].played);
+        return luckA > luckB ? a : b;
+    });
+    
+    return luckyWinner;
+}
+
+// [V9.45] 실시간 타임라인(Live Timeline) 렌더링 로직
+function renderLiveTimeline(filteredGames) {
+    const container = document.getElementById('dashTimeline');
+    if (!container) return;
+    
+    // 최신 순 정렬
+    const recentGames = [...filteredGames].sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || (parseInt(b.round) - parseInt(a.round))).slice(0, 5);
+    
+    if (recentGames.length === 0) {
+        container.innerHTML = `<div style="font-size: 11px; color: #999; text-align: center; padding: 10px;">데이터가 없습니다.</div>`;
+        return;
+    }
+    
+    let html = "";
+    recentGames.forEach(g => {
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        const winner = actual[0];
+        const loser = actual[actual.length - 1];
+        
+        let tag = "치열한 승부";
+        let color = "var(--sub-text)";
+        
+        if (actual.length >= 3) {
+            if (g.startOrder && g.startOrder[0] === winner) {
+                tag = "압도적 선공승"; color = "var(--rank1)";
+            } else if (g.startOrder && g.startOrder[g.startOrder.length - 1] === winner) {
+                tag = "짜릿한 역전승"; color = "var(--accent)";
+            }
+        }
+        
+        html += `<div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.5); padding: 8px 12px; border-radius: 10px; font-size: 12px; border-left: 4px solid ${color};">
+                    <div style="font-weight: 800; color: #555;">${g.dateStr.slice(5)} <span style="color:${color}; margin-left:5px;">[${tag}]</span></div>
+                    <div style="font-weight: 900; color:var(--text-color);">${winner}🥇 <span style="font-size:10px; color:#999; font-weight:400;">vs</span> ${loser}💀</div>
+                 </div>`;
+    });
+    
+    container.innerHTML = html;
+    const countEl = document.getElementById('timeline-count');
+    if (countEl) countEl.innerText = `(최근 ${recentGames.length}G 분석됨)`;
 }
 
 function renderDashboard() {
@@ -760,6 +881,12 @@ function renderDashboard() {
         filtered = filtered.filter(g => g.ranks.filter(n => n.trim() !== "").length === count);
     }
     dCard.style.display = 'block';
+    
+    // [V9.45] 럭키가이 & 타임라인 렌더링 호출
+    const luckyEl = document.getElementById('dashLuckyGuy');
+    if (luckyEl) luckyEl.innerText = calculateLuckyGuy(filtered);
+    renderLiveTimeline(filtered);
+
     if (filtered.length === 0) {
         ['dashTotalGames', 'dashTotalDays', 'dashMVP', 'dashVillain', 'dashTrendPlayer', 'dashTrendScore', 'dashDefense'].forEach(id => {
             const el = document.getElementById(id); if (el) el.innerText = id.includes('Total') ? (id.includes('Games') ? '0G' : '0일') : '-';
@@ -986,7 +1113,6 @@ function renderDefenseStats() {
     const filterVal = document.getElementById('statsFilterCount')?.value || "all";
     const monthVal = document.getElementById('statsFilterMonth')?.value || "";
 
-    // [추가된 부분] 디펜스 카드 필터 라벨 업데이트
     const labelEl = document.getElementById('defenseFilterLabel');
     if (labelEl) {
         let countText = filterVal === "all" ? "전체" : filterVal + "인";
@@ -1056,7 +1182,6 @@ function renderMemberHistory(name, rank = "") {
         return true;
     }).sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || ((parseInt(b.round) || 0) - (parseInt(a.round) || 0)));
     
-    // 글로벌 토스트 알림 적용
     if (allPersonal.length === 0) { 
         showToastMsg("해당 조건의 기록이 없습니다.");
         return; 
@@ -1449,7 +1574,6 @@ function searchRecords() {
         });
     });
     
-    // 🚨 [v9.45 완벽 반영본] 1순위: 평균 승점 ➡️ 2순위: 1위 '승률(%)' ➡️ 3순위: 1위 횟수
     const monthlyRankedPlayers = [...players].sort((a,b) => {
         if (monthlyStatsAll[a].played === 0 && monthlyStatsAll[b].played > 0) return 1;
         if (monthlyStatsAll[b].played === 0 && monthlyStatsAll[a].played > 0) return -1;
@@ -1472,7 +1596,6 @@ function searchRecords() {
             const wrP = monthlyStatsAll[p].win / monthlyStatsAll[p].played || 0;
             const wrPrev = monthlyStatsAll[prevP].win / monthlyStatsAll[prevP].played || 0;
             
-            // 승점과 승률(%)이 모두 똑같을 때만 공동 순위
             if (avgP !== avgPrev || wrP !== wrPrev) { currentRank = i + 1; }
         }
         if (p === player) { myMonthlyRank = currentRank; break; }
@@ -1616,7 +1739,6 @@ function showToastMsg(msg) {
     }, 3000);
 }
 
-// 🚨 [데이터 초기화 3단계 안전 잠금 로직]
 function confirmReset(step) {
     const btnWrap = document.getElementById('resetSteps');
     if (!btnWrap) return;
@@ -1722,6 +1844,9 @@ window.onload = () => {
         if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); } 
         showLastGameResult(); 
     }, 3000);
+
+    // [V9.45] 웰컴 스크린 페이드아웃 후 팝 사운드 재생
+    setTimeout(() => playSystemSound('pop'), 3500); 
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
