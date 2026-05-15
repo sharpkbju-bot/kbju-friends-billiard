@@ -1,4 +1,4 @@
-// main.js - V9.45 Live Pulse Edition
+// main.js - V9.46 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -8,7 +8,7 @@ let infoModalCountdownInterval = null;
 let scoreCountdownInterval = null; 
 let dashInfoCountdownInterval = null; 
 let globalToastTimeout = null; 
-let audioCtx = null; // V9.45 Web Audio API Context
+let audioCtx = null; // V9.46 Web Audio API Context
 
 function triggerHaptic(pattern) {
     if (navigator.vibrate) {
@@ -16,7 +16,7 @@ function triggerHaptic(pattern) {
     }
 }
 
-// [V9.45] 효과음 합성 함수 (Web Audio API)
+// [V9.46] 효과음 합성 함수 (Web Audio API)
 function playSystemSound(type) {
     try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -45,7 +45,7 @@ function playSystemSound(type) {
     } catch (e) { console.log("Audio play failed", e); }
 }
 
-// [V9.45] 화면 플래시 효과
+// [V9.46] 화면 플래시 효과
 function triggerSuccessFlash() {
     const flash = document.getElementById('success-flash');
     if (flash) {
@@ -743,7 +743,7 @@ async function saveGame() {
     }
     if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
     
-    // [V9.45] 성공 이펙트 및 사운드 발생
+    // [V9.46] 성공 이펙트 및 사운드 발생
     triggerSuccessFlash();
     playSystemSound('success');
 
@@ -785,7 +785,7 @@ function calculateLuckyGuy(filteredGames) {
     return luckyWinner;
 }
 
-// [V9.45 이모지 추가 패치] tag 변수에 직접 이모지 결합
+// [V9.46 이모지 추가 패치] tag 변수에 직접 이모지 결합
 function renderLiveTimeline(filteredGames) {
     const container = document.getElementById('dashTimeline');
     if (!container) return;
