@@ -842,7 +842,7 @@ function renderLiveTimeline(filteredGames) {
     
     container.innerHTML = html;
     const countEl = document.getElementById('timeline-count');
-    if (countEl) countEl.innerText = `(최근 ${recentGames.length}G 분석됨)`;
+    if (countEl) countEl.innerText = `(최근 ${recentGames.length}G 분석)`;
 }
 
 function renderDashboard() {
