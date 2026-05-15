@@ -806,3 +806,7 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
     background: rgba(255, 20, 147, 0.1) !important;
     border-color: #ff1493 !important;
 }
+/* 실시간 타임라인 카드 확대 모드(1.2배) 적용 제외 (역보정) */
+.zoom-active #live-timeline-container {
+    zoom: 0.833333;
+}
