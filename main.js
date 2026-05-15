@@ -818,9 +818,28 @@ function renderLiveTimeline(filteredGames) {
         const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr);
         const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
         
-        html += `<div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.5); padding: 8px 12px; border-radius: 10px; font-size: 12px; border-left: 4px solid ${color};">
-                    <div style="font-weight: 800; color: #555;">${g.dateStr.slice(5)} <span style="color:var(--rank1); margin-left:4px;">${gameNumber}G</span> <span style="color:${color}; margin-left:4px;">[${tag}]</span></div>
-                    <div style="font-weight: 900; color:var(--text-color);">${winner}🥇 <span style="font-size:10px; color:#999; font-weight:400;">vs</span> ${loser}💀</div>
+        // 1. 승자와 패자의 초구 추첨 순서 계산
+        let winnerOrderText = "";
+        let loserOrderText = "";
+        if (g.startOrder && g.startOrder.length > 0) {
+            const wIdx = g.startOrder.indexOf(winner);
+            const lIdx = g.startOrder.indexOf(loser);
+            if (wIdx !== -1) winnerOrderText = `<span style="font-size:10px; font-weight:800; color:#888;">(${wIdx + 1}번째 순서)</span>`;
+            if (lIdx !== -1) loserOrderText = `<span style="font-size:10px; font-weight:800; color:#888;">(${lIdx + 1}번째 순서)</span>`;
+        }
+
+        // [수정된 부분] 해당 날짜의 전체 게임을 불러와 현재 게임이 몇 번째(n G)인지 역산
+        const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr);
+        const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
+        
+        // 2. 가로 배치를 세로(2줄) 배치로 변경 및 순번 삽입
+        html += `<div style="display: flex; flex-direction: column; background: rgba(255,255,255,0.5); padding: 10px 12px; border-radius: 10px; font-size: 13px; border-left: 4px solid ${color};">
+                    <div style="font-weight: 800; color: #555; text-align: left; margin-bottom: 6px;">
+                        ${g.dateStr.slice(5)} <span style="color:var(--rank1); margin-left:4px;">${gameNumber}G</span> <span style="color:${color}; margin-left:4px;">[${tag}]</span>
+                    </div>
+                    <div style="font-weight: 900; color:var(--text-color); text-align: right;">
+                        ${winner}🥇${winnerOrderText} <span style="font-size:11px; color:#999; font-weight:400; margin:0 5px;">vs</span> ${loser}💀${loserOrderText}
+                    </div>
                  </div>`;
     });
     
