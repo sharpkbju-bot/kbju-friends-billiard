@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v9.45 - Live Pulse Edition */
+/* Billiard World Style v9.46 - Live Pulse Edition */
 /* [절대 원칙 준수]: 최적화 전면 금지, 모든 클래스와 테마를 개별적으로 분리 전개함 */
 
 :root { 
@@ -765,7 +765,7 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
     font-weight: 900;     
 }
 
-/* [V9.45 신규] 럭키 가이 및 타임라인 스타일 */
+/* [V9.46 신규] 럭키 가이 및 타임라인 스타일 */
 .lucky-guy-box {
     position: relative;
     overflow: hidden;
