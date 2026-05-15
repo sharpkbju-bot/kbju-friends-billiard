@@ -948,7 +948,6 @@ function renderDashboard() {
     });
     document.getElementById('dashDefense').innerText = defCandidate !== "-" ? `${defCandidate} (${maxDefAvg.toFixed(1)}위)` : "-";
 }
-
 function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); }
 function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
 
@@ -1020,6 +1019,7 @@ function renderStats() {
         rich.style.display = 'block'; rich.innerHTML = `💸 야! 또 나냐? 다들 카드까봐!<br><span style="font-size:16px; color:var(--rankL); font-weight:900;">${losers.join(', ')}</span>`; 
     } else { rich.style.display = 'none'; }
 }
+
 function showDefenseDetail(playerName) {
     const filterVal = document.getElementById('statsFilterCount')?.value || "all";
     const monthVal = document.getElementById('statsFilterMonth')?.value || "";
@@ -1704,7 +1704,7 @@ function analyzeStrategy() {
         area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'none'; return;
     }
 
-    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 다음 선수들의 <b>뒤에서 <b>기록한 성적</div>`;
+    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 다음 선수들의 <b>뒤에서</b> 기록한 성적</div>`;
     targets.forEach(t => {
         const s = stats[t]; const avg = (s.totalRank / s.games).toFixed(1);
         const winP = Math.round((s.wins / s.games) * 100); const lastP = Math.round((s.lasts / s.games) * 100); const otherP = 100 - winP - lastP; 
@@ -1778,6 +1778,64 @@ async function executeReset() {
     }
 }
 
+function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
+function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
+function closeAppWindow() { 
+    window.close(); 
+    setTimeout(() => { 
+        document.body.innerHTML = `<div style="background:linear-gradient(135deg, #4a90e2, #9370db); height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-family: 'Pretendard', sans-serif;">
+                                       <div style="font-size:60px; margin-bottom:20px;">👋</div><div style="font-size:20px; font-weight:900; line-height:1.6;">앱 종료</div><div style="font-size:14px; margin-top:30px; opacity:0.8;">다음에 또 봐!</div>
+                                   </div>`; 
+        document.body.style.backgroundImage = 'none'; document.body.style.padding = '0'; 
+    }, 300); 
+}
+
+function showLoading(v, t) { 
+    document.getElementById('loadingText').innerText = t; 
+    document.getElementById('loading').style.display = v ? 'flex' : 'none'; 
+}
+
+function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
+
+function exportData() { 
+    if (gameLogs.length === 0) return alert("데이터 없음"); 
+    const link = document.createElement('a'); 
+    link.href = 'data:application/json;charset=utf-8,'+ encodeURIComponent(JSON.stringify(gameLogs, null, 2)); 
+    link.download = `billiard_backup_${new Date().toLocaleDateString('sv-SE')}.json`; 
+    link.click(); 
+}
+
+function triggerImport() { document.getElementById('importFile').click(); }
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            if (!Array.isArray(importedData)) throw new Error("Invalid format");
+            if (!confirm(`백업 파일에서 ${importedData.length}개의 데이터를 발견했습니다.\n전체 복구를 진행하시겠습니까?`)) { event.target.value = ''; return; }
+            showLoading(true, "기존 데이터 초기화 중...");
+            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
+            for (let i = 0; i < importedData.length; i++) {
+                showLoading(true, `데이터 복구 중... (${i + 1} / ${importedData.length})`);
+                const game = importedData[i]; const ranks = game.ranks || [];
+                const payload = { action: "SAVE", date: game.dateStr, ranks: [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""], startOrder: game.startOrder || null };
+                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+            }
+            alert("데이터 복구가 성공적으로 완료되었습니다!");
+            event.target.value = ''; showLoading(true, "최신 데이터 불러오는 중..."); await fetchData();
+        } catch (err) {
+            alert("복구 중 오류가 발생했습니다.\n오류 내용: " + err.message);
+            showLoading(false); event.target.value = '';
+        }
+    };
+    reader.readAsText(file);
+}
+
+function setDefaultSearchDates() { if (searchFlatpickr) searchFlatpickr.setDate(new Date()); }
+
 window.onload = () => { 
     try {
         function applyHighlight(instance) {
@@ -1814,7 +1872,8 @@ window.onload = () => {
                 }
             }
         });
-       flatpickr("#statsFilterMonth", { 
+
+        flatpickr("#statsFilterMonth", { 
             plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
             locale: "ko", disableMobile: true,
             onReady: function(selectedDates, dateStr, instance) {
@@ -1845,7 +1904,6 @@ window.onload = () => {
         showLastGameResult(); 
     }, 3000);
 
-    // [V9.45] 웰컴 스크린 페이드아웃 후 팝 사운드 재생
     setTimeout(() => playSystemSound('pop'), 3500); 
     
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
