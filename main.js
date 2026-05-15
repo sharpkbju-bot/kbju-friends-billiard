@@ -217,8 +217,8 @@ function showDashInfo(type) {
         icon = "📅"; title = "총 게임 일수";
         desc = wrapStart + "단순 게임 횟수가 아닌, 실제로 당구 클럽에 모여서 <b>게임을 즐긴 날짜의 총합</b>을 의미." + wrapEnd;
     } else if (type === 'lucky') { // [V9.45] 럭키 가이 설명 추가
-        icon = "🍀"; title = "오늘의 럭키 가이 기준";
-        desc = wrapStart + "<b>평균 승점</b>과 <b>평균 순위</b>를 기반으로 산출합니다. 낮은 순위(높은 숫자)를 기록했음에도 불구하고 가성비 좋게 승점을 쏠쏠하게 챙긴 '운수 좋은 사람'을 의미합니다." + wrapEnd;
+        icon = "🍀"; title = "최고의 럭키 가이 기준";
+        desc = wrapStart + "<b>평균 승점</b>과 <b>평균 순위</b>를 기반으로 산출합니다. 낮은 순위(높은 숫자)를 기록했음에도 불구하고 가성비 좋게 승점을 쏠쏠하게 챙긴 '최고 가성비 선수'를 의미합니다." + wrapEnd;
     } else if (type === 'mvp') {
         icon = "👑"; title = "월간 MVP 기준";
         desc = wrapStart + "<b>평균 승점</b>을 최우선으로 고려. 평균 승점이 같을 경우 승률(1위 횟수)을 비교하여 <b>해당 월에 가장 압도적인 기량을 보여준 선수</b>를 선정." + wrapEnd;
