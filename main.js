@@ -1269,6 +1269,7 @@ function renderMemberHistory(name, rank = "") {
                 <div style="font-size:12px; flex:1; font-weight:900; color:var(--sub-text);">최근 컨디션 (${recent.length}G)</div>
                 <div style="font-size:14px; font-weight:900; color:${cond[2]};">${cond[0]} ${cond[1]}</div>
              </div>`;
+
     // [V9.47 천적/샌드백 분석 로직 추가]
     let h2h = {};
     players.forEach(p => { if (p !== name) h2h[p] = { match: 0, win: 0, loss: 0 }; });
@@ -1303,7 +1304,7 @@ function renderMemberHistory(name, rank = "") {
     let nemesisText = nemesis ? `<span style="color:var(--rankL); font-size:16px; font-weight:900;">${nemesis}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[nemesis].win/h2h[nemesis].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">비등비등</span>`;
     let bagText = punchingBag ? `<span style="color:var(--rank1); font-size:16px; font-weight:900;">${punchingBag}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[punchingBag].win/h2h[punchingBag].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">비등비등</span>`;
 
-   // [V9.47 수정] 천적 및 샌드백 상자에 클릭(터치) 이벤트 및 포인터 커서 부여
+    // [V9.47 수정] 천적 및 샌드백 상자에 클릭(터치) 이벤트 및 포인터 커서 부여
     html += `<div style="display: flex; gap: 10px; margin-top: 10px;">
                 <div class="condition-box cond-responsive" onclick="showH2HDetailModal('${name}')" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:pointer; justify-content:center;">
                     <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">😈 나의 천적 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
@@ -1314,11 +1315,7 @@ function renderMemberHistory(name, rank = "") {
                     <div style="text-align:center;">${bagText}</div>
                 </div>
              </div>`;
-                <div class="condition-box cond-responsive" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:default; justify-content:center;">
-                    <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">🥊 나의 샌드백</div>
-                    <div style="text-align:center;">${bagText}</div>
-                </div>
-             </div>`;         
+             
     html += `<button id="member-share-btn" class="share-btn-common" style="margin:15px 0;" onclick="shareMemberResult('${name}')">📸 개인 전적 스크린샷 공유</button>`;
     
     recent.forEach(g => { 
