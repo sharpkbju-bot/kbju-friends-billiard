@@ -1986,7 +1986,11 @@ function showH2HDetailModal(playerName, type) {
                      </div>`;
         } else {
             const winRate = item.winRate;
-            const rateColor = winRate > 50 ? 'var(--accent)' : (winRate < 50 ? 'var(--rankL)' : '#333');
+            
+            // [V9.51 수정] 승률에 따른 명시적 컬러 구분 (우세:네이비, 동률:브라운, 열세:레드)
+            let rateColor = '#795548'; // 50% 동률은 브라운
+            if (winRate > 50) rateColor = '#1A237E'; // 51% 이상 우세는 네이비
+            else if (winRate < 50) rateColor = '#e74c3c'; // 49% 이하 열세는 레드
             
             html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px 15px; border-radius:12px; border:1px solid rgba(0,0,0,0.02);">
                         <span style="font-weight:900; font-size:16px; color:${getPlayerColor(p)}">${playerThemes[p].emoji} ${p}</span>
@@ -2024,6 +2028,5 @@ function showH2HDetailModal(playerName, type) {
     if (infoModalCountdownInterval) { clearInterval(infoModalCountdownInterval); infoModalCountdownInterval = null; }
     if (dashInfoCountdownInterval) { clearInterval(dashInfoCountdownInterval); dashInfoCountdownInterval = null; }
     const timerEl = document.getElementById('dash-info-timer'); if (timerEl) timerEl.remove();
-    
     document.getElementById('info-modal').style.display = 'flex';
 }
