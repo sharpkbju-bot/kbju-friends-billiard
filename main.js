@@ -1303,11 +1303,17 @@ function renderMemberHistory(name, rank = "") {
     let nemesisText = nemesis ? `<span style="color:var(--rankL); font-size:16px; font-weight:900;">${nemesis}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[nemesis].win/h2h[nemesis].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">비등비등</span>`;
     let bagText = punchingBag ? `<span style="color:var(--rank1); font-size:16px; font-weight:900;">${punchingBag}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[punchingBag].win/h2h[punchingBag].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">비등비등</span>`;
 
+   // [V9.47 수정] 천적 및 샌드백 상자에 클릭(터치) 이벤트 및 포인터 커서 부여
     html += `<div style="display: flex; gap: 10px; margin-top: 10px;">
-                <div class="condition-box cond-responsive" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:default; justify-content:center;">
-                    <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">😈 나의 천적</div>
+                <div class="condition-box cond-responsive" onclick="showH2HDetailModal('${name}')" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:pointer; justify-content:center;">
+                    <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">😈 나의 천적 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
                     <div style="text-align:center;">${nemesisText}</div>
                 </div>
+                <div class="condition-box cond-responsive" onclick="showH2HDetailModal('${name}')" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:pointer; justify-content:center;">
+                    <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">🥊 나의 샌드백 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
+                    <div style="text-align:center;">${bagText}</div>
+                </div>
+             </div>`;
                 <div class="condition-box cond-responsive" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:default; justify-content:center;">
                     <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">🥊 나의 샌드백</div>
                     <div style="text-align:center;">${bagText}</div>
@@ -1909,3 +1915,81 @@ window.onload = () => {
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
 document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
+// [V9.47 신규 전원 상성 분석 상세 모달 팝업 로직]
+function showH2HDetailModal(playerName) {
+    triggerHaptic(10);
+    
+    // 1. 해당 선수가 참여한 모든 경기 추출
+    const allPersonal = gameLogs.filter(g => {
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        return actual.includes(playerName);
+    });
+    
+    // 2. 전원 상대 전적 객체 초기화 및 계산
+    let h2h = {};
+    players.forEach(p => { if (p !== playerName) h2h[p] = { match: 0, win: 0, loss: 0 }; });
+    
+    allPersonal.forEach(g => {
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        const myIdx = actual.indexOf(playerName);
+        actual.forEach((p, pIdx) => {
+            if (p !== playerName && h2h[p]) {
+                h2h[p].match++;
+                if (myIdx < pIdx) h2h[p].win++; 
+                else if (myIdx > pIdx) h2h[p].loss++; 
+            }
+        });
+    });
+
+    // 3. 흰색 팝업 내 다크모드 글자색 증발 완벽 방어 스타일 포함 HTML 빌드
+    let html = `<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; color: #333; margin-top:5px;">`;
+    
+    players.forEach(p => {
+        if (p === playerName) return;
+        const s = h2h[p];
+        
+        if (s.match === 0) {
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px 15px; border-radius:12px;">
+                        <span style="font-weight:900; font-size:15px; color:${getPlayerColor(p)}">${playerThemes[p].emoji} ${p}</span>
+                        <span style="font-size:12px; font-weight:800; color:#999;">분석 데이터 경기 없음</span>
+                     </div>`;
+        } else {
+            const winRate = Math.round((s.win / s.match) * 100);
+            // 승률 우위는 파란색 계열, 열위는 빨간색 계열, 동률은 기본 어두운 색상
+            const rateColor = winRate > 50 ? 'var(--accent)' : (winRate < 50 ? 'var(--rankL)' : '#333');
+            
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px 15px; border-radius:12px; border:1px solid rgba(0,0,0,0.02);">
+                        <span style="font-weight:900; font-size:16px; color:${getPlayerColor(p)}">${playerThemes[p].emoji} ${p}</span>
+                        <span style="font-weight:900; color:${rateColor}; font-size:15px; text-align:right;">
+                            승률 ${winRate}% <br>
+                            <span style="font-size:11px; color:#666; font-weight:800; display:block; margin-top:2px;">(${s.match}전 ${s.win}승 ${s.loss}패)</span>
+                        </span>
+                     </div>`;
+        }
+    });
+    html += `</div>`;
+    
+    // 4. 범용 모달 객체 캐스팅 및 동적 인젝션
+    const titleEl = document.getElementById('info-modal-title');
+    const descEl = document.getElementById('info-modal-desc');
+    
+    document.getElementById('info-modal-icon').innerHTML = "⚔️";
+    titleEl.innerHTML = `${playerName}의 전원 상성 분석`;
+    descEl.innerHTML = html;
+    
+    // 지난번 타이틀 증발 원천 차단 CSS 오버라이드 적용
+    const currentAppTheme = document.documentElement.getAttribute('data-theme');
+    if (currentAppTheme === 'dark' || currentAppTheme === 'navy') {
+        titleEl.style.setProperty('color', '#2980b9', 'important');
+    } else {
+        titleEl.style.removeProperty('color');
+        titleEl.style.color = 'var(--rank1)';
+    }
+    
+    // 타이머 인터벌 초기화 (사용자가 원하는 만큼 볼 수 있도록 고정)
+    if (infoModalCountdownInterval) { clearInterval(infoModalCountdownInterval); infoModalCountdownInterval = null; }
+    if (dashInfoCountdownInterval) { clearInterval(dashInfoCountdownInterval); dashInfoCountdownInterval = null; }
+    const timerEl = document.getElementById('dash-info-timer'); if (timerEl) timerEl.remove();
+    
+    document.getElementById('info-modal').style.display = 'flex';
+}
