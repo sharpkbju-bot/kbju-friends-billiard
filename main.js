@@ -279,9 +279,6 @@ function showDashInfo(type) {
                 <tr><th style="width: 22%; text-align: center;">이름</th><th style="width: 28%; text-align: center;">평균 승점</th><th style="width: 50%; text-align: center;">7게임 순위표</th></tr>
             </thead><tbody>`;
         playerStats.forEach(stat => {
-            // [수정된 부분] Flexbox와 고정 폭(width: 18px)을 적용하여 열을 완벽하게 맞춤
-            let rankHtml = `<div style="display: flex; align-items: center; justify-content: center;">`;
-            playerStats.forEach(stat => {
             let rankHtml = `<div style="display: flex; align-items: center; justify-content: center;">`;
             stat.ranksList.forEach((r, idx) => {
                 if (idx === stat.ranksList.length - 1) {
