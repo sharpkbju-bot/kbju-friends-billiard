@@ -797,6 +797,7 @@ function calculateLuckyGuy(filteredGames) {
 
 // [V9.46 이모지 추가 패치] tag 변수에 직접 이모지 결합
 // [V9.46 수정] 실시간 타임라인 렌더링 (레이아웃 2줄 변경 및 중복 에러 픽스)
+// [V9.46 수정] 실시간 타임라인 렌더링 (다크/네이비 모드 텍스트 가독성 향상)
 function renderLiveTimeline(filteredGames) {
     const container = document.getElementById('dashTimeline');
     if (!container) return;
@@ -807,6 +808,12 @@ function renderLiveTimeline(filteredGames) {
         container.innerHTML = `<div style="font-size: 11px; color: #999; text-align: center; padding: 10px;">데이터가 없습니다.</div>`;
         return;
     }
+
+    // [추가된 핵심 로직] 현재 테마를 감지하여 다크/네이비 모드일 경우 진한 네이비 브라운(#3e2723) 적용
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const isDarkMode = currentTheme === 'dark' || currentTheme === 'navy';
+    const subTextColor = isDarkMode ? "#3e2723" : "#888"; 
+    const vsTextColor = isDarkMode ? "#3e2723" : "#999"; 
     
     let html = "";
     recentGames.forEach(g => {
@@ -825,27 +832,26 @@ function renderLiveTimeline(filteredGames) {
             }
         }
 
-        // 1. 해당 날짜의 전체 게임을 불러와 현재 게임이 몇 번째(n G)인지 역산
         const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr);
         const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
         
-        // 2. 승자와 패자의 초구 추첨 순서 계산
+        // 동적 색상(subTextColor) 변수 적용
         let winnerOrderText = "";
         let loserOrderText = "";
         if (g.startOrder && g.startOrder.length > 0) {
             const wIdx = g.startOrder.indexOf(winner);
             const lIdx = g.startOrder.indexOf(loser);
-            if (wIdx !== -1) winnerOrderText = `<span style="font-size:10px; font-weight:800; color:#888;">(${wIdx + 1}번째 순서)</span>`;
-            if (lIdx !== -1) loserOrderText = `<span style="font-size:10px; font-weight:800; color:#888;">(${lIdx + 1}번째 순서)</span>`;
+            if (wIdx !== -1) winnerOrderText = `<span style="font-size:10px; font-weight:800; color:${subTextColor};">(${wIdx + 1}번째 순서)</span>`;
+            if (lIdx !== -1) loserOrderText = `<span style="font-size:10px; font-weight:800; color:${subTextColor};">(${lIdx + 1}번째 순서)</span>`;
         }
         
-        // 3. 가로 배치를 세로(2줄) 배치로 변경 및 순번 삽입
+        // 동적 색상(vsTextColor) 변수 적용
         html += `<div style="display: flex; flex-direction: column; background: rgba(255,255,255,0.5); padding: 10px 12px; border-radius: 10px; font-size: 13px; border-left: 4px solid ${color};">
                     <div style="font-weight: 800; color: #555; text-align: left; margin-bottom: 6px;">
                         ${g.dateStr.slice(5)} <span style="color:var(--rank1); margin-left:4px;">${gameNumber}G</span> <span style="color:${color}; margin-left:4px;">[${tag}]</span>
                     </div>
                     <div style="font-weight: 900; color:var(--text-color); text-align: right;">
-                        ${winner}🥇${winnerOrderText} <span style="font-size:11px; color:#999; font-weight:400; margin:0 5px;">vs</span> ${loser}💀${loserOrderText}
+                        ${winner}🥇${winnerOrderText} <span style="font-size:11px; color:${vsTextColor}; font-weight:800; margin:0 5px;">vs</span> ${loser}💀${loserOrderText}
                     </div>
                  </div>`;
     });
