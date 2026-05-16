@@ -273,30 +273,38 @@ function showDashInfo(type) {
 
         playerStats.sort((a, b) => (b.avgScore - a.avgScore) || (b.winRate - a.winRate) || (b.wins - a.wins));
 
-        let trendHtml = `<div style="font-size:12px; color:var(--sub-text); margin-bottom:15px; text-align:center; font-weight:800;">(가장 오른쪽 사각형이 최신 게임 결과)</div>`;
+        // [V9.46] 다크/네이비 모드에서도 흰색 배경 팝업에서 가독성을 보장하기 위해 명시적인 다크 색상(#444, #555, #666) 고정 적용
+        let trendHtml = `<div style="font-size:12px; color:#555; margin-bottom:15px; text-align:center; font-weight:800;">(가장 오른쪽 사각형이 최신 게임 결과)</div>`;
         trendHtml += `<table class="trend-table">
             <thead>
-                <tr><th style="width: 22%; text-align: center;">이름</th><th style="width: 28%; text-align: center;">평균 승점</th><th style="width: 50%; text-align: center;">7게임 순위표</th></tr>
+                <tr>
+                    <th style="width: 22%; text-align: center; color: #666;">이름</th>
+                    <th style="width: 28%; text-align: center; color: #666;">평균 승점</th>
+                    <th style="width: 50%; text-align: center; color: #666;">7게임 순위표</th>
+                </tr>
             </thead><tbody>`;
+            
         playerStats.forEach(stat => {
             let rankHtml = `<div style="display: flex; align-items: center; justify-content: center;">`;
             stat.ranksList.forEach((r, idx) => {
                 if (idx === stat.ranksList.length - 1) {
-                    // [수정] 가장 우측의 최근 게임 결과가 '꼴'찌인 경우 퍼플 컬러 변수(var(--rank3))로 동적 오버라이드
                     if (r === '꼴') {
-                        rankHtml += `<span class="recent-rank-box" style="margin-left: 3px; border-color: var(--rank3); background: rgba(142, 68, 173, 0.12); color: var(--rank3);">${r}</span>`;
+                        // '꼴'찌 박스: 보라색 계열 강제 고정
+                        rankHtml += `<span class="recent-rank-box" style="margin-left: 3px; border-color: #8e44ad; background: rgba(142, 68, 173, 0.12); color: #8e44ad;">${r}</span>`;
                     } else {
-                        rankHtml += `<span class="recent-rank-box" style="margin-left: 3px;">${r}</span>`;
+                        // 일반 등수 박스: 빨간색 계열 강제 고정
+                        rankHtml += `<span class="recent-rank-box" style="margin-left: 3px; border-color: #ff4757; background: rgba(255, 71, 87, 0.15); color: #ff4757;">${r}</span>`;
                     }
                 } else {
-                    rankHtml += `<span class="trend-rank-text" style="display: inline-block; width: 18px; text-align: center;">${r}</span><span style="opacity: 0.5; font-weight: 900; margin: 0 1px;">-</span>`;
+                    // 이전 전적 텍스트 및 하이픈: 진한 회색(#444) 강제 고정
+                    rankHtml += `<span class="trend-rank-text" style="display: inline-block; width: 18px; text-align: center; color: #444;">${r}</span><span style="opacity: 0.5; font-weight: 900; margin: 0 1px; color: #444;">-</span>`;
                 }
             });
             rankHtml += `</div>`;
             
             trendHtml += `<tr>
                 <td style="color:${getPlayerColor(stat.name)}; text-align: center; font-weight: 900; font-size:16px;">${stat.name}</td>
-                <td style="color:var(--accent); text-align: center; font-weight: 900; font-size:16px;">${stat.avgScore.toFixed(2)}</td>
+                <td style="color:#ff4757; text-align: center; font-weight: 900; font-size:16px;">${stat.avgScore.toFixed(2)}</td>
                 <td style="text-align: center; white-space: nowrap;">${rankHtml}</td>
             </tr>`;
         });
