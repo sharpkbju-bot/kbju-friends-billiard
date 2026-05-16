@@ -1,4 +1,4 @@
-// main.js - V9.49 Live Pulse Edition
+// main.js - V9.50 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -8,7 +8,7 @@ let infoModalCountdownInterval = null;
 let scoreCountdownInterval = null; 
 let dashInfoCountdownInterval = null; 
 let globalToastTimeout = null; 
-let audioCtx = null; // V9.49 Web Audio API Context
+let audioCtx = null; // V9.50 Web Audio API Context
 
 function triggerHaptic(pattern) {
     if (navigator.vibrate) {
@@ -16,7 +16,7 @@ function triggerHaptic(pattern) {
     }
 }
 
-// [V9.49] 효과음 합성 함수 (Web Audio API)
+// [V9.50] 효과음 합성 함수 (Web Audio API)
 function playSystemSound(type) {
     try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -45,7 +45,7 @@ function playSystemSound(type) {
     } catch (e) { console.log("Audio play failed", e); }
 }
 
-// [V9.49] 화면 플래시 효과
+// [V9.50] 화면 플래시 효과
 function triggerSuccessFlash() {
     const flash = document.getElementById('success-flash');
     if (flash) {
@@ -273,7 +273,7 @@ function showDashInfo(type) {
 
         playerStats.sort((a, b) => (b.avgScore - a.avgScore) || (b.winRate - a.winRate) || (b.wins - a.wins));
 
-        // [V9.49] 다크/네이비 모드에서도 흰색 배경 팝업에서 가독성을 보장하기 위해 명시적인 다크 색상(#444, #555, #666) 고정 적용
+        // [V9.50] 다크/네이비 모드에서도 흰색 배경 팝업에서 가독성을 보장하기 위해 명시적인 다크 색상(#444, #555, #666) 고정 적용
         let trendHtml = `<div style="font-size:12px; color:#555; margin-bottom:15px; text-align:center; font-weight:800;">(가장 오른쪽 사각형이 최신 게임 결과)</div>`;
         trendHtml += `<table class="trend-table">
             <thead>
@@ -323,7 +323,7 @@ function showDashInfo(type) {
     titleEl.innerHTML = title;
     descEl.innerHTML = desc;
 
-    // [V9.49 팝업 타이틀 가독성 패치] 다크/네이비 모드 강제 흰색 변환 방어
+    // [V9.50 팝업 타이틀 가독성 패치] 다크/네이비 모드 강제 흰색 변환 방어
     const currentAppTheme = document.documentElement.getAttribute('data-theme');
     if (currentAppTheme === 'dark' || currentAppTheme === 'navy') {
         titleEl.style.setProperty('color', '#2980b9', 'important'); // 뚜렷한 파란색 고정
@@ -774,7 +774,7 @@ async function saveGame() {
     }
     if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
     
-    // [V9.49] 성공 이펙트 및 사운드 발생
+    // [V9.50] 성공 이펙트 및 사운드 발생
     triggerSuccessFlash();
     playSystemSound('success');
 
@@ -816,9 +816,9 @@ function calculateLuckyGuy(filteredGames) {
     return luckyWinner;
 }
 
-// [V9.49 이모지 추가 패치] tag 변수에 직접 이모지 결합
-// [V9.49 수정] 실시간 타임라인 렌더링 (레이아웃 2줄 변경 및 중복 에러 픽스)
-// [V9.49 수정] 실시간 타임라인 렌더링 (다크/네이비 모드 텍스트 가독성 향상)
+// [V9.50 이모지 추가 패치] tag 변수에 직접 이모지 결합
+// [V9.50 수정] 실시간 타임라인 렌더링 (레이아웃 2줄 변경 및 중복 에러 픽스)
+// [V9.50 수정] 실시간 타임라인 렌더링 (다크/네이비 모드 텍스트 가독성 향상)
 function renderLiveTimeline(filteredGames) {
     const container = document.getElementById('dashTimeline');
     if (!container) return;
@@ -1026,7 +1026,7 @@ function renderStats() {
         const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
         const getVal = (v, t) => isPercentMode ? (t === 0 ? '0' : ((v/t)*100).toFixed(0)) : v;
         
-        // [V9.49 수정] <td> 태그 style에 color:${getPlayerColor(p)}; 를 추가하여 퍼스널 컬러 적용
+        // [V9.50 수정] <td> 태그 style에 color:${getPlayerColor(p)}; 를 추가하여 퍼스널 컬러 적용
         return `<tr><td style="color:${getPlayerColor(p)}; font-weight:900; text-decoration:underline; cursor:pointer;" onclick="renderMemberHistory('${p}', '${cRank}')">${getTier(stats[p].score).icon} ${p}</td><td>${stats[p].played}</td><td style="color:var(--rank1);">${getVal(stats[p].ranks[0], stats[p].played)}</td><td style="color:var(--rank2);">${getVal(stats[p].ranks[1], stats[p].played)}</td><td style="color:var(--rank3);">${getVal(stats[p].ranks[2], stats[p].played)}</td><td style="color:var(--rank4);">${getVal(stats[p].ranks[3], stats[p].played)}</td><td style="color:var(--rankL);">${getVal(stats[p].ranks[4], stats[p].played)}</td><td><span class="win-rate-pill">${winRate}%</span></td></tr>`;
     }).join('');
     
@@ -1272,7 +1272,7 @@ function renderMemberHistory(name, rank = "") {
                 <div style="font-size:14px; font-weight:900; color:${cond[2]};">${cond[0]} ${cond[1]}</div>
              </div>`;
 
-    // [V9.49 천적/샌드백 분석 로직 추가]
+    // [V9.50 천적/샌드백 분석 로직 추가]
     let h2h = {};
     players.forEach(p => { if (p !== name) h2h[p] = { match: 0, win: 0, loss: 0 }; });
     
@@ -1306,8 +1306,8 @@ function renderMemberHistory(name, rank = "") {
     let nemesisText = nemesis ? `<span style="color:var(--rankL); font-size:16px; font-weight:900;">${nemesis}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[nemesis].win/h2h[nemesis].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">천적이 없어!</span>`;
     let bagText = punchingBag ? `<span style="color:var(--rank1); font-size:16px; font-weight:900;">${punchingBag}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[punchingBag].win/h2h[punchingBag].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">샌드백이 없어!</span>`;
 
-    // [V9.49 수정] 천적 및 샌드백 상자에 클릭(터치) 이벤트 및 포인터 커서 부여
-    // [V9.49 수정] 천적 및 샌드백 상자에 정렬 타입 지정 인자('nemesis', 'bag') 추가 바인딩
+    // [V9.50 수정] 천적 및 샌드백 상자에 클릭(터치) 이벤트 및 포인터 커서 부여
+    // [V9.50 수정] 천적 및 샌드백 상자에 정렬 타입 지정 인자('nemesis', 'bag') 추가 바인딩
     html += `<div style="display: flex; gap: 10px; margin-top: 10px;">
                 <div class="condition-box cond-responsive" onclick="showH2HDetailModal('${name}', 'nemesis')" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:pointer; justify-content:center;">
                     <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">😈 나의 천적 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
@@ -1915,15 +1915,23 @@ window.onload = () => {
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
 document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
-// [V9.49 신규 전원 상성 분석 상세 모달 팝업 로직]
-// [V9.49 신규 전원 상성 분석 상세 모달 팝업 로직 - 정렬 알고리즘 완벽 탑재]
+// [V9.50 신규 전원 상성 분석 상세 모달 팝업 로직]
+// [V9.50 신규 전원 상성 분석 상세 모달 팝업 로직 - 정렬 알고리즘 완벽 탑재]
+// [V9.50 신규 전원 상성 분석 상세 모달 팝업 로직 - 월/인원 필터 완벽 연동 및 정렬 탑재]
 function showH2HDetailModal(playerName, type) {
     triggerHaptic(10);
     
-    // 1. 해당 선수가 참여한 모든 경기 추출
+    // [V9.50 핵심 패치] 현재 화면에 설정된 월별/인원 필터값 읽어오기
+    const filterVal = document.getElementById('statsFilterCount')?.value || "all";
+    const monthVal = document.getElementById('statsFilterMonth')?.value || "";
+
+    // 1. 해당 선수가 참여한 모든 경기 추출 (필터 조건 완벽 적용)
     const allPersonal = gameLogs.filter(g => {
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return false; // 월 필터
         const actual = g.ranks.filter(n => n.trim() !== "");
-        return actual.includes(playerName);
+        if (!actual.includes(playerName)) return false; 
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return false; // 인원 필터
+        return true;
     });
     
     // 2. 전원 상대 전적 객체 초기화 및 계산
@@ -1942,7 +1950,7 @@ function showH2HDetailModal(playerName, type) {
         });
     });
 
-    // 3. [신규 고도화 알고리즘] 정렬을 위한 1차 상대 전적 리스트 빌드
+    // 3. 정렬을 위한 1차 상대 전적 리스트 빌드
     let opponentList = [];
     players.forEach(p => {
         if (p === playerName) return;
@@ -1951,23 +1959,20 @@ function showH2HDetailModal(playerName, type) {
         opponentList.push({ name: p, stats: s, winRate: winRate });
     });
 
-    // 4. [신규 고도화 알고리즘] 유저의 터치 의도(type)에 따른 동적 정렬 수행
+    // 4. 유저의 터치 의도(type)에 따른 동적 정렬 수행
     opponentList.sort((a, b) => {
-        // 경기 전적이 아예 없는 유저는 정렬 타입 상관없이 무조건 가장 하단으로 배치
         if (a.stats.match === 0 && b.stats.match > 0) return 1;
         if (b.stats.match === 0 && a.stats.match > 0) return -1;
         if (a.stats.match === 0 && b.stats.match === 0) return 0;
 
         if (type === 'nemesis') {
-            // '나의 천적' 터치 시: 나에게 강했던 순 (즉, 나의 승률이 낮은 오름차순 정렬)
             return a.winRate - b.winRate || b.stats.loss - a.stats.loss;
         } else {
-            // '나의 샌드백' 터치 시: 나에게 약했던 순 (즉, 나의 승률이 높은 내림차순 정렬)
             return b.winRate - a.winRate || b.stats.win - a.stats.win;
         }
     });
 
-    // 5. 흰색 팝업 내 다크모드 글자색 증발 완벽 방어 스타일 포함 HTML 빌드
+    // 5. HTML 빌드
     let html = `<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; color: #333; margin-top:5px;">`;
     
     opponentList.forEach(item => {
@@ -1977,7 +1982,7 @@ function showH2HDetailModal(playerName, type) {
         if (s.match === 0) {
             html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px 15px; border-radius:12px;">
                         <span style="font-weight:900; font-size:15px; color:${getPlayerColor(p)}">${playerThemes[p].emoji} ${p}</span>
-                        <span style="font-size:12px; font-weight:800; color:#999;">분석 데이터 경기 없음</span>
+                        <span style="font-size:12px; font-weight:800; color:#999;">해당 조건 전적 없음</span>
                      </div>`;
         } else {
             const winRate = item.winRate;
@@ -1999,12 +2004,15 @@ function showH2HDetailModal(playerName, type) {
     const descEl = document.getElementById('info-modal-desc');
     
     document.getElementById('info-modal-icon').innerHTML = "⚔️";
-    // 타이틀에 정렬 기준 부연 설명을 동적으로 추가하여 UI 완성도 극대화
-    const suffix = type === 'nemesis' ? ' (천적 순)' : ' (샌드백 순)';
-    titleEl.innerHTML = `${playerName}의 전원 상성 분석${suffix}`;
+    
+    // [V9.50 추가] 타이틀에 필터 상태(월, 인원) 명시
+    let monthText = monthVal ? `, ${monthVal}월` : '';
+    let countText = filterVal === 'all' ? '' : `, ${filterVal}인`;
+    const suffix = type === 'nemesis' ? '천적 순' : '샌드백 순';
+    
+    titleEl.innerHTML = `${playerName}의 상성 분석 <br><span style="font-size:12px; color:var(--sub-text); margin-top:5px; display:block;">(${suffix}${monthText}${countText})</span>`;
     descEl.innerHTML = html;
     
-    // 지난번 타이틀 증발 원천 차단 CSS 오버라이드 적용
     const currentAppTheme = document.documentElement.getAttribute('data-theme');
     if (currentAppTheme === 'dark' || currentAppTheme === 'navy') {
         titleEl.style.setProperty('color', '#2980b9', 'important');
@@ -2013,7 +2021,6 @@ function showH2HDetailModal(playerName, type) {
         titleEl.style.color = 'var(--rank1)';
     }
     
-    // 타이머 인터벌 초기화 (상성 분석 팝업은 사용자가 수동으로 닫을 때까지 대기하도록 고정)
     if (infoModalCountdownInterval) { clearInterval(infoModalCountdownInterval); infoModalCountdownInterval = null; }
     if (dashInfoCountdownInterval) { clearInterval(dashInfoCountdownInterval); dashInfoCountdownInterval = null; }
     const timerEl = document.getElementById('dash-info-timer'); if (timerEl) timerEl.remove();
