@@ -281,9 +281,16 @@ function showDashInfo(type) {
         playerStats.forEach(stat => {
             // [수정된 부분] Flexbox와 고정 폭(width: 18px)을 적용하여 열을 완벽하게 맞춤
             let rankHtml = `<div style="display: flex; align-items: center; justify-content: center;">`;
+            playerStats.forEach(stat => {
+            let rankHtml = `<div style="display: flex; align-items: center; justify-content: center;">`;
             stat.ranksList.forEach((r, idx) => {
                 if (idx === stat.ranksList.length - 1) {
-                    rankHtml += `<span class="recent-rank-box" style="margin-left: 3px;">${r}</span>`;
+                    // [수정] 가장 우측의 최근 게임 결과가 '꼴'찌인 경우 퍼플 컬러 변수(var(--rank3))로 동적 오버라이드
+                    if (r === '꼴') {
+                        rankHtml += `<span class="recent-rank-box" style="margin-left: 3px; border-color: var(--rank3); background: rgba(142, 68, 173, 0.12); color: var(--rank3);">${r}</span>`;
+                    } else {
+                        rankHtml += `<span class="recent-rank-box" style="margin-left: 3px;">${r}</span>`;
+                    }
                 } else {
                     rankHtml += `<span class="trend-rank-text" style="display: inline-block; width: 18px; text-align: center;">${r}</span><span style="opacity: 0.5; font-weight: 900; margin: 0 1px;">-</span>`;
                 }
