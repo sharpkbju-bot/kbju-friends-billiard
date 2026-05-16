@@ -279,11 +279,17 @@ function showDashInfo(type) {
                 <tr><th style="width: 22%; text-align: center;">이름</th><th style="width: 28%; text-align: center;">평균 승점</th><th style="width: 50%; text-align: center;">7게임 순위표</th></tr>
             </thead><tbody>`;
         playerStats.forEach(stat => {
-            let rankHtml = "";
+            // [수정된 부분] Flexbox와 고정 폭(width: 18px)을 적용하여 열을 완벽하게 맞춤
+            let rankHtml = `<div style="display: flex; align-items: center; justify-content: center;">`;
             stat.ranksList.forEach((r, idx) => {
-                if (idx === stat.ranksList.length - 1) rankHtml += `<span class="recent-rank-box">${r}</span>`;
-                else rankHtml += `<span class="trend-rank-text">${r}</span>-`;
+                if (idx === stat.ranksList.length - 1) {
+                    rankHtml += `<span class="recent-rank-box" style="margin-left: 3px;">${r}</span>`;
+                } else {
+                    rankHtml += `<span class="trend-rank-text" style="display: inline-block; width: 18px; text-align: center;">${r}</span><span style="opacity: 0.5; font-weight: 900; margin: 0 1px;">-</span>`;
+                }
             });
+            rankHtml += `</div>`;
+            
             trendHtml += `<tr>
                 <td style="color:${getPlayerColor(stat.name)}; text-align: center; font-weight: 900; font-size:16px;">${stat.name}</td>
                 <td style="color:var(--accent); text-align: center; font-weight: 900; font-size:16px;">${stat.avgScore.toFixed(2)}</td>
