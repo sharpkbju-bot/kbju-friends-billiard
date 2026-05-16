@@ -1301,8 +1301,8 @@ function renderMemberHistory(name, rank = "") {
         if (bagList.length > 0 && h2h[bagList[0]].win > h2h[bagList[0]].loss) punchingBag = bagList[0];
     }
 
-    let nemesisText = nemesis ? `<span style="color:var(--rankL); font-size:16px; font-weight:900;">${nemesis}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[nemesis].win/h2h[nemesis].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">비등비등</span>`;
-    let bagText = punchingBag ? `<span style="color:var(--rank1); font-size:16px; font-weight:900;">${punchingBag}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[punchingBag].win/h2h[punchingBag].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">비등비등</span>`;
+    let nemesisText = nemesis ? `<span style="color:var(--rankL); font-size:16px; font-weight:900;">${nemesis}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[nemesis].win/h2h[nemesis].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">천적이 없어!</span>`;
+    let bagText = punchingBag ? `<span style="color:var(--rank1); font-size:16px; font-weight:900;">${punchingBag}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[punchingBag].win/h2h[punchingBag].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">샌드백이 없어!</span>`;
 
     // [V9.48 수정] 천적 및 샌드백 상자에 클릭(터치) 이벤트 및 포인터 커서 부여
     // [V9.48 수정] 천적 및 샌드백 상자에 정렬 타입 지정 인자('nemesis', 'bag') 추가 바인딩
