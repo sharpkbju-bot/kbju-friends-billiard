@@ -1269,7 +1269,50 @@ function renderMemberHistory(name, rank = "") {
                 <div style="font-size:12px; flex:1; font-weight:900; color:var(--sub-text);">최근 컨디션 (${recent.length}G)</div>
                 <div style="font-size:14px; font-weight:900; color:${cond[2]};">${cond[0]} ${cond[1]}</div>
              </div>`;
-             
+    // [V9.47 천적/샌드백 분석 로직 추가]
+    let h2h = {};
+    players.forEach(p => { if (p !== name) h2h[p] = { match: 0, win: 0, loss: 0 }; });
+    
+    allPersonal.forEach(g => {
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        const myIdx = actual.indexOf(name);
+        actual.forEach((p, pIdx) => {
+            if (p !== name && h2h[p]) {
+                h2h[p].match++;
+                // 내가 승리 (상대보다 등수가 높음 - 인덱스는 작음)
+                if (myIdx < pIdx) h2h[p].win++; 
+                // 내가 패배 (상대보다 등수가 낮음 - 인덱스는 큼)
+                else if (myIdx > pIdx) h2h[p].loss++; 
+            }
+        });
+    });
+
+    let validOpponents = Object.keys(h2h).filter(p => h2h[p].match >= 1);
+    let nemesis = null; let punchingBag = null;
+
+    if (validOpponents.length > 0) {
+        let nemesisList = [...validOpponents].sort((a, b) => (h2h[b].loss / h2h[b].match) - (h2h[a].loss / h2h[a].match) || h2h[b].loss - h2h[a].loss);
+        let bagList = [...validOpponents].sort((a, b) => (h2h[b].win / h2h[b].match) - (h2h[a].win / h2h[a].match) || h2h[b].win - h2h[a].win);
+
+        // 패배 횟수가 승리 횟수보다 많은 경우에만 '천적'으로 인정
+        if (nemesisList.length > 0 && h2h[nemesisList[0]].loss > h2h[nemesisList[0]].win) nemesis = nemesisList[0];
+        // 승리 횟수가 패배 횟수보다 많은 경우에만 '샌드백'으로 인정
+        if (bagList.length > 0 && h2h[bagList[0]].win > h2h[bagList[0]].loss) punchingBag = bagList[0];
+    }
+
+    let nemesisText = nemesis ? `<span style="color:var(--rankL); font-size:16px; font-weight:900;">${nemesis}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[nemesis].win/h2h[nemesis].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">비등비등</span>`;
+    let bagText = punchingBag ? `<span style="color:var(--rank1); font-size:16px; font-weight:900;">${punchingBag}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[punchingBag].win/h2h[punchingBag].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">비등비등</span>`;
+
+    html += `<div style="display: flex; gap: 10px; margin-top: 10px;">
+                <div class="condition-box cond-responsive" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:default; justify-content:center;">
+                    <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">😈 나의 천적</div>
+                    <div style="text-align:center;">${nemesisText}</div>
+                </div>
+                <div class="condition-box cond-responsive" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:default; justify-content:center;">
+                    <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">🥊 나의 샌드백</div>
+                    <div style="text-align:center;">${bagText}</div>
+                </div>
+             </div>`;         
     html += `<button id="member-share-btn" class="share-btn-common" style="margin:15px 0;" onclick="shareMemberResult('${name}')">📸 개인 전적 스크린샷 공유</button>`;
     
     recent.forEach(g => { 
