@@ -316,13 +316,26 @@ function showDashInfo(type) {
         desc = wrapStart + "추첨된 순번 상 <b>내 바로 다음 순서인 선수의 멘탈을 붕괴시켜 평균 순위를 가장 낮게(숫자가 높게) 만든</b> 디펜스 최고의 지배자." + wrapEnd;
     }
 
-    const descEl = document.getElementById('info-modal-desc');
+   const descEl = document.getElementById('info-modal-desc');
+    const titleEl = document.getElementById('info-modal-title');
+    
     document.getElementById('info-modal-icon').innerHTML = icon;
-    document.getElementById('info-modal-title').innerHTML = title;
+    titleEl.innerHTML = title;
     descEl.innerHTML = desc;
+
+    // [V9.46 팝업 타이틀 가독성 패치] 다크/네이비 모드 강제 흰색 변환 방어
+    const currentAppTheme = document.documentElement.getAttribute('data-theme');
+    if (currentAppTheme === 'dark' || currentAppTheme === 'navy') {
+        titleEl.style.setProperty('color', '#2980b9', 'important'); // 뚜렷한 파란색 고정
+    } else {
+        titleEl.style.removeProperty('color');
+        titleEl.style.color = 'var(--rank1)'; // 기본 테마 색상 복구
+    }
+
     document.getElementById('info-modal').style.display = 'flex';
 
     if (dashInfoCountdownInterval) clearInterval(dashInfoCountdownInterval);
+// ... (이하 카운트다운 로직 동일)
     let timeLeft = 10;
     let timerEl = document.getElementById('dash-info-timer');
     if (!timerEl) {
