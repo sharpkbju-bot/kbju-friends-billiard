@@ -1,4 +1,4 @@
-// main.js - V9.47 Live Pulse Edition
+// main.js - V9.48 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -8,7 +8,7 @@ let infoModalCountdownInterval = null;
 let scoreCountdownInterval = null; 
 let dashInfoCountdownInterval = null; 
 let globalToastTimeout = null; 
-let audioCtx = null; // V9.47 Web Audio API Context
+let audioCtx = null; // V9.48 Web Audio API Context
 
 function triggerHaptic(pattern) {
     if (navigator.vibrate) {
@@ -16,7 +16,7 @@ function triggerHaptic(pattern) {
     }
 }
 
-// [V9.47] 효과음 합성 함수 (Web Audio API)
+// [V9.48] 효과음 합성 함수 (Web Audio API)
 function playSystemSound(type) {
     try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -45,7 +45,7 @@ function playSystemSound(type) {
     } catch (e) { console.log("Audio play failed", e); }
 }
 
-// [V9.47] 화면 플래시 효과
+// [V9.48] 화면 플래시 효과
 function triggerSuccessFlash() {
     const flash = document.getElementById('success-flash');
     if (flash) {
@@ -273,7 +273,7 @@ function showDashInfo(type) {
 
         playerStats.sort((a, b) => (b.avgScore - a.avgScore) || (b.winRate - a.winRate) || (b.wins - a.wins));
 
-        // [V9.47] 다크/네이비 모드에서도 흰색 배경 팝업에서 가독성을 보장하기 위해 명시적인 다크 색상(#444, #555, #666) 고정 적용
+        // [V9.48] 다크/네이비 모드에서도 흰색 배경 팝업에서 가독성을 보장하기 위해 명시적인 다크 색상(#444, #555, #666) 고정 적용
         let trendHtml = `<div style="font-size:12px; color:#555; margin-bottom:15px; text-align:center; font-weight:800;">(가장 오른쪽 사각형이 최신 게임 결과)</div>`;
         trendHtml += `<table class="trend-table">
             <thead>
@@ -323,7 +323,7 @@ function showDashInfo(type) {
     titleEl.innerHTML = title;
     descEl.innerHTML = desc;
 
-    // [V9.47 팝업 타이틀 가독성 패치] 다크/네이비 모드 강제 흰색 변환 방어
+    // [V9.48 팝업 타이틀 가독성 패치] 다크/네이비 모드 강제 흰색 변환 방어
     const currentAppTheme = document.documentElement.getAttribute('data-theme');
     if (currentAppTheme === 'dark' || currentAppTheme === 'navy') {
         titleEl.style.setProperty('color', '#2980b9', 'important'); // 뚜렷한 파란색 고정
@@ -774,7 +774,7 @@ async function saveGame() {
     }
     if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
     
-    // [V9.47] 성공 이펙트 및 사운드 발생
+    // [V9.48] 성공 이펙트 및 사운드 발생
     triggerSuccessFlash();
     playSystemSound('success');
 
@@ -816,9 +816,9 @@ function calculateLuckyGuy(filteredGames) {
     return luckyWinner;
 }
 
-// [V9.47 이모지 추가 패치] tag 변수에 직접 이모지 결합
-// [V9.47 수정] 실시간 타임라인 렌더링 (레이아웃 2줄 변경 및 중복 에러 픽스)
-// [V9.47 수정] 실시간 타임라인 렌더링 (다크/네이비 모드 텍스트 가독성 향상)
+// [V9.48 이모지 추가 패치] tag 변수에 직접 이모지 결합
+// [V9.48 수정] 실시간 타임라인 렌더링 (레이아웃 2줄 변경 및 중복 에러 픽스)
+// [V9.48 수정] 실시간 타임라인 렌더링 (다크/네이비 모드 텍스트 가독성 향상)
 function renderLiveTimeline(filteredGames) {
     const container = document.getElementById('dashTimeline');
     if (!container) return;
@@ -1270,7 +1270,7 @@ function renderMemberHistory(name, rank = "") {
                 <div style="font-size:14px; font-weight:900; color:${cond[2]};">${cond[0]} ${cond[1]}</div>
              </div>`;
 
-    // [V9.47 천적/샌드백 분석 로직 추가]
+    // [V9.48 천적/샌드백 분석 로직 추가]
     let h2h = {};
     players.forEach(p => { if (p !== name) h2h[p] = { match: 0, win: 0, loss: 0 }; });
     
@@ -1304,8 +1304,8 @@ function renderMemberHistory(name, rank = "") {
     let nemesisText = nemesis ? `<span style="color:var(--rankL); font-size:16px; font-weight:900;">${nemesis}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[nemesis].win/h2h[nemesis].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">비등비등</span>`;
     let bagText = punchingBag ? `<span style="color:var(--rank1); font-size:16px; font-weight:900;">${punchingBag}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[punchingBag].win/h2h[punchingBag].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">비등비등</span>`;
 
-    // [V9.47 수정] 천적 및 샌드백 상자에 클릭(터치) 이벤트 및 포인터 커서 부여
-    // [V9.47 수정] 천적 및 샌드백 상자에 정렬 타입 지정 인자('nemesis', 'bag') 추가 바인딩
+    // [V9.48 수정] 천적 및 샌드백 상자에 클릭(터치) 이벤트 및 포인터 커서 부여
+    // [V9.48 수정] 천적 및 샌드백 상자에 정렬 타입 지정 인자('nemesis', 'bag') 추가 바인딩
     html += `<div style="display: flex; gap: 10px; margin-top: 10px;">
                 <div class="condition-box cond-responsive" onclick="showH2HDetailModal('${name}', 'nemesis')" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:pointer; justify-content:center;">
                     <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">😈 나의 천적 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
@@ -1913,8 +1913,8 @@ window.onload = () => {
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
 document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
-// [V9.47 신규 전원 상성 분석 상세 모달 팝업 로직]
-// [V9.47 신규 전원 상성 분석 상세 모달 팝업 로직 - 정렬 알고리즘 완벽 탑재]
+// [V9.48 신규 전원 상성 분석 상세 모달 팝업 로직]
+// [V9.48 신규 전원 상성 분석 상세 모달 팝업 로직 - 정렬 알고리즘 완벽 탑재]
 function showH2HDetailModal(playerName, type) {
     triggerHaptic(10);
     
