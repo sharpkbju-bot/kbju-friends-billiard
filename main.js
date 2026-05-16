@@ -1766,64 +1766,6 @@ async function executeReset() {
     }
 }
 
-function showExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
-function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
-function closeAppWindow() { 
-    window.close(); 
-    setTimeout(() => { 
-        document.body.innerHTML = `<div style="background:linear-gradient(135deg, #4a90e2, #9370db); height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; font-family: 'Pretendard', sans-serif;">
-                                       <div style="font-size:60px; margin-bottom:20px;">👋</div><div style="font-size:20px; font-weight:900; line-height:1.6;">앱 종료</div><div style="font-size:14px; margin-top:30px; opacity:0.8;">다음에 또 봐!</div>
-                                   </div>`; 
-        document.body.style.backgroundImage = 'none'; document.body.style.padding = '0'; 
-    }, 300); 
-}
-
-function showLoading(v, t) { 
-    document.getElementById('loadingText').innerText = t; 
-    document.getElementById('loading').style.display = v ? 'flex' : 'none'; 
-}
-
-function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
-
-function exportData() { 
-    if (gameLogs.length === 0) return alert("데이터 없음"); 
-    const link = document.createElement('a'); 
-    link.href = 'data:application/json;charset=utf-8,'+ encodeURIComponent(JSON.stringify(gameLogs, null, 2)); 
-    link.download = `billiard_backup_${new Date().toLocaleDateString('sv-SE')}.json`; 
-    link.click(); 
-}
-
-function triggerImport() { document.getElementById('importFile').click(); }
-
-function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        try {
-            const importedData = JSON.parse(e.target.result);
-            if (!Array.isArray(importedData)) throw new Error("Invalid format");
-            if (!confirm(`백업 파일에서 ${importedData.length}개의 데이터를 발견했습니다.\n전체 복구를 진행하시겠습니까?`)) { event.target.value = ''; return; }
-            showLoading(true, "기존 데이터 초기화 중...");
-            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
-            for (let i = 0; i < importedData.length; i++) {
-                showLoading(true, `데이터 복구 중... (${i + 1} / ${importedData.length})`);
-                const game = importedData[i]; const ranks = game.ranks || [];
-                const payload = { action: "SAVE", date: game.dateStr, ranks: [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""], startOrder: game.startOrder || null };
-                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-            }
-            alert("데이터 복구가 성공적으로 완료되었습니다!");
-            event.target.value = ''; showLoading(true, "최신 데이터 불러오는 중..."); await fetchData();
-        } catch (err) {
-            alert("복구 중 오류가 발생했습니다.\n오류 내용: " + err.message);
-            showLoading(false); event.target.value = '';
-        }
-    };
-    reader.readAsText(file);
-}
-
-function setDefaultSearchDates() { if (searchFlatpickr) searchFlatpickr.setDate(new Date()); }
-
 window.onload = () => { 
     try {
         function applyHighlight(instance) {
