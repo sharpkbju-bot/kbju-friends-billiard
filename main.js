@@ -1305,12 +1305,13 @@ function renderMemberHistory(name, rank = "") {
     let bagText = punchingBag ? `<span style="color:var(--rank1); font-size:16px; font-weight:900;">${punchingBag}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[punchingBag].win/h2h[punchingBag].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">비등비등</span>`;
 
     // [V9.47 수정] 천적 및 샌드백 상자에 클릭(터치) 이벤트 및 포인터 커서 부여
+    // [V9.47 수정] 천적 및 샌드백 상자에 정렬 타입 지정 인자('nemesis', 'bag') 추가 바인딩
     html += `<div style="display: flex; gap: 10px; margin-top: 10px;">
-                <div class="condition-box cond-responsive" onclick="showH2HDetailModal('${name}')" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:pointer; justify-content:center;">
+                <div class="condition-box cond-responsive" onclick="showH2HDetailModal('${name}', 'nemesis')" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:pointer; justify-content:center;">
                     <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">😈 나의 천적 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
                     <div style="text-align:center;">${nemesisText}</div>
                 </div>
-                <div class="condition-box cond-responsive" onclick="showH2HDetailModal('${name}')" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:pointer; justify-content:center;">
+                <div class="condition-box cond-responsive" onclick="showH2HDetailModal('${name}', 'bag')" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:pointer; justify-content:center;">
                     <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">🥊 나의 샌드백 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
                     <div style="text-align:center;">${bagText}</div>
                 </div>
@@ -1913,7 +1914,8 @@ window.onload = () => {
 };
 document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
 // [V9.47 신규 전원 상성 분석 상세 모달 팝업 로직]
-function showH2HDetailModal(playerName) {
+// [V9.47 신규 전원 상성 분석 상세 모달 팝업 로직 - 정렬 알고리즘 완벽 탑재]
+function showH2HDetailModal(playerName, type) {
     triggerHaptic(10);
     
     // 1. 해당 선수가 참여한 모든 경기 추출
@@ -1938,12 +1940,37 @@ function showH2HDetailModal(playerName) {
         });
     });
 
-    // 3. 흰색 팝업 내 다크모드 글자색 증발 완벽 방어 스타일 포함 HTML 빌드
-    let html = `<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; color: #333; margin-top:5px;">`;
-    
+    // 3. [신규 고도화 알고리즘] 정렬을 위한 1차 상대 전적 리스트 빌드
+    let opponentList = [];
     players.forEach(p => {
         if (p === playerName) return;
         const s = h2h[p];
+        const winRate = s.match > 0 ? Math.round((s.win / s.match) * 100) : -1;
+        opponentList.push({ name: p, stats: s, winRate: winRate });
+    });
+
+    // 4. [신규 고도화 알고리즘] 유저의 터치 의도(type)에 따른 동적 정렬 수행
+    opponentList.sort((a, b) => {
+        // 경기 전적이 아예 없는 유저는 정렬 타입 상관없이 무조건 가장 하단으로 배치
+        if (a.stats.match === 0 && b.stats.match > 0) return 1;
+        if (b.stats.match === 0 && a.stats.match > 0) return -1;
+        if (a.stats.match === 0 && b.stats.match === 0) return 0;
+
+        if (type === 'nemesis') {
+            // '나의 천적' 터치 시: 나에게 강했던 순 (즉, 나의 승률이 낮은 오름차순 정렬)
+            return a.winRate - b.winRate || b.stats.loss - a.stats.loss;
+        } else {
+            // '나의 샌드백' 터치 시: 나에게 약했던 순 (즉, 나의 승률이 높은 내림차순 정렬)
+            return b.winRate - a.winRate || b.stats.win - a.stats.win;
+        }
+    });
+
+    // 5. 흰색 팝업 내 다크모드 글자색 증발 완벽 방어 스타일 포함 HTML 빌드
+    let html = `<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; color: #333; margin-top:5px;">`;
+    
+    opponentList.forEach(item => {
+        const p = item.name;
+        const s = item.stats;
         
         if (s.match === 0) {
             html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px 15px; border-radius:12px;">
@@ -1951,8 +1978,7 @@ function showH2HDetailModal(playerName) {
                         <span style="font-size:12px; font-weight:800; color:#999;">분석 데이터 경기 없음</span>
                      </div>`;
         } else {
-            const winRate = Math.round((s.win / s.match) * 100);
-            // 승률 우위는 파란색 계열, 열위는 빨간색 계열, 동률은 기본 어두운 색상
+            const winRate = item.winRate;
             const rateColor = winRate > 50 ? 'var(--accent)' : (winRate < 50 ? 'var(--rankL)' : '#333');
             
             html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px 15px; border-radius:12px; border:1px solid rgba(0,0,0,0.02);">
@@ -1966,12 +1992,14 @@ function showH2HDetailModal(playerName) {
     });
     html += `</div>`;
     
-    // 4. 범용 모달 객체 캐스팅 및 동적 인젝션
+    // 6. 범용 모달 객체 캐스팅 및 동적 인젝션
     const titleEl = document.getElementById('info-modal-title');
     const descEl = document.getElementById('info-modal-desc');
     
     document.getElementById('info-modal-icon').innerHTML = "⚔️";
-    titleEl.innerHTML = `${playerName}의 전원 상성 분석`;
+    // 타이틀에 정렬 기준 부연 설명을 동적으로 추가하여 UI 완성도 극대화
+    const suffix = type === 'nemesis' ? ' (천적 순)' : ' (샌드백 순)';
+    titleEl.innerHTML = `${playerName}의 전원 상성 분석${suffix}`;
     descEl.innerHTML = html;
     
     // 지난번 타이틀 증발 원천 차단 CSS 오버라이드 적용
@@ -1983,7 +2011,7 @@ function showH2HDetailModal(playerName) {
         titleEl.style.color = 'var(--rank1)';
     }
     
-    // 타이머 인터벌 초기화 (사용자가 원하는 만큼 볼 수 있도록 고정)
+    // 타이머 인터벌 초기화 (상성 분석 팝업은 사용자가 수동으로 닫을 때까지 대기하도록 고정)
     if (infoModalCountdownInterval) { clearInterval(infoModalCountdownInterval); infoModalCountdownInterval = null; }
     if (dashInfoCountdownInterval) { clearInterval(dashInfoCountdownInterval); dashInfoCountdownInterval = null; }
     const timerEl = document.getElementById('dash-info-timer'); if (timerEl) timerEl.remove();
