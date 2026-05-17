@@ -1309,8 +1309,22 @@ function renderMemberHistory(name, rank = "") {
     // [V9.50 수정] 천적 및 샌드백 상자에 클릭(터치) 이벤트 및 포인터 커서 부여
     // [V9.50 수정] 천적 및 샌드백 상자에 정렬 타입 지정 인자('nemesis', 'bag') 추가 바인딩
     // [V9.51 수정] 천적 및 샌드백 상자에 스포트라이트(네온) 글로우 효과 완벽 적용
-    const nemColor = { bg: 'rgba(255, 173, 173, 0.25)', shadow: 'rgba(255, 173, 173, 0.5)', border: '#FFADAD' }; // 천적: 경고의 레드톤
-    const bagColor = { bg: 'rgba(155, 246, 255, 0.25)', shadow: 'rgba(155, 246, 255, 0.5)', border: '#9BF6FF' }; // 샌드백: 여유의 시안톤
+    // [V9.52 수정] 천적 및 샌드백 상자에 스포트라이트 랜덤 컬러 완벽 적용
+    const spotlightColors = [
+        { bg: 'rgba(255, 173, 173, 0.25)', shadow: 'rgba(255, 173, 173, 0.5)', border: '#FFADAD' },
+        { bg: 'rgba(255, 214, 165, 0.25)', shadow: 'rgba(255, 214, 165, 0.5)', border: '#FFD6A5' },
+        { bg: 'rgba(253, 255, 182, 0.25)', shadow: 'rgba(253, 255, 182, 0.5)', border: '#FDFFB6' },
+        { bg: 'rgba(202, 255, 191, 0.25)', shadow: 'rgba(202, 255, 191, 0.5)', border: '#CAFFBF' },
+        { bg: 'rgba(155, 246, 255, 0.25)', shadow: 'rgba(155, 246, 255, 0.5)', border: '#9BF6FF' },
+        { bg: 'rgba(160, 196, 255, 0.25)', shadow: 'rgba(160, 196, 255, 0.5)', border: '#A0C4FF' },
+        { bg: 'rgba(189, 178, 255, 0.25)', shadow: 'rgba(189, 178, 255, 0.5)', border: '#BDB2FF' },
+        { bg: 'rgba(255, 198, 255, 0.25)', shadow: 'rgba(255, 198, 255, 0.5)', border: '#FFC6FF' }
+    ];
+    
+    // 두 상자의 색상이 겹치지 않도록 랜덤 셔플 후 2개 추출
+    const shuffledColors = [...spotlightColors].sort(() => 0.5 - Math.random());
+    const nemColor = shuffledColors[0];
+    const bagColor = shuffledColors[1];
 
     html += `<div style="display: flex; gap: 10px; margin-top: 10px;">
                 <div class="cond-responsive" onclick="showH2HDetailModal('${name}', 'nemesis')" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; background: ${nemColor.bg}; padding: 15px 5px; border-radius: 14px; border: 2.5px solid ${nemColor.border}; box-shadow: 0 0 10px ${nemColor.border}, 0 0 20px ${nemColor.shadow}, inset 0 0 8px rgba(255,255,255,0.3); backdrop-filter: blur(5px); transition: all 0.4s ease; box-sizing: border-box;">
