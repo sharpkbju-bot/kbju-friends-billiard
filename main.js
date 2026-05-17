@@ -1322,11 +1322,13 @@ function renderMemberHistory(name, rank = "") {
     ];
     
     // 두 상자의 색상이 겹치지 않도록 랜덤 셔플 후 2개 추출
+    // 두 상자의 색상이 겹치지 않도록 랜덤 셔플 후 2개 추출
     const shuffledColors = [...spotlightColors].sort(() => 0.5 - Math.random());
     const nemColor = shuffledColors[0];
     const bagColor = shuffledColors[1];
 
-    html += `<div style="display: flex; gap: 10px; margin-top: 10px;">
+    // [V9.53 수정] 캡처 시 버튼이 사라져도 겹치지 않도록 margin-bottom: 15px; 안전 여백 추가
+    html += `<div style="display: flex; gap: 10px; margin-top: 10px; margin-bottom: 15px;">
                 <div class="cond-responsive" onclick="showH2HDetailModal('${name}', 'nemesis')" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; background: ${nemColor.bg}; padding: 15px 5px; border-radius: 14px; border: 2.5px solid ${nemColor.border}; box-shadow: 0 0 10px ${nemColor.border}, 0 0 20px ${nemColor.shadow}, inset 0 0 8px rgba(255,255,255,0.3); backdrop-filter: blur(5px); transition: all 0.4s ease; box-sizing: border-box;">
                     <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px; text-shadow: 0 0 5px rgba(255,255,255,0.5);">😈 나의 천적 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
                     <div style="text-align:center; text-shadow: 1px 1px 2px rgba(0,0,0,0.1), 0 0 8px ${nemColor.shadow};">${nemesisText}</div>
