@@ -1308,14 +1308,18 @@ function renderMemberHistory(name, rank = "") {
 
     // [V9.50 수정] 천적 및 샌드백 상자에 클릭(터치) 이벤트 및 포인터 커서 부여
     // [V9.50 수정] 천적 및 샌드백 상자에 정렬 타입 지정 인자('nemesis', 'bag') 추가 바인딩
+    // [V9.51 수정] 천적 및 샌드백 상자에 스포트라이트(네온) 글로우 효과 완벽 적용
+    const nemColor = { bg: 'rgba(255, 173, 173, 0.25)', shadow: 'rgba(255, 173, 173, 0.5)', border: '#FFADAD' }; // 천적: 경고의 레드톤
+    const bagColor = { bg: 'rgba(155, 246, 255, 0.25)', shadow: 'rgba(155, 246, 255, 0.5)', border: '#9BF6FF' }; // 샌드백: 여유의 시안톤
+
     html += `<div style="display: flex; gap: 10px; margin-top: 10px;">
-                <div class="condition-box cond-responsive" onclick="showH2HDetailModal('${name}', 'nemesis')" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:pointer; justify-content:center;">
-                    <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">😈 나의 천적 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
-                    <div style="text-align:center;">${nemesisText}</div>
+                <div class="cond-responsive" onclick="showH2HDetailModal('${name}', 'nemesis')" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; background: ${nemColor.bg}; padding: 15px 5px; border-radius: 14px; border: 2.5px solid ${nemColor.border}; box-shadow: 0 0 10px ${nemColor.border}, 0 0 20px ${nemColor.shadow}, inset 0 0 8px rgba(255,255,255,0.3); backdrop-filter: blur(5px); transition: all 0.4s ease; box-sizing: border-box;">
+                    <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px; text-shadow: 0 0 5px rgba(255,255,255,0.5);">😈 나의 천적 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
+                    <div style="text-align:center; text-shadow: 1px 1px 2px rgba(0,0,0,0.1), 0 0 8px ${nemColor.shadow};">${nemesisText}</div>
                 </div>
-                <div class="condition-box cond-responsive" onclick="showH2HDetailModal('${name}', 'bag')" style="flex:1; flex-direction:column; align-items:center; padding:15px 5px; cursor:pointer; justify-content:center;">
-                    <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px;">🥊 나의 샌드백 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
-                    <div style="text-align:center;">${bagText}</div>
+                <div class="cond-responsive" onclick="showH2HDetailModal('${name}', 'bag')" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; background: ${bagColor.bg}; padding: 15px 5px; border-radius: 14px; border: 2.5px solid ${bagColor.border}; box-shadow: 0 0 10px ${bagColor.border}, 0 0 20px ${bagColor.shadow}, inset 0 0 8px rgba(255,255,255,0.3); backdrop-filter: blur(5px); transition: all 0.4s ease; box-sizing: border-box;">
+                    <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px; text-shadow: 0 0 5px rgba(255,255,255,0.5);">🥊 나의 샌드백 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
+                    <div style="text-align:center; text-shadow: 1px 1px 2px rgba(0,0,0,0.1), 0 0 8px ${bagColor.shadow};">${bagText}</div>
                 </div>
              </div>`;
              
