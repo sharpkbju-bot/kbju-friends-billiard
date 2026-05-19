@@ -810,3 +810,100 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
 .zoom-active #live-timeline-container {
     zoom: 0.833333;
 }
+/* ============================================================
+   [V9.54] 차세대 달력 프리미엄 다크 네온 UI (글래스모피즘)
+   ============================================================ */
+.calendar-card {
+    background: linear-gradient(145deg, rgba(20, 24, 35, 0.95), rgba(10, 12, 18, 0.98)) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+}
+
+.calendar-card #monthDisplay {
+    color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 0 0 20px #00e5ff;
+    font-size: 23px !important;
+}
+
+.calendar-card .nav-btn {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+.calendar-card .nav-btn:active { background: rgba(255, 255, 255, 0.15) !important; }
+
+.calendar-card .weekday {
+    color: rgba(255, 255, 255, 0.4) !important;
+    font-weight: 800;
+}
+
+.calendar-card .day-new {
+    background: transparent !important;
+    border-radius: 12px !important; /* 세련된 스쿼클 형태 */
+}
+
+.calendar-card .day-num { color: #e0e0e0 !important; }
+
+.calendar-card .sun-new .day-num { color: #ff4d6d !important; text-shadow: 0 0 8px rgba(255, 77, 109, 0.4) !important; }
+.calendar-card .sat-new .day-num { color: #4facfe !important; text-shadow: 0 0 8px rgba(79, 172, 254, 0.4) !important; }
+
+.calendar-card .day-new:hover:not(.selected-new) { background: rgba(255, 255, 255, 0.1) !important; }
+
+@keyframes rainbowGlow {
+    0% { border-color: #ff4d6d; box-shadow: 0 0 15px rgba(255, 77, 109, 0.6), inset 0 0 10px rgba(255, 77, 109, 0.3); }
+    33% { border-color: #00e5ff; box-shadow: 0 0 15px rgba(0, 229, 255, 0.6), inset 0 0 10px rgba(0, 229, 255, 0.3); }
+    66% { border-color: #b5179e; box-shadow: 0 0 15px rgba(181, 23, 158, 0.6), inset 0 0 10px rgba(181, 23, 158, 0.3); }
+    100% { border-color: #ff4d6d; box-shadow: 0 0 15px rgba(255, 77, 109, 0.6), inset 0 0 10px rgba(255, 77, 109, 0.3); }
+}
+
+.calendar-card .selected-new {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 2px solid transparent;
+    animation: rainbowGlow 4s linear infinite !important;
+    transform: scale(1.1) !important;
+}
+
+.calendar-card .selected-new .day-num {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8) !important;
+}
+
+.calendar-card .record-dot {
+    background: #00e5ff !important;
+    box-shadow: 0 0 8px #00e5ff, 0 0 12px #00e5ff !important;
+    width: 5px !important;
+    height: 5px !important;
+    border-radius: 50% !important;
+    bottom: 5px !important;
+}
+
+.calendar-card .selected-new .record-dot {
+    background: #ffffff !important;
+    box-shadow: 0 0 8px #ffffff !important;
+}
+
+/* 하단 타임라인 단추 글래스모피즘 */
+.calendar-card .timeline-wrap { border-top: 1px dashed rgba(255, 255, 255, 0.15) !important; }
+.calendar-card .timeline-date { color: rgba(255, 255, 255, 0.5) !important; }
+
+.calendar-card .timeline-dot {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.1) !important;
+}
+
+.calendar-card .timeline-item.active .timeline-date {
+    color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8) !important;
+}
+
+.calendar-card .timeline-item.active .timeline-dot {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-width: 2px !important;
+    animation: rainbowGlow 4s linear infinite !important;
+}
