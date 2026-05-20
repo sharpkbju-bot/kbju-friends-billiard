@@ -907,3 +907,103 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
     border-width: 2px !important;
     animation: rainbowGlow 4s linear infinite !important;
 }
+/* ============================================================
+   [V9.56] 차세대 달력 오가닉 내추럴 우드 UI (미니멀리즘)
+   ============================================================ */
+.calendar-card {
+    background: #fdfbf7 !important; /* 고급스러운 라이트 크림/베이지 톤 */
+    /* 미세한 린넨(Linen) 패브릭 텍스처 패턴 적용 */
+    background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.01) 75%, rgba(0,0,0,0.01)), repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.01) 75%, rgba(0,0,0,0.01)) !important;
+    background-position: 0 0, 4px 4px !important;
+    background-size: 8px 8px !important;
+    border: 1px solid #e8e5df !important;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.05), -10px -10px 20px rgba(255, 255, 255, 0.8) !important;
+    color: #333333 !important;
+}
+
+.calendar-card #monthDisplay {
+    color: #2c3e50 !important;
+    font-family: 'Georgia', 'Times New Roman', serif !important; /* 우아한 세리프 폰트 */
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px;
+}
+
+.calendar-card .nav-btn {
+    background: #f4f1ea !important;
+    border: 1px solid #e8e5df !important;
+    color: #555 !important;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05), -2px -2px 5px rgba(255,255,255,0.7) !important;
+}
+
+.calendar-card .weekday {
+    color: #7f8c8d !important;
+    font-family: 'Georgia', 'Times New Roman', serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+}
+
+.calendar-card .day-new {
+    background: transparent !important;
+    border-radius: 50% !important; /* 단정하고 클래식한 원형 날짜 */
+    transition: all 0.3s ease;
+}
+
+.calendar-card .day-num { color: #555555 !important; font-weight: 500 !important; }
+.calendar-card .sun-new .day-num { color: #d35400 !important; }
+.calendar-card .sat-new .day-num { color: #2980b9 !important; }
+
+.calendar-card .day-new:hover:not(.selected-new) {
+    background: #f4f1ea !important;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05), inset -2px -2px 5px rgba(255,255,255,0.7) !important;
+}
+
+/* 리얼 골드(Gold-foiled) 셀렉터 렌더링 */
+.calendar-card .selected-new {
+    background: #fdfbf7 !important;
+    border: 1px solid #d4af37 !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.2), inset 0 0 5px rgba(212, 175, 55, 0.05) !important;
+    transform: scale(1.05) !important;
+}
+
+.calendar-card .selected-new .day-num {
+    color: #d4af37 !important;
+    font-weight: 900 !important;
+}
+
+/* 핑크 하트를 대체할 은은한 음각 크림색 도트 */
+.calendar-card .record-dot {
+    background: #f4f1ea !important;
+    border: 1px solid #e0dcd3 !important;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.1), inset 1px 1px 2px #ffffff !important;
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    bottom: 4px !important;
+}
+
+.calendar-card .selected-new .record-dot {
+    background: #d4af37 !important;
+    border: none !important;
+}
+
+/* 하단 타임라인 단추 오가닉 우드 톤앤매너 */
+.calendar-card .timeline-wrap { border-top: 1px solid #e8e5df !important; margin-top:15px; padding-top:15px; }
+.calendar-card .timeline-date { color: #7f8c8d !important; font-family: 'Georgia', 'Times New Roman', serif !important; }
+
+.calendar-card .timeline-dot {
+    background: #fdfbf7 !important;
+    border: 1px solid #d4af37 !important;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05) !important;
+}
+
+.calendar-card .timeline-item.active .timeline-date {
+    color: #d4af37 !important;
+    font-weight: 700 !important;
+}
+
+.calendar-card .timeline-item.active .timeline-dot {
+    background: #d4af37 !important;
+    border: 2px solid #b5952f !important;
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.3) !important;
+}
