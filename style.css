@@ -907,3 +907,105 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
     border-width: 2px !important;
     animation: rainbowGlow 4s linear infinite !important;
 }
+/* ============================================================
+   [V9.57] 차세대 달력 모노크롬 매트 블랙 UI (하이엔드 미니멀)
+   ============================================================ */
+.calendar-card {
+    background: #0a0a0a !important; /* 완벽한 무광 매트 블랙 */
+    border: 1px solid #222222 !important;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.95) !important;
+    color: #ffffff !important;
+}
+
+.calendar-card #monthDisplay {
+    color: #ffffff !important;
+    font-family: 'Pretendard', sans-serif !important;
+    font-size: 21px !important;
+    font-weight: 900 !important;
+    letter-spacing: 2px;
+}
+
+.calendar-card .nav-btn {
+    background: #141414 !important;
+    border: 1px solid #2a2a2a !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    border-radius: 6px !important; /* 샤프한 각진 모서리 */
+}
+
+.calendar-card .nav-btn:active { background: #222222 !important; }
+
+.calendar-card .weekday {
+    color: #555555 !important; /* 묵직하게 다운된 요일 텍스트 */
+    font-family: 'Pretendard', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px;
+}
+
+.calendar-card .day-new {
+    background: transparent !important;
+    border-radius: 5px !important; /* 미니멀리즘 스퀘어 타입 */
+    margin: 2px !important;
+    transition: all 0.2s ease;
+}
+
+.calendar-card .day-num { color: #888888 !important; font-weight: 600 !important; }
+
+/* 모노크롬 기조 속에서 일요일, 토요일의 최소한의 식별 밸런스 튜닝 */
+.calendar-card .sun-new .day-num { color: #ff334b !important; opacity: 0.85; }
+.calendar-card .sat-new .day-num { color: #3399ff !important; opacity: 0.85; }
+
+.calendar-card .day-new:hover:not(.selected-new) {
+    background: #141414 !important;
+}
+
+/* 선택된 날짜: 날카롭고 선명한 네온 퍼플 보더 및 레이저 언더 글로우 */
+.calendar-card .selected-new {
+    background: #111111 !important;
+    border: 1px solid #bc47ff !important; /* 선명한 하이엔드 네온 퍼플 */
+    box-shadow: 0 0 14px rgba(188, 71, 255, 0.65), inset 0 0 6px rgba(188, 71, 255, 0.3) !important;
+    transform: scale(1.05) !important;
+}
+
+.calendar-card .selected-new .day-num {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+}
+
+/* 핑크 하트를 완벽히 대체하는 초정밀 픽셀 스퀘어 닷 */
+.calendar-card .record-dot {
+    background: #ffffff !important; /* 순백색 마icro 닷 */
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.8) !important;
+    width: 4px !important;
+    height: 4px !important;
+    border-radius: 0% !important; /* 각진 사각형의 픽셀 감성 */
+    bottom: 5px !important;
+}
+
+.calendar-card .selected-new .record-dot {
+    background: #bc47ff !important;
+    box-shadow: 0 0 6px #bc47ff !important;
+}
+
+/* 하단 타임라인 단추 매트 블랙 컨셉 마칭 */
+.calendar-card .timeline-wrap { border-top: 1px solid #222222 !important; margin-top:15px; padding-top:15px; }
+.calendar-card .timeline-date { color: #555555 !important; font-weight: 800 !important; }
+
+.calendar-card .timeline-dot {
+    background: #141414 !important;
+    border: 1px solid #2a2a2a !important;
+    box-shadow: none !important;
+    border-radius: 5px !important;
+}
+
+.calendar-card .timeline-item.active .timeline-date {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+}
+
+.calendar-card .timeline-item.active .timeline-dot {
+    background: #111111 !important;
+    border: 1px solid #bc47ff !important;
+    box-shadow: 0 0 12px rgba(188, 71, 255, 0.6) !important;
+}
