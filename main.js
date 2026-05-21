@@ -703,7 +703,7 @@ function renderCalendar() {
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
         // [V9.54 수정] 하트 이모지 대신 순수 CSS 야광 닷(Dot)을 위한 빈 div 삽입
-        // [V9.56 수정] 하트 이모지 대신 순수 CSS 오가닉 닷(Dot)을 위한 빈 div 삽입
+        // [V10.0 수정] 하트 이모지 대신 순수 CSS 오가닉 닷(Dot)을 위한 빈 div 삽입
         const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
         grid.innerHTML += `<div class="${dayClass}" onclick="selectDate('${dStr}')"><span class="day-num">${d}</span>${recordDot}</div>`;
     }
