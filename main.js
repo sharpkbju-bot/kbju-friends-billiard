@@ -1174,7 +1174,18 @@ function renderDefenseStats() {
         let rankLabel = currentRank + '위';
         let rankColor = currentRank === 1 ? 'var(--rank1)' : (currentRank === 2 ? 'var(--rank2)' : (currentRank === 3 ? 'var(--rank3)' : (currentRank === activePlayers.length && activePlayers.length > 3 ? 'var(--rankL)' : 'var(--text-color)')));
         if (currentRank === 1) rankLabel = '1위🥇';
-        html += `<tr onclick="showDefenseDetail('${p}')" style="cursor:pointer;"><td style="color:${rankColor}; font-weight:900;">${rankLabel}</td><td style="color:${getPlayerColor(p)}; font-weight:900; text-decoration:underline;">${p}</td><td style="color:#5D4037;">${defenseStats[p].count}전</td><td style="color:var(--accent); font-weight:900;">${avgRank}위</td></tr>`;
+
+        // [V10.0 추가] 평균 등수(1.0 ~ 5.0)를 바 차트 길이(%)로 변환하는 제이의 알고리즘
+        // 방어율이 좋아 등수가 1위에 가까울수록 차트 게이지가 가득 찹니다.
+        const barWidth = Math.max(15, 100 - ((parseFloat(avgRank) - 1) * 20));
+
+        // [V10.0 수정] 기존 <tr> 태그를 유지하면서 defense-item 클래스와 --defense-width를 주입
+        html += `<tr class="defense-item" style="--defense-width: ${barWidth}%; cursor:pointer;" onclick="showDefenseDetail('${p}')">
+                    <td style="color:${rankColor}; font-weight:900; width:60px;">${rankLabel}</td>
+                    <td style="color:${getPlayerColor(p)}; font-weight:900; text-decoration:underline; width:60px;">${p}</td>
+                    <td style="color:#888; font-size:12px; font-weight:800; width:50px;">${defenseStats[p].count}전</td>
+                    <td class="defense-bar-value" style="width:50px;">${avgRank}위</td>
+                 </tr>`;
     });
     tbody.innerHTML = html;
 }
