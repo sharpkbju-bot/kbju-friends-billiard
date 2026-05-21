@@ -971,11 +971,11 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
     font-weight: 900 !important;
 }
 
-/* 핑크 하트를 대체할 은은한 음각 크림색 도트 */
+/* 진한 퍼플 컬러로 포인트 변경 */
 .calendar-card .record-dot {
-    background: #f4f1ea !important;
-    border: 1px solid #e0dcd3 !important;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.1), inset 1px 1px 2px #ffffff !important;
+    background: #4a148c !important; /* 럭셔리한 딥 퍼플 */
+    border: 1px solid #380b61 !important;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.2), inset 1px 1px 2px rgba(255,255,255,0.3) !important;
     width: 6px !important;
     height: 6px !important;
     border-radius: 50% !important;
