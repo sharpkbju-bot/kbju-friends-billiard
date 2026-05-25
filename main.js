@@ -733,6 +733,8 @@ function selectDate(dateStr) {
             const recordTarget = document.getElementById('record-header-wrap');
             if (recordTarget) recordTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
+    } else {
+        showToastMsg("기록 없음");
     }
 }
 
