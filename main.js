@@ -2073,22 +2073,46 @@ function showQuickViewModal(dateStr, round) {
     }
     
     const startOrder = targetGame.startOrder;
+    // [추가] 해당 게임의 실제 최종 순위 배열 추출
+    const actualRanks = targetGame.ranks.filter(n => n && n.trim() !== ""); 
     
     // 게임 넘버 파악
     const sameDateGames = gameLogs.filter(x => x.dateStr === dateStr);
     const gameNumber = sameDateGames.findIndex(x => x.round === round) + 1;
     
+    // [수정] 모달 타이틀 문구 변경
     let html = `<div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">🎯</div>
                 <div style="font-size:18px; font-weight:900; color:var(--text-color); margin-bottom:5px; display:block; text-align:center;">${dateStr}</div>
-                <div style="font-size:14px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; display:block; text-align:center;">[ ${gameNumber}G 초구 및 순서 ]</div>
+                <div style="font-size:14px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; display:block; text-align:center;">[ ${gameNumber}G 초구 및 순서와 순위 ]</div>
                 <div style="display:block; font-weight:900;">`;
     
     startOrder.forEach((name, i) => {
         const orderLabel = (i === 0) ? "1번 (초구)🎱" : `${i + 1}번`;
         const orderColor = (i === 0) ? 'var(--rank1)' : 'var(--text-color)';
+        
+        // [추가] 이름 옆에 표시될 실제 순위 텍스트 및 테마 컬러 매칭 로직
+        const rankIdx = actualRanks.indexOf(name);
+        let finalRankLabel = "";
+        let finalRankColor = "var(--sub-text)"; // 2~4위를 위한 기본 서브 텍스트 컬러
+        
+        if (rankIdx !== -1) {
+            if (rankIdx === 0) {
+                finalRankLabel = "(1위)";
+                finalRankColor = "var(--rank1)"; // 1위는 파란색
+            } else if (rankIdx === actualRanks.length - 1 && actualRanks.length > 1) {
+                finalRankLabel = "(꼴찌)";
+                finalRankColor = "var(--rankL)"; // 꼴찌는 빨간색
+            } else {
+                finalRankLabel = `(${rankIdx + 1}위)`;
+            }
+        }
+
+        // [수정] Flexbox 우측 영역에 순위 라벨(<span ...>) 추가
         html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7); margin-bottom:8px;">
                     <div style="color:${orderColor}; font-size:${i === 0 ? '16px' : '14px'}; font-weight:${i === 0 ? '900' : '800'};">${orderLabel}</div>
-                    <div style="color:${orderColor}; font-size:${i === 0 ? '22px' : '16px'}; font-weight:${i === 0 ? '900' : '800'};">${name}</div>
+                    <div style="color:${orderColor}; font-size:${i === 0 ? '22px' : '16px'}; font-weight:${i === 0 ? '900' : '800'}; text-align:right;">
+                        ${name} <span style="font-size:14px; font-weight:900; color:${finalRankColor}; margin-left:6px; letter-spacing:-0.5px;">${finalRankLabel}</span>
+                    </div>
                  </div>`;
     });
     
@@ -2102,7 +2126,7 @@ function showQuickViewModal(dateStr, round) {
     modal.style.display = 'flex'; 
     content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
     
-    closeAllOverlays(); // 액션 오버레이가 열려있으므로 모달 출력과 동시에 닫아줍니다.
+    closeAllOverlays(); // 액션 오버레이 닫기
 }
 
 function closeQuickViewModal() {
