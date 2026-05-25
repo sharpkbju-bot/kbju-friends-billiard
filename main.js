@@ -702,7 +702,7 @@ function renderCalendar() {
         if (dStr === realTodayStr) dayClass += " today-new";
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
-        // [V9.54 수정] 하트 이모지 대신 순수 CSS 야광 닷(Dot)을 위한 빈 div 삽입
+        // [V9.55 수정] 하트 이모지 대신 순수 CSS 야광 닷(Dot)을 위한 빈 div 삽입
         const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
         grid.innerHTML += `<div class="${dayClass}" onclick="selectDate('${dStr}')"><span class="day-num">${d}</span>${recordDot}</div>`;
     }
@@ -1504,12 +1504,13 @@ function renderGameList() {
             html += `<div class="game-item" onclick="toggleActionOverlay(this)">
                          <div class="game-info"><span>${idx+1}G</span><div style="display:inline-flex; align-items:center;">${generateNamesHTML(names)}</div></div>
                          <div class="action-overlay">
+                             <div class="overlay-btn btn-detail-p" onclick="event.stopPropagation(); showQuickViewModal('${g.dateStr}', ${g.round})">상세</div>
                              <div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
                              <div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>
                              <div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div>
                          </div>
                      </div>`; 
-        }); 
+        });
         area.innerHTML = html; 
     } else { area.innerHTML = ""; }
 }
@@ -2050,4 +2051,51 @@ function showH2HDetailModal(playerName, type) {
     if (dashInfoCountdownInterval) { clearInterval(dashInfoCountdownInterval); dashInfoCountdownInterval = null; }
     const timerEl = document.getElementById('dash-info-timer'); if (timerEl) timerEl.remove();
     document.getElementById('info-modal').style.display = 'flex';
+}
+function showQuickViewModal(dateStr, round) {
+    triggerHaptic(10);
+    const targetGame = gameLogs.find(g => g.dateStr === dateStr && g.round === round);
+    if (!targetGame) {
+        showToastMsg("데이터 없음");
+        return;
+    }
+    const actualRanks = targetGame.ranks.filter(n => n && n.trim() !== "");
+    
+    // 게임 넘버 파악
+    const sameDateGames = gameLogs.filter(x => x.dateStr === dateStr);
+    const gameNumber = sameDateGames.findIndex(x => x.round === round) + 1;
+    
+    let html = `<div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">🔍</div>
+                <div style="font-size:18px; font-weight:900; color:var(--text-color); margin-bottom:5px; display:block; text-align:center;">${dateStr}</div>
+                <div style="font-size:14px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; display:block; text-align:center;">[ ${gameNumber}G 상세 기록 ]</div>
+                <div style="display:block; font-weight:900;">`;
+    
+    actualRanks.forEach((name, i) => {
+        const rankLabel = (i === 0) ? "1위🥇" : (i === actualRanks.length - 1 ? "꼴찌💀" : `${i + 1}위`);
+        const rankColor = (i === 0) ? 'var(--rank1)' : (i === actualRanks.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
+        html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7); margin-bottom:8px;">
+                    <div style="color:${rankColor}; font-size:${i === 0 ? '16px' : '14px'}; font-weight:${i === 0 ? '900' : '800'};">${rankLabel}</div>
+                    <div style="color:${rankColor}; font-size:${i === 0 ? '22px' : '16px'}; font-weight:${i === 0 ? '900' : '800'};">${name}</div>
+                 </div>`;
+    });
+    
+    html += `</div>
+             <button class="save-btn" style="background:#bdc3c7; margin-top:15px; color:#444; width:100%; box-shadow:none;" onclick="closeQuickViewModal()">닫기</button>`;
+    
+    const modal = document.getElementById('quick-view-modal'); 
+    const content = document.getElementById('quick-view-content');
+    
+    content.innerHTML = html; 
+    modal.style.display = 'flex'; 
+    content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+    
+    closeAllOverlays(); // 액션 오버레이가 열려있으므로 모달 출력과 동시에 닫아줍니다.
+}
+
+function closeQuickViewModal() {
+    const modal = document.getElementById('quick-view-modal'); 
+    const content = document.getElementById('quick-view-content');
+    if(!modal || !content) return;
+    content.style.animation = 'scaleDownPopup 0.3s ease-in forwards';
+    setTimeout(() => { modal.style.display = 'none'; content.style.animation = 'none'; }, 300);
 }
