@@ -1785,7 +1785,7 @@ function analyzeStrategy() {
 
     const targets = Object.keys(stats).sort((a, b) => (stats[a].totalRank / stats[a].games) - (stats[b].totalRank / stats[b].games));
     if (targets.length === 0) {
-        area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">분석 가능한 데이터가 없습니다. (추첨 순서 필요)</div>`;
+        area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">분석 가능한 데이터가 없습니다.</div>`;
         area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'none'; return;
     }
 
