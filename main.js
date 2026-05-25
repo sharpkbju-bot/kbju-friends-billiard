@@ -1818,12 +1818,16 @@ function showToastMsg(msg) {
     const toast = document.getElementById('toast');
     if (!toast) return;
     toast.innerText = msg;
-    toast.style.display = 'block'; toast.style.zIndex = '999999';
-    void toast.offsetWidth; toast.classList.add('show');
+    toast.style.display = 'block'; 
+    toast.style.zIndex = '999999';
+    void toast.offsetWidth; 
+    toast.classList.add('show');
+    
     if (globalToastTimeout) clearTimeout(globalToastTimeout);
+    
     globalToastTimeout = setTimeout(() => {
         toast.classList.remove('show');
-        setTimeout(() => { if(!toast.classList.contains('show')) toast.style.display = 'none'; }, 300);
+        toast.style.display = 'none';
     }, 3000);
 }
 
