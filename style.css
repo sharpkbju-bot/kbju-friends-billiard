@@ -815,7 +815,7 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
     zoom: 0.833333;
 }
 /* ============================================================
-   [V9.56 - 대안 A] 클린 플로팅 & 모던 UI (Apple iOS 스타일)
+   [V9.58 - 대안 A] 클린 플로팅 & 모던 UI (Apple iOS 스타일)
    ============================================================ */
 .calendar-card {
     background: var(--card-bg) !important;
