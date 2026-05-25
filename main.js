@@ -1506,7 +1506,7 @@ function renderGameList() {
             html += `<div class="game-item" onclick="toggleActionOverlay(this)">
                          <div class="game-info"><span>${idx+1}G</span><div style="display:inline-flex; align-items:center;">${generateNamesHTML(names)}</div></div>
                          <div class="action-overlay">
-                             <div class="overlay-btn btn-detail-p" onclick="event.stopPropagation(); showQuickViewModal('${g.dateStr}', ${g.round})">상세</div>
+                             <div class="overlay-btn btn-detail-p" onclick="event.stopPropagation(); showQuickViewModal('${g.dateStr}', ${g.round})">순서</div>
                              <div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
                              <div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>
                              <div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div>
@@ -2065,23 +2065,30 @@ function showQuickViewModal(dateStr, round) {
         showToastMsg("데이터 없음");
         return;
     }
-    const actualRanks = targetGame.ranks.filter(n => n && n.trim() !== "");
+    
+    // [방어 로직] 순서(startOrder) 데이터가 없는 과거 게임 처리
+    if (!targetGame.startOrder || targetGame.startOrder.length === 0) {
+        showToastMsg("저장된 순서 정보가 없습니다.");
+        return;
+    }
+    
+    const startOrder = targetGame.startOrder;
     
     // 게임 넘버 파악
     const sameDateGames = gameLogs.filter(x => x.dateStr === dateStr);
     const gameNumber = sameDateGames.findIndex(x => x.round === round) + 1;
     
-    let html = `<div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">🔍</div>
+    let html = `<div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">🎯</div>
                 <div style="font-size:18px; font-weight:900; color:var(--text-color); margin-bottom:5px; display:block; text-align:center;">${dateStr}</div>
-                <div style="font-size:14px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; display:block; text-align:center;">[ ${gameNumber}G 상세 기록 ]</div>
+                <div style="font-size:14px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; display:block; text-align:center;">[ ${gameNumber}G 초구 및 순서 ]</div>
                 <div style="display:block; font-weight:900;">`;
     
-    actualRanks.forEach((name, i) => {
-        const rankLabel = (i === 0) ? "1위🥇" : (i === actualRanks.length - 1 ? "꼴찌💀" : `${i + 1}위`);
-        const rankColor = (i === 0) ? 'var(--rank1)' : (i === actualRanks.length - 1 ? 'var(--rankL)' : 'var(--text-color)');
+    startOrder.forEach((name, i) => {
+        const orderLabel = (i === 0) ? "1번 (초구)🎱" : `${i + 1}번`;
+        const orderColor = (i === 0) ? 'var(--rank1)' : 'var(--text-color)';
         html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7); margin-bottom:8px;">
-                    <div style="color:${rankColor}; font-size:${i === 0 ? '16px' : '14px'}; font-weight:${i === 0 ? '900' : '800'};">${rankLabel}</div>
-                    <div style="color:${rankColor}; font-size:${i === 0 ? '22px' : '16px'}; font-weight:${i === 0 ? '900' : '800'};">${name}</div>
+                    <div style="color:${orderColor}; font-size:${i === 0 ? '16px' : '14px'}; font-weight:${i === 0 ? '900' : '800'};">${orderLabel}</div>
+                    <div style="color:${orderColor}; font-size:${i === 0 ? '22px' : '16px'}; font-weight:${i === 0 ? '900' : '800'};">${name}</div>
                  </div>`;
     });
     
