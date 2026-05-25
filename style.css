@@ -76,6 +76,8 @@
     --bg: rgba(236, 238, 241, 0.4);
 }
 
+/* 네이비 테마 내부 추가 */
+[data-theme='navy'] .btn-detail-p { background: #1e3c28; color: #2ecc71; }
 /* 🌑 네이비 테마 설정 (Deep Sea Blue) */
 [data-theme='navy'] {
     --main: #bdc3c7;
@@ -164,7 +166,8 @@
 [data-theme='navy'] #statsFilterMonth { color: #ffffff !important; background: rgba(0, 0, 0, 0.3) !important; }
 [data-theme='navy'] #statsFilterMonth::placeholder { color: #ffffff !important; opacity: 1 !important; }
 
-
+/* 다크 테마 내부 추가 */
+[data-theme='dark'] .btn-detail-p { background: #1b5e20; color: #81c784; }
 /* 🌑 다크 테마 설정 (Midnight Black) */
 [data-theme='dark'] {
     --main: #bdc3c7;
@@ -230,6 +233,7 @@
 [data-theme='dark'] .condition-box { background: rgba(0, 0, 0, 0.3); border: 1.5px solid navy; }
 [data-theme='dark'] .search-result-card { background: rgba(50, 50, 55, 0.9) !important; border-color: #ff4d6d !important; }
 [data-theme='dark'] .action-overlay { background: rgba(0, 0, 0, 0.7); }
+.btn-detail-p { background: #d4efdf; color: #27ae60; }
 [data-theme='dark'] .btn-edit-p { background: #2c3e50; color: #3498db; }
 [data-theme='dark'] .btn-del-p { background: #4b2323; color: #ff7675; }
 [data-theme='dark'] .btn-cancel-p { background: #3d3d3d; color: #b2bec3; }
@@ -811,7 +815,7 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
     zoom: 0.833333;
 }
 /* ============================================================
-   [V9.54] 차세대 달력 프리미엄 다크 네온 UI (글래스모피즘)
+   [V9.55] 차세대 달력 프리미엄 다크 네온 UI (글래스모피즘)
    ============================================================ */
 .calendar-card {
     background: linear-gradient(145deg, rgba(20, 24, 35, 0.95), rgba(10, 12, 18, 0.98)) !important;
