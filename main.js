@@ -708,7 +708,7 @@ function renderCalendar() {
         if (dStr === realTodayStr) dayClass += " today-new";
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
-        // [V10.000 수정] 하트 이모지 대신 순수 CSS 야광 닷(Dot)을 위한 빈 div 삽입
+        // [V10.00 수정] 하트 이모지 대신 순수 CSS 야광 닷(Dot)을 위한 빈 div 삽입
         const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
         grid.innerHTML += `<div class="${dayClass}" onclick="selectDate('${dStr}')"><span class="day-num">${d}</span>${recordDot}</div>`;
     }
