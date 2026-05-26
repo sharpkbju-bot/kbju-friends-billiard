@@ -8,8 +8,8 @@
     <meta name="theme-color" content="#ffffff" id="theme-color-meta">
     <title>Billiards Record</title>
     
-    <link rel="manifest" href="manifest.json?v=10.00">
-    <link rel="stylesheet" href="style.css?v=10.00">
+    <link rel="manifest" href="manifest.json?v=10.000">
+    <link rel="stylesheet" href="style.css?v=10.000">
     <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body data-theme="pastel1">
@@ -205,7 +205,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
-    <script src="main.js?v=10.0"></script>
+    <script src="main.js?v=10.00"></script>
     
     <script>
         // 웰컴 스크린 제거 로직
@@ -222,7 +222,7 @@
         // 서비스 워커 등록 (PWA)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=10.0')
+                navigator.serviceWorker.register('sw.js?v=10.00')
                     .then(reg => console.log('SW Registered!', reg))
                     .catch(err => console.log('SW Fail!', err));
             });
