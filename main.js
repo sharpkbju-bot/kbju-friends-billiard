@@ -972,7 +972,7 @@ function renderDashboard() {
         }
     });
     document.getElementById('dashDefense').innerText = defCandidate !== "-" ? `${defCandidate} (${maxDefAvg.toFixed(1)}위)` : "-";
-// [V10.0 신규] 최다 초구 / 말구 산출 로직
+// [v10.00 신규] 최다 초구 / 말구 산출 로직
     let startOrderStats = {};
     players.forEach(p => startOrderStats[p] = { first: 0, last: 0 });
     filtered.forEach(g => {
