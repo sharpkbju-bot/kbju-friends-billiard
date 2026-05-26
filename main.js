@@ -708,7 +708,7 @@ function renderCalendar() {
         if (dStr === realTodayStr) dayClass += " today-new";
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
-        // [V10.00 수정] 하트 이모지 대신 순수 CSS 야광 닷(Dot)을 위한 빈 div 삽입
+        // [V10.000 수정] 하트 이모지 대신 순수 CSS 야광 닷(Dot)을 위한 빈 div 삽입
         const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
         grid.innerHTML += `<div class="${dayClass}" onclick="selectDate('${dStr}')"><span class="day-num">${d}</span>${recordDot}</div>`;
     }
@@ -972,7 +972,7 @@ function renderDashboard() {
         }
     });
     document.getElementById('dashDefense').innerText = defCandidate !== "-" ? `${defCandidate} (${maxDefAvg.toFixed(1)}위)` : "-";
-// [V10.0 신규] 최다 초구 / 말구 산출 로직
+// [V10.00 신규] 최다 초구 / 말구 산출 로직
     let startOrderStats = {};
     players.forEach(p => startOrderStats[p] = { first: 0, last: 0 });
     filtered.forEach(g => {
