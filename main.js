@@ -913,7 +913,7 @@ function renderDashboard() {
     if (luckyEl) luckyEl.innerText = calculateLuckyGuy(filtered);
     renderLiveTimeline(filtered);
 
-    iif (filtered.length === 0) {
+    if (filtered.length === 0) {
         ['dashTotalGames', 'dashTotalDays', 'dashMVP', 'dashVillain', 'dashFirstBreak', 'dashLastTurn', 'dashTrendPlayer', 'dashTrendScore', 'dashDefense'].forEach(id => {
             const el = document.getElementById(id); if (el) el.innerText = id.includes('Total') ? (id.includes('Games') ? '0G' : '0일') : '-';
         }); return;
