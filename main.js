@@ -233,6 +233,14 @@ function showDashInfo(type) {
     } else if (type === 'villain') {
         icon = "💸"; title = "지갑 전사 기준";
         desc = wrapStart + "해당 월에 참여한 게임 수 대비 <b>꼴찌를 가장 높은 비율로 기록한 선수</b>. 게임비를 가장 많이 지출했을 것으로 추정되는 안타까운(?) 타이틀." + wrapEnd;
+    // --- ↓ 여기부터 추가 ↓ ---
+    } else if (type === 'firstBreak') {
+        icon = "🎱"; title = "최다 초구자 (MOST FIRST BREAKS)";
+        desc = wrapStart + "순서 추첨에서 <b>1번(초구)</b>을 가장 많이 뽑은 선수입니다.<br>시작부터 게임을 리드하는 행운의 사나이!" + wrapEnd;
+    } else if (type === 'lastTurn') {
+        icon = "💀"; title = "최다 말구자 (MOST LAST TURNS)";
+        desc = wrapStart + "순서 추첨에서 <b>마지막 순서(말구)</b>를 가장 많이 뽑은 선수입니다.<br>가장 불리한 위치에서 시작해야 하는 인내의 아이콘..." + wrapEnd;
+    // --- ↑ 여기까지 추가 ↑ ---
     } else if (type === 'trend') {
         icon = "📈"; title = "최근 7게임 레코드";
         
