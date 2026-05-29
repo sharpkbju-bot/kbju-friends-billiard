@@ -913,8 +913,8 @@ function renderDashboard() {
     if (luckyEl) luckyEl.innerText = calculateLuckyGuy(filtered);
     renderLiveTimeline(filtered);
 
-    if (filtered.length === 0) {
-        ['dashTotalGames', 'dashTotalDays', 'dashMVP', 'dashVillain', 'dashTrendPlayer', 'dashTrendScore', 'dashDefense'].forEach(id => {
+    iif (filtered.length === 0) {
+        ['dashTotalGames', 'dashTotalDays', 'dashMVP', 'dashVillain', 'dashFirstBreak', 'dashLastTurn', 'dashTrendPlayer', 'dashTrendScore', 'dashDefense'].forEach(id => {
             const el = document.getElementById(id); if (el) el.innerText = id.includes('Total') ? (id.includes('Games') ? '0G' : '0일') : '-';
         }); return;
     }
@@ -973,6 +973,40 @@ function renderDashboard() {
         }
     });
     document.getElementById('dashDefense').innerText = defCandidate !== "-" ? `${defCandidate} (${maxDefAvg.toFixed(1)}위)` : "-";
+    // --- ↓ 여기부터 삽입 (V9.60 신규 최다 초구/말구 산출) ↓ ---
+    let startOrderStats = {};
+    players.forEach(p => startOrderStats[p] = { first: 0, last: 0 });
+    
+    filtered.forEach(g => {
+        if (g.startOrder && g.startOrder.length > 0) {
+            const firstP = g.startOrder[0];
+            const lastP = g.startOrder[g.startOrder.length - 1];
+            if (startOrderStats[firstP]) startOrderStats[firstP].first++;
+            // 1인 게임 예외 처리 방어 (length > 1)
+            if (startOrderStats[lastP] && g.startOrder.length > 1) startOrderStats[lastP].last++;
+        }
+    });
+    
+    let maxFirst = 0, maxLast = 0;
+    let bestFirst = "-", bestLast = "-";
+    
+    activePlayers.forEach(p => {
+        // 초구 1위 산출 (동률일 경우 참여 게임 수 우선)
+        if (startOrderStats[p].first > maxFirst) { maxFirst = startOrderStats[p].first; bestFirst = p; }
+        else if (startOrderStats[p].first === maxFirst && maxFirst > 0) {
+            if (pStats[p] && pStats[bestFirst] && pStats[p].played > pStats[bestFirst].played) bestFirst = p;
+        }
+        
+        // 말구 1위 산출 (동률일 경우 참여 게임 수 우선)
+        if (startOrderStats[p].last > maxLast) { maxLast = startOrderStats[p].last; bestLast = p; }
+        else if (startOrderStats[p].last === maxLast && maxLast > 0) {
+            if (pStats[p] && pStats[bestLast] && pStats[p].played > pStats[bestLast].played) bestLast = p;
+        }
+    });
+
+    document.getElementById('dashFirstBreak').innerText = bestFirst !== "-" ? `${bestFirst} (${maxFirst}회)` : "-";
+    document.getElementById('dashLastTurn').innerText = bestLast !== "-" ? `${bestLast} (${maxLast}회)` : "-";
+    // --- ↑ 여기까지 삽입 ↑ ---
 }
 function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); }
 function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
