@@ -234,12 +234,73 @@ function showDashInfo(type) {
         icon = "💸"; title = "지갑 전사 기준";
         desc = wrapStart + "해당 월에 참여한 게임 수 대비 <b>꼴찌를 가장 높은 비율로 기록한 선수</b>. 게임비를 가장 많이 지출했을 것으로 추정되는 안타까운(?) 타이틀." + wrapEnd;
     // --- ↓ 여기부터 추가 ↓ ---
-    } else if (type === 'firstBreak') {
-        icon = "🎱"; title = "최다 초구자 (MOST FIRST BREAKS)";
-        desc = wrapStart + "순서 추첨에서 <b>1번(초구)</b>으로 가장 많이 뽑힌 선수.<br>시작부터 게임을 리드하는 행운의 사나이!" + wrapEnd;
-    } else if (type === 'lastTurn') {
-        icon = "💀"; title = "최다 말구자 (MOST LAST TURNS)";
-        desc = wrapStart + "순서 추첨에서 <b>마지막 순서(말구)</b>로 가장 많이 뽑힌 선수.<br>가장 불리한 위치에서 시작해야 하는 인내의 아이콘." + wrapEnd;
+    } else if (type === 'firstBreak' || type === 'lastTurn') {
+        // 1. 현재 대시보드 필터값(월별, 인원수) 동기화
+        const filterEl = document.getElementById('statsFilterCount');
+        const filterVal = filterEl ? filterEl.value : "all";
+        const monthEl = document.getElementById('statsFilterMonth');
+        const monthVal = monthEl ? monthEl.value : "";
+        
+        // 2. 필터 적용된 게임 목록 생성
+        let filteredGames = gameLogs;
+        if (monthVal) filteredGames = filteredGames.filter(g => g.dateStr.startsWith(monthVal));
+        if (filterVal !== "all") {
+            const count = parseInt(filterVal);
+            filteredGames = filteredGames.filter(g => g.ranks.filter(n => n.trim() !== "").length === count);
+        }
+
+        // 3. 통계 연산용 임시 객체 초기화
+        let startOrderStats = {};
+        players.forEach(p => startOrderStats[p] = { count: 0, played: 0 });
+
+        // 4. 모든 게임 순회하며 초구/말구 횟수 추출 (1인 게임 방어 포함)
+        filteredGames.forEach(g => {
+            const actual = g.ranks.filter(n => n.trim() !== "");
+            actual.forEach(p => { if (startOrderStats[p]) startOrderStats[p].played++; });
+            
+            if (g.startOrder && g.startOrder.length > 0) {
+                const targetP = type === 'firstBreak' ? g.startOrder[0] : g.startOrder[g.startOrder.length - 1];
+                if (type === 'firstBreak') {
+                    if (startOrderStats[targetP]) startOrderStats[targetP].count++;
+                } else {
+                    if (startOrderStats[targetP] && g.startOrder.length > 1) startOrderStats[targetP].count++;
+                }
+            }
+        });
+
+        // 5. 산출된 데이터를 정렬 배열로 변환 (횟수 내림차순 -> 참여 횟수 내림차순)
+        let statList = players.filter(p => startOrderStats[p].played > 0).map(p => ({
+            name: p, count: startOrderStats[p].count, played: startOrderStats[p].played
+        }));
+        statList.sort((a, b) => b.count - a.count || b.played - a.played);
+
+        // 6. UI 기본 정보 세팅
+        let listHtml = `<div style="margin-top: 15px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 15px;">`;
+        if (type === 'firstBreak') {
+            icon = "🎱"; title = "최다 초구자 (MOST FIRST BREAKS)";
+            desc = wrapStart + "순서 추첨에서 <b>1번(초구)</b>으로 가장 많이 뽑힌 선수.<br>시작부터 게임을 리드하는 행운의 사나이!" + wrapEnd;
+            listHtml += `<div style="font-size:13px; color:var(--sub-text); font-weight:900; margin-bottom:12px; text-align:center;">[ 전체 선수 초구 횟수 ]</div>`;
+        } else {
+            icon = "💀"; title = "최다 말구자 (MOST LAST TURNS)";
+            desc = wrapStart + "순서 추첨에서 <b>마지막 순서(말구)</b>로 가장 많이 뽑힌 선수.<br>가장 불리한 위치에서 시작해야 하는 인내의 아이콘." + wrapEnd;
+            listHtml += `<div style="font-size:13px; color:var(--sub-text); font-weight:900; margin-bottom:12px; text-align:center;">[ 전체 선수 말구 횟수 ]</div>`;
+        }
+        
+        // 7. 동적 리스트 HTML 생성 (디자인 적용)
+        statList.forEach((s, idx) => {
+            let rankStr = `${idx + 1}위`;
+            if (idx === 0 && s.count > 0) rankStr = (type === 'firstBreak') ? "1위🥇" : "1위💀";
+            let valColor = (type === 'firstBreak') ? 'var(--rank1)' : 'var(--rankL)';
+            
+            listHtml += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:10px 15px; border-radius:10px; margin-bottom:6px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
+                            <div style="font-size:14px; font-weight:800; color:var(--sub-text); width:45px; text-align:left;">${rankStr}</div>
+                            <div style="font-size:15px; font-weight:900; color:${getPlayerColor(s.name)}; flex:1; text-align:center;">${s.name}</div>
+                            <div style="font-size:15px; font-weight:900; color:${valColor}; width:40px; text-align:right;">${s.count}회</div>
+                         </div>`;
+        });
+        
+        listHtml += `</div>`;
+        desc += listHtml; // 기존 안내문 아래에 리스트 추가
     // --- ↑ 여기까지 추가 ↑ ---
     } else if (type === 'trend') {
         icon = "📈"; title = "최근 7게임 레코드";
