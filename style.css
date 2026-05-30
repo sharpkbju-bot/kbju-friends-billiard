@@ -816,102 +816,104 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
     zoom: 0.833333;
 }
 /* ============================================================
-   [V9.60] 차세대 달력 오가닉 내추럴 우드 UI (미니멀리즘)
+   [V9.60] 차세대 달력 모노크롬 매트 블랙 UI (하이엔드 미니멀)
    ============================================================ */
 .calendar-card {
-    background: #fdfbf7 !important; /* 고급스러운 라이트 크림/베이지 톤 */
-    /* 미세한 린넨(Linen) 패브릭 텍스처 패턴 적용 */
-    background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.01) 75%, rgba(0,0,0,0.01)), repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.01) 75%, rgba(0,0,0,0.01)) !important;
-    background-position: 0 0, 4px 4px !important;
-    background-size: 8px 8px !important;
-    border: 1px solid #e8e5df !important;
-    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.05), -10px -10px 20px rgba(255, 255, 255, 0.8) !important;
-    color: #333333 !important;
+    background: #0a0a0a !important; /* 완벽한 무광 매트 블랙 */
+    border: 1px solid #222222 !important;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.95) !important;
+    color: #ffffff !important;
 }
 
 .calendar-card #monthDisplay {
-    color: #2c3e50 !important;
-    font-family: 'Georgia', 'Times New Roman', serif !important; /* 우아한 세리프 폰트 */
-    font-size: 22px !important;
-    font-weight: 700 !important;
-    letter-spacing: 1px;
+    color: #ffffff !important;
+    font-family: 'Pretendard', sans-serif !important;
+    font-size: 21px !important;
+    font-weight: 900 !important;
+    letter-spacing: 2px;
 }
 
 .calendar-card .nav-btn {
-    background: #f4f1ea !important;
-    border: 1px solid #e8e5df !important;
-    color: #555 !important;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.05), -2px -2px 5px rgba(255,255,255,0.7) !important;
+    background: #141414 !important;
+    border: 1px solid #2a2a2a !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    border-radius: 6px !important; /* 샤프한 각진 모서리 */
 }
 
+.calendar-card .nav-btn:active { background: #222222 !important; }
+
 .calendar-card .weekday {
-    color: #7f8c8d !important;
-    font-family: 'Georgia', 'Times New Roman', serif !important;
+    color: #555555 !important; /* 묵직하게 다운된 요일 텍스트 */
+    font-family: 'Pretendard', sans-serif !important;
     font-size: 11px !important;
-    font-weight: 600 !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px;
 }
 
 .calendar-card .day-new {
     background: transparent !important;
-    border-radius: 50% !important; /* 단정하고 클래식한 원형 날짜 */
-    transition: all 0.3s ease;
+    border-radius: 5px !important; /* 미니멀리즘 스퀘어 타입 */
+    margin: 2px !important;
+    transition: all 0.2s ease;
 }
 
-.calendar-card .day-num { color: #555555 !important; font-weight: 500 !important; }
-.calendar-card .sun-new .day-num { color: #d35400 !important; }
-.calendar-card .sat-new .day-num { color: #2980b9 !important; }
+.calendar-card .day-num { color: #888888 !important; font-weight: 600 !important; }
+
+/* 모노크롬 기조 속에서 일요일, 토요일의 최소한의 식별 밸런스 튜닝 */
+.calendar-card .sun-new .day-num { color: #ff334b !important; opacity: 0.85; }
+.calendar-card .sat-new .day-num { color: #3399ff !important; opacity: 0.85; }
 
 .calendar-card .day-new:hover:not(.selected-new) {
-    background: #f4f1ea !important;
-    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05), inset -2px -2px 5px rgba(255,255,255,0.7) !important;
+    background: #141414 !important;
 }
 
-/* 리얼 골드(Gold-foiled) 셀렉터 렌더링 */
+/* 선택된 날짜: 날카롭고 선명한 네온 퍼플 보더 및 레이저 언더 글로우 */
 .calendar-card .selected-new {
-    background: #fdfbf7 !important;
-    border: 1px solid #d4af37 !important;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.2), inset 0 0 5px rgba(212, 175, 55, 0.05) !important;
+    background: #111111 !important;
+    border: 1px solid #bc47ff !important; /* 선명한 하이엔드 네온 퍼플 */
+    box-shadow: 0 0 14px rgba(188, 71, 255, 0.65), inset 0 0 6px rgba(188, 71, 255, 0.3) !important;
     transform: scale(1.05) !important;
 }
 
 .calendar-card .selected-new .day-num {
-    color: #d4af37 !important;
+    color: #ffffff !important;
     font-weight: 900 !important;
 }
 
-/* 진한 퍼플 컬러로 포인트 변경 */
+/* 핑크 하트를 완벽히 대체하는 초정밀 픽셀 스퀘어 닷 */
 .calendar-card .record-dot {
-    background: #4a148c !important; /* 럭셔리한 딥 퍼플 */
-    border: 1px solid #380b61 !important;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.2), inset 1px 1px 2px rgba(255,255,255,0.3) !important;
-    width: 6px !important;
-    height: 6px !important;
-    border-radius: 50% !important;
-    bottom: 4px !important;
+    background: #ffffff !important; /* 순백색 마icro 닷 */
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.8) !important;
+    width: 4px !important;
+    height: 4px !important;
+    border-radius: 0% !important; /* 각진 사각형의 픽셀 감성 */
+    bottom: 5px !important;
 }
 
 .calendar-card .selected-new .record-dot {
-    background: #d4af37 !important;
-    border: none !important;
+    background: #bc47ff !important;
+    box-shadow: 0 0 6px #bc47ff !important;
 }
 
-/* 하단 타임라인 단추 오가닉 우드 톤앤매너 */
-.calendar-card .timeline-wrap { border-top: 1px solid #e8e5df !important; margin-top:15px; padding-top:15px; }
-.calendar-card .timeline-date { color: #7f8c8d !important; font-family: 'Georgia', 'Times New Roman', serif !important; }
+/* 하단 타임라인 단추 매트 블랙 컨셉 마칭 */
+.calendar-card .timeline-wrap { border-top: 1px solid #222222 !important; margin-top:15px; padding-top:15px; }
+.calendar-card .timeline-date { color: #555555 !important; font-weight: 800 !important; }
 
 .calendar-card .timeline-dot {
-    background: #fdfbf7 !important;
-    border: 1px solid #d4af37 !important;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.05) !important;
+    background: #141414 !important;
+    border: 1px solid #2a2a2a !important;
+    box-shadow: none !important;
+    border-radius: 5px !important;
 }
 
 .calendar-card .timeline-item.active .timeline-date {
-    color: #d4af37 !important;
-    font-weight: 700 !important;
+    color: #ffffff !important;
+    font-weight: 900 !important;
 }
 
 .calendar-card .timeline-item.active .timeline-dot {
-    background: #d4af37 !important;
-    border: 2px solid #b5952f !important;
-    box-shadow: 0 0 8px rgba(212, 175, 55, 0.3) !important;
+    background: #111111 !important;
+    border: 1px solid #bc47ff !important;
+    box-shadow: 0 0 12px rgba(188, 71, 255, 0.6) !important;
 }
