@@ -2216,7 +2216,7 @@ function showTodayReplay() {
                 <div class="replay-card" style="cursor:pointer;" onclick="closeReplayModal()">
                     <div style="font-size:50px; margin-bottom:20px;">🏁</div>
                     <div style="font-size:20px; font-weight:900; margin-bottom:20px; color:#fff;">오늘의 복기 종료!</div>
-                    <div style="font-size:12px; color:#b0bec5; font-weight:800; margin-bottom:20px;">(화면을 터치하면 닫힙니다)</div>
+                    <div style="font-size:12px; color:#b0bec5; font-weight:800; margin-bottom:20px;">(화면을 터치하면 닫힙니다.)</div>
                     <button class="save-btn" style="background:#bdc3c7; color:#444;" onclick="event.stopPropagation(); closeReplayModal()">닫기</button>
                 </div>
             `;
