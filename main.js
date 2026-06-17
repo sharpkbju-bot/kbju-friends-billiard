@@ -1,4 +1,4 @@
-// main.js - V9.50 Live Pulse Edition
+// main.js - V9.62 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -9,6 +9,7 @@ let scoreCountdownInterval = null;
 let dashInfoCountdownInterval = null; 
 let globalToastTimeout = null; 
 let audioCtx = null; // V9.50 Web Audio API Context
+let replayInterval = null; // [V9.62 신규] 오늘의 복기 애니메이션 타이머
 
 function triggerHaptic(pattern) {
     if (navigator.vibrate) {
@@ -233,15 +234,12 @@ function showDashInfo(type) {
     } else if (type === 'villain') {
         icon = "💸"; title = "지갑 전사 기준";
         desc = wrapStart + "해당 월에 참여한 게임 수 대비 <b>꼴찌를 가장 높은 비율로 기록한 선수</b>. 게임비를 가장 많이 지출했을 것으로 추정되는 안타까운(?) 타이틀." + wrapEnd;
-    // --- ↓ 여기부터 추가 ↓ ---
     } else if (type === 'firstBreak' || type === 'lastTurn') {
-        // 1. 현재 대시보드 필터값(월별, 인원수) 동기화
         const filterEl = document.getElementById('statsFilterCount');
         const filterVal = filterEl ? filterEl.value : "all";
         const monthEl = document.getElementById('statsFilterMonth');
         const monthVal = monthEl ? monthEl.value : "";
         
-        // 2. 필터 적용된 게임 목록 생성
         let filteredGames = gameLogs;
         if (monthVal) filteredGames = filteredGames.filter(g => g.dateStr.startsWith(monthVal));
         if (filterVal !== "all") {
@@ -249,11 +247,9 @@ function showDashInfo(type) {
             filteredGames = filteredGames.filter(g => g.ranks.filter(n => n.trim() !== "").length === count);
         }
 
-        // 3. 통계 연산용 임시 객체 초기화
         let startOrderStats = {};
         players.forEach(p => startOrderStats[p] = { count: 0, played: 0 });
 
-        // 4. 모든 게임 순회하며 초구/말구 횟수 추출 (1인 게임 방어 포함)
         filteredGames.forEach(g => {
             const actual = g.ranks.filter(n => n.trim() !== "");
             actual.forEach(p => { if (startOrderStats[p]) startOrderStats[p].played++; });
@@ -268,13 +264,11 @@ function showDashInfo(type) {
             }
         });
 
-        // 5. 산출된 데이터를 정렬 배열로 변환 (횟수 내림차순 -> 참여 횟수 내림차순)
         let statList = players.filter(p => startOrderStats[p].played > 0).map(p => ({
             name: p, count: startOrderStats[p].count, played: startOrderStats[p].played
         }));
         statList.sort((a, b) => b.count - a.count || b.played - a.played);
 
-        // 6. UI 기본 정보 세팅
         let listHtml = `<div style="margin-top: 15px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 15px;">`;
         if (type === 'firstBreak') {
             icon = "🎱"; title = "최다 초구자 (MOST FIRST BREAKS)";
@@ -286,7 +280,6 @@ function showDashInfo(type) {
             listHtml += `<div style="font-size:13px; color:var(--sub-text); font-weight:900; margin-bottom:12px; text-align:center;">[ 전체 선수 말구 횟수 ]</div>`;
         }
         
-        // 7. 동적 리스트 HTML 생성 (디자인 적용)
         statList.forEach((s, idx) => {
             let rankStr = `${idx + 1}위`;
             if (idx === 0 && s.count > 0) rankStr = (type === 'firstBreak') ? "1위🥇" : "1위💀";
@@ -300,8 +293,7 @@ function showDashInfo(type) {
         });
         
         listHtml += `</div>`;
-        desc += listHtml; // 기존 안내문 아래에 리스트 추가
-    // --- ↑ 여기까지 추가 ↑ ---
+        desc += listHtml; 
     } else if (type === 'trend') {
         icon = "📈"; title = "최근 7게임 레코드";
         
@@ -342,7 +334,6 @@ function showDashInfo(type) {
 
         playerStats.sort((a, b) => (b.avgScore - a.avgScore) || (b.winRate - a.winRate) || (b.wins - a.wins));
 
-        // [V9.50] 다크/네이비 모드에서도 흰색 배경 팝업에서 가독성을 보장하기 위해 명시적인 다크 색상(#444, #555, #666) 고정 적용
         let trendHtml = `<div style="font-size:12px; color:#555; margin-bottom:15px; text-align:center; font-weight:800;">(가장 오른쪽 사각형이 최신 게임 결과)</div>`;
         trendHtml += `<table class="trend-table">
             <thead>
@@ -358,14 +349,11 @@ function showDashInfo(type) {
             stat.ranksList.forEach((r, idx) => {
                 if (idx === stat.ranksList.length - 1) {
                     if (r === '꼴') {
-                        // '꼴'찌 박스: 보라색 계열 강제 고정
                         rankHtml += `<span class="recent-rank-box" style="margin-left: 3px; border-color: #8e44ad; background: rgba(142, 68, 173, 0.12); color: #8e44ad;">${r}</span>`;
                     } else {
-                        // 일반 등수 박스: 빨간색 계열 강제 고정
                         rankHtml += `<span class="recent-rank-box" style="margin-left: 3px; border-color: #ff4757; background: rgba(255, 71, 87, 0.15); color: #ff4757;">${r}</span>`;
                     }
                 } else {
-                    // 이전 전적 텍스트 및 하이픈: 진한 회색(#444) 강제 고정
                     rankHtml += `<span class="trend-rank-text" style="display: inline-block; width: 18px; text-align: center; color: #444;">${r}</span><span style="opacity: 0.5; font-weight: 900; margin: 0 1px; color: #444;">-</span>`;
                 }
             });
@@ -392,19 +380,17 @@ function showDashInfo(type) {
     titleEl.innerHTML = title;
     descEl.innerHTML = desc;
 
-    // [V9.50 팝업 타이틀 가독성 패치] 다크/네이비 모드 강제 흰색 변환 방어
     const currentAppTheme = document.documentElement.getAttribute('data-theme');
     if (currentAppTheme === 'dark' || currentAppTheme === 'navy') {
-        titleEl.style.setProperty('color', '#2980b9', 'important'); // 뚜렷한 파란색 고정
+        titleEl.style.setProperty('color', '#2980b9', 'important'); 
     } else {
         titleEl.style.removeProperty('color');
-        titleEl.style.color = 'var(--rank1)'; // 기본 테마 색상 복구
+        titleEl.style.color = 'var(--rank1)'; 
     }
 
     document.getElementById('info-modal').style.display = 'flex';
 
     if (dashInfoCountdownInterval) clearInterval(dashInfoCountdownInterval);
-// ... (이하 카운트다운 로직 동일)
     let timeLeft = 10;
     let timerEl = document.getElementById('dash-info-timer');
     if (!timerEl) {
@@ -771,7 +757,6 @@ function renderCalendar() {
         if (dStr === realTodayStr) dayClass += " today-new";
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
-        // [V9.61 수정] 하트 이모지 대신 순수 CSS 야광 닷(Dot)을 위한 빈 div 삽입
         const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
         grid.innerHTML += `<div class="${dayClass}" onclick="selectDate('${dStr}')"><span class="day-num">${d}</span>${recordDot}</div>`;
     }
@@ -846,7 +831,6 @@ async function saveGame() {
     }
     if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
     
-    // [V9.50] 성공 이펙트 및 사운드 발생
     triggerSuccessFlash();
     playSystemSound('success');
 
@@ -888,9 +872,6 @@ function calculateLuckyGuy(filteredGames) {
     return luckyWinner;
 }
 
-// [V9.50 이모지 추가 패치] tag 변수에 직접 이모지 결합
-// [V9.50 수정] 실시간 타임라인 렌더링 (레이아웃 2줄 변경 및 중복 에러 픽스)
-// [V9.50 수정] 실시간 타임라인 렌더링 (다크/네이비 모드 텍스트 가독성 향상)
 function renderLiveTimeline(filteredGames) {
     const container = document.getElementById('dashTimeline');
     if (!container) return;
@@ -902,7 +883,6 @@ function renderLiveTimeline(filteredGames) {
         return;
     }
 
-    // [추가된 핵심 로직] 현재 테마를 감지하여 다크/네이비 모드일 경우 진한 네이비 브라운(#3e2723) 적용
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const isDarkMode = currentTheme === 'dark' || currentTheme === 'navy';
     const subTextColor = isDarkMode ? "#3e2723" : "#888"; 
@@ -928,7 +908,6 @@ function renderLiveTimeline(filteredGames) {
         const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr);
         const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
         
-        // 동적 색상(subTextColor) 변수 적용
         let winnerOrderText = "";
         let loserOrderText = "";
         if (g.startOrder && g.startOrder.length > 0) {
@@ -938,7 +917,6 @@ function renderLiveTimeline(filteredGames) {
             if (lIdx !== -1) loserOrderText = `<span style="font-size:10px; font-weight:800; color:${subTextColor};">(${lIdx + 1}번째 순서)</span>`;
         }
         
-        // 동적 색상(vsTextColor) 변수 적용
         html += `<div style="display: flex; flex-direction: column; background: rgba(255,255,255,0.5); padding: 10px 12px; border-radius: 10px; font-size: 13px; border-left: 4px solid ${color};">
                     <div style="font-weight: 800; color: #555; text-align: left; margin-bottom: 6px;">
                         ${g.dateStr.slice(5)} <span style="color:var(--rank1); margin-left:4px;">${gameNumber}G</span> <span style="color:${color}; margin-left:4px;">[${tag}]</span>
@@ -1034,7 +1012,6 @@ function renderDashboard() {
         }
     });
     document.getElementById('dashDefense').innerText = defCandidate !== "-" ? `${defCandidate} (${maxDefAvg.toFixed(1)}위)` : "-";
-    // --- ↓ 여기부터 삽입 (V9.61 신규 최다 초구/말구 산출) ↓ ---
     let startOrderStats = {};
     players.forEach(p => startOrderStats[p] = { first: 0, last: 0 });
     
@@ -1043,7 +1020,6 @@ function renderDashboard() {
             const firstP = g.startOrder[0];
             const lastP = g.startOrder[g.startOrder.length - 1];
             if (startOrderStats[firstP]) startOrderStats[firstP].first++;
-            // 1인 게임 예외 처리 방어 (length > 1)
             if (startOrderStats[lastP] && g.startOrder.length > 1) startOrderStats[lastP].last++;
         }
     });
@@ -1052,13 +1028,11 @@ function renderDashboard() {
     let bestFirst = "-", bestLast = "-";
     
     activePlayers.forEach(p => {
-        // 초구 1위 산출 (동률일 경우 참여 게임 수 우선)
         if (startOrderStats[p].first > maxFirst) { maxFirst = startOrderStats[p].first; bestFirst = p; }
         else if (startOrderStats[p].first === maxFirst && maxFirst > 0) {
             if (pStats[p] && pStats[bestFirst] && pStats[p].played > pStats[bestFirst].played) bestFirst = p;
         }
         
-        // 말구 1위 산출 (동률일 경우 참여 게임 수 우선)
         if (startOrderStats[p].last > maxLast) { maxLast = startOrderStats[p].last; bestLast = p; }
         else if (startOrderStats[p].last === maxLast && maxLast > 0) {
             if (pStats[p] && pStats[bestLast] && pStats[p].played > pStats[bestLast].played) bestLast = p;
@@ -1067,7 +1041,6 @@ function renderDashboard() {
 
     document.getElementById('dashFirstBreak').innerText = bestFirst !== "-" ? `${bestFirst} (${maxFirst}회)` : "-";
     document.getElementById('dashLastTurn').innerText = bestLast !== "-" ? `${bestLast} (${maxLast}회)` : "-";
-    // --- ↑ 여기까지 삽입 ↑ ---
 }
 function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); }
 function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
@@ -1100,7 +1073,6 @@ function renderScoreRank() {
 }
 
 function shareScoreRankResult() { captureAndShare('scoreRank-capture-area', 'scoreRank-share-btn', 'score_rank.png', '멤버별 승점 순위', '멤버별 승점 순위 결과입니다!'); }
-
 function renderStats() {
     const subtitleEl = document.querySelector('.stats-subtitle');
     if (subtitleEl) { subtitleEl.innerText = isPercentMode ? "(평균 승점 기준. 확률 %)" : "(평균 승점 기준. 횟수)"; }
@@ -1132,7 +1104,6 @@ function renderStats() {
         const winRate = stats[p].played > 0 ? ((stats[p].ranks[0] / stats[p].played) * 100).toFixed(1) : "0.0";
         const getVal = (v, t) => isPercentMode ? (t === 0 ? '0' : ((v/t)*100).toFixed(0)) : v;
         
-        // [V9.50 수정] <td> 태그 style에 color:${getPlayerColor(p)}; 를 추가하여 퍼스널 컬러 적용
         return `<tr><td style="color:${getPlayerColor(p)}; font-weight:900; text-decoration:underline; cursor:pointer;" onclick="renderMemberHistory('${p}', '${cRank}')">${getTier(stats[p].score).icon} ${p}</td><td>${stats[p].played}</td><td style="color:var(--rank1);">${getVal(stats[p].ranks[0], stats[p].played)}</td><td style="color:var(--rank2);">${getVal(stats[p].ranks[1], stats[p].played)}</td><td style="color:var(--rank3);">${getVal(stats[p].ranks[2], stats[p].played)}</td><td style="color:var(--rank4);">${getVal(stats[p].ranks[3], stats[p].played)}</td><td style="color:var(--rankL);">${getVal(stats[p].ranks[4], stats[p].played)}</td><td><span class="win-rate-pill">${winRate}%</span></td></tr>`;
     }).join('');
     
@@ -1378,7 +1349,6 @@ function renderMemberHistory(name, rank = "") {
                 <div style="font-size:14px; font-weight:900; color:${cond[2]};">${cond[0]} ${cond[1]}</div>
              </div>`;
 
-    // [V9.50 천적/샌드백 분석 로직 추가]
     let h2h = {};
     players.forEach(p => { if (p !== name) h2h[p] = { match: 0, win: 0, loss: 0 }; });
     
@@ -1388,9 +1358,7 @@ function renderMemberHistory(name, rank = "") {
         actual.forEach((p, pIdx) => {
             if (p !== name && h2h[p]) {
                 h2h[p].match++;
-                // 내가 승리 (상대보다 등수가 높음 - 인덱스는 작음)
                 if (myIdx < pIdx) h2h[p].win++; 
-                // 내가 패배 (상대보다 등수가 낮음 - 인덱스는 큼)
                 else if (myIdx > pIdx) h2h[p].loss++; 
             }
         });
@@ -1403,19 +1371,13 @@ function renderMemberHistory(name, rank = "") {
         let nemesisList = [...validOpponents].sort((a, b) => (h2h[b].loss / h2h[b].match) - (h2h[a].loss / h2h[a].match) || h2h[b].loss - h2h[a].loss);
         let bagList = [...validOpponents].sort((a, b) => (h2h[b].win / h2h[b].match) - (h2h[a].win / h2h[a].match) || h2h[b].win - h2h[a].win);
 
-        // 패배 횟수가 승리 횟수보다 많은 경우에만 '천적'으로 인정
         if (nemesisList.length > 0 && h2h[nemesisList[0]].loss > h2h[nemesisList[0]].win) nemesis = nemesisList[0];
-        // 승리 횟수가 패배 횟수보다 많은 경우에만 '샌드백'으로 인정
         if (bagList.length > 0 && h2h[bagList[0]].win > h2h[bagList[0]].loss) punchingBag = bagList[0];
     }
 
     let nemesisText = nemesis ? `<span style="color:var(--rankL); font-size:16px; font-weight:900;">${nemesis}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[nemesis].win/h2h[nemesis].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">천적이 없어!</span>`;
     let bagText = punchingBag ? `<span style="color:var(--rank1); font-size:16px; font-weight:900;">${punchingBag}</span><br><span style="font-size:11px; color:var(--sub-text); font-weight:800;">승률 ${Math.round((h2h[punchingBag].win/h2h[punchingBag].match)*100)}%</span>` : `<span style="color:var(--sub-text); font-weight:800; font-size:12px;">샌드백이 없어!</span>`;
 
-    // [V9.50 수정] 천적 및 샌드백 상자에 클릭(터치) 이벤트 및 포인터 커서 부여
-    // [V9.50 수정] 천적 및 샌드백 상자에 정렬 타입 지정 인자('nemesis', 'bag') 추가 바인딩
-    // [V9.51 수정] 천적 및 샌드백 상자에 스포트라이트(네온) 글로우 효과 완벽 적용
-    // [V9.52 수정] 천적 및 샌드백 상자에 스포트라이트 랜덤 컬러 완벽 적용
     const spotlightColors = [
         { bg: 'rgba(255, 173, 173, 0.25)', shadow: 'rgba(255, 173, 173, 0.5)', border: '#FFADAD' },
         { bg: 'rgba(255, 214, 165, 0.25)', shadow: 'rgba(255, 214, 165, 0.5)', border: '#FFD6A5' },
@@ -1427,13 +1389,10 @@ function renderMemberHistory(name, rank = "") {
         { bg: 'rgba(255, 198, 255, 0.25)', shadow: 'rgba(255, 198, 255, 0.5)', border: '#FFC6FF' }
     ];
     
-    // 두 상자의 색상이 겹치지 않도록 랜덤 셔플 후 2개 추출
-    // 두 상자의 색상이 겹치지 않도록 랜덤 셔플 후 2개 추출
     const shuffledColors = [...spotlightColors].sort(() => 0.5 - Math.random());
     const nemColor = shuffledColors[0];
     const bagColor = shuffledColors[1];
 
-    // [V9.53 수정] 캡처 시 버튼이 사라져도 겹치지 않도록 margin-bottom: 15px; 안전 여백 추가
     html += `<div style="display: flex; gap: 10px; margin-top: 10px; margin-bottom: 15px;">
                 <div class="cond-responsive" onclick="showH2HDetailModal('${name}', 'nemesis')" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; background: ${nemColor.bg}; padding: 15px 5px; border-radius: 14px; border: 2.5px solid ${nemColor.border}; box-shadow: 0 0 10px ${nemColor.border}, 0 0 20px ${nemColor.shadow}, inset 0 0 8px rgba(255,255,255,0.3); backdrop-filter: blur(5px); transition: all 0.4s ease; box-sizing: border-box;">
                     <div style="font-size:12px; font-weight:900; color:var(--sub-text); margin-bottom:8px; text-shadow: 0 0 5px rgba(255,255,255,0.5);">😈 나의 천적 <span style="font-size:9px; opacity:0.6;">(터치)</span></div>
@@ -1595,6 +1554,7 @@ function renderTodayMVP() {
     area.innerHTML = html; area.style.display = 'flex';
 }
 
+// [V9.62 수정] 오늘의 복기(Replay) 진입 버튼 추가 렌더링
 function renderGameList() {
     const games = gameLogs.filter(g => g.dateStr === selectedDateStr); 
     const area = document.getElementById('dayGameList');
@@ -1602,7 +1562,10 @@ function renderGameList() {
     
     if(games.length > 0) { 
         let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>
-                    <button id="today-share-btn" class="share-btn-common" style="margin-bottom:15px;" onclick="shareTodayResult()">📸 오늘의 전적 스크린샷 공유</button>`; 
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <button id="today-share-btn" class="share-btn-common" style="flex:1; margin:0;" onclick="shareTodayResult()">📸 전적 공유</button>
+                        <button class="share-btn-common" style="flex:1; margin:0; background: linear-gradient(145deg, #f1c40f, #f39c12); border: 1.5px solid #d35400; color: #fff;" onclick="showTodayReplay()">▶️ 오늘의 복기</button>
+                    </div>`; 
                     
         games.forEach((g, idx) => { 
             const names = g.ranks.filter(n => n && n.trim() !== ""); 
@@ -2046,26 +2009,21 @@ window.onload = () => {
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
 document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
-// [V9.50 신규 전원 상성 분석 상세 모달 팝업 로직]
-// [V9.50 신규 전원 상성 분석 상세 모달 팝업 로직 - 정렬 알고리즘 완벽 탑재]
-// [V9.50 신규 전원 상성 분석 상세 모달 팝업 로직 - 월/인원 필터 완벽 연동 및 정렬 탑재]
+
 function showH2HDetailModal(playerName, type) {
     triggerHaptic(10);
     
-    // [V9.50 핵심 패치] 현재 화면에 설정된 월별/인원 필터값 읽어오기
     const filterVal = document.getElementById('statsFilterCount')?.value || "all";
     const monthVal = document.getElementById('statsFilterMonth')?.value || "";
 
-    // 1. 해당 선수가 참여한 모든 경기 추출 (필터 조건 완벽 적용)
     const allPersonal = gameLogs.filter(g => {
-        if (monthVal && !g.dateStr.startsWith(monthVal)) return false; // 월 필터
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return false; 
         const actual = g.ranks.filter(n => n.trim() !== "");
         if (!actual.includes(playerName)) return false; 
-        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return false; // 인원 필터
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return false; 
         return true;
     });
     
-    // 2. 전원 상대 전적 객체 초기화 및 계산
     let h2h = {};
     players.forEach(p => { if (p !== playerName) h2h[p] = { match: 0, win: 0, loss: 0 }; });
     
@@ -2081,7 +2039,6 @@ function showH2HDetailModal(playerName, type) {
         });
     });
 
-    // 3. 정렬을 위한 1차 상대 전적 리스트 빌드
     let opponentList = [];
     players.forEach(p => {
         if (p === playerName) return;
@@ -2090,7 +2047,6 @@ function showH2HDetailModal(playerName, type) {
         opponentList.push({ name: p, stats: s, winRate: winRate });
     });
 
-    // 4. 유저의 터치 의도(type)에 따른 동적 정렬 수행
     opponentList.sort((a, b) => {
         if (a.stats.match === 0 && b.stats.match > 0) return 1;
         if (b.stats.match === 0 && a.stats.match > 0) return -1;
@@ -2103,7 +2059,6 @@ function showH2HDetailModal(playerName, type) {
         }
     });
 
-    // 5. HTML 빌드
     let html = `<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; color: #333; margin-top:5px;">`;
     
     opponentList.forEach(item => {
@@ -2118,10 +2073,9 @@ function showH2HDetailModal(playerName, type) {
         } else {
             const winRate = item.winRate;
             
-            // [V9.51 수정] 승률에 따른 명시적 컬러 구분 (우세:네이비, 동률:브라운, 열세:레드)
-            let rateColor = '#795548'; // 50% 동률은 브라운
-            if (winRate > 50) rateColor = '#1A237E'; // 51% 이상 우세는 네이비
-            else if (winRate < 50) rateColor = '#e74c3c'; // 49% 이하 열세는 레드
+            let rateColor = '#795548'; 
+            if (winRate > 50) rateColor = '#1A237E'; 
+            else if (winRate < 50) rateColor = '#e74c3c'; 
             
             html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px 15px; border-radius:12px; border:1px solid rgba(0,0,0,0.02);">
                         <span style="font-weight:900; font-size:16px; color:${getPlayerColor(p)}">${playerThemes[p].emoji} ${p}</span>
@@ -2134,13 +2088,11 @@ function showH2HDetailModal(playerName, type) {
     });
     html += `</div>`;
     
-    // 6. 범용 모달 객체 캐스팅 및 동적 인젝션
     const titleEl = document.getElementById('info-modal-title');
     const descEl = document.getElementById('info-modal-desc');
     
     document.getElementById('info-modal-icon').innerHTML = "⚔️";
     
-    // [V9.50 추가] 타이틀에 필터 상태(월, 인원) 명시
     let monthText = monthVal ? `, ${monthVal}월` : '';
     let countText = filterVal === 'all' ? '' : `, ${filterVal}인`;
     const suffix = type === 'nemesis' ? '천적 순' : '샌드백 순';
@@ -2161,6 +2113,7 @@ function showH2HDetailModal(playerName, type) {
     const timerEl = document.getElementById('dash-info-timer'); if (timerEl) timerEl.remove();
     document.getElementById('info-modal').style.display = 'flex';
 }
+
 function showQuickViewModal(dateStr, round) {
     triggerHaptic(10);
     const targetGame = gameLogs.find(g => g.dateStr === dateStr && g.round === round);
@@ -2169,21 +2122,17 @@ function showQuickViewModal(dateStr, round) {
         return;
     }
     
-    // [방어 로직] 순서(startOrder) 데이터가 없는 과거 게임 처리
     if (!targetGame.startOrder || targetGame.startOrder.length === 0) {
         showToastMsg("저장된 순서 정보가 없습니다.");
         return;
     }
     
     const startOrder = targetGame.startOrder;
-    // [추가] 해당 게임의 실제 최종 순위 배열 추출
     const actualRanks = targetGame.ranks.filter(n => n && n.trim() !== ""); 
     
-    // 게임 넘버 파악
     const sameDateGames = gameLogs.filter(x => x.dateStr === dateStr);
     const gameNumber = sameDateGames.findIndex(x => x.round === round) + 1;
     
-    // [수정] 모달 타이틀 문구 변경
     let html = `<div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">🎯</div>
                 <div style="font-size:18px; font-weight:900; color:var(--text-color); margin-bottom:5px; display:block; text-align:center;">${dateStr}</div>
                 <div style="font-size:14px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; display:block; text-align:center;">[ ${gameNumber}G 초구 및 순서와 순위 ]</div>
@@ -2193,24 +2142,22 @@ function showQuickViewModal(dateStr, round) {
         const orderLabel = (i === 0) ? "1번 (초구)🎱" : `${i + 1}번`;
         const orderColor = (i === 0) ? 'var(--rank1)' : 'var(--text-color)';
         
-        // [추가] 이름 옆에 표시될 실제 순위 텍스트 및 테마 컬러 매칭 로직
         const rankIdx = actualRanks.indexOf(name);
         let finalRankLabel = "";
-        let finalRankColor = "var(--sub-text)"; // 2~4위를 위한 기본 서브 텍스트 컬러
+        let finalRankColor = "var(--sub-text)"; 
         
         if (rankIdx !== -1) {
             if (rankIdx === 0) {
                 finalRankLabel = "(1위)";
-                finalRankColor = "var(--rank1)"; // 1위는 파란색
+                finalRankColor = "var(--rank1)"; 
             } else if (rankIdx === actualRanks.length - 1 && actualRanks.length > 1) {
                 finalRankLabel = "(꼴찌)";
-                finalRankColor = "var(--rankL)"; // 꼴찌는 빨간색
+                finalRankColor = "var(--rankL)"; 
             } else {
                 finalRankLabel = `(${rankIdx + 1}위)`;
             }
         }
 
-        // [수정] Flexbox 우측 영역에 순위 라벨(<span ...>) 추가
         html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7); margin-bottom:8px;">
                     <div style="color:${orderColor}; font-size:${i === 0 ? '16px' : '14px'}; font-weight:${i === 0 ? '900' : '800'};">${orderLabel}</div>
                     <div style="color:${orderColor}; font-size:${i === 0 ? '22px' : '16px'}; font-weight:${i === 0 ? '900' : '800'}; text-align:right;">
@@ -2229,7 +2176,7 @@ function showQuickViewModal(dateStr, round) {
     modal.style.display = 'flex'; 
     content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
     
-    closeAllOverlays(); // 액션 오버레이 닫기
+    closeAllOverlays(); 
 }
 
 function closeQuickViewModal() {
@@ -2238,4 +2185,78 @@ function closeQuickViewModal() {
     if(!modal || !content) return;
     content.style.animation = 'scaleDownPopup 0.3s ease-in forwards';
     setTimeout(() => { modal.style.display = 'none'; content.style.animation = 'none'; }, 300);
+}
+
+// [V9.62 신규] 오늘의 복기 애니메이션 로직
+function showTodayReplay() {
+    triggerHaptic(10);
+    const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
+    if (games.length === 0) return showToastMsg("복기할 데이터가 없습니다.");
+
+    // 순서 데이터가 없는 과거 수기 입력 게임 제외
+    const validGames = games.filter(g => g.startOrder && g.startOrder.length > 0);
+    if (validGames.length === 0) return showToastMsg("이전 기록은 복기를 지원하지 않습니다.");
+
+    // 라운드 순서 정렬
+    validGames.sort((a, b) => parseInt(a.round) - parseInt(b.round));
+
+    const modal = document.getElementById('replay-modal');
+    const content = document.getElementById('replay-content');
+    modal.style.display = 'flex';
+    
+    let currentIndex = 0;
+    if (replayInterval) clearInterval(replayInterval);
+
+    function renderStep() {
+        if (currentIndex >= validGames.length) {
+            clearInterval(replayInterval);
+            content.innerHTML = `
+                <div class="replay-card">
+                    <div style="font-size:50px; margin-bottom:20px;">🏁</div>
+                    <div style="font-size:20px; font-weight:900; margin-bottom:20px; color:#fff;">오늘의 복기 종료!</div>
+                    <button class="save-btn" style="background:#bdc3c7; color:#444;" onclick="closeReplayModal()">닫기</button>
+                </div>
+            `;
+            return;
+        }
+
+        const g = validGames[currentIndex];
+        const actualRanks = g.ranks.filter(n => n && n.trim() !== "");
+        const firstP = g.startOrder[0];
+        const winnerP = actualRanks[0];
+        const loserP = actualRanks[actualRanks.length - 1];
+        
+        content.innerHTML = `
+            <div class="replay-card">
+                <div class="replay-header">DAY'S REPLAY - ${selectedDateStr}</div>
+                <div class="replay-round">제 ${currentIndex + 1} 경기</div>
+                <div class="replay-row">
+                    <div class="replay-label">초구 (1번) 🎱</div>
+                    <div class="replay-value" style="color:var(--rank1);">${firstP}</div>
+                </div>
+                <div class="replay-row">
+                    <div class="replay-label">1위 🥇</div>
+                    <div class="replay-value" style="color:#ffeb3b;">${winnerP}</div>
+                </div>
+                <div class="replay-row">
+                    <div class="replay-label">꼴찌 💀</div>
+                    <div class="replay-value" style="color:var(--rankL);">${loserP}</div>
+                </div>
+            </div>
+        `;
+        triggerHaptic(15);
+        currentIndex++;
+    }
+
+    renderStep();
+    replayInterval = setInterval(renderStep, 2500); // 2.5초마다 다음 경기로 자동 전환
+}
+
+function closeReplayModal() {
+    if (replayInterval) {
+        clearInterval(replayInterval);
+        replayInterval = null;
+    }
+    const modal = document.getElementById('replay-modal');
+    if (modal) modal.style.display = 'none';
 }
