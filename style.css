@@ -918,3 +918,35 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
     z-index: 100005; transition: opacity 0.8s ease-out; color: white; text-align: center;
     pointer-events: none;
 }
+
+/* [V9.62] 오늘의 복기(Replay) 전용 스타일 추가 */
+.replay-card {
+    background: linear-gradient(145deg, rgba(30, 40, 60, 0.95), rgba(15, 20, 35, 0.98));
+    border: 2px solid rgba(100, 181, 246, 0.5);
+    border-radius: 20px;
+    padding: 25px 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 15px rgba(100, 181, 246, 0.2);
+    text-align: center;
+    color: #fff;
+    animation: fadeInScale 0.4s ease-out;
+}
+.replay-header {
+    font-size: 14px; color: #90caf9; font-weight: 900; margin-bottom: 20px; letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(144, 202, 249, 0.6);
+}
+.replay-round {
+    font-size: 28px; font-weight: 900; color: #ffeb3b; margin-bottom: 25px;
+    text-shadow: 0 0 15px rgba(255, 235, 59, 0.5);
+}
+.replay-row {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; margin-bottom: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.replay-label { font-size: 13px; font-weight: 800; color: #b0bec5; }
+.replay-value { font-size: 18px; font-weight: 900; }
+
+@keyframes fadeInScale {
+    0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
