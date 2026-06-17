@@ -2249,7 +2249,7 @@ function showTodayReplay() {
     }
 
     renderStep();
-    replayInterval = setInterval(renderStep, 2500); // 2.5초마다 다음 경기로 자동 전환
+    replayInterval = setInterval(renderStep, 10000); // 10초마다 다음 경기로 자동 전환
 }
 
 function closeReplayModal() {
