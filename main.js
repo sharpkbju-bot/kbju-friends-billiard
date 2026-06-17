@@ -2245,7 +2245,7 @@ function showTodayReplay() {
                     <div class="replay-label">꼴찌 💀</div>
                     <div class="replay-value" style="color:var(--rankL);">${loserP}</div>
                 </div>
-                <div style="margin-top:20px; font-size:11px; color:#90caf9; font-weight:800; opacity:0.8;">(화면을 터치하면 다음으로 넘어갑니다)</div>
+                <div style="margin-top:20px; font-size:11px; color:#90caf9; font-weight:800; opacity:0.8;">(화면을 터치하면 다음으로 넘어갑니다.)</div>
             </div>
         `;
         triggerHaptic(15);
