@@ -757,6 +757,7 @@ function renderCalendar() {
         if (dStr === realTodayStr) dayClass += " today-new";
         if (dayOfWeek === 0 || isHoliday(year, month, d)) dayClass += " sun-new";
         if (dayOfWeek === 6) dayClass += " sat-new";
+        // [V9.55 수정] 하트 이모지 대신 순수 CSS 야광 닷(Dot)을 위한 빈 div 삽입
         const recordDot = hasRecord ? `<div class="record-dot"></div>` : "";
         grid.innerHTML += `<div class="${dayClass}" onclick="selectDate('${dStr}')"><span class="day-num">${d}</span>${recordDot}</div>`;
     }
@@ -2010,6 +2011,7 @@ window.onload = () => {
 };
 document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
 
+// [V9.50 신규 전원 상성 분석 상세 모달 팝업 로직]
 function showH2HDetailModal(playerName, type) {
     triggerHaptic(10);
     
@@ -2187,7 +2189,7 @@ function closeQuickViewModal() {
     setTimeout(() => { modal.style.display = 'none'; content.style.animation = 'none'; }, 300);
 }
 
-// [V9.62 신규] 오늘의 복기 애니메이션 로직
+// [V9.62 신규] 오늘의 복기 애니메이션 로직 (터치 스킵 기능 추가)
 function showTodayReplay() {
     triggerHaptic(10);
     const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
@@ -2209,12 +2211,13 @@ function showTodayReplay() {
 
     function renderStep() {
         if (currentIndex >= validGames.length) {
-            clearInterval(replayInterval);
+            if (replayInterval) clearInterval(replayInterval);
             content.innerHTML = `
-                <div class="replay-card">
+                <div class="replay-card" style="cursor:pointer;" onclick="closeReplayModal()">
                     <div style="font-size:50px; margin-bottom:20px;">🏁</div>
                     <div style="font-size:20px; font-weight:900; margin-bottom:20px; color:#fff;">오늘의 복기 종료!</div>
-                    <button class="save-btn" style="background:#bdc3c7; color:#444;" onclick="closeReplayModal()">닫기</button>
+                    <div style="font-size:12px; color:#b0bec5; font-weight:800; margin-bottom:20px;">(화면을 터치하면 닫힙니다)</div>
+                    <button class="save-btn" style="background:#bdc3c7; color:#444;" onclick="event.stopPropagation(); closeReplayModal()">닫기</button>
                 </div>
             `;
             return;
@@ -2227,7 +2230,7 @@ function showTodayReplay() {
         const loserP = actualRanks[actualRanks.length - 1];
         
         content.innerHTML = `
-            <div class="replay-card">
+            <div class="replay-card" style="cursor:pointer;" onclick="skipToNextReplay()">
                 <div class="replay-header">DAY'S REPLAY - ${selectedDateStr}</div>
                 <div class="replay-round">제 ${currentIndex + 1} 경기</div>
                 <div class="replay-row">
@@ -2242,11 +2245,23 @@ function showTodayReplay() {
                     <div class="replay-label">꼴찌 💀</div>
                     <div class="replay-value" style="color:var(--rankL);">${loserP}</div>
                 </div>
+                <div style="margin-top:20px; font-size:11px; color:#90caf9; font-weight:800; opacity:0.8;">(화면을 터치하면 다음으로 넘어갑니다)</div>
             </div>
         `;
         triggerHaptic(15);
         currentIndex++;
     }
+
+    // 전역에서 skip 함수를 호출할 수 있도록 window 객체에 바인딩 (타이머 중복 방지 코어)
+    window.skipToNextReplay = function() {
+        triggerHaptic(10);
+        if (replayInterval) clearInterval(replayInterval); // 기존 타이머 즉시 파괴
+        renderStep(); // 즉시 다음 화면 렌더링
+        if (currentIndex <= validGames.length) {
+            // 종료 화면이 아닐 경우에만 새 타이머 시작
+            replayInterval = setInterval(renderStep, 10000);
+        }
+    };
 
     renderStep();
     replayInterval = setInterval(renderStep, 10000); // 10초마다 다음 경기로 자동 전환
@@ -2256,6 +2271,10 @@ function closeReplayModal() {
     if (replayInterval) {
         clearInterval(replayInterval);
         replayInterval = null;
+    }
+    // window 객체에 등록한 skip 함수도 함께 정리
+    if (window.skipToNextReplay) {
+        delete window.skipToNextReplay;
     }
     const modal = document.getElementById('replay-modal');
     if (modal) modal.style.display = 'none';
