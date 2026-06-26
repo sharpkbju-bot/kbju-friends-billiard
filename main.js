@@ -1,4 +1,4 @@
-// main.js - V9.62 Live Pulse Edition
+// main.js - V9.65 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -334,6 +334,7 @@ function showDashInfo(type) {
 
         playerStats.sort((a, b) => (b.avgScore - a.avgScore) || (b.winRate - a.winRate) || (b.wins - a.wins));
 
+        // [V9.50] 다크/네이비 모드에서도 흰색 배경 팝업에서 가독성을 보장하기 위해 명시적인 다크 색상(#444, #555, #666) 고정 적용
         let trendHtml = `<div style="font-size:12px; color:#555; margin-bottom:15px; text-align:center; font-weight:800;">(가장 오른쪽 사각형이 최신 게임 결과)</div>`;
         trendHtml += `<table class="trend-table">
             <thead>
@@ -349,11 +350,14 @@ function showDashInfo(type) {
             stat.ranksList.forEach((r, idx) => {
                 if (idx === stat.ranksList.length - 1) {
                     if (r === '꼴') {
+                        // '꼴'찌 박스: 보라색 계열 강제 고정
                         rankHtml += `<span class="recent-rank-box" style="margin-left: 3px; border-color: #8e44ad; background: rgba(142, 68, 173, 0.12); color: #8e44ad;">${r}</span>`;
                     } else {
+                        // 일반 등수 박스: 빨간색 계열 강제 고정
                         rankHtml += `<span class="recent-rank-box" style="margin-left: 3px; border-color: #ff4757; background: rgba(255, 71, 87, 0.15); color: #ff4757;">${r}</span>`;
                     }
                 } else {
+                    // 이전 전적 텍스트 및 하이픈: 진한 회색(#444) 강제 고정
                     rankHtml += `<span class="trend-rank-text" style="display: inline-block; width: 18px; text-align: center; color: #444;">${r}</span><span style="opacity: 0.5; font-weight: 900; margin: 0 1px; color: #444;">-</span>`;
                 }
             });
@@ -380,17 +384,19 @@ function showDashInfo(type) {
     titleEl.innerHTML = title;
     descEl.innerHTML = desc;
 
+    // [V9.50 팝업 타이틀 가독성 패치] 다크/네이비 모드 강제 흰색 변환 방어
     const currentAppTheme = document.documentElement.getAttribute('data-theme');
     if (currentAppTheme === 'dark' || currentAppTheme === 'navy') {
-        titleEl.style.setProperty('color', '#2980b9', 'important'); 
+        titleEl.style.setProperty('color', '#2980b9', 'important'); // 뚜렷한 파란색 고정
     } else {
         titleEl.style.removeProperty('color');
-        titleEl.style.color = 'var(--rank1)'; 
+        titleEl.style.color = 'var(--rank1)'; // 기본 테마 색상 복구
     }
 
     document.getElementById('info-modal').style.display = 'flex';
 
     if (dashInfoCountdownInterval) clearInterval(dashInfoCountdownInterval);
+// ... (이하 카운트다운 로직 동일)
     let timeLeft = 10;
     let timerEl = document.getElementById('dash-info-timer');
     if (!timerEl) {
@@ -727,7 +733,7 @@ async function fetchData() {
 }
 
 function renderAll() { 
-    renderDashboard(); renderCalendar(); renderStats(); renderScoreRank(); renderDefenseStats(); renderGameList(); analyzeStrategy(); 
+    renderDashboard(); renderCalendar(); renderStats(); renderScoreRank(); renderDefenseStats(); renderGameList(); analyzeStrategy(); analyzeOrderStats();
 }
 
 function isHoliday(year, month, day) {
@@ -832,6 +838,7 @@ async function saveGame() {
     }
     if(new Set(ranks).size !== ranks.length) return alert("누가 쌍둥인겨? 잘 선택혀!(중복)");
     
+    // [V9.50] 성공 이펙트 및 사운드 발생
     triggerSuccessFlash();
     playSystemSound('success');
 
@@ -1043,7 +1050,7 @@ function renderDashboard() {
     document.getElementById('dashFirstBreak').innerText = bestFirst !== "-" ? `${bestFirst} (${maxFirst}회)` : "-";
     document.getElementById('dashLastTurn').innerText = bestLast !== "-" ? `${bestLast} (${maxLast}회)` : "-";
 }
-function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); }
+function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); analyzeOrderStats(); }
 function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
 
 function renderScoreRank() {
@@ -1555,7 +1562,6 @@ function renderTodayMVP() {
     area.innerHTML = html; area.style.display = 'flex';
 }
 
-// [V9.62 수정] 오늘의 복기(Replay) 진입 버튼 추가 렌더링
 function renderGameList() {
     const games = gameLogs.filter(g => g.dateStr === selectedDateStr); 
     const area = document.getElementById('dayGameList');
@@ -1881,6 +1887,93 @@ function analyzeStrategy() {
 
 function shareStrategyResult() { const player = document.getElementById('strategyPlayer').value; captureAndShare('strategy-capture-area', 'strategy-share-btn', `strategy_${player}.png`, '상성 분석', `${player} 선수의 상성 분석 결과입니다!`); }
 
+// [V9.65 신규 추가] 순번별 성적 분석 로직
+function analyzeOrderStats() {
+    const player = document.getElementById('orderStatsPlayer').value;
+    const area = document.getElementById('orderStatsResultArea'); 
+    const shareBtn = document.getElementById('orderStats-share-btn');
+    if (!player) { area.style.display = 'none'; if (shareBtn) shareBtn.style.display = 'none'; return; }
+
+    const filterVal = document.getElementById('statsFilterCount')?.value || "all";
+    const monthVal = document.getElementById('statsFilterMonth')?.value || "";
+    
+    let stats = {
+        '초구(1번)': { games: 0, totalRank: 0, wins: 0, lasts: 0 },
+        '2번': { games: 0, totalRank: 0, wins: 0, lasts: 0 },
+        '3번': { games: 0, totalRank: 0, wins: 0, lasts: 0 },
+        '4번': { games: 0, totalRank: 0, wins: 0, lasts: 0 },
+        '말구': { games: 0, totalRank: 0, wins: 0, lasts: 0 }
+    };
+    let hasData = false;
+
+    gameLogs.forEach(g => {
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
+        if (g.startOrder && g.startOrder.includes(player)) {
+            const actual = g.ranks.filter(n => n && n.trim() !== "");
+            if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+            
+            const myOrderIdx = g.startOrder.indexOf(player);
+            const totalPlayers = g.startOrder.length;
+            
+            let orderType = "";
+            if (myOrderIdx === 0) orderType = '초구(1번)';
+            else if (myOrderIdx === totalPlayers - 1 && totalPlayers > 1) orderType = '말구';
+            else if (myOrderIdx === 1) orderType = '2번';
+            else if (myOrderIdx === 2) orderType = '3번';
+            else if (myOrderIdx === 3) orderType = '4번';
+            
+            if (!orderType || !stats[orderType]) return; 
+
+            const myRankIdx = actual.indexOf(player);
+            if (myRankIdx !== -1) {
+                hasData = true;
+                stats[orderType].games++;
+                stats[orderType].totalRank += (myRankIdx + 1);
+                if (myRankIdx === 0) stats[orderType].wins++;
+                if (myRankIdx === actual.length - 1 && actual.length > 1) stats[orderType].lasts++;
+            }
+        }
+    });
+
+    if (!hasData) {
+        area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">분석 가능한 데이터가 없습니다.</div>`;
+        area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'none'; return;
+    }
+
+    const orderKeys = ['초구(1번)', '2번', '3번', '4번', '말구'];
+    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 특정 <b>순번</b>일 때 기록한 성적</div>`;
+    
+    orderKeys.forEach(t => {
+        const s = stats[t];
+        if (s.games === 0) return; 
+        
+        const avg = (s.totalRank / s.games).toFixed(1);
+        const winP = Math.round((s.wins / s.games) * 100); 
+        const lastP = Math.round((s.lasts / s.games) * 100); 
+        const otherP = 100 - winP - lastP; 
+        
+        let orderColor = "var(--text-color)";
+        if (t === '초구(1번)') orderColor = "var(--rank1)";
+        if (t === '말구') orderColor = "var(--rankL)";
+        
+        html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="font-size:15px; font-weight:800; color:var(--sub-text);">순서: <span style="font-size:19px; font-weight:900; color:${orderColor};">${t}</span> <span style="font-size:14px; font-weight:900; color:var(--accent); margin-left:4px;">${s.games}G</span></div>
+                        <div style="font-size:15px; font-weight:800; color:var(--text-color);">평균 ${avg}위</div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">1위 확률</div><div style="font-size:15px; font-weight:900; color:var(--rank1);">${winP}%, <span style="font-size:12px; color:var(--sub-text);">${s.wins}회</span></div></div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">기타 확률</div><div style="font-size:15px; font-weight:900; color:var(--rank2);">${otherP}%, <span style="font-size:12px; color:var(--sub-text);">${s.games - s.wins - s.lasts}회</span></div></div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">꼴찌 확률</div><div style="font-size:15px; font-weight:900; color:var(--rankL);">${lastP}%, <span style="font-size:12px; color:var(--sub-text);">${s.lasts}회</span></div></div>
+                    </div>
+                 </div>`;
+    });
+    area.innerHTML = html; area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'block';
+    setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+}
+
+function shareOrderStatsResult() { const player = document.getElementById('orderStatsPlayer').value; captureAndShare('orderStats-capture-area', 'orderStats-share-btn', `order_stats_${player}.png`, '순번별 성적 분석', `${player} 선수의 순번별 성적 분석 결과입니다!`); }
+
 function showToastMsg(msg) {
     const toast = document.getElementById('toast');
     if (!toast) return;
@@ -2010,22 +2103,26 @@ window.onload = () => {
     updateInputFields(); setDefaultSearchDates(); fetchData(); 
 };
 document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
-
 // [V9.50 신규 전원 상성 분석 상세 모달 팝업 로직]
+// [V9.50 신규 전원 상성 분석 상세 모달 팝업 로직 - 정렬 알고리즘 완벽 탑재]
+// [V9.50 신규 전원 상성 분석 상세 모달 팝업 로직 - 월/인원 필터 완벽 연동 및 정렬 탑재]
 function showH2HDetailModal(playerName, type) {
     triggerHaptic(10);
     
+    // [V9.50 핵심 패치] 현재 화면에 설정된 월별/인원 필터값 읽어오기
     const filterVal = document.getElementById('statsFilterCount')?.value || "all";
     const monthVal = document.getElementById('statsFilterMonth')?.value || "";
 
+    // 1. 해당 선수가 참여한 모든 경기 추출 (필터 조건 완벽 적용)
     const allPersonal = gameLogs.filter(g => {
-        if (monthVal && !g.dateStr.startsWith(monthVal)) return false; 
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return false; // 월 필터
         const actual = g.ranks.filter(n => n.trim() !== "");
         if (!actual.includes(playerName)) return false; 
-        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return false; 
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return false; // 인원 필터
         return true;
     });
     
+    // 2. 전원 상대 전적 객체 초기화 및 계산
     let h2h = {};
     players.forEach(p => { if (p !== playerName) h2h[p] = { match: 0, win: 0, loss: 0 }; });
     
@@ -2041,6 +2138,7 @@ function showH2HDetailModal(playerName, type) {
         });
     });
 
+    // 3. 정렬을 위한 1차 상대 전적 리스트 빌드
     let opponentList = [];
     players.forEach(p => {
         if (p === playerName) return;
@@ -2049,6 +2147,7 @@ function showH2HDetailModal(playerName, type) {
         opponentList.push({ name: p, stats: s, winRate: winRate });
     });
 
+    // 4. 유저의 터치 의도(type)에 따른 동적 정렬 수행
     opponentList.sort((a, b) => {
         if (a.stats.match === 0 && b.stats.match > 0) return 1;
         if (b.stats.match === 0 && a.stats.match > 0) return -1;
@@ -2061,6 +2160,7 @@ function showH2HDetailModal(playerName, type) {
         }
     });
 
+    // 5. HTML 빌드
     let html = `<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; color: #333; margin-top:5px;">`;
     
     opponentList.forEach(item => {
@@ -2075,9 +2175,10 @@ function showH2HDetailModal(playerName, type) {
         } else {
             const winRate = item.winRate;
             
-            let rateColor = '#795548'; 
-            if (winRate > 50) rateColor = '#1A237E'; 
-            else if (winRate < 50) rateColor = '#e74c3c'; 
+            // [V9.51 수정] 승률에 따른 명시적 컬러 구분 (우세:네이비, 동률:브라운, 열세:레드)
+            let rateColor = '#795548'; // 50% 동률은 브라운
+            if (winRate > 50) rateColor = '#1A237E'; // 51% 이상 우세는 네이비
+            else if (winRate < 50) rateColor = '#e74c3c'; // 49% 이하 열세는 레드
             
             html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px 15px; border-radius:12px; border:1px solid rgba(0,0,0,0.02);">
                         <span style="font-weight:900; font-size:16px; color:${getPlayerColor(p)}">${playerThemes[p].emoji} ${p}</span>
@@ -2090,11 +2191,13 @@ function showH2HDetailModal(playerName, type) {
     });
     html += `</div>`;
     
+    // 6. 범용 모달 객체 캐스팅 및 동적 인젝션
     const titleEl = document.getElementById('info-modal-title');
     const descEl = document.getElementById('info-modal-desc');
     
     document.getElementById('info-modal-icon').innerHTML = "⚔️";
     
+    // [V9.50 추가] 타이틀에 필터 상태(월, 인원) 명시
     let monthText = monthVal ? `, ${monthVal}월` : '';
     let countText = filterVal === 'all' ? '' : `, ${filterVal}인`;
     const suffix = type === 'nemesis' ? '천적 순' : '샌드백 순';
@@ -2115,7 +2218,6 @@ function showH2HDetailModal(playerName, type) {
     const timerEl = document.getElementById('dash-info-timer'); if (timerEl) timerEl.remove();
     document.getElementById('info-modal').style.display = 'flex';
 }
-
 function showQuickViewModal(dateStr, round) {
     triggerHaptic(10);
     const targetGame = gameLogs.find(g => g.dateStr === dateStr && g.round === round);
