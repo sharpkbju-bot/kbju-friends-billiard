@@ -564,13 +564,52 @@ function pickRandomOrder() {
     const limit = parseInt(document.getElementById('playerCount').value);
     if (selectedPlayersForLottery.length !== limit) return alert(`게임 참여 ${limit}명을 선택해!(현재 ${selectedPlayersForLottery.length}명)`);
     
-    let pool = [...selectedPlayersForLottery]; 
-    const firstIdx = Math.floor(Math.random() * pool.length);
-    const firstPlayer = pool.splice(firstIdx, 1)[0]; 
-    const remaining = pool.sort(() => Math.random() - 0.5);
+    // [V9.65 수정] Fisher-Yates 셔플 및 연속 인접 방지 페널티 로직 적용
+    const todayGames = gameLogs.filter(g => g.dateStr === selectedDateStr && g.startOrder && g.startOrder.length > 0);
+    let bestOrder = [];
+    let minPenalty = Infinity;
+    const MAX_ATTEMPTS = 100;
+
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+        // 1. Fisher-Yates Shuffle 실행 (완벽한 수학적 무작위성 보장)
+        let candidate = [...selectedPlayersForLottery];
+        for (let i = candidate.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [candidate[i], candidate[j]] = [candidate[j], candidate[i]];
+        }
+
+        // 2. 페널티 계산 (당일 진행된 이전 게임들의 순서와 중복되는지 검사)
+        let penalty = 0;
+        for (let g of todayGames) {
+            const prevOrder = g.startOrder;
+            for (let i = 0; i < candidate.length; i++) {
+                const currentP = candidate[i];
+                const nextP = candidate[(i + 1) % candidate.length]; // 원형 연결 기준 검사
+
+                for (let j = 0; j < prevOrder.length; j++) {
+                    if (prevOrder[j] === currentP && prevOrder[(j + 1) % prevOrder.length] === nextP) {
+                        penalty++; // 중복 인접 발견 시 페널티 부과
+                    }
+                }
+            }
+        }
+
+        // 3. 최적의 결과 저장
+        if (penalty < minPenalty) {
+            minPenalty = penalty;
+            bestOrder = [...candidate];
+        }
+
+        // 페널티가 0이면 중복이 전혀 없는 완벽한 셔플이므로 즉시 확정
+        if (penalty === 0) break;
+    }
     
-    lastDrawnPlayers = [firstPlayer, ...remaining]; 
+    // 확정된 최적의 순서를 기존 변수 구조에 맞게 할당 (정합성 보존)
+    lastDrawnPlayers = [...bestOrder]; 
     currentStartOrder = [...lastDrawnPlayers];
+    
+    const firstPlayer = bestOrder[0];
+    const remaining = bestOrder.slice(1);
     
     const resultArea = document.getElementById('order-result'); 
     const confirmBtn = document.querySelector('#order-modal button');
@@ -597,6 +636,7 @@ function pickRandomOrder() {
         checkDuplicates();
     }
     
+    // 기존의 3단계 UI 애니메이션 로직 100% 보존
     if (animationStep === 0) {
         resultArea.innerHTML = `<div style="padding: 30px 0;"><div style="font-size: 14px; color: var(--sub-text); margin-bottom: 10px;">초구의 영광은 누구에게?</div><div id="slotName" style="font-size: 32px; font-weight: 900; color: var(--rank1); letter-spacing: 2px;">🎰</div></div>`;
         let start = Date.now(); 
