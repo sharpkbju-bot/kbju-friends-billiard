@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=9.73">
+    <link rel="manifest" href="manifest.json?v=9.74">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=9.73">
-    <link rel="apple-touch-icon" href="image_0.png?v=9.73">
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=9.74">
+    <link rel="apple-touch-icon" href="image_0.png?v=9.74">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 
-    <link rel="stylesheet" href="style.css?v=9.73">
+    <link rel="stylesheet" href="style.css?v=9.74">
 
     <title>우리들의 Billiard World</title>
 </head>
@@ -27,7 +27,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;9.73
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;9.74
     </div>
 </div>
 
@@ -174,9 +174,10 @@
             </div>
         </div>
         <!-- [V9.73 신규] 월간 종합 시상식 호출 버튼 및 해당 월 선택 추가 -->
-        <div style="display: flex; gap: 10px; margin-top: 15px; width: 100%; box-sizing: border-box;">
+        <!-- [V9.74 수정] 컨테이너에 ID 부여 및 버튼 텍스트 변경, flex 비율 1:1로 조정 -->
+        <div id="awards-btn-container" style="display: flex; gap: 10px; margin-top: 15px; width: 100%; box-sizing: border-box;">
             <input type="text" id="awardsMonthBtn" style="flex: 1; background: #34495e; color: #fff; border: 1.5px solid #2c3e50; text-align: center; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; padding: 12px; box-sizing: border-box; -webkit-appearance: none; margin: 0; box-shadow: 0px 4px 15px rgba(0,0,0,0.2);" placeholder="해당 월" readonly>
-            <button id="awards-call-btn" class="share-btn-common" style="flex: 2; background: linear-gradient(145deg, #f1c40f, #f39c12); color: #fff; border: 1.5px solid #d35400; margin: 0;" onclick="showMonthlyAwards()">🏆 월간 종합 시상식 하이라이트</button>
+            <button id="awards-call-btn" class="share-btn-common" style="flex: 1; background: linear-gradient(145deg, #f1c40f, #f39c12); color: #fff; border: 1.5px solid #d35400; margin: 0;" onclick="showMonthlyAwards()">🏆 월간 종합 하이라이트</button>
         </div>
     </div>
 </div>
@@ -432,8 +433,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-<script src="main.js?v=9.73"></script>
-<script src="share.js?v=9.73"></script>
+<script src="main.js?v=9.74"></script>
+<script src="share.js?v=9.74"></script>
 
 </body>
 </html>
