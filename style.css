@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v9.65 - Live Pulse Edition */
+/* Billiard World Style v9.71 - Live Pulse Edition */
 /* [절대 원칙 준수]: 최적화 전면 금지, 모든 클래스와 테마를 개별적으로 분리 전개함 */
 
 :root { 
@@ -638,7 +638,7 @@ button.edit-btn { background: linear-gradient(145deg, #ffae24, #da8c10) !importa
 .zoom-active .overlay-btn { padding: 4px 8px !important; font-size: 11px !important; border-radius: 6px !important; }
 
 .btn-edit-p { background: #d1e9ff; color: #0056b3; } 
-.btn-del-p { background: #ffdada; color: #d63031; }  
+.btn-del-p { background: #ffdada; color: #d63031; } 
 .btn-cancel-p { background: #f0f0f0; color: #636e72; } 
 
 #exit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 10001; backdrop-filter: blur(5px); }
@@ -886,25 +886,25 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
     box-shadow: 0 0 8px #ffffff !important;
 }
 
-/* 하단 타임라인 단추 오가닉 우드 톤앤매너 */
-.calendar-card .timeline-wrap { border-top: 1px solid #e8e5df !important; margin-top:15px; padding-top:15px; }
-.calendar-card .timeline-date { color: #7f8c8d !important; font-family: 'Georgia', 'Times New Roman', serif !important; }
+/* 하단 타임라인 단추 글래스모피즘 */
+.calendar-card .timeline-wrap { border-top: 1px dashed rgba(255, 255, 255, 0.15) !important; }
+.calendar-card .timeline-date { color: rgba(255, 255, 255, 0.5) !important; }
 
 .calendar-card .timeline-dot {
-    background: #fdfbf7 !important;
-    border: 1px solid #d4af37 !important;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.05) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.1) !important;
 }
 
 .calendar-card .timeline-item.active .timeline-date {
-    color: #d4af37 !important;
-    font-weight: 700 !important;
+    color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8) !important;
 }
 
 .calendar-card .timeline-item.active .timeline-dot {
-    background: #d4af37 !important;
-    border: 2px solid #b5952f !important;
-    box-shadow: 0 0 8px rgba(212, 175, 55, 0.3) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-width: 2px !important;
+    animation: rainbowGlow 4s linear infinite !important;
 }
 
 /* [V9.61] 웰컴 화면 프리미엄 네온 배경 최적화 구현 */
