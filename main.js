@@ -1,4 +1,4 @@
-// main.js - V9.71 Live Pulse Edition
+// main.js - V9.73 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -10,6 +10,7 @@ let dashInfoCountdownInterval = null;
 let globalToastTimeout = null; 
 let audioCtx = null; // V9.50 Web Audio API Context
 let replayInterval = null; // [V9.62 신규] 오늘의 복기 애니메이션 타이머
+let awardsCountdownInterval = null; // [V9.73 신규] 시상식 10초 자동 종료 타이머
 
 function triggerHaptic(pattern) {
     if (navigator.vibrate) {
@@ -66,6 +67,7 @@ let isPercentMode = false;
 
 let selectedPlayersForLottery = [];
 let searchFlatpickr; 
+let awardsFlatpickr; // [V9.73 신규] 월간 시상식 전용 달력 인스턴스
 let animationStep = 0;
 let lastDrawnPlayers = []; 
 let currentStartOrder = []; 
@@ -285,9 +287,11 @@ function showDashInfo(type) {
             if (idx === 0 && s.count > 0) rankStr = (type === 'firstBreak') ? "1위🥇" : "1위💀";
             let valColor = (type === 'firstBreak') ? 'var(--rank1)' : 'var(--rankL)';
             
+            // [V9.68] 전체 게임의 횟수 총합이 아닌, 해당 선수가 "실제 참여한 게임 수(played)" 대비 확률 계산
             let percentage = s.played > 0 ? Math.round((s.count / s.played) * 100) : 0;
             let countText = `${s.count}회(${percentage}%)`;
 
+            // [V9.68] 횟수(확률) 문자열이 길어지므로 텍스트 깨짐을 방지하기 위해 width: auto 및 white-space: nowrap 적용
             listHtml += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:10px 15px; border-radius:10px; margin-bottom:6px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
                             <div style="font-size:14px; font-weight:800; color:var(--sub-text); width:45px; text-align:left;">${rankStr}</div>
                             <div style="font-size:15px; font-weight:900; color:${getPlayerColor(s.name)}; flex:1; text-align:center;">${s.name}</div>
@@ -376,7 +380,7 @@ function showDashInfo(type) {
         desc = wrapStart + "추첨된 순번 상 <b>내 바로 다음 순서인 선수의 멘탈을 붕괴시켜 평균 순위를 가장 낮게(숫자가 높게) 만든</b> 디펜스 최고의 지배자." + wrapEnd;
     }
 
-    const descEl = document.getElementById('info-modal-desc');
+   const descEl = document.getElementById('info-modal-desc');
     const titleEl = document.getElementById('info-modal-title');
     
     document.getElementById('info-modal-icon').innerHTML = icon;
@@ -663,7 +667,6 @@ function pickRandomOrder() {
     }
     animationStep = (animationStep + 1) % 3;
 }
-
 function closeOrderModal() { 
     document.getElementById('order-modal').style.display = 'none'; 
     if (lastDrawnPlayers && lastDrawnPlayers.length > 0) { showPlayersGraph(lastDrawnPlayers); lastDrawnPlayers = []; } 
@@ -878,6 +881,7 @@ async function saveGame() {
         cancelEdit(); currentStartOrder = []; document.getElementById('playerCount').value = "3"; resetPlayerSelection(); updateInputFields(); await fetchData(); 
     } catch (e) { alert("오류 발생!"); showLoading(false); }
 }
+
 function calculateLuckyGuy(filteredGames) {
     if (filteredGames.length === 0) return "-";
     
@@ -1079,6 +1083,7 @@ function renderDashboard() {
     document.getElementById('dashFirstBreak').innerText = bestFirst !== "-" ? `${bestFirst} (${maxFirst}회)` : "-";
     document.getElementById('dashLastTurn').innerText = bestLast !== "-" ? `${bestLast} (${maxLast}회)` : "-";
 }
+
 function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); analyzeOrderStats(); }
 function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
 
@@ -1608,7 +1613,7 @@ function renderGameList() {
             html += `<div class="game-item" onclick="toggleActionOverlay(this)">
                          <div class="game-info"><span>${idx+1}G</span><div style="display:inline-flex; align-items:center;">${generateNamesHTML(names)}</div></div>
                          <div class="action-overlay">
-                             <div class="overlay-btn btn-detail-p" onclick="event.stopPropagation(); showQuickViewModal('${g.dateStr}', ${g.round})">순서</div>
+                             <div class="overlay-btn btn-detail-p" onclick="event.stopPropagation(); showQuickViewModal('${g.dateStr}', ${g.round})">상세</div>
                              <div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
                              <div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>
                              <div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div>
@@ -1675,14 +1680,14 @@ function showLoading(v, t) {
 
 function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
-// [V9.70 신규] 월간 종합 시상식 (Monthly Awards) 로직
+// [V9.73 신규] 월간 종합 시상식 (Monthly Awards) 로직 - MVP 타이브레이커 추가
 function showMonthlyAwards() {
     triggerHaptic(10);
-    const monthVal = document.getElementById('statsFilterMonth')?.value || "";
+    const monthVal = document.getElementById('awardsMonthBtn')?.value || ""; 
     const filterVal = document.getElementById('statsFilterCount')?.value || "all";
 
     if (!monthVal) {
-        showToastMsg("대시보드 상단의 '월별 순위'에서 특정 월을 선택해주세요.");
+        showToastMsg('"해당 월" 버튼을 클릭하여 월을 선택하세요.');
         return;
     }
 
@@ -1698,13 +1703,14 @@ function showMonthlyAwards() {
     }
 
     let stats = {};
-    players.forEach(p => stats[p] = { played: 0, wins: 0, lasts: 0, comebackWins: 0, defTotalNextRank: 0, defCount: 0 });
+    players.forEach(p => stats[p] = { played: 0, wins: 0, lasts: 0, comebackWins: 0, defTotalNextRank: 0, defCount: 0, score: 0 });
 
     filtered.forEach(g => {
         const actual = g.ranks.filter(n => n.trim() !== "");
         actual.forEach((p, idx) => {
             if (stats[p]) {
                 stats[p].played++;
+                stats[p].score += getEarnedScore(idx, actual.length);
                 if (idx === 0) stats[p].wins++;
                 if (idx === actual.length - 1 && actual.length > 1) stats[p].lasts++;
             }
@@ -1731,6 +1737,22 @@ function showMonthlyAwards() {
 
     const activePlayers = players.filter(p => stats[p].played > 0);
     if (activePlayers.length === 0) return;
+
+    // [V9.73] MVP 산출 로직 (1순위: 평균승점, 2순위: 승률, 3순위: 1위횟수)
+    let mvpKing = "-";
+    let mvpAvg = 0;
+    if (activePlayers.length > 0) {
+        mvpKing = activePlayers.reduce((a, b) => {
+            const avgA = stats[a].score / stats[a].played;
+            const avgB = stats[b].score / stats[b].played;
+            if (avgA !== avgB) return avgA > avgB ? a : b;
+            const wrA = stats[a].wins / stats[a].played;
+            const wrB = stats[b].wins / stats[b].played;
+            if (wrA !== wrB) return wrA > wrB ? a : b;
+            return stats[a].wins > stats[b].wins ? a : b;
+        });
+        mvpAvg = (stats[mvpKing].score / stats[mvpKing].played).toFixed(2);
+    }
 
     let mostWins = 0; let winKing = "-";
     activePlayers.forEach(p => {
@@ -1776,6 +1798,14 @@ function showMonthlyAwards() {
             <div style="font-size:22px; font-weight:900; color:#fff; margin-bottom:5px;">[ ${monthVal} ]</div>
             <div style="font-size:12px; color:#b0bec5; font-weight:800; margin-bottom:20px;">(${countText} 기준)</div>
             
+            <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(155,89,182,0.1); border-color:rgba(155,89,182,0.3);">
+                <div style="font-size:12px; color:#e040fb; font-weight:900; margin-bottom:5px;">👑 이달의 MVP (최고 평점)</div>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div style="font-size:20px; font-weight:900; color:#fff;">${mvpKing !== "-" ? mvpKing : "해당자 없음"}</div>
+                    <div style="font-size:14px; font-weight:900; color:#e040fb;">${mvpAvg > 0 ? '평균 ' + mvpAvg + '점' : '-'}</div>
+                </div>
+            </div>
+
             <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(255,215,0,0.1); border-color:rgba(255,215,0,0.3);">
                 <div style="font-size:12px; color:#ffd600; font-weight:900; margin-bottom:5px;">🥇 무적의 1위왕 (최다 1위)</div>
                 <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
@@ -1808,14 +1838,28 @@ function showMonthlyAwards() {
                 </div>
             </div>
             
-            <div style="margin-top:20px; font-size:11px; color:#90caf9; font-weight:800; opacity:0.8;">(화면을 터치하면 닫힙니다.)</div>
+            <div id="awards-timer" style="margin-top:20px; font-size:11px; color:#90caf9; font-weight:800; opacity:0.8;">10초 후 자동으로 닫힙니다.</div>
             <button id="awards-share-btn" class="share-btn-common" style="margin-top:15px; background:linear-gradient(145deg, #f1c40f, #f39c12); color:#fff; border:1.5px solid #d35400; font-size:14px; padding:15px !important;" onclick="event.stopPropagation(); shareMonthlyAwards('${monthVal}')">📸 시상식 결과 공유</button>
         </div>
     `;
     modal.style.display = 'flex';
+    
+    // [V9.73] 10초 카운트다운 타이머
+    if (awardsCountdownInterval) clearInterval(awardsCountdownInterval);
+    let timeLeft = 10;
+    awardsCountdownInterval = setInterval(() => {
+        timeLeft--;
+        const timerEl = document.getElementById('awards-timer');
+        if (timerEl) timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
+        if (timeLeft <= 0) {
+            clearInterval(awardsCountdownInterval);
+            closeAwardsModal();
+        }
+    }, 1000);
 }
 
 function closeAwardsModal() {
+    if (awardsCountdownInterval) { clearInterval(awardsCountdownInterval); awardsCountdownInterval = null; }
     const modal = document.getElementById('awards-modal');
     if (modal) modal.style.display = 'none';
 }
@@ -1823,6 +1867,7 @@ function closeAwardsModal() {
 function shareMonthlyAwards(monthVal) {
     captureAndShare('awards-content', 'awards-share-btn', `monthly_awards_${monthVal}.png`, '월간 종합 시상식', `${monthVal} 월간 종합 시상식 결과입니다!`);
 }
+
 function analyzeStrategy() {
     const player = document.getElementById('strategyPlayer').value;
     const area = document.getElementById('strategyResultArea'); const shareBtn = document.getElementById('strategy-share-btn');
@@ -2019,7 +2064,7 @@ async function executeReset() {
     }
 }
 
-// [V9.71 결함 복구] 누락된 window.onload 및 하위 필수 엔진 100% 복원 완료
+// [V9.71 결함 복구 및 V9.73 업데이트 반영] 누락된 window.onload 및 하위 필수 엔진 100% 복원 완료
 window.onload = () => { 
     try {
         function applyHighlight(instance) {
@@ -2076,6 +2121,21 @@ window.onload = () => {
                 }
             }
         });
+
+        // [V9.73 신규] 월간 시상식 전용 '해당 월' 버튼 달력 바인딩 추가
+        awardsFlatpickr = flatpickr("#awardsMonthBtn", { 
+            plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
+            locale: "ko", disableMobile: true,
+            onReady: function(selectedDates, dateStr, instance) {
+                applyHighlight(instance);
+            },
+            onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
+            onYearChange: function(selectedDates, dateStr, instance) { setTimeout(() => applyHighlight(instance), 50); },
+            onChange: function(selectedDates, dateStr, instance) {
+                applyHighlight(instance);
+            }
+        });
+
     } catch(e) { console.error("Flatpickr initialization failed", e); }
     
     let savedTheme = localStorage.getItem('appTheme') || 'yellow'; 
@@ -2433,4 +2493,192 @@ function searchRecords() {
                        
     sArea.style.display = 'block'; lArea.style.display = 'block'; document.getElementById('search-share-btn').style.display = 'block';
     setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+}
+
+// [V9.73 신규] 월간 종합 시상식 (Monthly Awards) 로직 - MVP 타이브레이커 추가
+function showMonthlyAwards() {
+    triggerHaptic(10);
+    const monthVal = document.getElementById('awardsMonthBtn')?.value || ""; 
+    const filterVal = document.getElementById('statsFilterCount')?.value || "all";
+
+    if (!monthVal) {
+        showToastMsg('"해당 월" 버튼을 클릭하여 월을 선택하세요.');
+        return;
+    }
+
+    let filtered = gameLogs.filter(g => g.dateStr.startsWith(monthVal));
+    if (filterVal !== "all") {
+        const count = parseInt(filterVal);
+        filtered = filtered.filter(g => g.ranks.filter(n => n.trim() !== "").length === count);
+    }
+
+    if (filtered.length === 0) {
+        showToastMsg("해당 월의 데이터가 없습니다.");
+        return;
+    }
+
+    let stats = {};
+    players.forEach(p => stats[p] = { played: 0, wins: 0, lasts: 0, comebackWins: 0, defTotalNextRank: 0, defCount: 0, score: 0 });
+
+    filtered.forEach(g => {
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        actual.forEach((p, idx) => {
+            if (stats[p]) {
+                stats[p].played++;
+                stats[p].score += getEarnedScore(idx, actual.length);
+                if (idx === 0) stats[p].wins++;
+                if (idx === actual.length - 1 && actual.length > 1) stats[p].lasts++;
+            }
+        });
+
+        if (g.startOrder && g.startOrder.length > 0) {
+            const winner = actual[0];
+            const lastStarter = g.startOrder[g.startOrder.length - 1];
+            if (actual.length > 1 && winner === lastStarter && stats[winner]) {
+                stats[winner].comebackWins++;
+            }
+
+            for (let i = 0; i < g.startOrder.length; i++) {
+                const preP = g.startOrder[i];
+                const nextP = g.startOrder[(i + 1) % g.startOrder.length];
+                const nextPRankIdx = actual.indexOf(nextP);
+                if (nextPRankIdx !== -1 && stats[preP]) {
+                    stats[preP].defTotalNextRank += (nextPRankIdx + 1);
+                    stats[preP].defCount++;
+                }
+            }
+        }
+    });
+
+    const activePlayers = players.filter(p => stats[p].played > 0);
+    if (activePlayers.length === 0) return;
+
+    // [V9.73] MVP 산출 로직 (1순위: 평균승점, 2순위: 승률, 3순위: 1위횟수)
+    let mvpKing = "-";
+    let mvpAvg = 0;
+    if (activePlayers.length > 0) {
+        mvpKing = activePlayers.reduce((a, b) => {
+            const avgA = stats[a].score / stats[a].played;
+            const avgB = stats[b].score / stats[b].played;
+            if (avgA !== avgB) return avgA > avgB ? a : b;
+            const wrA = stats[a].wins / stats[a].played;
+            const wrB = stats[b].wins / stats[b].played;
+            if (wrA !== wrB) return wrA > wrB ? a : b;
+            return stats[a].wins > stats[b].wins ? a : b;
+        });
+        mvpAvg = (stats[mvpKing].score / stats[mvpKing].played).toFixed(2);
+    }
+
+    let mostWins = 0; let winKing = "-";
+    activePlayers.forEach(p => {
+        if (stats[p].wins > mostWins) { mostWins = stats[p].wins; winKing = p; }
+        else if (stats[p].wins === mostWins && mostWins > 0) {
+            if (stats[p].played < stats[winKing]?.played) winKing = p; 
+        }
+    });
+
+    let mostComebacks = 0; let comebackKing = "-";
+    activePlayers.forEach(p => {
+        if (stats[p].comebackWins > mostComebacks) { mostComebacks = stats[p].comebackWins; comebackKing = p; }
+        else if (stats[p].comebackWins === mostComebacks && mostComebacks > 0) {
+            if (stats[p].played < stats[comebackKing]?.played) comebackKing = p;
+        }
+    });
+
+    let maxDefAvg = -1; let defKing = "-";
+    activePlayers.forEach(p => {
+        if (stats[p].defCount > 0) {
+            const avg = stats[p].defTotalNextRank / stats[p].defCount;
+            if (avg > maxDefAvg) { maxDefAvg = avg; defKing = p; }
+        }
+    });
+
+    let mostLasts = 0; let lastKing = "-";
+    activePlayers.forEach(p => {
+        if (stats[p].lasts > mostLasts) { mostLasts = stats[p].lasts; lastKing = p; }
+        else if (stats[p].lasts === mostLasts && mostLasts > 0) {
+            if (stats[p].played > stats[lastKing]?.played) lastKing = p; 
+        }
+    });
+
+    const modal = document.getElementById('awards-modal');
+    const content = document.getElementById('awards-content');
+
+    let countText = filterVal === "all" ? "전체 인원" : filterVal + "인";
+    
+    content.innerHTML = `
+        <div class="replay-card" style="cursor:pointer; position:relative; overflow:hidden;" onclick="closeAwardsModal()">
+            <div style="position:absolute; top:-20px; left:-20px; font-size:100px; opacity:0.1; transform:rotate(-15deg);">🏆</div>
+            <div class="replay-header" style="font-size:16px; color:#ffeb3b; text-shadow:0 0 10px rgba(255,235,59,0.5);">🏆 MONTHLY AWARDS</div>
+            <div style="font-size:22px; font-weight:900; color:#fff; margin-bottom:5px;">[ ${monthVal} ]</div>
+            <div style="font-size:12px; color:#b0bec5; font-weight:800; margin-bottom:20px;">(${countText} 기준)</div>
+            
+            <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(155,89,182,0.1); border-color:rgba(155,89,182,0.3);">
+                <div style="font-size:12px; color:#e040fb; font-weight:900; margin-bottom:5px;">👑 이달의 MVP (최고 평점)</div>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div style="font-size:20px; font-weight:900; color:#fff;">${mvpKing !== "-" ? mvpKing : "해당자 없음"}</div>
+                    <div style="font-size:14px; font-weight:900; color:#e040fb;">${mvpAvg > 0 ? '평균 ' + mvpAvg + '점' : '-'}</div>
+                </div>
+            </div>
+
+            <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(255,215,0,0.1); border-color:rgba(255,215,0,0.3);">
+                <div style="font-size:12px; color:#ffd600; font-weight:900; margin-bottom:5px;">🥇 무적의 1위왕 (최다 1위)</div>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div style="font-size:20px; font-weight:900; color:#fff;">${winKing !== "-" ? winKing : "해당자 없음"}</div>
+                    <div style="font-size:14px; font-weight:900; color:#ffd600;">${mostWins > 0 ? mostWins + '회' : '-'}</div>
+                </div>
+            </div>
+
+            <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(0,229,255,0.1); border-color:rgba(0,229,255,0.3);">
+                <div style="font-size:12px; color:#18ffff; font-weight:900; margin-bottom:5px;">⚡ 역전의 명수 (말구 출발 1위)</div>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div style="font-size:20px; font-weight:900; color:#fff;">${comebackKing !== "-" ? comebackKing : "해당자 없음"}</div>
+                    <div style="font-size:14px; font-weight:900; color:#18ffff;">${mostComebacks > 0 ? mostComebacks + '회' : '-'}</div>
+                </div>
+            </div>
+
+            <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(129,199,132,0.1); border-color:rgba(129,199,132,0.3);">
+                <div style="font-size:12px; color:#81c784; font-weight:900; margin-bottom:5px;">🛡️ 인간 방어벽 (디펜스 1위)</div>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div style="font-size:20px; font-weight:900; color:#fff;">${defKing !== "-" ? defKing : "해당자 없음"}</div>
+                    <div style="font-size:14px; font-weight:900; color:#81c784;">${maxDefAvg > 0 ? '평균 ' + maxDefAvg.toFixed(1) + '위' : '-'}</div>
+                </div>
+            </div>
+
+            <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(255,138,128,0.1); border-color:rgba(255,138,128,0.3);">
+                <div style="font-size:12px; color:#ff8a80; font-weight:900; margin-bottom:5px;">💸 당구장 영주 (최다 꼴찌)</div>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div style="font-size:20px; font-weight:900; color:#fff;">${lastKing !== "-" ? lastKing : "해당자 없음"}</div>
+                    <div style="font-size:14px; font-weight:900; color:#ff8a80;">${mostLasts > 0 ? mostLasts + '회' : '-'}</div>
+                </div>
+            </div>
+            
+            <div id="awards-timer" style="margin-top:20px; font-size:11px; color:#90caf9; font-weight:800; opacity:0.8;">10초 후 자동으로 닫힙니다.</div>
+            <button id="awards-share-btn" class="share-btn-common" style="margin-top:15px; background:linear-gradient(145deg, #f1c40f, #f39c12); color:#fff; border:1.5px solid #d35400; font-size:14px; padding:15px !important;" onclick="event.stopPropagation(); shareMonthlyAwards('${monthVal}')">📸 시상식 결과 공유</button>
+        </div>
+    `;
+    modal.style.display = 'flex';
+    
+    // [V9.73] 10초 카운트다운 타이머
+    if (awardsCountdownInterval) clearInterval(awardsCountdownInterval);
+    let timeLeft = 10;
+    awardsCountdownInterval = setInterval(() => {
+        timeLeft--;
+        const timerEl = document.getElementById('awards-timer');
+        if (timerEl) timerEl.innerText = `${timeLeft}초 후 자동으로 닫힙니다.`;
+        if (timeLeft <= 0) {
+            clearInterval(awardsCountdownInterval);
+            closeAwardsModal();
+        }
+    }, 1000);
+}
+
+function closeAwardsModal() {
+    if (awardsCountdownInterval) { clearInterval(awardsCountdownInterval); awardsCountdownInterval = null; }
+    const modal = document.getElementById('awards-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+function shareMonthlyAwards(monthVal) {
+    captureAndShare('awards-content', 'awards-share-btn', `monthly_awards_${monthVal}.png`, '월간 종합 시상식', `${monthVal} 월간 종합 시상식 결과입니다!`);
 }
