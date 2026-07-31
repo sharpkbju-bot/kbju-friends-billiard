@@ -1,4 +1,4 @@
-// main.js - V9.70 Live Pulse Edition
+// main.js - V9.71 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -376,7 +376,7 @@ function showDashInfo(type) {
         desc = wrapStart + "추첨된 순번 상 <b>내 바로 다음 순서인 선수의 멘탈을 붕괴시켜 평균 순위를 가장 낮게(숫자가 높게) 만든</b> 디펜스 최고의 지배자." + wrapEnd;
     }
 
-   const descEl = document.getElementById('info-modal-desc');
+    const descEl = document.getElementById('info-modal-desc');
     const titleEl = document.getElementById('info-modal-title');
     
     document.getElementById('info-modal-icon').innerHTML = icon;
@@ -663,6 +663,7 @@ function pickRandomOrder() {
     }
     animationStep = (animationStep + 1) % 3;
 }
+
 function closeOrderModal() { 
     document.getElementById('order-modal').style.display = 'none'; 
     if (lastDrawnPlayers && lastDrawnPlayers.length > 0) { showPlayersGraph(lastDrawnPlayers); lastDrawnPlayers = []; } 
@@ -877,7 +878,6 @@ async function saveGame() {
         cancelEdit(); currentStartOrder = []; document.getElementById('playerCount').value = "3"; resetPlayerSelection(); updateInputFields(); await fetchData(); 
     } catch (e) { alert("오류 발생!"); showLoading(false); }
 }
-
 function calculateLuckyGuy(filteredGames) {
     if (filteredGames.length === 0) return "-";
     
@@ -1608,7 +1608,7 @@ function renderGameList() {
             html += `<div class="game-item" onclick="toggleActionOverlay(this)">
                          <div class="game-info"><span>${idx+1}G</span><div style="display:inline-flex; align-items:center;">${generateNamesHTML(names)}</div></div>
                          <div class="action-overlay">
-                             <div class="overlay-btn btn-detail-p" onclick="event.stopPropagation(); showQuickViewModal('${g.dateStr}', ${g.round})">상세</div>
+                             <div class="overlay-btn btn-detail-p" onclick="event.stopPropagation(); showQuickViewModal('${g.dateStr}', ${g.round})">순서</div>
                              <div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
                              <div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>
                              <div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div>
@@ -1674,193 +1674,6 @@ function showLoading(v, t) {
 }
 
 function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
-
-function exportData() { 
-    if (gameLogs.length === 0) return alert("데이터 없음"); 
-    const link = document.createElement('a'); 
-    link.href = 'data:application/json;charset=utf-8,'+ encodeURIComponent(JSON.stringify(gameLogs, null, 2)); 
-    link.download = `billiard_backup_${new Date().toLocaleDateString('sv-SE')}.json`; 
-    link.click(); 
-}
-
-function triggerImport() { document.getElementById('importFile').click(); }
-
-function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        try {
-            const importedData = JSON.parse(e.target.result);
-            if (!Array.isArray(importedData)) throw new Error("Invalid format");
-            if (!confirm(`백업 파일에서 ${importedData.length}개의 데이터를 발견했습니다.\n전체 복구를 진행하시겠습니까?`)) { event.target.value = ''; return; }
-            showLoading(true, "기존 데이터 초기화 중...");
-            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
-            for (let i = 0; i < importedData.length; i++) {
-                showLoading(true, `데이터 복구 중... (${i + 1} / ${importedData.length})`);
-                const game = importedData[i]; const ranks = game.ranks || [];
-                const payload = { action: "SAVE", date: game.dateStr, ranks: [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""], startOrder: game.startOrder || null };
-                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-            }
-            alert("데이터 복구가 성공적으로 완료되었습니다!");
-            event.target.value = ''; showLoading(true, "최신 데이터 불러오는 중..."); await fetchData();
-        } catch (err) {
-            alert("복구 중 오류가 발생했습니다.\n오류 내용: " + err.message);
-            showLoading(false); event.target.value = '';
-        }
-    };
-    reader.readAsText(file);
-}
-
-function setDefaultSearchDates() { if (searchFlatpickr) searchFlatpickr.setDate(new Date()); }
-
-function resetSearch() {
-    const dateInput = document.getElementById('searchDateRange'); const playerInput = document.getElementById('searchPlayer');
-    const sArea = document.getElementById('searchSummaryArea'); const lArea = document.getElementById('searchHistoryListArea');
-    const shareBtn = document.getElementById('search-share-btn');
-    if(dateInput) dateInput.value = ''; if(playerInput) playerInput.value = '';
-    if(sArea) { sArea.innerHTML = ''; sArea.style.display = 'none'; }
-    if(lArea) { lArea.innerHTML = ''; lArea.style.display = 'none'; }
-    if(shareBtn) shareBtn.style.display = 'none';
-    if (typeof setDefaultSearchDates === 'function') setDefaultSearchDates();
-}
-
-function searchRecords() {
-    const mon = document.getElementById('searchDateRange').value; const player = document.getElementById('searchPlayer').value;
-    if(!mon || !player) return alert("검색월과 선수를 선택해줘!");
-    
-    const filtered = gameLogs.filter(g => g.dateStr.startsWith(mon) && g.ranks.includes(player));
-    filtered.sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || ((parseInt(b.round) || 0) - (parseInt(a.round) || 0)));
-    
-    const sArea = document.getElementById('searchSummaryArea'); const lArea = document.getElementById('searchHistoryListArea');
-    
-    if(filtered.length === 0) { 
-        sArea.innerHTML = `<div class="empty-search-msg" style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">기록 없음</div>`; 
-        sArea.style.display = 'block'; lArea.style.display = 'none'; 
-        document.getElementById('search-share-btn').style.display = 'none'; return; 
-    }
-    
-    let r = [0, 0, 0, 0, 0]; let monthlyTotalScore = 0;
-    filtered.forEach(g => { 
-        const actual = g.ranks.filter(n => n.trim() !== ""); const rIdx = actual.indexOf(player); 
-        if (rIdx === actual.length - 1 && actual.length > 1) r[4]++; else if (rIdx < 4) r[rIdx]++; 
-        monthlyTotalScore += getEarnedScore(rIdx, actual.length);
-    });
-    
-    let monthlyAvgScore = filtered.length > 0 ? (monthlyTotalScore / filtered.length).toFixed(2) : "0.00";
-    let winRateFloat = filtered.length > 0 ? ((r[0] / filtered.length) * 100).toFixed(1) : "0.0";
-    let safetyRate = filtered.length > 0 ? Math.round(((filtered.length - r[4]) / filtered.length) * 100) : 0;
-    let othersCount = filtered.length - r[0] - r[4];
-    
-    let monthlyStatsAll = {}; players.forEach(p => monthlyStatsAll[p] = { played: 0, score: 0, win: 0 });
-    const allGamesThisMonth = gameLogs.filter(g => g.dateStr.startsWith(mon));
-    allGamesThisMonth.forEach(g => {
-        const actual = g.ranks.filter(n => n.trim() !== "");
-        actual.forEach((pName, idx) => {
-            if (monthlyStatsAll[pName]) {
-                monthlyStatsAll[pName].played++; monthlyStatsAll[pName].score += getEarnedScore(idx, actual.length);
-                if (idx === 0) monthlyStatsAll[pName].win++;
-            }
-        });
-    });
-    
-    const monthlyRankedPlayers = [...players].sort((a,b) => {
-        if (monthlyStatsAll[a].played === 0 && monthlyStatsAll[b].played > 0) return 1;
-        if (monthlyStatsAll[b].played === 0 && monthlyStatsAll[a].played > 0) return -1;
-        
-        const avgA = monthlyStatsAll[a].score / monthlyStatsAll[a].played || 0;
-        const avgB = monthlyStatsAll[b].score / monthlyStatsAll[b].played || 0;
-        const wrA = monthlyStatsAll[a].win / monthlyStatsAll[a].played || 0;
-        const wrB = monthlyStatsAll[b].win / monthlyStatsAll[b].played || 0;
-        
-        return (avgB - avgA) || (wrB - wrA) || (monthlyStatsAll[b].win - monthlyStatsAll[a].win);
-    });
-    
-    let myMonthlyRank = 1; let currentRank = 1;
-    for (let i = 0; i < monthlyRankedPlayers.length; i++) {
-        const p = monthlyRankedPlayers[i];
-        if (i > 0) {
-            const prevP = monthlyRankedPlayers[i - 1];
-            const avgP = monthlyStatsAll[p].score / monthlyStatsAll[p].played || 0;
-            const avgPrev = monthlyStatsAll[prevP].score / monthlyStatsAll[prevP].played || 0;
-            const wrP = monthlyStatsAll[p].win / monthlyStatsAll[p].played || 0;
-            const wrPrev = monthlyStatsAll[prevP].win / monthlyStatsAll[prevP].played || 0;
-            
-            if (avgP !== avgPrev || wrP !== wrPrev) { currentRank = i + 1; }
-        }
-        if (p === player) { myMonthlyRank = currentRank; break; }
-    }
-    
-    const tier = getTier(monthlyTotalScore);
-    const wRatio = filtered.length > 0 ? r[0] / filtered.length : 0;
-    const lRatio = filtered.length > 0 ? r[4] / filtered.length : 0;
-    let cond = (wRatio >= 0.3 && lRatio >= 0.3) ? ["⚡", "도깨비", "var(--rank3)"] : (wRatio >= 0.3 ? ["☀️", "최상", "var(--rankL)"] : (lRatio >= 0.3 ? ["🌧️", "비상", "var(--rank1)"] : ["⛅", "보통", "var(--rank2)"]));
-  
-    let winRateVal = Math.round(winRateFloat); let avgScoreVal = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); let safetyVal = safetyRate;
-
-    const spotlightColors = [
-        { bg: 'rgba(255, 173, 173, 0.25)', shadow: 'rgba(255, 173, 173, 0.5)', border: '#FFADAD' },
-        { bg: 'rgba(255, 214, 165, 0.25)', shadow: 'rgba(255, 214, 165, 0.5)', border: '#FFD6A5' },
-        { bg: 'rgba(253, 255, 182, 0.25)', shadow: 'rgba(253, 255, 182, 0.5)', border: '#FDFFB6' },
-        { bg: 'rgba(202, 255, 191, 0.25)', shadow: 'rgba(202, 255, 191, 0.5)', border: '#CAFFBF' },
-        { bg: 'rgba(155, 246, 255, 0.25)', shadow: 'rgba(155, 246, 255, 0.5)', border: '#9BF6FF' },
-        { bg: 'rgba(160, 196, 255, 0.25)', shadow: 'rgba(160, 196, 255, 0.5)', border: '#A0C4FF' },
-        { bg: 'rgba(189, 178, 255, 0.25)', shadow: 'rgba(189, 178, 255, 0.5)', border: '#BDB2FF' },
-        { bg: 'rgba(255, 198, 255, 0.25)', shadow: 'rgba(255, 198, 255, 0.5)', border: '#FFC6FF' }
-    ];
-    const pick = spotlightColors[Math.floor(Math.random() * spotlightColors.length)];
-
-    function createSpotlightCard(label, value, subValue = "") {
-        const neonColor = pick.border; 
-        return `<div style="background: ${pick.bg}; padding: 15px 10px; border-radius: 14px; text-align: center; border: 2.5px solid ${neonColor}; box-shadow: 0 0 10px ${neonColor}, 0 0 20px ${pick.shadow}, inset 0 0 8px rgba(255,255,255,0.3); backdrop-filter: blur(5px); transition: all 0.4s ease; margin: 2px;">
-                    <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 8px; text-shadow: 0 0 5px rgba(255,255,255,0.5);">${label}</div>
-                    <div style="font-size: 18px; font-weight: 900; color: var(--text-color); text-shadow: 1px 1px 2px rgba(0,0,0,0.1), 0 0 8px ${pick.shadow};">${value} ${subValue}</div>
-                </div>`;
-    }
-
-    let billiardsStyle = ""; let styleDesc = ""; let styleColor = "";
-    if (winRateVal >= 35 && safetyVal >= 80) { billiardsStyle = "👑 전략적 지배자"; styleDesc = "공수 밸런스가 완벽한 최강의 포식자! 상대를 압도하는 실력자!"; styleColor = "var(--rank1)"; } 
-    else if (winRateVal >= 35 && safetyVal < 80) { billiardsStyle = "🐅 폭격형 호랑이"; styleDesc = "화끈한 공격력으로 경기를 주도하지만, 수비가 다소 불안한 공격수!"; styleColor = "#FF6B81"; } 
-    else if (winRateVal < 35 && safetyVal >= 80) { billiardsStyle = "🐢 철벽 거북이"; styleDesc = "좀처럼 무너지지 않는 멘탈! 다양한 공략법으로 득점하는 짠당구의 고수!"; styleColor = "#3498DB"; } 
-    else { billiardsStyle = "🐣 성장하는 꿈나무"; styleDesc = "아직은 경험이 더 필요한 단계! 하지만 잠재력만큼은 무궁무진!"; styleColor = "#95a5a6"; }
-
-    function createRing(val, color, label, type) {
-        return `<div style="display:flex; flex-direction:column; align-items:center; cursor:pointer; flex: 1;" onclick="showRingCriteria('${type}')">
-            <svg viewBox="0 0 36 36" style="width:70px; height:70px; margin-bottom:8px; overflow:visible;">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(150,150,150,0.2)" stroke-width="4.5" />
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="${color}" stroke-width="4.5" stroke-dasharray="${val}, 100" stroke-linecap="round" />
-                <text x="18" y="21.5" text-anchor="middle" font-size="10" font-weight="900" fill="${color}">${val}%</text>
-            </svg>
-            <span style="font-size:12px; font-weight:900; color:var(--sub-text);">${label}</span>
-        </div>`;
-    }
-
-    sArea.innerHTML = `<div class="summary-box" style="margin: 0 -5px; box-sizing: border-box; background:var(--record-bg); border:2px solid var(--record-border); border-radius:15px; padding:25px 15px;">
-                           <div style="text-align:center; font-weight:900; color:var(--text-color); margin-bottom:20px; font-size:18px; letter-spacing:-0.5px;">[ ${player}, ${mon} ]</div>
-                           <div style="display: flex; justify-content: center; align-items: center; width: 100%; box-sizing: border-box; margin-bottom: 35px;">${createRing(winRateVal, '#9B59B6', '승률', 'win')}${createRing(avgScoreVal, '#FF6B81', '평균득점', 'score')}${createRing(safetyVal, '#3498DB', '생존율', 'safety')}</div>
-                           <div style="background: rgba(255,255,255,0.7); border: 2px dashed ${styleColor}; border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center; cursor: pointer; transition: all 0.2s;" onclick="showInfoModal('style')">
-                               <div style="font-size: 13px; font-weight: 800; color: var(--sub-text); margin-bottom: 5px;">나의 당구 MBTI <span style="font-size:10px; opacity:0.6;">(터치 시 기준 안내)</span></div>
-                               <div style="font-size: 20px; font-weight: 900; color: ${styleColor}; margin-bottom: 8px;">${billiardsStyle}</div><div style="font-size: 12px; font-weight: 700; color: #555; line-height: 1.4; word-break: keep-all;">${styleDesc}</div>
-                           </div>
-                           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">${createSpotlightCard("월간순위", `${myMonthlyRank}위`)}${createSpotlightCard("총/평균 승점", `${monthlyTotalScore}점`, `<span style="font-size:13px; color:var(--sub-text);">(${monthlyAvgScore})</span>`)}${createSpotlightCard("티어", `<span style="color: ${tier.color};">${tier.icon}${tier.name}</span>`)}${createSpotlightCard("컨디션", `<span style="color: ${cond[2]};">${cond[0]}${cond[1]}</span>`)}</div>
-                       </div>`;
-                      
-    lArea.innerHTML = `<div style="max-height:250px; overflow-y:auto; padding-right:5px; margin-top:15px;">
-                           ${filtered.map(g => {
-                               const actual = g.ranks.filter(n=>n.trim()!==''); const rankIndex = actual.indexOf(player);
-                               const rankColor = rankIndex === 0 ? 'darkblue' : (rankIndex === actual.length-1 ? 'red' : 'var(--text-color)');
-                               const rankLabel = rankIndex === 0 ? '1위🥇' : (rankIndex === actual.length-1 ? '꼴찌💀' : (rankIndex+1)+'위');
-                               const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr); const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
-                               return `<div class="history-item search-result-card" style="flex-direction:column; align-items:flex-start; gap:5px;">
-                                           <div style="display:flex; justify-content:space-between; width:100%;"><div style="font-size:13px; color:var(--sub-text);">${g.dateStr} <span style="font-size:12px; font-weight:900; color:var(--rank1); margin-left:6px;">${gameNumber}G</span></div><div style="font-size:14px; font-weight:900; color:${rankColor};">${rankLabel}</div></div>
-                                           <div style="font-size:12px; display:inline-flex; align-items:center;">${generateNamesHTML(actual)}</div>
-                                       </div>`;
-                           }).join('')}
-                       </div>`;
-                       
-    sArea.style.display = 'block'; lArea.style.display = 'block'; document.getElementById('search-share-btn').style.display = 'block';
-    setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-}
 
 // [V9.70 신규] 월간 종합 시상식 (Monthly Awards) 로직
 function showMonthlyAwards() {
@@ -2009,4 +1822,615 @@ function closeAwardsModal() {
 
 function shareMonthlyAwards(monthVal) {
     captureAndShare('awards-content', 'awards-share-btn', `monthly_awards_${monthVal}.png`, '월간 종합 시상식', `${monthVal} 월간 종합 시상식 결과입니다!`);
+}
+function analyzeStrategy() {
+    const player = document.getElementById('strategyPlayer').value;
+    const area = document.getElementById('strategyResultArea'); const shareBtn = document.getElementById('strategy-share-btn');
+    if (!player) { area.style.display = 'none'; if (shareBtn) shareBtn.style.display = 'none'; return; }
+
+    const filterVal = document.getElementById('statsFilterCount')?.value || "all";
+    const monthVal = document.getElementById('statsFilterMonth')?.value || "";
+    let stats = {}; 
+
+    gameLogs.forEach(g => {
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
+        if (g.startOrder && g.startOrder.includes(player)) {
+            const actual = g.ranks.filter(n => n && n.trim() !== "");
+            if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+            const order = g.startOrder; const myOrderIdx = order.indexOf(player);
+            const prevP = order[(myOrderIdx - 1 + order.length) % order.length];
+            const myRankIdx = actual.indexOf(player);
+            if (myRankIdx !== -1) {
+                if (!stats[prevP]) stats[prevP] = { games: 0, totalRank: 0, wins: 0, lasts: 0 };
+                stats[prevP].games++; stats[prevP].totalRank += (myRankIdx + 1);
+                if (myRankIdx === 0) stats[prevP].wins++;
+                if (myRankIdx === actual.length - 1 && actual.length > 1) stats[prevP].lasts++;
+            }
+        }
+    });
+
+    const targets = Object.keys(stats).sort((a, b) => (stats[a].totalRank / stats[a].games) - (stats[b].totalRank / stats[b].games));
+    if (targets.length === 0) {
+        area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">분석 가능한 데이터가 없습니다.</div>`;
+        area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'none'; return;
+    }
+
+    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 다음 선수들의 <b>뒤에서</b> 기록한 성적</div>`;
+    targets.forEach(t => {
+        const s = stats[t]; const avg = (s.totalRank / s.games).toFixed(1);
+        const winP = Math.round((s.wins / s.games) * 100); const lastP = Math.round((s.lasts / s.games) * 100); const otherP = 100 - winP - lastP; 
+        html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="font-size:15px; font-weight:800; color:var(--sub-text);">앞 순서: <span style="font-size:19px; font-weight:900; color:${getPlayerColor(t)};">${t}</span> <span style="font-size:14px; font-weight:900; color:var(--accent); margin-left:4px;">${s.games}G</span></div>
+                        <div style="font-size:15px; font-weight:800; color:var(--text-color);">${player}의 성적: 평균 ${avg}위</div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">1위 확률</div><div style="font-size:15px; font-weight:900; color:var(--rank1);">${winP}%, <span style="font-size:12px; color:var(--sub-text);">${s.wins}회</span></div></div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">기타 확률</div><div style="font-size:15px; font-weight:900; color:var(--rank2);">${otherP}%, <span style="font-size:12px; color:var(--sub-text);">${s.games - s.wins - s.lasts}회</span></div></div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">꼴찌 확률</div><div style="font-size:15px; font-weight:900; color:var(--rankL);">${lastP}%, <span style="font-size:12px; color:var(--sub-text);">${s.lasts}회</span></div></div>
+                    </div>
+                 </div>`;
+    });
+    area.innerHTML = html; area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'block';
+    setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+}
+
+function shareStrategyResult() { const player = document.getElementById('strategyPlayer').value; captureAndShare('strategy-capture-area', 'strategy-share-btn', `strategy_${player}.png`, '상성 분석', `${player} 선수의 상성 분석 결과입니다!`); }
+
+function analyzeOrderStats() {
+    const player = document.getElementById('orderStatsPlayer').value;
+    const area = document.getElementById('orderStatsResultArea'); 
+    const shareBtn = document.getElementById('orderStats-share-btn');
+    if (!player) { area.style.display = 'none'; if (shareBtn) shareBtn.style.display = 'none'; return; }
+
+    const filterVal = document.getElementById('statsFilterCount')?.value || "all";
+    const monthVal = document.getElementById('statsFilterMonth')?.value || "";
+    
+    let stats = {
+        '초구(1번)': { games: 0, totalRank: 0, wins: 0, lasts: 0 },
+        '2번': { games: 0, totalRank: 0, wins: 0, lasts: 0 },
+        '3번': { games: 0, totalRank: 0, wins: 0, lasts: 0 },
+        '4번': { games: 0, totalRank: 0, wins: 0, lasts: 0 },
+        '말구': { games: 0, totalRank: 0, wins: 0, lasts: 0 }
+    };
+    let hasData = false;
+
+    gameLogs.forEach(g => {
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
+        if (g.startOrder && g.startOrder.includes(player)) {
+            const actual = g.ranks.filter(n => n && n.trim() !== "");
+            if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+            
+            const myOrderIdx = g.startOrder.indexOf(player);
+            const totalPlayers = g.startOrder.length;
+            
+            let orderType = "";
+            if (myOrderIdx === 0) orderType = '초구(1번)';
+            else if (myOrderIdx === totalPlayers - 1 && totalPlayers > 1) orderType = '말구';
+            else if (myOrderIdx === 1) orderType = '2번';
+            else if (myOrderIdx === 2) orderType = '3번';
+            else if (myOrderIdx === 3) orderType = '4번';
+            
+            if (!orderType || !stats[orderType]) return; 
+
+            const myRankIdx = actual.indexOf(player);
+            if (myRankIdx !== -1) {
+                hasData = true;
+                stats[orderType].games++;
+                stats[orderType].totalRank += (myRankIdx + 1);
+                if (myRankIdx === 0) stats[orderType].wins++;
+                if (myRankIdx === actual.length - 1 && actual.length > 1) stats[orderType].lasts++;
+            }
+        }
+    });
+
+    if (!hasData) {
+        area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">분석 가능한 데이터가 없습니다.</div>`;
+        area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'none'; return;
+    }
+
+    const orderKeys = ['초구(1번)', '2번', '3번', '4번', '말구'];
+    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 특정 <b>순번</b>일 때 기록한 성적</div>`;
+    
+    orderKeys.forEach(t => {
+        const s = stats[t];
+        if (s.games === 0) return; 
+        
+        const avg = (s.totalRank / s.games).toFixed(1);
+        const winP = Math.round((s.wins / s.games) * 100); 
+        const lastP = Math.round((s.lasts / s.games) * 100); 
+        const otherP = 100 - winP - lastP; 
+        
+        let orderColor = "var(--text-color)";
+        if (t === '초구(1번)') orderColor = "var(--rank1)";
+        if (t === '말구') orderColor = "var(--rankL)";
+        
+        html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="font-size:15px; font-weight:800; color:var(--sub-text);">순서: <span style="font-size:19px; font-weight:900; color:${orderColor};">${t}</span> <span style="font-size:14px; font-weight:900; color:var(--accent); margin-left:4px;">${s.games}G</span></div>
+                        <div style="font-size:15px; font-weight:800; color:var(--text-color);">평균 ${avg}위</div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">1위 확률</div><div style="font-size:15px; font-weight:900; color:var(--rank1);">${winP}%, <span style="font-size:12px; color:var(--sub-text);">${s.wins}회</span></div></div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">기타 확률</div><div style="font-size:15px; font-weight:900; color:var(--rank2);">${otherP}%, <span style="font-size:12px; color:var(--sub-text);">${s.games - s.wins - s.lasts}회</span></div></div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">꼴찌 확률</div><div style="font-size:15px; font-weight:900; color:var(--rankL);">${lastP}%, <span style="font-size:12px; color:var(--sub-text);">${s.lasts}회</span></div></div>
+                    </div>
+                 </div>`;
+    });
+    area.innerHTML = html; area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'block';
+    setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+}
+
+function shareOrderStatsResult() { const player = document.getElementById('orderStatsPlayer').value; captureAndShare('orderStats-capture-area', 'orderStats-share-btn', `order_stats_${player}.png`, '순번별 성적 분석', `${player} 선수의 순번별 성적 분석 결과입니다!`); }
+
+function showToastMsg(msg) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.innerText = msg;
+    toast.style.display = 'block'; 
+    toast.style.zIndex = '999999';
+    void toast.offsetWidth; 
+    toast.classList.add('show');
+    
+    if (globalToastTimeout) clearTimeout(globalToastTimeout);
+    
+    globalToastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+        toast.style.display = 'none';
+    }, 3000);
+}
+
+function confirmReset(step) {
+    const btnWrap = document.getElementById('resetSteps');
+    if (!btnWrap) return;
+    const cancelBtn = `<button class="save-btn" style="background:#bdc3c7; color:#444; margin-top:10px; width:100%; box-shadow: none;" onclick="cancelReset()">아니, 취소할게 (데이터 유지)</button>`;
+
+    if (step === 1) {
+        triggerHaptic(10);
+        btnWrap.innerHTML = `<button class="reset-btn" style="background: linear-gradient(145deg, #f39c12, #e67e22);" onclick="confirmReset(2)">⚠️ 진짜 초기화 할거야? (1/3)</button>${cancelBtn}`;
+    } else if (step === 2) {
+        triggerHaptic(20);
+        btnWrap.innerHTML = `<button class="reset-btn" style="background: linear-gradient(145deg, #e74c3c, #c0392b);" onclick="confirmReset(3)">🚨 진심이지? 절대 복구 안돼! (2/3)</button>${cancelBtn}`;
+    } else if (step === 3) {
+        triggerHaptic(30);
+        btnWrap.innerHTML = `<button class="reset-btn" style="background: #000000; color:#fff;" onclick="confirmReset(4)">💀 마지막 경고: 데이터 영구 소각 (3/3)</button>${cancelBtn}`;
+    } else if (step === 4) {
+        triggerHaptic([20, 30, 20]);
+        executeReset();
+    }
+}
+
+function cancelReset() {
+    const btnWrap = document.getElementById('resetSteps');
+    if (btnWrap) btnWrap.innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`;
+}
+
+async function executeReset() {
+    showLoading(true, "모든 데이터 소각 중...");
+    try {
+        const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
+        if (response.ok) {
+            gameLogs = []; renderAll(); alert("모든 데이터가 영구적으로 초기화되었습니다.");
+        } else { throw new Error("Reset Failed"); }
+    } catch (e) {
+        alert("서버 통신 오류로 초기화에 실패했습니다.");
+    } finally {
+        showLoading(false); cancelReset();
+    }
+}
+
+// [V9.71 결함 복구] 누락된 window.onload 및 하위 필수 엔진 100% 복원 완료
+window.onload = () => { 
+    try {
+        function applyHighlight(instance) {
+            if (!instance || !instance.calendarContainer) return;
+            const year = instance.currentYear;
+            const monthEls = instance.calendarContainer.querySelectorAll('.flatpickr-monthSelect-month');
+            monthEls.forEach((el, index) => {
+                const monthStr = String(index + 1).padStart(2, '0');
+                const targetPrefix = `${year}-${monthStr}`;
+                const hasRecord = gameLogs.some(g => g.dateStr.startsWith(targetPrefix));
+                if (hasRecord) {
+                    if (!el.classList.contains('selected')) { el.style.backgroundColor = '#5D4037'; el.style.color = '#ffffff'; } 
+                    else { el.style.backgroundColor = ''; el.style.color = ''; }
+                } else { el.style.backgroundColor = ''; el.style.color = ''; }
+            });
+        }
+
+        searchFlatpickr = flatpickr("#searchDateRange", { 
+            plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
+            locale: "ko", disableMobile: true,
+            onReady: function(selectedDates, dateStr, instance) {
+                const clearBtnWrap = document.createElement("div"); clearBtnWrap.style.padding = "0 10px 10px 10px";
+                clearBtnWrap.innerHTML = "<button type='button' style='width:100%; padding:10px; background:var(--edit); color:white; border:none; border-radius:8px; font-weight:900; font-size:13px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1);'>전체 기간으로 리셋</button>";
+                clearBtnWrap.onclick = function() { instance.clear(); instance.close(); };
+                instance.calendarContainer.appendChild(clearBtnWrap); applyHighlight(instance);
+            },
+            onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
+            onYearChange: function(selectedDates, dateStr, instance) { setTimeout(() => applyHighlight(instance), 50); },
+            onChange: function(selectedDates, dateStr, instance) {
+                applyHighlight(instance);
+                if (dateStr) {
+                    const hasRecord = gameLogs.some(g => g.dateStr.startsWith(dateStr));
+                    if (!hasRecord) showToastMsg("게임 기록 없음");
+                }
+            }
+        });
+
+        flatpickr("#statsFilterMonth", { 
+            plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
+            locale: "ko", disableMobile: true,
+            onReady: function(selectedDates, dateStr, instance) {
+                const clearBtnWrap = document.createElement("div"); clearBtnWrap.style.padding = "0 10px 10px 10px";
+                clearBtnWrap.innerHTML = "<button type='button' style='width:100%; padding:10px; background:var(--edit); color:white; border:none; border-radius:8px; font-weight:900; font-size:13px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1);'>전체 기간으로 리셋</button>";
+                clearBtnWrap.onclick = function() { instance.clear(); instance.close(); onFilterChange(); };
+                instance.calendarContainer.appendChild(clearBtnWrap); applyHighlight(instance); 
+            },
+            onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
+            onYearChange: function(selectedDates, dateStr, instance) { setTimeout(() => applyHighlight(instance), 50); },
+            onChange: function(selectedDates, dateStr, instance) {
+                applyHighlight(instance); onFilterChange(); 
+                if (dateStr) {
+                    const hasRecord = gameLogs.some(g => g.dateStr.startsWith(dateStr));
+                    if (!hasRecord) showToastMsg("게임 기록 없음");
+                }
+            }
+        });
+    } catch(e) { console.error("Flatpickr initialization failed", e); }
+    
+    let savedTheme = localStorage.getItem('appTheme') || 'yellow'; 
+    document.documentElement.setAttribute('data-theme', savedTheme); 
+    document.getElementById('themeSelect').value = savedTheme;
+    
+    setTimeout(() => { 
+        const ws = document.getElementById('welcome-screen'); 
+        if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); } 
+        showLastGameResult(); 
+    }, 3000);
+
+    setTimeout(() => playSystemSound('pop'), 3500); 
+    
+    updateInputFields(); setDefaultSearchDates(); fetchData(); 
+};
+document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
+
+function showH2HDetailModal(playerName, type) {
+    triggerHaptic(10);
+    const filterVal = document.getElementById('statsFilterCount')?.value || "all";
+    const monthVal = document.getElementById('statsFilterMonth')?.value || "";
+
+    const allPersonal = gameLogs.filter(g => {
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return false; 
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        if (!actual.includes(playerName)) return false; 
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return false; 
+        return true;
+    });
+    
+    let h2h = {};
+    players.forEach(p => { if (p !== playerName) h2h[p] = { match: 0, win: 0, loss: 0 }; });
+    
+    allPersonal.forEach(g => {
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        const myIdx = actual.indexOf(playerName);
+        actual.forEach((p, pIdx) => {
+            if (p !== playerName && h2h[p]) {
+                h2h[p].match++;
+                if (myIdx < pIdx) h2h[p].win++; 
+                else if (myIdx > pIdx) h2h[p].loss++; 
+            }
+        });
+    });
+
+    let opponentList = [];
+    players.forEach(p => {
+        if (p === playerName) return;
+        const s = h2h[p];
+        const winRate = s.match > 0 ? Math.round((s.win / s.match) * 100) : -1;
+        opponentList.push({ name: p, stats: s, winRate: winRate });
+    });
+
+    opponentList.sort((a, b) => {
+        if (a.stats.match === 0 && b.stats.match > 0) return 1;
+        if (b.stats.match === 0 && a.stats.match > 0) return -1;
+        if (a.stats.match === 0 && b.stats.match === 0) return 0;
+        if (type === 'nemesis') { return a.winRate - b.winRate || b.stats.loss - a.stats.loss; } 
+        else { return b.winRate - a.winRate || b.stats.win - a.stats.win; }
+    });
+
+    let html = `<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; color: #333; margin-top:5px;">`;
+    
+    opponentList.forEach(item => {
+        const p = item.name;
+        const s = item.stats;
+        
+        if (s.match === 0) {
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px 15px; border-radius:12px;">
+                        <span style="font-weight:900; font-size:15px; color:${getPlayerColor(p)}">${playerThemes[p].emoji} ${p}</span>
+                        <span style="font-size:12px; font-weight:800; color:#999;">해당 조건 전적 없음</span>
+                     </div>`;
+        } else {
+            const winRate = item.winRate;
+            let rateColor = '#795548'; 
+            if (winRate > 50) rateColor = '#1A237E'; 
+            else if (winRate < 50) rateColor = '#e74c3c'; 
+            
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px 15px; border-radius:12px; border:1px solid rgba(0,0,0,0.02);">
+                        <span style="font-weight:900; font-size:16px; color:${getPlayerColor(p)}">${playerThemes[p].emoji} ${p}</span>
+                        <span style="font-weight:900; color:${rateColor}; font-size:15px; text-align:right;">
+                            승률 ${winRate}% <br>
+                            <span style="font-size:11px; color:#666; font-weight:800; display:block; margin-top:2px;">(${s.match}전 ${s.win}승 ${s.loss}패)</span>
+                        </span>
+                     </div>`;
+        }
+    });
+    html += `</div>`;
+    
+    const titleEl = document.getElementById('info-modal-title');
+    const descEl = document.getElementById('info-modal-desc');
+    document.getElementById('info-modal-icon').innerHTML = "⚔️";
+    
+    let monthText = monthVal ? `, ${monthVal}월` : '';
+    let countText = filterVal === 'all' ? '' : `, ${filterVal}인`;
+    const suffix = type === 'nemesis' ? '천적 순' : '샌드백 순';
+    
+    titleEl.innerHTML = `${playerName}의 상성 분석 <br><span style="font-size:12px; color:var(--sub-text); margin-top:5px; display:block;">(${suffix}${monthText}${countText})</span>`;
+    descEl.innerHTML = html;
+    
+    const currentAppTheme = document.documentElement.getAttribute('data-theme');
+    if (currentAppTheme === 'dark' || currentAppTheme === 'navy') { titleEl.style.setProperty('color', '#2980b9', 'important'); } 
+    else { titleEl.style.removeProperty('color'); titleEl.style.color = 'var(--rank1)'; }
+    
+    if (infoModalCountdownInterval) { clearInterval(infoModalCountdownInterval); infoModalCountdownInterval = null; }
+    if (dashInfoCountdownInterval) { clearInterval(dashInfoCountdownInterval); dashInfoCountdownInterval = null; }
+    const timerEl = document.getElementById('dash-info-timer'); if (timerEl) timerEl.remove();
+    document.getElementById('info-modal').style.display = 'flex';
+}
+
+function showQuickViewModal(dateStr, round) {
+    triggerHaptic(10);
+    const targetGame = gameLogs.find(g => g.dateStr === dateStr && g.round === round);
+    if (!targetGame) { showToastMsg("데이터 없음"); return; }
+    if (!targetGame.startOrder || targetGame.startOrder.length === 0) { showToastMsg("저장된 순서 정보가 없습니다."); return; }
+    
+    const startOrder = targetGame.startOrder;
+    const actualRanks = targetGame.ranks.filter(n => n && n.trim() !== ""); 
+    const sameDateGames = gameLogs.filter(x => x.dateStr === dateStr);
+    const gameNumber = sameDateGames.findIndex(x => x.round === round) + 1;
+    
+    let html = `<div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">🎯</div>
+                <div style="font-size:18px; font-weight:900; color:var(--text-color); margin-bottom:5px; display:block; text-align:center;">${dateStr}</div>
+                <div style="font-size:14px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; display:block; text-align:center;">[ ${gameNumber}G 초구 및 순서와 순위 ]</div>
+                <div style="display:block; font-weight:900;">`;
+    
+    startOrder.forEach((name, i) => {
+        const orderLabel = (i === 0) ? "1번 (초구)🎱" : `${i + 1}번`;
+        const orderColor = (i === 0) ? 'var(--rank1)' : 'var(--text-color)';
+        const rankIdx = actualRanks.indexOf(name);
+        let finalRankLabel = ""; let finalRankColor = "var(--sub-text)"; 
+        if (rankIdx !== -1) {
+            if (rankIdx === 0) { finalRankLabel = "(1위)"; finalRankColor = "var(--rank1)"; } 
+            else if (rankIdx === actualRanks.length - 1 && actualRanks.length > 1) { finalRankLabel = "(꼴찌)"; finalRankColor = "var(--rankL)"; } 
+            else { finalRankLabel = `(${rankIdx + 1}위)`; }
+        }
+        html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7); margin-bottom:8px;">
+                    <div style="color:${orderColor}; font-size:${i === 0 ? '16px' : '14px'}; font-weight:${i === 0 ? '900' : '800'};">${orderLabel}</div>
+                    <div style="color:${orderColor}; font-size:${i === 0 ? '22px' : '16px'}; font-weight:${i === 0 ? '900' : '800'}; text-align:right;">
+                        ${name} <span style="font-size:14px; font-weight:900; color:${finalRankColor}; margin-left:6px; letter-spacing:-0.5px;">${finalRankLabel}</span>
+                    </div>
+                 </div>`;
+    });
+    
+    html += `</div><button class="save-btn" style="background:#bdc3c7; margin-top:15px; color:#444; width:100%; box-shadow:none;" onclick="closeQuickViewModal()">닫기</button>`;
+    
+    const modal = document.getElementById('quick-view-modal'); const content = document.getElementById('quick-view-content');
+    content.innerHTML = html; modal.style.display = 'flex'; 
+    content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+    closeAllOverlays(); 
+}
+
+function closeQuickViewModal() {
+    const modal = document.getElementById('quick-view-modal'); const content = document.getElementById('quick-view-content');
+    if(!modal || !content) return;
+    content.style.animation = 'scaleDownPopup 0.3s ease-in forwards';
+    setTimeout(() => { modal.style.display = 'none'; content.style.animation = 'none'; }, 300);
+}
+
+function showTodayReplay() {
+    triggerHaptic(10);
+    const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
+    if (games.length === 0) return showToastMsg("복기할 데이터가 없습니다.");
+    const validGames = games.filter(g => g.startOrder && g.startOrder.length > 0);
+    if (validGames.length === 0) return showToastMsg("이전 기록은 복기를 지원하지 않습니다.");
+    validGames.sort((a, b) => parseInt(a.round) - parseInt(b.round));
+
+    const modal = document.getElementById('replay-modal'); const content = document.getElementById('replay-content');
+    modal.style.display = 'flex';
+    let currentIndex = 0; if (replayInterval) clearInterval(replayInterval);
+
+    function renderStep() {
+        if (currentIndex >= validGames.length) {
+            if (replayInterval) clearInterval(replayInterval);
+            content.innerHTML = `<div class="replay-card" style="cursor:pointer;" onclick="closeReplayModal()"><div style="font-size:50px; margin-bottom:20px;">🏁</div><div style="font-size:20px; font-weight:900; margin-bottom:20px; color:#fff;">오늘의 복기 종료!</div><div style="font-size:12px; color:#b0bec5; font-weight:800; margin-bottom:20px;">(화면을 터치하면 닫힙니다.)</div><button class="save-btn" style="background:#bdc3c7; color:#444;" onclick="event.stopPropagation(); closeReplayModal()">닫기</button></div>`;
+            return;
+        }
+        const g = validGames[currentIndex]; const actualRanks = g.ranks.filter(n => n && n.trim() !== "");
+        const firstP = g.startOrder[0]; const winnerP = actualRanks[0]; const loserP = actualRanks[actualRanks.length - 1];
+        
+        content.innerHTML = `<div class="replay-card" style="cursor:pointer;" onclick="skipToNextReplay()"><div class="replay-header">DAY'S REPLAY - ${selectedDateStr}</div><div class="replay-round">제 ${currentIndex + 1} 경기</div><div class="replay-row"><div class="replay-label">초구 (1번) 🎱</div><div class="replay-value" style="color:var(--rank1);">${firstP}</div></div><div class="replay-row"><div class="replay-label">1위 🥇</div><div class="replay-value" style="color:#ffeb3b;">${winnerP}</div></div><div class="replay-row"><div class="replay-label">꼴찌 💀</div><div class="replay-value" style="color:var(--rankL);">${loserP}</div></div><div style="margin-top:20px; font-size:11px; color:#90caf9; font-weight:800; opacity:0.8;">(화면을 터치하면 다음으로 넘어갑니다.)</div></div>`;
+        triggerHaptic(15); currentIndex++;
+    }
+
+    window.skipToNextReplay = function() { triggerHaptic(10); if (replayInterval) clearInterval(replayInterval); renderStep(); if (currentIndex <= validGames.length) { replayInterval = setInterval(renderStep, 10000); } };
+    renderStep(); replayInterval = setInterval(renderStep, 10000); 
+}
+
+function closeReplayModal() { if (replayInterval) { clearInterval(replayInterval); replayInterval = null; } if (window.skipToNextReplay) { delete window.skipToNextReplay; } const modal = document.getElementById('replay-modal'); if (modal) modal.style.display = 'none'; }
+
+function exportData() { 
+    if (gameLogs.length === 0) return alert("데이터 없음"); 
+    const link = document.createElement('a'); 
+    link.href = 'data:application/json;charset=utf-8,'+ encodeURIComponent(JSON.stringify(gameLogs, null, 2)); 
+    link.download = `billiard_backup_${new Date().toLocaleDateString('sv-SE')}.json`; 
+    link.click(); 
+}
+
+function triggerImport() { document.getElementById('importFile').click(); }
+
+function importData(event) {
+    const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            if (!Array.isArray(importedData)) throw new Error("Invalid format");
+            if (!confirm(`백업 파일에서 ${importedData.length}개의 데이터를 발견했습니다.\n전체 복구를 진행하시겠습니까?`)) { event.target.value = ''; return; }
+            showLoading(true, "기존 데이터 초기화 중...");
+            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
+            for (let i = 0; i < importedData.length; i++) {
+                showLoading(true, `데이터 복구 중... (${i + 1} / ${importedData.length})`);
+                const game = importedData[i]; const ranks = game.ranks || [];
+                const payload = { action: "SAVE", date: game.dateStr, ranks: [ranks[0] || "", ranks[1] || "", ranks[2] || "", ranks[3] || "", ranks[4] || ""], startOrder: game.startOrder || null };
+                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+            }
+            alert("데이터 복구가 성공적으로 완료되었습니다!"); event.target.value = ''; showLoading(true, "최신 데이터 불러오는 중..."); await fetchData();
+        } catch (err) { alert("복구 중 오류가 발생했습니다.\n오류 내용: " + err.message); showLoading(false); event.target.value = ''; }
+    };
+    reader.readAsText(file);
+}
+
+function setDefaultSearchDates() { if (searchFlatpickr) searchFlatpickr.setDate(new Date()); }
+
+function resetSearch() {
+    const dateInput = document.getElementById('searchDateRange'); const playerInput = document.getElementById('searchPlayer');
+    const sArea = document.getElementById('searchSummaryArea'); const lArea = document.getElementById('searchHistoryListArea');
+    const shareBtn = document.getElementById('search-share-btn');
+    if(dateInput) dateInput.value = ''; if(playerInput) playerInput.value = '';
+    if(sArea) { sArea.innerHTML = ''; sArea.style.display = 'none'; }
+    if(lArea) { lArea.innerHTML = ''; lArea.style.display = 'none'; }
+    if(shareBtn) shareBtn.style.display = 'none';
+    if (typeof setDefaultSearchDates === 'function') setDefaultSearchDates();
+}
+
+function searchRecords() {
+    const mon = document.getElementById('searchDateRange').value; const player = document.getElementById('searchPlayer').value;
+    if(!mon || !player) return alert("검색월과 선수를 선택해줘!");
+    
+    const filtered = gameLogs.filter(g => g.dateStr.startsWith(mon) && g.ranks.includes(player));
+    filtered.sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || ((parseInt(b.round) || 0) - (parseInt(a.round) || 0)));
+    
+    const sArea = document.getElementById('searchSummaryArea'); const lArea = document.getElementById('searchHistoryListArea');
+    
+    if(filtered.length === 0) { 
+        sArea.innerHTML = `<div class="empty-search-msg" style="text-align:center; padding:20px; font-weight:800; color:var(--sub-text);">기록 없음</div>`; 
+        sArea.style.display = 'block'; lArea.style.display = 'none'; 
+        document.getElementById('search-share-btn').style.display = 'none'; return; 
+    }
+    
+    let r = [0, 0, 0, 0, 0]; let monthlyTotalScore = 0;
+    filtered.forEach(g => { 
+        const actual = g.ranks.filter(n => n.trim() !== ""); const rIdx = actual.indexOf(player); 
+        if (rIdx === actual.length - 1 && actual.length > 1) r[4]++; else if (rIdx < 4) r[rIdx]++; 
+        monthlyTotalScore += getEarnedScore(rIdx, actual.length);
+    });
+    
+    let monthlyAvgScore = filtered.length > 0 ? (monthlyTotalScore / filtered.length).toFixed(2) : "0.00";
+    let winRateFloat = filtered.length > 0 ? ((r[0] / filtered.length) * 100).toFixed(1) : "0.0";
+    let safetyRate = filtered.length > 0 ? Math.round(((filtered.length - r[4]) / filtered.length) * 100) : 0;
+    
+    let monthlyStatsAll = {}; players.forEach(p => monthlyStatsAll[p] = { played: 0, score: 0, win: 0 });
+    const allGamesThisMonth = gameLogs.filter(g => g.dateStr.startsWith(mon));
+    allGamesThisMonth.forEach(g => {
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        actual.forEach((pName, idx) => {
+            if (monthlyStatsAll[pName]) {
+                monthlyStatsAll[pName].played++; monthlyStatsAll[pName].score += getEarnedScore(idx, actual.length);
+                if (idx === 0) monthlyStatsAll[pName].win++;
+            }
+        });
+    });
+    
+    const monthlyRankedPlayers = [...players].sort((a,b) => {
+        if (monthlyStatsAll[a].played === 0 && monthlyStatsAll[b].played > 0) return 1;
+        if (monthlyStatsAll[b].played === 0 && monthlyStatsAll[a].played > 0) return -1;
+        const avgA = monthlyStatsAll[a].score / monthlyStatsAll[a].played || 0;
+        const avgB = monthlyStatsAll[b].score / monthlyStatsAll[b].played || 0;
+        const wrA = monthlyStatsAll[a].win / monthlyStatsAll[a].played || 0;
+        const wrB = monthlyStatsAll[b].win / monthlyStatsAll[b].played || 0;
+        return (avgB - avgA) || (wrB - wrA) || (monthlyStatsAll[b].win - monthlyStatsAll[a].win);
+    });
+    
+    let myMonthlyRank = 1; let currentRank = 1;
+    for (let i = 0; i < monthlyRankedPlayers.length; i++) {
+        const p = monthlyRankedPlayers[i];
+        if (i > 0) {
+            const prevP = monthlyRankedPlayers[i - 1];
+            const avgP = monthlyStatsAll[p].score / monthlyStatsAll[p].played || 0;
+            const avgPrev = monthlyStatsAll[prevP].score / monthlyStatsAll[prevP].played || 0;
+            const wrP = monthlyStatsAll[p].win / monthlyStatsAll[p].played || 0;
+            const wrPrev = monthlyStatsAll[prevP].win / monthlyStatsAll[prevP].played || 0;
+            if (avgP !== avgPrev || wrP !== wrPrev) { currentRank = i + 1; }
+        }
+        if (p === player) { myMonthlyRank = currentRank; break; }
+    }
+    
+    const tier = getTier(monthlyTotalScore);
+    const wRatio = filtered.length > 0 ? r[0] / filtered.length : 0;
+    const lRatio = filtered.length > 0 ? r[4] / filtered.length : 0;
+    let cond = (wRatio >= 0.3 && lRatio >= 0.3) ? ["⚡", "도깨비", "var(--rank3)"] : (wRatio >= 0.3 ? ["☀️", "최상", "var(--rankL)"] : (lRatio >= 0.3 ? ["🌧️", "비상", "var(--rank1)"] : ["⛅", "보통", "var(--rank2)"]));
+  
+    let winRateVal = Math.round(winRateFloat); let avgScoreVal = Math.min(100, Math.round((parseFloat(monthlyAvgScore) / 5) * 100)); let safetyVal = safetyRate;
+
+    const spotlightColors = [{ bg: 'rgba(255, 173, 173, 0.25)', shadow: 'rgba(255, 173, 173, 0.5)', border: '#FFADAD' }, { bg: 'rgba(255, 214, 165, 0.25)', shadow: 'rgba(255, 214, 165, 0.5)', border: '#FFD6A5' }, { bg: 'rgba(253, 255, 182, 0.25)', shadow: 'rgba(253, 255, 182, 0.5)', border: '#FDFFB6' }, { bg: 'rgba(202, 255, 191, 0.25)', shadow: 'rgba(202, 255, 191, 0.5)', border: '#CAFFBF' }, { bg: 'rgba(155, 246, 255, 0.25)', shadow: 'rgba(155, 246, 255, 0.5)', border: '#9BF6FF' }, { bg: 'rgba(160, 196, 255, 0.25)', shadow: 'rgba(160, 196, 255, 0.5)', border: '#A0C4FF' }, { bg: 'rgba(189, 178, 255, 0.25)', shadow: 'rgba(189, 178, 255, 0.5)', border: '#BDB2FF' }, { bg: 'rgba(255, 198, 255, 0.25)', shadow: 'rgba(255, 198, 255, 0.5)', border: '#FFC6FF' }];
+    const pick = spotlightColors[Math.floor(Math.random() * spotlightColors.length)];
+
+    function createSpotlightCard(label, value, subValue = "") {
+        const neonColor = pick.border; 
+        return `<div style="background: ${pick.bg}; padding: 15px 10px; border-radius: 14px; text-align: center; border: 2.5px solid ${neonColor}; box-shadow: 0 0 10px ${neonColor}, 0 0 20px ${pick.shadow}, inset 0 0 8px rgba(255,255,255,0.3); backdrop-filter: blur(5px); transition: all 0.4s ease; margin: 2px;">
+                    <div style="font-size: 12px; font-weight: 800; color: var(--sub-text); margin-bottom: 8px; text-shadow: 0 0 5px rgba(255,255,255,0.5);">${label}</div>
+                    <div style="font-size: 18px; font-weight: 900; color: var(--text-color); text-shadow: 1px 1px 2px rgba(0,0,0,0.1), 0 0 8px ${pick.shadow};">${value} ${subValue}</div>
+                </div>`;
+    }
+
+    let billiardsStyle = ""; let styleDesc = ""; let styleColor = "";
+    if (winRateVal >= 35 && safetyVal >= 80) { billiardsStyle = "👑 전략적 지배자"; styleDesc = "공수 밸런스가 완벽한 최강의 포식자! 상대를 압도하는 실력자!"; styleColor = "var(--rank1)"; } 
+    else if (winRateVal >= 35 && safetyVal < 80) { billiardsStyle = "🐅 폭격형 호랑이"; styleDesc = "화끈한 공격력으로 경기를 주도하지만, 수비가 다소 불안한 공격수!"; styleColor = "#FF6B81"; } 
+    else if (winRateVal < 35 && safetyVal >= 80) { billiardsStyle = "🐢 철벽 거북이"; styleDesc = "좀처럼 무너지지 않는 멘탈! 다양한 공략법으로 득점하는 짠당구의 고수!"; styleColor = "#3498DB"; } 
+    else { billiardsStyle = "🐣 성장하는 꿈나무"; styleDesc = "아직은 경험이 더 필요한 단계! 하지만 잠재력만큼은 무궁무진!"; styleColor = "#95a5a6"; }
+
+    function createRing(val, color, label, type) {
+        return `<div style="display:flex; flex-direction:column; align-items:center; cursor:pointer; flex: 1;" onclick="showRingCriteria('${type}')">
+            <svg viewBox="0 0 36 36" style="width:70px; height:70px; margin-bottom:8px; overflow:visible;">
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(150,150,150,0.2)" stroke-width="4.5" />
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="${color}" stroke-width="4.5" stroke-dasharray="${val}, 100" stroke-linecap="round" />
+                <text x="18" y="21.5" text-anchor="middle" font-size="10" font-weight="900" fill="${color}">${val}%</text>
+            </svg>
+            <span style="font-size:12px; font-weight:900; color:var(--sub-text);">${label}</span>
+        </div>`;
+    }
+
+    sArea.innerHTML = `<div class="summary-box" style="margin: 0 -5px; box-sizing: border-box; background:var(--record-bg); border:2px solid var(--record-border); border-radius:15px; padding:25px 15px;">
+                           <div style="text-align:center; font-weight:900; color:var(--text-color); margin-bottom:20px; font-size:18px; letter-spacing:-0.5px;">[ ${player}, ${mon} ]</div>
+                           <div style="display: flex; justify-content: center; align-items: center; width: 100%; box-sizing: border-box; margin-bottom: 35px;">${createRing(winRateVal, '#9B59B6', '승률', 'win')}${createRing(avgScoreVal, '#FF6B81', '평균득점', 'score')}${createRing(safetyVal, '#3498DB', '생존율', 'safety')}</div>
+                           <div style="background: rgba(255,255,255,0.7); border: 2px dashed ${styleColor}; border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center; cursor: pointer; transition: all 0.2s;" onclick="showInfoModal('style')">
+                               <div style="font-size: 13px; font-weight: 800; color: var(--sub-text); margin-bottom: 5px;">나의 당구 MBTI <span style="font-size:10px; opacity:0.6;">(터치 시 기준 안내)</span></div>
+                               <div style="font-size: 20px; font-weight: 900; color: ${styleColor}; margin-bottom: 8px;">${billiardsStyle}</div><div style="font-size: 12px; font-weight: 700; color: #555; line-height: 1.4; word-break: keep-all;">${styleDesc}</div>
+                           </div>
+                           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">${createSpotlightCard("월간순위", `${myMonthlyRank}위`)}${createSpotlightCard("총/평균 승점", `${monthlyTotalScore}점`, `<span style="font-size:13px; color:var(--sub-text);">(${monthlyAvgScore})</span>`)}${createSpotlightCard("티어", `<span style="color: ${tier.color};">${tier.icon}${tier.name}</span>`)}${createSpotlightCard("컨디션", `<span style="color: ${cond[2]};">${cond[0]}${cond[1]}</span>`)}</div>
+                       </div>`;
+                      
+    lArea.innerHTML = `<div style="max-height:250px; overflow-y:auto; padding-right:5px; margin-top:15px;">
+                           ${filtered.map(g => {
+                               const actual = g.ranks.filter(n=>n.trim()!==''); const rankIndex = actual.indexOf(player);
+                               const rankColor = rankIndex === 0 ? 'darkblue' : (rankIndex === actual.length-1 ? 'red' : 'var(--text-color)');
+                               const rankLabel = rankIndex === 0 ? '1위🥇' : (rankIndex === actual.length-1 ? '꼴찌💀' : (rankIndex+1)+'위');
+                               const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr); const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
+                               return `<div class="history-item search-result-card" style="flex-direction:column; align-items:flex-start; gap:5px;">
+                                           <div style="display:flex; justify-content:space-between; width:100%;"><div style="font-size:13px; color:var(--sub-text);">${g.dateStr} <span style="font-size:12px; font-weight:900; color:var(--rank1); margin-left:6px;">${gameNumber}G</span></div><div style="font-size:14px; font-weight:900; color:${rankColor};">${rankLabel}</div></div>
+                                           <div style="font-size:12px; display:inline-flex; align-items:center;">${generateNamesHTML(actual)}</div>
+                                       </div>`;
+                           }).join('')}
+                       </div>`;
+                       
+    sArea.style.display = 'block'; lArea.style.display = 'block'; document.getElementById('search-share-btn').style.display = 'block';
+    setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 }
