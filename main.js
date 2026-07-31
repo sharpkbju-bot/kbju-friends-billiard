@@ -341,7 +341,7 @@ function showDashInfo(type) {
 
         playerStats.sort((a, b) => (b.avgScore - a.avgScore) || (b.winRate - a.winRate) || (b.wins - a.wins));
 
-        let trendHtml = `<div style="font-size:12px; color:#555; margin-bottom:15px; text-align:center; font-weight:800;">(가장 오른쪽 사각형이 최신 게임 결과)</div>`;
+        let trendHtml = `<div style="font-size:12px; color:#555; margin-bottom:15px; text-align:center; font-weight:800;">(가장 오른쪽 사각형이 최근 게임 결과)</div>`;
         trendHtml += `<table class="trend-table">
             <thead>
                 <tr>
