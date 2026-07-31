@@ -1799,7 +1799,7 @@ function showMonthlyAwards() {
             <div style="font-size:12px; color:#b0bec5; font-weight:800; margin-bottom:20px;">(${countText} 기준)</div>
             
             <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(155,89,182,0.1); border-color:rgba(155,89,182,0.3);">
-                <div style="font-size:12px; color:#e040fb; font-weight:900; margin-bottom:5px;">👑 이달의 MVP (최고 평점)</div>
+                <div style="font-size:12px; color:#e040fb; font-weight:900; margin-bottom:5px;">👑 이달의 MVP (최고 승점)</div>
                 <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                     <div style="font-size:20px; font-weight:900; color:#fff;">${mvpKing !== "-" ? mvpKing : "해당자 없음"}</div>
                     <div style="font-size:14px; font-weight:900; color:#e040fb;">${mvpAvg > 0 ? '평균 ' + mvpAvg + '점' : '-'}</div>
