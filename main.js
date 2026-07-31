@@ -1,4 +1,4 @@
-// main.js - V9.73 Live Pulse Edition
+// main.js - V9.74 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -10,7 +10,7 @@ let dashInfoCountdownInterval = null;
 let globalToastTimeout = null; 
 let audioCtx = null; // V9.50 Web Audio API Context
 let replayInterval = null; // [V9.62 신규] 오늘의 복기 애니메이션 타이머
-let awardsCountdownInterval = null; // [V9.73 신규] 시상식 10초 자동 종료 타이머
+let awardsCountdownInterval = null; // [V9.74 신규] 시상식 10초 자동 종료 타이머
 
 function triggerHaptic(pattern) {
     if (navigator.vibrate) {
@@ -67,7 +67,7 @@ let isPercentMode = false;
 
 let selectedPlayersForLottery = [];
 let searchFlatpickr; 
-let awardsFlatpickr; // [V9.73 신규] 월간 시상식 전용 달력 인스턴스
+let awardsFlatpickr; // [V9.74 신규] 월간 시상식 전용 달력 인스턴스
 let animationStep = 0;
 let lastDrawnPlayers = []; 
 let currentStartOrder = []; 
@@ -1680,7 +1680,7 @@ function showLoading(v, t) {
 
 function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
 
-// [V9.73 신규] 월간 종합 시상식 (Monthly Awards) 로직 - MVP 타이브레이커 추가
+// [V9.74 신규] 월간 종합 시상식 (Monthly Awards) 로직 - MVP 타이브레이커 추가
 function showMonthlyAwards() {
     triggerHaptic(10);
     const monthVal = document.getElementById('awardsMonthBtn')?.value || ""; 
@@ -1738,7 +1738,7 @@ function showMonthlyAwards() {
     const activePlayers = players.filter(p => stats[p].played > 0);
     if (activePlayers.length === 0) return;
 
-    // [V9.73] MVP 산출 로직 (1순위: 평균승점, 2순위: 승률, 3순위: 1위횟수)
+    // [V9.74] MVP 산출 로직 (1순위: 평균승점, 2순위: 승률, 3순위: 1위횟수)
     let mvpKing = "-";
     let mvpAvg = 0;
     if (activePlayers.length > 0) {
@@ -1839,12 +1839,12 @@ function showMonthlyAwards() {
             </div>
             
             <div id="awards-timer" style="margin-top:20px; font-size:11px; color:#90caf9; font-weight:800; opacity:0.8;">10초 후 자동으로 닫힙니다.</div>
-            <button id="awards-share-btn" class="share-btn-common" style="margin-top:15px; background:linear-gradient(145deg, #f1c40f, #f39c12); color:#fff; border:1.5px solid #d35400; font-size:14px; padding:15px !important;" onclick="event.stopPropagation(); shareMonthlyAwards('${monthVal}')">📸 시상식 결과 공유</button>
+            <button id="awards-share-btn" class="share-btn-common" style="margin-top:15px; background:linear-gradient(145deg, #f1c40f, #f39c12); color:#fff; border:1.5px solid #d35400; font-size:14px; padding:15px !important;" onclick="event.stopPropagation(); shareMonthlyAwards('${monthVal}')">📸 하이라이트 결과 공유</button>
         </div>
     `;
     modal.style.display = 'flex';
     
-    // [V9.73] 10초 카운트다운 타이머
+    // [V9.74] 10초 카운트다운 타이머
     if (awardsCountdownInterval) clearInterval(awardsCountdownInterval);
     let timeLeft = 10;
     awardsCountdownInterval = setInterval(() => {
@@ -1865,7 +1865,7 @@ function closeAwardsModal() {
 }
 
 function shareMonthlyAwards(monthVal) {
-    captureAndShare('awards-content', 'awards-share-btn', `monthly_awards_${monthVal}.png`, '월간 종합 시상식', `${monthVal} 월간 종합 시상식 결과입니다!`);
+    captureAndShare('awards-content', 'awards-share-btn', `monthly_awards_${monthVal}.png`, '월간 종합 하이라이트', `${monthVal} 월간 종합 하이라이트 결과입니다!`);
 }
 
 function analyzeStrategy() {
@@ -2064,7 +2064,7 @@ async function executeReset() {
     }
 }
 
-// [V9.71 결함 복구 및 V9.73 업데이트 반영] 누락된 window.onload 및 하위 필수 엔진 100% 복원 완료
+// [V9.71 결함 복구 및 V9.74 업데이트 반영] 누락된 window.onload 및 하위 필수 엔진 100% 복원 완료
 window.onload = () => { 
     try {
         function applyHighlight(instance) {
@@ -2122,7 +2122,7 @@ window.onload = () => {
             }
         });
 
-        // [V9.73 신규] 월간 시상식 전용 '해당 월' 버튼 달력 바인딩 추가
+        // [V9.74 신규] 월간 시상식 전용 '해당 월' 버튼 달력 바인딩 추가
         awardsFlatpickr = flatpickr("#awardsMonthBtn", { 
             plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
             locale: "ko", disableMobile: true,
@@ -2495,7 +2495,7 @@ function searchRecords() {
     setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 }
 
-// [V9.73 신규] 월간 종합 시상식 (Monthly Awards) 로직 - MVP 타이브레이커 추가
+// [V9.74 신규] 월간 종합 시상식 (Monthly Awards) 로직 - MVP 타이브레이커 추가
 function showMonthlyAwards() {
     triggerHaptic(10);
     const monthVal = document.getElementById('awardsMonthBtn')?.value || ""; 
@@ -2553,7 +2553,7 @@ function showMonthlyAwards() {
     const activePlayers = players.filter(p => stats[p].played > 0);
     if (activePlayers.length === 0) return;
 
-    // [V9.73] MVP 산출 로직 (1순위: 평균승점, 2순위: 승률, 3순위: 1위횟수)
+    // [V9.74] MVP 산출 로직 (1순위: 평균승점, 2순위: 승률, 3순위: 1위횟수)
     let mvpKing = "-";
     let mvpAvg = 0;
     if (activePlayers.length > 0) {
@@ -2654,12 +2654,12 @@ function showMonthlyAwards() {
             </div>
             
             <div id="awards-timer" style="margin-top:20px; font-size:11px; color:#90caf9; font-weight:800; opacity:0.8;">10초 후 자동으로 닫힙니다.</div>
-            <button id="awards-share-btn" class="share-btn-common" style="margin-top:15px; background:linear-gradient(145deg, #f1c40f, #f39c12); color:#fff; border:1.5px solid #d35400; font-size:14px; padding:15px !important;" onclick="event.stopPropagation(); shareMonthlyAwards('${monthVal}')">📸 시상식 결과 공유</button>
+            <button id="awards-share-btn" class="share-btn-common" style="margin-top:15px; background:linear-gradient(145deg, #f1c40f, #f39c12); color:#fff; border:1.5px solid #d35400; font-size:14px; padding:15px !important;" onclick="event.stopPropagation(); shareMonthlyAwards('${monthVal}')">📸 하이라이트 결과 공유</button>
         </div>
     `;
     modal.style.display = 'flex';
     
-    // [V9.73] 10초 카운트다운 타이머
+    // [V9.74] 10초 카운트다운 타이머
     if (awardsCountdownInterval) clearInterval(awardsCountdownInterval);
     let timeLeft = 10;
     awardsCountdownInterval = setInterval(() => {
@@ -2680,5 +2680,5 @@ function closeAwardsModal() {
 }
 
 function shareMonthlyAwards(monthVal) {
-    captureAndShare('awards-content', 'awards-share-btn', `monthly_awards_${monthVal}.png`, '월간 종합 시상식', `${monthVal} 월간 종합 시상식 결과입니다!`);
+    captureAndShare('awards-content', 'awards-share-btn', `monthly_awards_${monthVal}.png`, '월간 종합 하이라이트', `${monthVal} 월간 종합 하이라이트 결과입니다!`);
 }
