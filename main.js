@@ -1,4 +1,4 @@
-// main.js - V9.67 Live Pulse Edition
+// main.js - V9.68 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -269,9 +269,6 @@ function showDashInfo(type) {
         }));
         statList.sort((a, b) => b.count - a.count || b.played - a.played);
 
-        let totalSum = 0;
-        statList.forEach(s => totalSum += s.count);
-
         let listHtml = `<div style="margin-top: 15px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 15px;">`;
         if (type === 'firstBreak') {
             icon = "🎱"; title = "최다 초구자 (MOST FIRST BREAKS)";
@@ -288,7 +285,7 @@ function showDashInfo(type) {
             if (idx === 0 && s.count > 0) rankStr = (type === 'firstBreak') ? "1위🥇" : "1위💀";
             let valColor = (type === 'firstBreak') ? 'var(--rank1)' : 'var(--rankL)';
             
-            let percentage = totalSum > 0 ? Math.round((s.count / totalSum) * 100) : 0;
+            let percentage = s.played > 0 ? Math.round((s.count / s.played) * 100) : 0;
             let countText = `${s.count}회(${percentage}%)`;
 
             listHtml += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:10px 15px; border-radius:10px; margin-bottom:6px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7);">
@@ -564,7 +561,6 @@ function pickRandomOrder() {
     const limit = parseInt(document.getElementById('playerCount').value);
     if (selectedPlayersForLottery.length !== limit) return alert(`게임 참여 ${limit}명을 선택해!(현재 ${selectedPlayersForLottery.length}명)`);
     
-    // [V9.65 수정] Fisher-Yates 셔플 및 연속 인접 방지 페널티 로직 적용
     const todayGames = gameLogs.filter(g => g.dateStr === selectedDateStr && g.startOrder && g.startOrder.length > 0);
     let bestOrder = [];
     let minPenalty = Infinity;
@@ -582,7 +578,7 @@ function pickRandomOrder() {
             const prevOrder = g.startOrder;
             for (let i = 0; i < candidate.length; i++) {
                 const currentP = candidate[i];
-                const nextP = candidate[(i + 1) % candidate.length];
+                const nextP = candidate[(i + 1) % candidate.length]; 
 
                 for (let j = 0; j < prevOrder.length; j++) {
                     if (prevOrder[j] === currentP && prevOrder[(j + 1) % prevOrder.length] === nextP) {
@@ -667,11 +663,11 @@ function pickRandomOrder() {
     }
     animationStep = (animationStep + 1) % 3;
 }
-
 function closeOrderModal() { 
     document.getElementById('order-modal').style.display = 'none'; 
     if (lastDrawnPlayers && lastDrawnPlayers.length > 0) { showPlayersGraph(lastDrawnPlayers); lastDrawnPlayers = []; } 
 }
+
 function showPlayersGraph(players) {
     const container = document.getElementById('graph-container'); const legendArea = document.getElementById('graph-legend');
     let legendHtml = ""; 
