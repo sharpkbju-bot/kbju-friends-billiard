@@ -1,4 +1,4 @@
-// main.js - V9.68 Live Pulse Edition
+// main.js - V9.70 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -1048,9 +1048,11 @@ function renderDashboard() {
     });
     document.getElementById('dashDefense').innerText = defCandidate !== "-" ? `${defCandidate} (${maxDefAvg.toFixed(1)}위)` : "-";
     let startOrderStats = {};
-    players.forEach(p => startOrderStats[p] = { first: 0, last: 0 });
+    players.forEach(p => startOrderStats[p] = { first: 0, last: 0, played: 0 });
     
     filtered.forEach(g => {
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        actual.forEach(p => { if (startOrderStats[p]) startOrderStats[p].played++; });
         if (g.startOrder && g.startOrder.length > 0) {
             const firstP = g.startOrder[0];
             const lastP = g.startOrder[g.startOrder.length - 1];
@@ -1065,12 +1067,12 @@ function renderDashboard() {
     activePlayers.forEach(p => {
         if (startOrderStats[p].first > maxFirst) { maxFirst = startOrderStats[p].first; bestFirst = p; }
         else if (startOrderStats[p].first === maxFirst && maxFirst > 0) {
-            if (pStats[p] && pStats[bestFirst] && pStats[p].played > pStats[bestFirst].played) bestFirst = p;
+            if (startOrderStats[p].played > startOrderStats[bestFirst].played) bestFirst = p;
         }
         
         if (startOrderStats[p].last > maxLast) { maxLast = startOrderStats[p].last; bestLast = p; }
         else if (startOrderStats[p].last === maxLast && maxLast > 0) {
-            if (pStats[p] && pStats[bestLast] && pStats[p].played > pStats[bestLast].played) bestLast = p;
+            if (startOrderStats[p].played > startOrderStats[bestLast].played) bestLast = p;
         }
     });
 
@@ -1606,7 +1608,7 @@ function renderGameList() {
             html += `<div class="game-item" onclick="toggleActionOverlay(this)">
                          <div class="game-info"><span>${idx+1}G</span><div style="display:inline-flex; align-items:center;">${generateNamesHTML(names)}</div></div>
                          <div class="action-overlay">
-                             <div class="overlay-btn btn-detail-p" onclick="event.stopPropagation(); showQuickViewModal('${g.dateStr}', ${g.round})">순서</div>
+                             <div class="overlay-btn btn-detail-p" onclick="event.stopPropagation(); showQuickViewModal('${g.dateStr}', ${g.round})">상세</div>
                              <div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
                              <div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>
                              <div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div>
@@ -1860,535 +1862,151 @@ function searchRecords() {
     setTimeout(() => { const target = document.getElementById('search-capture-area'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 }
 
-function analyzeStrategy() {
-    const player = document.getElementById('strategyPlayer').value;
-    const area = document.getElementById('strategyResultArea'); const shareBtn = document.getElementById('strategy-share-btn');
-    if (!player) { area.style.display = 'none'; if (shareBtn) shareBtn.style.display = 'none'; return; }
-
-    const filterVal = document.getElementById('statsFilterCount')?.value || "all";
-    const monthVal = document.getElementById('statsFilterMonth')?.value || "";
-    let stats = {}; 
-
-    gameLogs.forEach(g => {
-        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
-        if (g.startOrder && g.startOrder.includes(player)) {
-            const actual = g.ranks.filter(n => n && n.trim() !== "");
-            if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
-            const order = g.startOrder; const myOrderIdx = order.indexOf(player);
-            const prevP = order[(myOrderIdx - 1 + order.length) % order.length];
-            const myRankIdx = actual.indexOf(player);
-            if (myRankIdx !== -1) {
-                if (!stats[prevP]) stats[prevP] = { games: 0, totalRank: 0, wins: 0, lasts: 0 };
-                stats[prevP].games++; stats[prevP].totalRank += (myRankIdx + 1);
-                if (myRankIdx === 0) stats[prevP].wins++;
-                if (myRankIdx === actual.length - 1 && actual.length > 1) stats[prevP].lasts++;
-            }
-        }
-    });
-
-    const targets = Object.keys(stats).sort((a, b) => (stats[a].totalRank / stats[a].games) - (stats[b].totalRank / stats[b].games));
-    if (targets.length === 0) {
-        area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">분석 가능한 데이터가 없습니다.</div>`;
-        area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'none'; return;
-    }
-
-    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 다음 선수들의 <b>뒤에서</b> 기록한 성적</div>`;
-    targets.forEach(t => {
-        const s = stats[t]; const avg = (s.totalRank / s.games).toFixed(1);
-        const winP = Math.round((s.wins / s.games) * 100); const lastP = Math.round((s.lasts / s.games) * 100); const otherP = 100 - winP - lastP; 
-        html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <div style="font-size:15px; font-weight:800; color:var(--sub-text);">앞 순서: <span style="font-size:19px; font-weight:900; color:${getPlayerColor(t)};">${t}</span> <span style="font-size:14px; font-weight:900; color:var(--accent); margin-left:4px;">${s.games}G</span></div>
-                        <div style="font-size:15px; font-weight:800; color:var(--text-color);">${player}의 성적: 평균 ${avg}위</div>
-                    </div>
-                    <div style="display:flex; gap:6px;">
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">1위 확률</div><div style="font-size:15px; font-weight:900; color:var(--rank1);">${winP}%, <span style="font-size:12px; color:var(--sub-text);">${s.wins}회</span></div></div>
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">기타 확률</div><div style="font-size:15px; font-weight:900; color:var(--rank2);">${otherP}%, <span style="font-size:12px; color:var(--sub-text);">${s.games - s.wins - s.lasts}회</span></div></div>
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">꼴찌 확률</div><div style="font-size:15px; font-weight:900; color:var(--rankL);">${lastP}%, <span style="font-size:12px; color:var(--sub-text);">${s.lasts}회</span></div></div>
-                    </div>
-                 </div>`;
-    });
-    area.innerHTML = html; area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'block';
-    setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-}
-
-function shareStrategyResult() { const player = document.getElementById('strategyPlayer').value; captureAndShare('strategy-capture-area', 'strategy-share-btn', `strategy_${player}.png`, '상성 분석', `${player} 선수의 상성 분석 결과입니다!`); }
-
-// [V9.65 신규 추가] 순번별 성적 분석 로직
-function analyzeOrderStats() {
-    const player = document.getElementById('orderStatsPlayer').value;
-    const area = document.getElementById('orderStatsResultArea'); 
-    const shareBtn = document.getElementById('orderStats-share-btn');
-    if (!player) { area.style.display = 'none'; if (shareBtn) shareBtn.style.display = 'none'; return; }
-
-    const filterVal = document.getElementById('statsFilterCount')?.value || "all";
-    const monthVal = document.getElementById('statsFilterMonth')?.value || "";
-    
-    let stats = {
-        '초구(1번)': { games: 0, totalRank: 0, wins: 0, lasts: 0 },
-        '2번': { games: 0, totalRank: 0, wins: 0, lasts: 0 },
-        '3번': { games: 0, totalRank: 0, wins: 0, lasts: 0 },
-        '4번': { games: 0, totalRank: 0, wins: 0, lasts: 0 },
-        '말구': { games: 0, totalRank: 0, wins: 0, lasts: 0 }
-    };
-    let hasData = false;
-
-    gameLogs.forEach(g => {
-        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
-        if (g.startOrder && g.startOrder.includes(player)) {
-            const actual = g.ranks.filter(n => n && n.trim() !== "");
-            if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
-            
-            const myOrderIdx = g.startOrder.indexOf(player);
-            const totalPlayers = g.startOrder.length;
-            
-            let orderType = "";
-            if (myOrderIdx === 0) orderType = '초구(1번)';
-            else if (myOrderIdx === totalPlayers - 1 && totalPlayers > 1) orderType = '말구';
-            else if (myOrderIdx === 1) orderType = '2번';
-            else if (myOrderIdx === 2) orderType = '3번';
-            else if (myOrderIdx === 3) orderType = '4번';
-            
-            if (!orderType || !stats[orderType]) return; 
-
-            const myRankIdx = actual.indexOf(player);
-            if (myRankIdx !== -1) {
-                hasData = true;
-                stats[orderType].games++;
-                stats[orderType].totalRank += (myRankIdx + 1);
-                if (myRankIdx === 0) stats[orderType].wins++;
-                if (myRankIdx === actual.length - 1 && actual.length > 1) stats[orderType].lasts++;
-            }
-        }
-    });
-
-    if (!hasData) {
-        area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">분석 가능한 데이터가 없습니다.</div>`;
-        area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'none'; return;
-    }
-
-    const orderKeys = ['초구(1번)', '2번', '3번', '4번', '말구'];
-    let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 특정 <b>순번</b>일 때 기록한 성적</div>`;
-    
-    orderKeys.forEach(t => {
-        const s = stats[t];
-        if (s.games === 0) return; 
-        
-        const avg = (s.totalRank / s.games).toFixed(1);
-        const winP = Math.round((s.wins / s.games) * 100); 
-        const lastP = Math.round((s.lasts / s.games) * 100); 
-        const otherP = 100 - winP - lastP; 
-        
-        let orderColor = "var(--text-color)";
-        if (t === '초구(1번)') orderColor = "var(--rank1)";
-        if (t === '말구') orderColor = "var(--rankL)";
-        
-        html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <div style="font-size:15px; font-weight:800; color:var(--sub-text);">순서: <span style="font-size:19px; font-weight:900; color:${orderColor};">${t}</span> <span style="font-size:14px; font-weight:900; color:var(--accent); margin-left:4px;">${s.games}G</span></div>
-                        <div style="font-size:15px; font-weight:800; color:var(--text-color);">평균 ${avg}위</div>
-                    </div>
-                    <div style="display:flex; gap:6px;">
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">1위 확률</div><div style="font-size:15px; font-weight:900; color:var(--rank1);">${winP}%, <span style="font-size:12px; color:var(--sub-text);">${s.wins}회</span></div></div>
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">기타 확률</div><div style="font-size:15px; font-weight:900; color:var(--rank2);">${otherP}%, <span style="font-size:12px; color:var(--sub-text);">${s.games - s.wins - s.lasts}회</span></div></div>
-                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">꼴찌 확률</div><div style="font-size:15px; font-weight:900; color:var(--rankL);">${lastP}%, <span style="font-size:12px; color:var(--sub-text);">${s.lasts}회</span></div></div>
-                    </div>
-                 </div>`;
-    });
-    area.innerHTML = html; area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'block';
-    setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-}
-
-function shareOrderStatsResult() { const player = document.getElementById('orderStatsPlayer').value; captureAndShare('orderStats-capture-area', 'orderStats-share-btn', `order_stats_${player}.png`, '순번별 성적 분석', `${player} 선수의 순번별 성적 분석 결과입니다!`); }
-
-function showToastMsg(msg) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-    toast.innerText = msg;
-    toast.style.display = 'block'; 
-    toast.style.zIndex = '999999';
-    void toast.offsetWidth; 
-    toast.classList.add('show');
-    
-    if (globalToastTimeout) clearTimeout(globalToastTimeout);
-    
-    globalToastTimeout = setTimeout(() => {
-        toast.classList.remove('show');
-        toast.style.display = 'none';
-    }, 3000);
-}
-
-function confirmReset(step) {
-    const btnWrap = document.getElementById('resetSteps');
-    if (!btnWrap) return;
-    const cancelBtn = `<button class="save-btn" style="background:#bdc3c7; color:#444; margin-top:10px; width:100%; box-shadow: none;" onclick="cancelReset()">아니, 취소할게 (데이터 유지)</button>`;
-
-    if (step === 1) {
-        triggerHaptic(10);
-        btnWrap.innerHTML = `<button class="reset-btn" style="background: linear-gradient(145deg, #f39c12, #e67e22);" onclick="confirmReset(2)">⚠️ 진짜 초기화 할거야? (1/3)</button>${cancelBtn}`;
-    } else if (step === 2) {
-        triggerHaptic(20);
-        btnWrap.innerHTML = `<button class="reset-btn" style="background: linear-gradient(145deg, #e74c3c, #c0392b);" onclick="confirmReset(3)">🚨 진심이지? 절대 복구 안돼! (2/3)</button>${cancelBtn}`;
-    } else if (step === 3) {
-        triggerHaptic(30);
-        btnWrap.innerHTML = `<button class="reset-btn" style="background: #000000; color:#fff;" onclick="confirmReset(4)">💀 마지막 경고: 데이터 영구 소각 (3/3)</button>${cancelBtn}`;
-    } else if (step === 4) {
-        triggerHaptic([20, 30, 20]);
-        executeReset();
-    }
-}
-
-function cancelReset() {
-    const btnWrap = document.getElementById('resetSteps');
-    if (btnWrap) btnWrap.innerHTML = `<button class="reset-btn" onclick="confirmReset(1)">⚠️ 모든 데이터 초기화 (복구 불가)</button>`;
-}
-
-async function executeReset() {
-    showLoading(true, "모든 데이터 소각 중...");
-    try {
-        const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "RESET" }) });
-        if (response.ok) {
-            gameLogs = []; renderAll(); alert("모든 데이터가 영구적으로 초기화되었습니다.");
-        } else { throw new Error("Reset Failed"); }
-    } catch (e) {
-        alert("서버 통신 오류로 초기화에 실패했습니다.");
-    } finally {
-        showLoading(false); cancelReset();
-    }
-}
-
-window.onload = () => { 
-    try {
-        function applyHighlight(instance) {
-            if (!instance || !instance.calendarContainer) return;
-            const year = instance.currentYear;
-            const monthEls = instance.calendarContainer.querySelectorAll('.flatpickr-monthSelect-month');
-            monthEls.forEach((el, index) => {
-                const monthStr = String(index + 1).padStart(2, '0');
-                const targetPrefix = `${year}-${monthStr}`;
-                const hasRecord = gameLogs.some(g => g.dateStr.startsWith(targetPrefix));
-                if (hasRecord) {
-                    if (!el.classList.contains('selected')) { el.style.backgroundColor = '#5D4037'; el.style.color = '#ffffff'; } 
-                    else { el.style.backgroundColor = ''; el.style.color = ''; }
-                } else { el.style.backgroundColor = ''; el.style.color = ''; }
-            });
-        }
-
-        searchFlatpickr = flatpickr("#searchDateRange", { 
-            plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
-            locale: "ko", disableMobile: true,
-            onReady: function(selectedDates, dateStr, instance) {
-                const clearBtnWrap = document.createElement("div"); clearBtnWrap.style.padding = "0 10px 10px 10px";
-                clearBtnWrap.innerHTML = "<button type='button' style='width:100%; padding:10px; background:var(--edit); color:white; border:none; border-radius:8px; font-weight:900; font-size:13px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1);'>전체 기간으로 리셋</button>";
-                clearBtnWrap.onclick = function() { instance.clear(); instance.close(); };
-                instance.calendarContainer.appendChild(clearBtnWrap); applyHighlight(instance);
-            },
-            onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
-            onYearChange: function(selectedDates, dateStr, instance) { setTimeout(() => applyHighlight(instance), 50); },
-            onChange: function(selectedDates, dateStr, instance) {
-                applyHighlight(instance);
-                if (dateStr) {
-                    const hasRecord = gameLogs.some(g => g.dateStr.startsWith(dateStr));
-                    if (!hasRecord) showToastMsg("게임 기록 없음");
-                }
-            }
-        });
-
-        flatpickr("#statsFilterMonth", { 
-            plugins: [new monthSelectPlugin({shorthand: true, dateFormat: "Y-m", altFormat: "Y-m"})], 
-            locale: "ko", disableMobile: true,
-            onReady: function(selectedDates, dateStr, instance) {
-                const clearBtnWrap = document.createElement("div"); clearBtnWrap.style.padding = "0 10px 10px 10px";
-                clearBtnWrap.innerHTML = "<button type='button' style='width:100%; padding:10px; background:var(--edit); color:white; border:none; border-radius:8px; font-weight:900; font-size:13px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1);'>전체 기간으로 리셋</button>";
-                clearBtnWrap.onclick = function() { instance.clear(); instance.close(); onFilterChange(); };
-                instance.calendarContainer.appendChild(clearBtnWrap); applyHighlight(instance); 
-            },
-            onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
-            onYearChange: function(selectedDates, dateStr, instance) { setTimeout(() => applyHighlight(instance), 50); },
-            onChange: function(selectedDates, dateStr, instance) {
-                applyHighlight(instance); onFilterChange(); 
-                if (dateStr) {
-                    const hasRecord = gameLogs.some(g => g.dateStr.startsWith(dateStr));
-                    if (!hasRecord) showToastMsg("게임 기록 없음");
-                }
-            }
-        });
-    } catch(e) { console.error("Flatpickr initialization failed", e); }
-    
-    let savedTheme = localStorage.getItem('appTheme') || 'yellow'; 
-    document.documentElement.setAttribute('data-theme', savedTheme); 
-    document.getElementById('themeSelect').value = savedTheme;
-    
-    setTimeout(() => { 
-        const ws = document.getElementById('welcome-screen'); 
-        if(ws) { ws.style.opacity = '0'; setTimeout(() => { ws.style.display = 'none'; }, 800); } 
-        showLastGameResult(); 
-    }, 3000);
-
-    setTimeout(() => playSystemSound('pop'), 3500); 
-    
-    updateInputFields(); setDefaultSearchDates(); fetchData(); 
-};
-document.addEventListener('click', (e) => { if(!e.target.closest('.game-item')) closeAllOverlays(); });
-
-function showH2HDetailModal(playerName, type) {
+// [V9.70 신규] 월간 종합 시상식 (Monthly Awards) 로직
+function showMonthlyAwards() {
     triggerHaptic(10);
-    
-    const filterVal = document.getElementById('statsFilterCount')?.value || "all";
     const monthVal = document.getElementById('statsFilterMonth')?.value || "";
+    const filterVal = document.getElementById('statsFilterCount')?.value || "all";
 
-    const allPersonal = gameLogs.filter(g => {
-        if (monthVal && !g.dateStr.startsWith(monthVal)) return false; 
-        const actual = g.ranks.filter(n => n.trim() !== "");
-        if (!actual.includes(playerName)) return false; 
-        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return false; 
-        return true;
-    });
-    
-    let h2h = {};
-    players.forEach(p => { if (p !== playerName) h2h[p] = { match: 0, win: 0, loss: 0 }; });
-    
-    allPersonal.forEach(g => {
-        const actual = g.ranks.filter(n => n.trim() !== "");
-        const myIdx = actual.indexOf(playerName);
-        actual.forEach((p, pIdx) => {
-            if (p !== playerName && h2h[p]) {
-                h2h[p].match++;
-                if (myIdx < pIdx) h2h[p].win++; 
-                else if (myIdx > pIdx) h2h[p].loss++; 
-            }
-        });
-    });
-
-    let opponentList = [];
-    players.forEach(p => {
-        if (p === playerName) return;
-        const s = h2h[p];
-        const winRate = s.match > 0 ? Math.round((s.win / s.match) * 100) : -1;
-        opponentList.push({ name: p, stats: s, winRate: winRate });
-    });
-
-    opponentList.sort((a, b) => {
-        if (a.stats.match === 0 && b.stats.match > 0) return 1;
-        if (b.stats.match === 0 && a.stats.match > 0) return -1;
-        if (a.stats.match === 0 && b.stats.match === 0) return 0;
-
-        if (type === 'nemesis') {
-            return a.winRate - b.winRate || b.stats.loss - a.stats.loss;
-        } else {
-            return b.winRate - a.winRate || b.stats.win - a.stats.win;
-        }
-    });
-
-    let html = `<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; color: #333; margin-top:5px;">`;
-    
-    opponentList.forEach(item => {
-        const p = item.name;
-        const s = item.stats;
-        
-        if (s.match === 0) {
-            html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px 15px; border-radius:12px;">
-                        <span style="font-weight:900; font-size:15px; color:${getPlayerColor(p)}">${playerThemes[p].emoji} ${p}</span>
-                        <span style="font-size:12px; font-weight:800; color:#999;">해당 조건 전적 없음</span>
-                     </div>`;
-        } else {
-            const winRate = item.winRate;
-            
-            let rateColor = '#795548'; 
-            if (winRate > 50) rateColor = '#1A237E'; 
-            else if (winRate < 50) rateColor = '#e74c3c'; 
-            
-            html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px 15px; border-radius:12px; border:1px solid rgba(0,0,0,0.02);">
-                        <span style="font-weight:900; font-size:16px; color:${getPlayerColor(p)}">${playerThemes[p].emoji} ${p}</span>
-                        <span style="font-weight:900; color:${rateColor}; font-size:15px; text-align:right;">
-                            승률 ${winRate}% <br>
-                            <span style="font-size:11px; color:#666; font-weight:800; display:block; margin-top:2px;">(${s.match}전 ${s.win}승 ${s.loss}패)</span>
-                        </span>
-                     </div>`;
-        }
-    });
-    html += `</div>`;
-    
-    const titleEl = document.getElementById('info-modal-title');
-    const descEl = document.getElementById('info-modal-desc');
-    
-    document.getElementById('info-modal-icon').innerHTML = "⚔️";
-    
-    let monthText = monthVal ? `, ${monthVal}월` : '';
-    let countText = filterVal === 'all' ? '' : `, ${filterVal}인`;
-    const suffix = type === 'nemesis' ? '천적 순' : '샌드백 순';
-    
-    titleEl.innerHTML = `${playerName}의 상성 분석 <br><span style="font-size:12px; color:var(--sub-text); margin-top:5px; display:block;">(${suffix}${monthText}${countText})</span>`;
-    descEl.innerHTML = html;
-    
-    const currentAppTheme = document.documentElement.getAttribute('data-theme');
-    if (currentAppTheme === 'dark' || currentAppTheme === 'navy') {
-        titleEl.style.setProperty('color', '#2980b9', 'important');
-    } else {
-        titleEl.style.removeProperty('color');
-        titleEl.style.color = 'var(--rank1)';
-    }
-    
-    if (infoModalCountdownInterval) { clearInterval(infoModalCountdownInterval); infoModalCountdownInterval = null; }
-    if (dashInfoCountdownInterval) { clearInterval(dashInfoCountdownInterval); dashInfoCountdownInterval = null; }
-    const timerEl = document.getElementById('dash-info-timer'); if (timerEl) timerEl.remove();
-    document.getElementById('info-modal').style.display = 'flex';
-}
-function showQuickViewModal(dateStr, round) {
-    triggerHaptic(10);
-    const targetGame = gameLogs.find(g => g.dateStr === dateStr && g.round === round);
-    if (!targetGame) {
-        showToastMsg("데이터 없음");
+    if (!monthVal) {
+        showToastMsg("대시보드 상단의 '월별 순위'에서 특정 월을 선택해주세요.");
         return;
     }
-    
-    if (!targetGame.startOrder || targetGame.startOrder.length === 0) {
-        showToastMsg("저장된 순서 정보가 없습니다.");
+
+    let filtered = gameLogs.filter(g => g.dateStr.startsWith(monthVal));
+    if (filterVal !== "all") {
+        const count = parseInt(filterVal);
+        filtered = filtered.filter(g => g.ranks.filter(n => n.trim() !== "").length === count);
+    }
+
+    if (filtered.length === 0) {
+        showToastMsg("해당 월의 데이터가 없습니다.");
         return;
     }
-    
-    const startOrder = targetGame.startOrder;
-    const actualRanks = targetGame.ranks.filter(n => n && n.trim() !== ""); 
-    
-    const sameDateGames = gameLogs.filter(x => x.dateStr === dateStr);
-    const gameNumber = sameDateGames.findIndex(x => x.round === round) + 1;
-    
-    let html = `<div style="font-size:40px; margin-bottom:10px; display:block; text-align:center;">🎯</div>
-                <div style="font-size:18px; font-weight:900; color:var(--text-color); margin-bottom:5px; display:block; text-align:center;">${dateStr}</div>
-                <div style="font-size:14px; font-weight:800; color:var(--sub-text); margin-bottom: 20px; display:block; text-align:center;">[ ${gameNumber}G 초구 및 순서와 순위 ]</div>
-                <div style="display:block; font-weight:900;">`;
-    
-    startOrder.forEach((name, i) => {
-        const orderLabel = (i === 0) ? "1번 (초구)🎱" : `${i + 1}번`;
-        const orderColor = (i === 0) ? 'var(--rank1)' : 'var(--text-color)';
-        
-        const rankIdx = actualRanks.indexOf(name);
-        let finalRankLabel = "";
-        let finalRankColor = "var(--sub-text)"; 
-        
-        if (rankIdx !== -1) {
-            if (rankIdx === 0) {
-                finalRankLabel = "(1위)";
-                finalRankColor = "var(--rank1)"; 
-            } else if (rankIdx === actualRanks.length - 1 && actualRanks.length > 1) {
-                finalRankLabel = "(꼴찌)";
-                finalRankColor = "var(--rankL)"; 
-            } else {
-                finalRankLabel = `(${rankIdx + 1}위)`;
+
+    let stats = {};
+    players.forEach(p => stats[p] = { played: 0, wins: 0, lasts: 0, comebackWins: 0, defTotalNextRank: 0, defCount: 0 });
+
+    filtered.forEach(g => {
+        const actual = g.ranks.filter(n => n.trim() !== "");
+        actual.forEach((p, idx) => {
+            if (stats[p]) {
+                stats[p].played++;
+                if (idx === 0) stats[p].wins++;
+                if (idx === actual.length - 1 && actual.length > 1) stats[p].lasts++;
+            }
+        });
+
+        if (g.startOrder && g.startOrder.length > 0) {
+            const winner = actual[0];
+            const lastStarter = g.startOrder[g.startOrder.length - 1];
+            if (actual.length > 1 && winner === lastStarter && stats[winner]) {
+                stats[winner].comebackWins++;
+            }
+
+            for (let i = 0; i < g.startOrder.length; i++) {
+                const preP = g.startOrder[i];
+                const nextP = g.startOrder[(i + 1) % g.startOrder.length];
+                const nextPRankIdx = actual.indexOf(nextP);
+                if (nextPRankIdx !== -1 && stats[preP]) {
+                    stats[preP].defTotalNextRank += (nextPRankIdx + 1);
+                    stats[preP].defCount++;
+                }
             }
         }
-
-        html += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.4); padding:12px 20px; border-radius:15px; border:1px solid rgba(0,0,0,0.05); box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7); margin-bottom:8px;">
-                    <div style="color:${orderColor}; font-size:${i === 0 ? '16px' : '14px'}; font-weight:${i === 0 ? '900' : '800'};">${orderLabel}</div>
-                    <div style="color:${orderColor}; font-size:${i === 0 ? '22px' : '16px'}; font-weight:${i === 0 ? '900' : '800'}; text-align:right;">
-                        ${name} <span style="font-size:14px; font-weight:900; color:${finalRankColor}; margin-left:6px; letter-spacing:-0.5px;">${finalRankLabel}</span>
-                    </div>
-                 </div>`;
     });
-    
-    html += `</div>
-             <button class="save-btn" style="background:#bdc3c7; margin-top:15px; color:#444; width:100%; box-shadow:none;" onclick="closeQuickViewModal()">닫기</button>`;
-    
-    const modal = document.getElementById('quick-view-modal'); 
-    const content = document.getElementById('quick-view-content');
-    
-    content.innerHTML = html; 
-    modal.style.display = 'flex'; 
-    content.style.animation = 'scaleUpPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
-    
-    closeAllOverlays(); 
-}
 
-function closeQuickViewModal() {
-    const modal = document.getElementById('quick-view-modal'); 
-    const content = document.getElementById('quick-view-content');
-    if(!modal || !content) return;
-    content.style.animation = 'scaleDownPopup 0.3s ease-in forwards';
-    setTimeout(() => { modal.style.display = 'none'; content.style.animation = 'none'; }, 300);
-}
+    const activePlayers = players.filter(p => stats[p].played > 0);
+    if (activePlayers.length === 0) return;
 
-// [V9.62 신규] 오늘의 복기 애니메이션 로직 (터치 스킵 기능 추가)
-function showTodayReplay() {
-    triggerHaptic(10);
-    const games = gameLogs.filter(g => g.dateStr === selectedDateStr);
-    if (games.length === 0) return showToastMsg("복기할 데이터가 없습니다.");
-
-    const validGames = games.filter(g => g.startOrder && g.startOrder.length > 0);
-    if (validGames.length === 0) return showToastMsg("이전 기록은 복기를 지원하지 않습니다.");
-
-    validGames.sort((a, b) => parseInt(a.round) - parseInt(b.round));
-
-    const modal = document.getElementById('replay-modal');
-    const content = document.getElementById('replay-content');
-    modal.style.display = 'flex';
-    
-    let currentIndex = 0;
-    if (replayInterval) clearInterval(replayInterval);
-
-    function renderStep() {
-        if (currentIndex >= validGames.length) {
-            if (replayInterval) clearInterval(replayInterval);
-            content.innerHTML = `
-                <div class="replay-card" style="cursor:pointer;" onclick="closeReplayModal()">
-                    <div style="font-size:50px; margin-bottom:20px;">🏁</div>
-                    <div style="font-size:20px; font-weight:900; margin-bottom:20px; color:#fff;">오늘의 복기 종료!</div>
-                    <div style="font-size:12px; color:#b0bec5; font-weight:800; margin-bottom:20px;">(화면을 터치하면 닫힙니다.)</div>
-                    <button class="save-btn" style="background:#bdc3c7; color:#444;" onclick="event.stopPropagation(); closeReplayModal()">닫기</button>
-                </div>
-            `;
-            return;
+    let mostWins = 0; let winKing = "-";
+    activePlayers.forEach(p => {
+        if (stats[p].wins > mostWins) { mostWins = stats[p].wins; winKing = p; }
+        else if (stats[p].wins === mostWins && mostWins > 0) {
+            if (stats[p].played < stats[winKing]?.played) winKing = p; 
         }
+    });
 
-        const g = validGames[currentIndex];
-        const actualRanks = g.ranks.filter(n => n && n.trim() !== "");
-        const firstP = g.startOrder[0];
-        const winnerP = actualRanks[0];
-        const loserP = actualRanks[actualRanks.length - 1];
-        
-        content.innerHTML = `
-            <div class="replay-card" style="cursor:pointer;" onclick="skipToNextReplay()">
-                <div class="replay-header">DAY'S REPLAY - ${selectedDateStr}</div>
-                <div class="replay-round">제 ${currentIndex + 1} 경기</div>
-                <div class="replay-row">
-                    <div class="replay-label">초구 (1번) 🎱</div>
-                    <div class="replay-value" style="color:var(--rank1);">${firstP}</div>
+    let mostComebacks = 0; let comebackKing = "-";
+    activePlayers.forEach(p => {
+        if (stats[p].comebackWins > mostComebacks) { mostComebacks = stats[p].comebackWins; comebackKing = p; }
+        else if (stats[p].comebackWins === mostComebacks && mostComebacks > 0) {
+            if (stats[p].played < stats[comebackKing]?.played) comebackKing = p;
+        }
+    });
+
+    let maxDefAvg = -1; let defKing = "-";
+    activePlayers.forEach(p => {
+        if (stats[p].defCount > 0) {
+            const avg = stats[p].defTotalNextRank / stats[p].defCount;
+            if (avg > maxDefAvg) { maxDefAvg = avg; defKing = p; }
+        }
+    });
+
+    let mostLasts = 0; let lastKing = "-";
+    activePlayers.forEach(p => {
+        if (stats[p].lasts > mostLasts) { mostLasts = stats[p].lasts; lastKing = p; }
+        else if (stats[p].lasts === mostLasts && mostLasts > 0) {
+            if (stats[p].played > stats[lastKing]?.played) lastKing = p; 
+        }
+    });
+
+    const modal = document.getElementById('awards-modal');
+    const content = document.getElementById('awards-content');
+
+    let countText = filterVal === "all" ? "전체 인원" : filterVal + "인";
+    
+    content.innerHTML = `
+        <div class="replay-card" style="cursor:pointer; position:relative; overflow:hidden;" onclick="closeAwardsModal()">
+            <div style="position:absolute; top:-20px; left:-20px; font-size:100px; opacity:0.1; transform:rotate(-15deg);">🏆</div>
+            <div class="replay-header" style="font-size:16px; color:#ffeb3b; text-shadow:0 0 10px rgba(255,235,59,0.5);">🏆 MONTHLY AWARDS</div>
+            <div style="font-size:22px; font-weight:900; color:#fff; margin-bottom:5px;">[ ${monthVal} ]</div>
+            <div style="font-size:12px; color:#b0bec5; font-weight:800; margin-bottom:20px;">(${countText} 기준)</div>
+            
+            <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(255,215,0,0.1); border-color:rgba(255,215,0,0.3);">
+                <div style="font-size:12px; color:#ffd600; font-weight:900; margin-bottom:5px;">🥇 무적의 1위왕 (최다 1위)</div>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div style="font-size:20px; font-weight:900; color:#fff;">${winKing !== "-" ? winKing : "해당자 없음"}</div>
+                    <div style="font-size:14px; font-weight:900; color:#ffd600;">${mostWins > 0 ? mostWins + '회' : '-'}</div>
                 </div>
-                <div class="replay-row">
-                    <div class="replay-label">1위 🥇</div>
-                    <div class="replay-value" style="color:#ffeb3b;">${winnerP}</div>
-                </div>
-                <div class="replay-row">
-                    <div class="replay-label">꼴찌 💀</div>
-                    <div class="replay-value" style="color:var(--rankL);">${loserP}</div>
-                </div>
-                <div style="margin-top:20px; font-size:11px; color:#90caf9; font-weight:800; opacity:0.8;">(화면을 터치하면 다음으로 넘어갑니다.)</div>
             </div>
-        `;
-        triggerHaptic(15);
-        currentIndex++;
-    }
 
-    window.skipToNextReplay = function() {
-        triggerHaptic(10);
-        if (replayInterval) clearInterval(replayInterval); 
-        renderStep(); 
-        if (currentIndex <= validGames.length) {
-            replayInterval = setInterval(renderStep, 10000);
-        }
-    };
+            <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(0,229,255,0.1); border-color:rgba(0,229,255,0.3);">
+                <div style="font-size:12px; color:#18ffff; font-weight:900; margin-bottom:5px;">⚡ 역전의 명수 (말구 출발 1위)</div>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div style="font-size:20px; font-weight:900; color:#fff;">${comebackKing !== "-" ? comebackKing : "해당자 없음"}</div>
+                    <div style="font-size:14px; font-weight:900; color:#18ffff;">${mostComebacks > 0 ? mostComebacks + '회' : '-'}</div>
+                </div>
+            </div>
 
-    renderStep();
-    replayInterval = setInterval(renderStep, 10000); 
+            <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(129,199,132,0.1); border-color:rgba(129,199,132,0.3);">
+                <div style="font-size:12px; color:#81c784; font-weight:900; margin-bottom:5px;">🛡️ 인간 방어벽 (디펜스 1위)</div>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div style="font-size:20px; font-weight:900; color:#fff;">${defKing !== "-" ? defKing : "해당자 없음"}</div>
+                    <div style="font-size:14px; font-weight:900; color:#81c784;">${maxDefAvg > 0 ? '평균 ' + maxDefAvg.toFixed(1) + '위' : '-'}</div>
+                </div>
+            </div>
+
+            <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(255,138,128,0.1); border-color:rgba(255,138,128,0.3);">
+                <div style="font-size:12px; color:#ff8a80; font-weight:900; margin-bottom:5px;">💸 당구장 영주 (최다 꼴찌)</div>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div style="font-size:20px; font-weight:900; color:#fff;">${lastKing !== "-" ? lastKing : "해당자 없음"}</div>
+                    <div style="font-size:14px; font-weight:900; color:#ff8a80;">${mostLasts > 0 ? mostLasts + '회' : '-'}</div>
+                </div>
+            </div>
+            
+            <div style="margin-top:20px; font-size:11px; color:#90caf9; font-weight:800; opacity:0.8;">(화면을 터치하면 닫힙니다.)</div>
+            <button id="awards-share-btn" class="share-btn-common" style="margin-top:15px; background:linear-gradient(145deg, #f1c40f, #f39c12); color:#fff; border:1.5px solid #d35400; font-size:14px; padding:15px !important;" onclick="event.stopPropagation(); shareMonthlyAwards('${monthVal}')">📸 시상식 결과 공유</button>
+        </div>
+    `;
+    modal.style.display = 'flex';
 }
 
-function closeReplayModal() {
-    if (replayInterval) {
-        clearInterval(replayInterval);
-        replayInterval = null;
-    }
-    if (window.skipToNextReplay) {
-        delete window.skipToNextReplay;
-    }
-    const modal = document.getElementById('replay-modal');
+function closeAwardsModal() {
+    const modal = document.getElementById('awards-modal');
     if (modal) modal.style.display = 'none';
+}
+
+function shareMonthlyAwards(monthVal) {
+    captureAndShare('awards-content', 'awards-share-btn', `monthly_awards_${monthVal}.png`, '월간 종합 시상식', `${monthVal} 월간 종합 시상식 결과입니다!`);
 }
