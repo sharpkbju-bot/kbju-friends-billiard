@@ -10,7 +10,7 @@ let dashInfoCountdownInterval = null;
 let globalToastTimeout = null; 
 let audioCtx = null; // V9.50 Web Audio API Context
 let replayInterval = null; // [V9.62 신규] 오늘의 복기 애니메이션 타이머
-let awardsCountdownInterval = null; // [V9.74 신규] 시상식 10초 자동 종료 타이머
+let awardsCountdownInterval = null; // [V9.74 신규] 월간 종합 하이라이트 10초 자동 종료 타이머
 
 function triggerHaptic(pattern) {
     if (navigator.vibrate) {
