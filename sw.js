@@ -1,11 +1,11 @@
-// Billiard World Service Worker v9.70
-const CACHE_NAME = 'billiard-v9.70'; // 캐시 강제 갱신
+// Billiard World Service Worker v9.71
+const CACHE_NAME = 'billiard-v9.71'; // 캐시 강제 갱신
 const ASSETS = [
-    'index.html?v=9.70',
-    'style.css?v=9.70',
-    'main.js?v=9.70',
-    'manifest.json?v=9.70',
-    'image_0.png?v=9.70',
+    'index.html?v=9.71',
+    'style.css?v=9.71',
+    'main.js?v=9.71',
+    'manifest.json?v=9.71',
+    'image_0.png?v=9.71',
     'image_1.png',
     'Gemini_Generated_Image_vod7c8vod7c8vod7.png'
 ];
