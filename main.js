@@ -2646,7 +2646,7 @@ function showMonthlyAwards() {
             </div>
 
             <div class="replay-row" style="flex-direction:column; align-items:flex-start; text-align:left; background:rgba(255,138,128,0.1); border-color:rgba(255,138,128,0.3);">
-                <div style="font-size:12px; color:#ff8a80; font-weight:900; margin-bottom:5px;">💸 당구장 영주 (최다 꼴찌)</div>
+                <div style="font-size:12px; color:#ff8a80; font-weight:900; margin-bottom:5px;">💸 당구장 물주 (최다 꼴찌)</div>
                 <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                     <div style="font-size:20px; font-weight:900; color:#fff;">${lastKing !== "-" ? lastKing : "해당자 없음"}</div>
                     <div style="font-size:14px; font-weight:900; color:#ff8a80;">${mostLasts > 0 ? mostLasts + '회' : '-'}</div>
