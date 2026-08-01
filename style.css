@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v9.78 - Live Pulse Edition */
+/* Billiard World Style v9.76 - Live Pulse Edition */
 /* [절대 원칙 준수]: 최적화 전면 금지, 모든 클래스와 테마를 개별적으로 분리 전개함 */
 
 :root { 
@@ -699,7 +699,7 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
 .zoom-active #info-modal { zoom: 0.833333; }
 .zoom-active #defense-detail-modal { zoom: 0.833333; }
 
-/* [V9.78 신규] 확대 모드에서 버튼 컨테이너 역보정 추가 */
+/* [V9.76 신규] 확대 모드에서 버튼 컨테이너 역보정 추가 */
 .zoom-active #awards-btn-container { zoom: 0.833333; }
 
 #info-modal .modal-content { 
