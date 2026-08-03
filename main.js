@@ -1623,7 +1623,7 @@ function renderGameList() {
             html += `<div class="game-item" onclick="toggleActionOverlay(this)">
                          <div class="game-info"><span>${idx+1}G</span><div style="display:inline-flex; align-items:center;">${generateNamesHTML(names)}</div></div>
                          <div class="action-overlay">
-                             <div class="overlay-btn btn-detail-p" onclick="event.stopPropagation(); showQuickViewModal('${g.dateStr}', ${g.round})">상세</div>
+                             <div class="overlay-btn btn-detail-p" onclick="event.stopPropagation(); showQuickViewModal('${g.dateStr}', ${g.round})">순서</div>
                              <div class="overlay-btn btn-edit-p" onclick="event.stopPropagation(); enterEditMode(${g.round}, '${names.join(',')}')">수정</div>
                              <div class="overlay-btn btn-del-p" onclick="event.stopPropagation(); deleteGame(${g.round})">삭제</div>
                              <div class="overlay-btn btn-cancel-p" onclick="event.stopPropagation(); closeAllOverlays()">취소</div>
