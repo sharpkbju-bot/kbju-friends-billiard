@@ -259,7 +259,7 @@
         <div id="dayGameList"></div>
     </div>
 </div>
-<!-- index.html (Part 2/2) -->
+
 <div class="card stats-card">
     <div id="stats-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
         <div style="margin:5px 0 10px 5px; text-align: left;">
@@ -319,7 +319,6 @@
     </div>
     <button id="scoreRank-share-btn" class="share-btn-common" style="margin-top: 10px;" onclick="shareScoreRankResult()">📸 멤버별 승점 순위 스크린샷 공유</button>
 </div>
-
 <div class="card" id="defenseCard">
     <div id="defense-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
         <h2 style="font-size:16px; margin:5px 0 15px 0; color:#444; font-weight:800; text-align:center;">🛡️ Defense 순위 <span id="defenseFilterLabel" style="font-size:12px; color:var(--rank1);"></span></h2>
@@ -337,6 +336,24 @@
         </table>
         <button id="defense-share-btn" class="share-btn-common" style="margin-top: 15px;" onclick="shareDefenseResult()">📸 디펜스 랭킹 스크린샷 공유</button>
     </div>
+</div>
+
+<div class="card" id="lastPlaceCard">
+    <div id="lastPlace-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
+        <h2 style="font-size:16px; margin:5px 0 15px 5px; color:#444; font-weight:800; text-align:left; letter-spacing:-0.5px;">📉 선수별 마지막 최하위 기록</h2>
+        <table class="stats-table last-place-table">
+            <thead>
+                <tr>
+                    <th style="text-align:center; width:20%;">선수</th>
+                    <th style="text-align:center; width:33%;">최근 최하위 날짜</th>
+                    <th style="text-align:center; width:15%;">게임</th>
+                    <th style="text-align:center; width:32%;">게임수 & D-DAY+</th>
+                </tr>
+            </thead>
+            <tbody id="lastPlaceBody"></tbody>
+        </table>
+    </div>
+    <button id="lastPlace-share-btn" class="share-btn-common" style="margin-top: 10px;" onclick="shareLastPlaceRecord()">📸 마지막 최하위 기록 스크린샷 공유</button>
 </div>
 
 <div class="card" id="strategyCard">
@@ -377,24 +394,6 @@
         <button id="orderStats-share-btn" class="share-btn-common" style="margin-top: 15px; display: none;" onclick="shareOrderStatsResult()">📸 순번별 성적 분석 스크린샷 공유</button>
         <div id="orderStatsResultArea" style="margin-top:15px; display:none;"></div>
     </div>
-</div>
-
-<div class="card" id="lastPlaceCard">
-    <div id="lastPlace-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
-        <h2 style="font-size:16px; margin:5px 0 15px 5px; color:#444; font-weight:800; text-align:left; letter-spacing:-0.5px;">📉 선수별 마지막 최하위 기록</h2>
-        <table class="stats-table last-place-table">
-            <thead>
-                <tr>
-                    <th style="text-align:center; width:20%;">선수</th>
-                    <th style="text-align:center; width:33%;">최근 최하위 날짜</th>
-                    <th style="text-align:center; width:15%;">게임</th>
-                    <th style="text-align:center; width:32%;">게임수 & D-day+</th>
-                </tr>
-            </thead>
-            <tbody id="lastPlaceBody"></tbody>
-        </table>
-    </div>
-    <button id="lastPlace-share-btn" class="share-btn-common" style="margin-top: 10px;" onclick="shareLastPlaceRecord()">📸 마지막 최하위 기록 스크린샷 공유</button>
 </div>
 
 <div class="card" id="searchCard">
