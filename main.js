@@ -588,7 +588,7 @@ function pickRandomOrder() {
     let minPenalty = Infinity;
     const MAX_ATTEMPTS = 100;
 
-    for (let attempt = 0; attempt < MAX_ATTEMATTEMPTS; attempt++) {
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
         let candidate = [...selectedPlayersForLottery];
         for (let i = candidate.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
