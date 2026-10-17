@@ -969,3 +969,49 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
 .zoom-active #lastPlaceCard {
     zoom: 0.833333;
 }
+/* ============================================================
+   [V9.80 신규] 초구 추첨 결과 팝업 무지개 네온 사인 테두리 효과
+   ============================================================ */
+@keyframes rainbowNeonSign {
+    0% { border-color: #ff0055; box-shadow: 0 0 12px #ff0055, 0 0 28px rgba(255, 0, 85, 0.75), inset 0 0 10px rgba(255, 0, 85, 0.45); }
+    14% { border-color: #ff7700; box-shadow: 0 0 12px #ff7700, 0 0 28px rgba(255, 119, 0, 0.75), inset 0 0 10px rgba(255, 119, 0, 0.45); }
+    28% { border-color: #ffdd00; box-shadow: 0 0 12px #ffdd00, 0 0 28px rgba(255, 221, 0, 0.75), inset 0 0 10px rgba(255, 221, 0, 0.45); }
+    42% { border-color: #00ff66; box-shadow: 0 0 12px #00ff66, 0 0 28px rgba(0, 255, 102, 0.75), inset 0 0 10px rgba(0, 255, 102, 0.45); }
+    57% { border-color: #00e5ff; box-shadow: 0 0 12px #00e5ff, 0 0 28px rgba(0, 229, 255, 0.75), inset 0 0 10px rgba(0, 229, 255, 0.45); }
+    71% { border-color: #7b2cbf; box-shadow: 0 0 12px #7b2cbf, 0 0 28px rgba(123, 44, 191, 0.75), inset 0 0 10px rgba(123, 44, 191, 0.45); }
+    85% { border-color: #ff00ff; box-shadow: 0 0 12px #ff00ff, 0 0 28px rgba(255, 0, 255, 0.75), inset 0 0 10px rgba(255, 0, 255, 0.45); }
+    100% { border-color: #ff0055; box-shadow: 0 0 12px #ff0055, 0 0 28px rgba(255, 0, 85, 0.75), inset 0 0 10px rgba(255, 0, 85, 0.45); }
+}
+
+@keyframes rainbowSpinTube {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.order-content {
+    isolation: isolate;
+    background: transparent !important;
+    border: 2.5px solid #ff0055;
+    animation: rainbowNeonSign 3.5s linear infinite;
+}
+
+.order-content::before {
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(#ff0055, #ff7700, #ffdd00, #00ff66, #00e5ff, #3a86ff, #7b2cbf, #ff00ff, #ff0055);
+    animation: rainbowSpinTube 2.5s linear infinite;
+    filter: blur(6px);
+    z-index: -2;
+}
+
+.order-content::after {
+    top: 3.5px;
+    left: 3.5px;
+    width: calc(100% - 7px);
+    height: calc(100% - 7px);
+    border-radius: 9px;
+    background: var(--card-bg);
+    z-index: -1;
+}
