@@ -697,6 +697,7 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
 .zoom-active .summary-stats-wrap .stat-val { font-size: 14px !important; letter-spacing: -0.5px !important; line-height: 1; display: flex; align-items: flex-end; justify-content: center; height: 100%; }
 .empty-search-msg { white-space: nowrap; letter-spacing: -0.5px; font-size: clamp(13px, 4.5vw, 16px); word-break: keep-all; }
 .zoom-active .empty-search-msg { font-size: 13px !important; }
+.zoom-active .search-summary-title { font-size: 14px !important; letter-spacing: -1px !important; white-space: nowrap !important; }
 
 @keyframes scaleUpPopup { 0% { transform: scale(0.3); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes scaleDownPopup { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.3); opacity: 0; } }
