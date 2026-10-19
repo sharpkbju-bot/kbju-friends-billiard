@@ -2105,7 +2105,14 @@ window.onload = () => {
             onReady: function(selectedDates, dateStr, instance) {
                 const clearBtnWrap = document.createElement("div"); clearBtnWrap.style.padding = "0 10px 10px 10px";
                 clearBtnWrap.innerHTML = "<button type='button' style='width:100%; padding:10px; background:var(--edit); color:white; border:none; border-radius:8px; font-weight:900; font-size:13px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1);'>전체 기간으로 리셋</button>";
-                clearBtnWrap.onclick = function() { instance.clear(); instance.close(); };
+                clearBtnWrap.onclick = function() { 
+                    instance.clear(); 
+                    instance.close(); 
+                    const playerInput = document.getElementById('searchPlayer');
+                    if (playerInput && playerInput.value) {
+                        searchRecords();
+                    }
+                };
                 instance.calendarContainer.appendChild(clearBtnWrap); applyHighlight(instance);
             },
             onOpen: function(selectedDates, dateStr, instance) { applyHighlight(instance); },
@@ -2389,9 +2396,12 @@ function resetSearch() {
 
 function searchRecords() {
     const mon = document.getElementById('searchDateRange').value; const player = document.getElementById('searchPlayer').value;
-    if(!mon || !player) return alert("검색월과 선수를 선택해줘!");
+    if(!player) return alert("선수를 선택해줘!");
     
-    const filtered = gameLogs.filter(g => g.dateStr.startsWith(mon) && g.ranks.includes(player));
+    const filtered = gameLogs.filter(g => {
+        if (mon && !g.dateStr.startsWith(mon)) return false;
+        return g.ranks.includes(player);
+    });
     filtered.sort((a, b) => (new Date(b.dateStr) - new Date(a.dateStr)) || ((parseInt(b.round) || 0) - (parseInt(a.round) || 0)));
     
     const sArea = document.getElementById('searchSummaryArea'); const lArea = document.getElementById('searchHistoryListArea');
@@ -2484,8 +2494,12 @@ function searchRecords() {
         </div>`;
     }
 
+   const uniqueDates = new Set(filtered.map(g => g.dateStr));
+    const totalDays = uniqueDates.size;
+    const monText = mon ? mon : "전체 기간";
+
     sArea.innerHTML = `<div class="summary-box" style="margin: 0 -5px; box-sizing: border-box; background:var(--record-bg); border:2px solid var(--record-border); border-radius:15px; padding:25px 15px;">
-                           <div style="text-align:center; font-weight:900; color:var(--text-color); margin-bottom:20px; font-size:18px; letter-spacing:-0.5px;">[ ${player}, ${mon} ]</div>
+                           <div class="search-summary-title" style="text-align:center; font-weight:900; color:var(--text-color); margin-bottom:20px; font-size:clamp(14px, 4.5vw, 18px); letter-spacing:-0.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">[ ${player}, ${monText}, ${totalDays}일 ]</div>
                            <div style="display: flex; justify-content: center; align-items: center; width: 100%; box-sizing: border-box; margin-bottom: 35px;">${createRing(winRateVal, '#9B59B6', '승률', 'win')}${createRing(avgScoreVal, '#FF6B81', '평균득점', 'score')}${createRing(safetyVal, '#3498DB', '생존율', 'safety')}</div>
                            <div style="background: rgba(255,255,255,0.7); border: 2px dashed ${styleColor}; border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center; cursor: pointer; transition: all 0.2s;" onclick="showInfoModal('style')">
                                <div style="font-size: 13px; font-weight: 800; color: var(--sub-text); margin-bottom: 5px;">나의 당구 MBTI <span style="font-size:10px; opacity:0.6;">(터치 시 기준 안내)</span></div>
