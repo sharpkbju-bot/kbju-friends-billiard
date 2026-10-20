@@ -2108,6 +2108,7 @@ window.onload = () => {
                 clearBtnWrap.onclick = function() { 
                     instance.clear(); 
                     instance.close(); 
+                    document.getElementById('searchDateRange').value = "전체 기간";
                     const playerInput = document.getElementById('searchPlayer');
                     if (playerInput && playerInput.value) {
                         searchRecords();
@@ -2395,7 +2396,8 @@ function resetSearch() {
 }
 
 function searchRecords() {
-    const mon = document.getElementById('searchDateRange').value; const player = document.getElementById('searchPlayer').value;
+    let mon = document.getElementById('searchDateRange').value; const player = document.getElementById('searchPlayer').value;
+    if (mon === "전체 기간") mon = "";
     if(!player) return alert("선수를 선택해줘!");
     
     const filtered = gameLogs.filter(g => {
@@ -2496,11 +2498,18 @@ function searchRecords() {
 
    const uniqueDates = new Set(filtered.map(g => g.dateStr));
     const totalDays = uniqueDates.size;
+    
+    const allPeriodGames = gameLogs.filter(g => {
+        if (mon && !g.dateStr.startsWith(mon)) return false;
+        return true;
+    });
+    const uniquePeriodDates = new Set(allPeriodGames.map(g => g.dateStr));
+    const totalPeriodDays = uniquePeriodDates.size;
+
     const monText = mon ? mon : "전체 기간";
 
     sArea.innerHTML = `<div class="summary-box" style="margin: 0 -5px; box-sizing: border-box; background:var(--record-bg); border:2px solid var(--record-border); border-radius:15px; padding:25px 15px;">
-                           <div class="search-summary-title" style="text-align:center; font-weight:900; color:var(--text-color); margin-bottom:20px; font-size:clamp(14px, 4.5vw, 18px); letter-spacing:-0.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">[ ${player}, ${monText}, ${totalDays}일 ]</div>
-                           <div style="display: flex; justify-content: center; align-items: center; width: 100%; box-sizing: border-box; margin-bottom: 35px;">${createRing(winRateVal, '#9B59B6', '승률', 'win')}${createRing(avgScoreVal, '#FF6B81', '평균득점', 'score')}${createRing(safetyVal, '#3498DB', '생존율', 'safety')}</div>
+                           <div class="search-summary-title" style="text-align:center; font-weight:900; color:var(--text-color); margin-bottom:20px; font-size:clamp(14px, 4.5vw, 18px); letter-spacing:-0.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">[ ${player}, ${monText}, ${totalPeriodDays}일 중 ${totalDays}일 ]</div>                           <div style="display: flex; justify-content: center; align-items: center; width: 100%; box-sizing: border-box; margin-bottom: 35px;">${createRing(winRateVal, '#9B59B6', '승률', 'win')}${createRing(avgScoreVal, '#FF6B81', '평균득점', 'score')}${createRing(safetyVal, '#3498DB', '생존율', 'safety')}</div>
                            <div style="background: rgba(255,255,255,0.7); border: 2px dashed ${styleColor}; border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center; cursor: pointer; transition: all 0.2s;" onclick="showInfoModal('style')">
                                <div style="font-size: 13px; font-weight: 800; color: var(--sub-text); margin-bottom: 5px;">나의 당구 MBTI <span style="font-size:10px; opacity:0.6;">(터치 시 기준 안내)</span></div>
                                <div style="font-size: 20px; font-weight: 900; color: ${styleColor}; margin-bottom: 8px;">${billiardsStyle}</div><div style="font-size: 12px; font-weight: 700; color: #555; line-height: 1.4; word-break: keep-all;">${styleDesc}</div>
