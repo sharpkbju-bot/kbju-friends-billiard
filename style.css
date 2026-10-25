@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v9.88 - Live Pulse Edition */
+/* Billiard World Style v9.89 - Live Pulse Edition */
 /* [절대 원칙 준수]: 최적화 전면 금지, 모든 클래스와 테마를 개별적으로 분리 전개함 */
 
 :root { 
@@ -1087,4 +1087,81 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
 
 .zoom-active .order-content {
     zoom: 0.85;
+}
+/* ============================================================
+   [V9.89 신규] LIVE 경기 한줄 중계 (자동 브리핑) 배너 스타일
+   ============================================================ */
+.live-cast-banner {
+    margin-top: 15px;
+    padding: 14px 14px;
+    background: linear-gradient(135deg, rgba(255, 71, 87, 0.12), rgba(33, 150, 243, 0.08));
+    border-radius: 12px;
+    border-left: 4px solid var(--accent);
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    text-align: left;
+    transition: transform 0.15s ease;
+}
+
+.live-cast-banner:active {
+    transform: scale(0.98);
+}
+
+.live-cast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.live-cast-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: -0.3px;
+}
+
+.live-cast-dot {
+    width: 7px;
+    height: 7px;
+    background-color: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+    animation: flash 0.8s infinite alternate;
+}
+
+.live-cast-more {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--sub-text);
+}
+
+.live-cast-text {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-color);
+    line-height: 1.5;
+    word-break: keep-all;
+}
+
+[data-theme='navy'] .live-cast-banner {
+    background: linear-gradient(135deg, rgba(255, 82, 82, 0.18), rgba(68, 138, 255, 0.12));
+    border-color: rgba(255, 255, 255, 0.12);
+    border-left: 4px solid #ff5252;
+}
+
+[data-theme='dark'] .live-cast-banner {
+    background: linear-gradient(135deg, rgba(255, 82, 82, 0.18), rgba(100, 181, 246, 0.1));
+    border-color: rgba(255, 255, 255, 0.12);
+    border-left: 4px solid #ff5252;
+}
+
+.zoom-active .live-cast-banner {
+    zoom: 0.88;
 }
