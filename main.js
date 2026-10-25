@@ -1,4 +1,4 @@
-// main.js - V9.87 Live Pulse Edition
+// main.js - V9.88 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -475,6 +475,9 @@ function showInfoModal(type) {
     } else if (type === 'style') { 
         icon = "🎱"; title = "당구 성향 분석 기준";
         desc = wrapStart + "<b>[승률 35% & 생존율 80% 기준]</b><br><br>• 👑 <b>전략적 지배자</b>: 승률↑ & 생존율↑<br>• 🐅 <b>폭격형 호랑이</b>: 승률↑ & 생존율↓<br>• 🐢 <b>철벽 거북이</b>: 승률↓ & 생존율↑<br>• 🐣 <b>성장하는 꿈나무</b>: 승률↓ & 생존율↓" + wrapEnd;
+    } else if (type === 'stamina') {
+        icon = "⏱️"; title = "라운드별 구간 및 체력 기준";
+        desc = wrapStart + "<b>[구간 분류 기준]</b><br>• 🌅 <b>첫판 (초반)</b>: 당일 1번째 경기 (1G)<br>• ☀️ <b>중반 (예열)</b>: 2G ~ 마지막 경기 전 (3G 이하인 날 기준)<br>• 🌙 <b>막판 & 장기전</b>: 당일 마지막 경기(클러치) 또는 4G 이상 장기전<br><br><b>[체력 유형 진단]</b><br>• 🤖 <b>무결점 강철체력</b>: 첫판·막판 모두 고득점 유지<br>• 🔥 <b>슬로우 스타터</b>: 첫판보다 막판/장기전 성적이 급상승<br>• ⚡ <b>첫판 제왕</b>: 1G 집중력 최강 (후반 체력 저하 주의)<br>• ☀️ <b>중반 지배자</b>: 몸이 풀린 중간 라운드에서 최고 효율" + wrapEnd;
     }
     
     const descEl = document.getElementById('info-modal-desc');
@@ -795,9 +798,8 @@ async function fetchData() {
 
 // [V9.80] renderLastPlaceRecord 함수를 최하단에서 호출하도록 로직 영향도 완벽 유지
 function renderAll() { 
-    renderDashboard(); renderCalendar(); renderStats(); renderScoreRank(); renderDefenseStats(); renderGameList(); analyzeStrategy(); analyzeOrderStats(); renderLastPlaceRecord(); renderStreakRecords();
+    renderDashboard(); renderCalendar(); renderStats(); renderScoreRank(); renderDefenseStats(); renderGameList(); analyzeStrategy(); analyzeOrderStats(); renderLastPlaceRecord(); renderStreakRecords(); analyzeStaminaStats();
 }
-
 function isHoliday(year, month, day) {
     const dStr = `${month + 1}-${day}`; 
     const fixed = ["1-1", "3-1", "5-1", "5-5", "6-6", "7-17", "8-15", "10-3", "10-9", "12-25"];
@@ -1112,7 +1114,7 @@ function renderDashboard() {
     document.getElementById('dashLastTurn').innerText = bestLast !== "-" ? `${bestLast} (${maxLast}회)` : "-";
 }
 
-function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); analyzeOrderStats(); renderStreakRecords(); }
+function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); analyzeOrderStats(); renderStreakRecords(); analyzeStaminaStats(); }
 function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
 
 function renderScoreRank() {
@@ -2641,7 +2643,7 @@ function renderLastPlaceRecord() {
 function shareLastPlaceRecord() {
     captureAndShare('lastPlace-capture-area', 'lastPlace-share-btn', 'last_place_record.png', '선수별 마지막 최하위 기록', '멤버별 마지막 최하위 기록 결과입니다!');
 }
-// [V9.87] 신규 로직 추가: 연승 & 연속 꼴찌 기네스북 탐색 및 산출 독립 함수 (기존 로직/변수 공유 없음)
+// [V9.88] 신규 로직 추가: 연승 & 연속 꼴찌 기네스북 탐색 및 산출 독립 함수 (기존 로직/변수 공유 없음)
 function renderStreakRecords() {
     const tbody = document.getElementById('streakBody');
     if (!tbody) return;
@@ -2760,11 +2762,11 @@ function renderStreakRecords() {
     tbody.innerHTML = html;
 }
 
-// [V9.87] 신규 로직 추가: 기네스북 스크린샷 공유 버튼 연동
+// [V9.88] 신규 로직 추가: 기네스북 스크린샷 공유 버튼 연동
 function shareStreakRecord() {
     captureAndShare('streak-capture-area', 'streak-share-btn', 'streak_guinness_record.png', '연승 & 연속 꼴찌 기네스북', '멤버별 연승 및 연속 꼴찌 기네스북 기록입니다!');
 }
-// [V9.87] 신규 로직 추가: 초구 추첨 결과 팝업용 실시간 현장 주의보 배지 생성 독립 함수
+// [V9.88] 신규 로직 추가: 초구 추첨 결과 팝업용 실시간 현장 주의보 배지 생성 독립 함수
 function generateOrderAlertBadgesHTML(drawnOrder) {
     if (!drawnOrder || drawnOrder.length === 0 || !gameLogs || gameLogs.length === 0) return "";
 
@@ -2869,4 +2871,178 @@ function generateOrderAlertBadgesHTML(drawnOrder) {
                 <div class="order-alert-title">🚨 실시간 현장 주의보 브리핑</div>
                 <div class="order-alert-list">${badges.join('')}</div>
             </div>`;
+}
+// [V9.88] 신규 로직 추가: 라운드별(첫판·중반·막판/장기전) 체력 및 집중력 분석 독립 함수
+function analyzeStaminaStats() {
+    const selectEl = document.getElementById('staminaPlayer');
+    const area = document.getElementById('staminaResultArea');
+    const shareBtn = document.getElementById('stamina-share-btn');
+    if (!selectEl || !area) return;
+
+    const player = selectEl.value;
+    if (!player) {
+        area.style.display = 'none';
+        if (shareBtn) shareBtn.style.display = 'none';
+        return;
+    }
+
+    const filterVal = document.getElementById('statsFilterCount')?.value || "all";
+    const monthVal = document.getElementById('statsFilterMonth')?.value || "";
+
+    // 날짜별 전체 게임을 라운드 순으로 정리하여 몇 번째 게임인지, 그날 총 몇 게임을 했는지 파악
+    const gamesByDate = {};
+    gameLogs.forEach(g => {
+        if (!gamesByDate[g.dateStr]) gamesByDate[g.dateStr] = [];
+        gamesByDate[g.dateStr].push(g);
+    });
+    Object.keys(gamesByDate).forEach(d => {
+        gamesByDate[d].sort((a, b) => (parseInt(a.round) || 0) - (parseInt(b.round) || 0));
+    });
+
+    let stats = {
+        early: { label: "🌅 첫판 (1G)", games: 0, totalRank: 0, scoreSum: 0, wins: 0, lasts: 0, color: "var(--rank1)" },
+        mid: { label: "☀️ 중반 (예열 구간)", games: 0, totalRank: 0, scoreSum: 0, wins: 0, lasts: 0, color: "var(--rank2)" },
+        late: { label: "🌙 막판 & 장기전 (클러치)", games: 0, totalRank: 0, scoreSum: 0, wins: 0, lasts: 0, color: "var(--accent)" }
+    };
+
+    let totalPlayed = 0;
+
+    Object.keys(gamesByDate).sort().forEach(dateStr => {
+        if (monthVal && !dateStr.startsWith(monthVal)) return;
+        const dayGames = gamesByDate[dateStr];
+        const totalDayGames = dayGames.length;
+
+        dayGames.forEach((g, idx) => {
+            const actual = g.ranks.filter(n => n && n.trim() !== "");
+            if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+            if (!actual.includes(player) || actual.length <= 1) return;
+
+            const gameNum = idx + 1;
+            const myRankIdx = actual.indexOf(player);
+            const earned = getEarnedScore(myRankIdx, actual.length);
+
+            // 구간 분류: 1G는 무조건 첫판 / 2게임 이상 한 날의 마지막 게임이거나 4G 이상이면 막판&장기전 / 나머지는 중반
+            let phaseKey = "mid";
+            if (gameNum === 1) {
+                phaseKey = "early";
+            } else if (gameNum === totalDayGames || gameNum >= 4) {
+                phaseKey = "late";
+            } else {
+                phaseKey = "mid";
+            }
+
+            const target = stats[phaseKey];
+            target.games++;
+            target.totalRank += (myRankIdx + 1);
+            target.scoreSum += earned;
+            if (myRankIdx === 0) target.wins++;
+            if (myRankIdx === actual.length - 1) target.lasts++;
+            totalPlayed++;
+        });
+    });
+
+    if (totalPlayed === 0) {
+        area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">해당 조건의 분석 가능한 데이터가 없습니다.</div>`;
+        area.style.display = 'block';
+        if (shareBtn) shareBtn.style.display = 'none';
+        return;
+    }
+
+    const earlyAvgScore = stats.early.games > 0 ? (stats.early.scoreSum / stats.early.games) : null;
+    const midAvgScore = stats.mid.games > 0 ? (stats.mid.scoreSum / stats.mid.games) : null;
+    const lateAvgScore = stats.late.games > 0 ? (stats.late.scoreSum / stats.late.games) : null;
+
+    const earlyWinRate = stats.early.games > 0 ? (stats.early.wins / stats.early.games) * 100 : 0;
+    const lateWinRate = stats.late.games > 0 ? (stats.late.wins / stats.late.games) * 100 : 0;
+    const lateLastRate = stats.late.games > 0 ? (stats.late.lasts / stats.late.games) * 100 : 0;
+
+    // 체력/집중력 스타일 자동 진단
+    let typeTitle = "⚖️ 기복 없는 밸런스형";
+    let typeDesc = "첫판부터 마지막 판까지 흔들림 없이 일정한 경기력을 유지하는 안정형 선수!";
+    let typeColor = "var(--rank2)";
+
+    if (earlyAvgScore !== null && lateAvgScore !== null) {
+        const diff = lateAvgScore - earlyAvgScore;
+        if (earlyAvgScore >= 2.0 && lateAvgScore >= 2.0 && earlyWinRate >= 35 && lateWinRate >= 35) {
+            typeTitle = "🤖 무결점 강철체력";
+            typeDesc = "첫판부터 막판까지 지치지 않고 승점을 쓸어 담는 공포의 에너자이저!";
+            typeColor = "var(--rank1)";
+        } else if (diff >= 0.45 || (lateWinRate - earlyWinRate >= 15)) {
+            typeTitle = "🔥 막판 스퍼트 (슬로우 스타터)";
+            typeDesc = "초반엔 몸을 풀고 게임이 후반으로 갈수록 집중력이 폭발하는 역전의 승부사!";
+            typeColor = "var(--accent)";
+        } else if (diff <= -0.45 && lateLastRate >= 35) {
+            typeTitle = "🔋 후반 체력 방전형";
+            typeDesc = "첫판엔 날카롭지만 게임이 길어지면 급격히 흔들립니다. 당분 보충이 필수!";
+            typeColor = "var(--rankL)";
+        } else if (diff <= -0.4) {
+            typeTitle = "⚡ 첫판 제왕 (초반 강자)";
+            typeDesc = "큐대를 잡자마자 1G에서 기선을 제압하는 초반 집중력 최강자!";
+            typeColor = "#e67e22";
+        } else if (midAvgScore !== null && midAvgScore > earlyAvgScore && midAvgScore > lateAvgScore) {
+            typeTitle = "☀️ 중반 라운드 지배자";
+            typeDesc = "몸이 적당히 풀린 2~3번째 게임에서 가장 무서운 퍼포먼스를 발휘합니다!";
+            typeColor = "#9b59b6";
+        }
+    } else if (earlyAvgScore !== null && earlyWinRate >= 40) {
+        typeTitle = "⚡ 첫판 제왕 (초반 강자)";
+        typeDesc = "시작과 동시에 승기를 잡는 초반 집중력이 뛰어난 선수!";
+        typeColor = "#e67e22";
+    }
+
+    let filterText = filterVal === "all" ? "전체 인원" : filterVal + "인";
+    let monthText = monthVal ? monthVal : "전체 기간";
+
+    let html = `<div style="text-align:center; font-size:12px; color:var(--sub-text); font-weight:800; margin-bottom:12px;">[ ${player} / ${monthText}, ${filterText} 기준 ]</div>`;
+
+    html += `<div style="background: rgba(255,255,255,0.65); border: 2px dashed ${typeColor}; border-radius: 12px; padding: 14px 12px; margin-bottom: 15px; text-align: center; cursor: pointer;" onclick="showInfoModal('stamina')">
+                <div style="font-size: 11px; font-weight: 800; color: var(--sub-text); margin-bottom: 4px;">체력 & 집중력 진단 <span style="font-size:10px; opacity:0.7;">(터치 시 기준 안내)</span></div>
+                <div style="font-size: 18px; font-weight: 900; color: ${typeColor}; margin-bottom: 6px;">${typeTitle}</div>
+                <div style="font-size: 12px; font-weight: 700; color: #555; line-height: 1.4; word-break: keep-all;">${typeDesc}</div>
+             </div>`;
+
+    const phaseOrder = ["early", "mid", "late"];
+    phaseOrder.forEach(key => {
+        const s = stats[key];
+        if (s.games === 0) return;
+
+        const avgRank = (s.totalRank / s.games).toFixed(1);
+        const avgScore = (s.scoreSum / s.games).toFixed(2);
+        const winP = Math.round((s.wins / s.games) * 100);
+        const lastP = Math.round((s.lasts / s.games) * 100);
+        const otherCount = s.games - s.wins - s.lasts;
+        const otherP = Math.max(0, 100 - winP - lastP);
+
+        html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="font-size:15px; font-weight:900; color:${s.color};">${s.label} <span style="font-size:13px; font-weight:900; color:var(--text-color); margin-left:4px;">(${s.games}G)</span></div>
+                        <div style="font-size:13px; font-weight:800; color:var(--text-color);">평균 ${avgRank}위 <span style="color:var(--sub-text);">/ ${avgScore}점</span></div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;">
+                            <div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">1위 확률</div>
+                            <div style="font-size:15px; font-weight:900; color:var(--rank1);">${winP}%, <span style="font-size:12px; color:var(--sub-text);">${s.wins}회</span></div>
+                        </div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;">
+                            <div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">기타 확률</div>
+                            <div style="font-size:15px; font-weight:900; color:var(--rank2);">${otherP}%, <span style="font-size:12px; color:var(--sub-text);">${otherCount}회</span></div>
+                        </div>
+                        <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;">
+                            <div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">꼴찌 확률</div>
+                            <div style="font-size:15px; font-weight:900; color:var(--rankL);">${lastP}%, <span style="font-size:12px; color:var(--sub-text);">${s.lasts}회</span></div>
+                        </div>
+                    </div>
+                 </div>`;
+    });
+
+    area.innerHTML = html;
+    area.style.display = 'block';
+    if (shareBtn) shareBtn.style.display = 'block';
+    setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+}
+
+// [V9.88] 신규 로직 추가: 체력/집중력 분석 스크린샷 공유 버튼 연동
+function shareStaminaResult() {
+    const player = document.getElementById('staminaPlayer').value;
+    captureAndShare('stamina-capture-area', 'stamina-share-btn', `stamina_stats_${player}.png`, '라운드별 체력/집중력 분석', `${player} 선수의 라운드별 체력 및 집중력 분석 결과입니다!`);
 }
