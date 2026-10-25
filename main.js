@@ -1,4 +1,4 @@
-// main.js - V9.86 Live Pulse Edition
+// main.js - V9.87 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -2638,7 +2638,7 @@ function renderLastPlaceRecord() {
 function shareLastPlaceRecord() {
     captureAndShare('lastPlace-capture-area', 'lastPlace-share-btn', 'last_place_record.png', '선수별 마지막 최하위 기록', '멤버별 마지막 최하위 기록 결과입니다!');
 }
-// [V9.86] 신규 로직 추가: 연승 & 연속 꼴찌 기네스북 탐색 및 산출 독립 함수 (기존 로직/변수 공유 없음)
+// [V9.87] 신규 로직 추가: 연승 & 연속 꼴찌 기네스북 탐색 및 산출 독립 함수 (기존 로직/변수 공유 없음)
 function renderStreakRecords() {
     const tbody = document.getElementById('streakBody');
     if (!tbody) return;
@@ -2757,7 +2757,7 @@ function renderStreakRecords() {
     tbody.innerHTML = html;
 }
 
-// [V9.86] 신규 로직 추가: 기네스북 스크린샷 공유 버튼 연동
+// [V9.87] 신규 로직 추가: 기네스북 스크린샷 공유 버튼 연동
 function shareStreakRecord() {
     captureAndShare('streak-capture-area', 'streak-share-btn', 'streak_guinness_record.png', '연승 & 연속 꼴찌 기네스북', '멤버별 연승 및 연속 꼴찌 기네스북 기록입니다!');
 }
