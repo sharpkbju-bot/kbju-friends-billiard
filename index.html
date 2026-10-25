@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=9.87">
+    <link rel="manifest" href="manifest.json?v=9.88">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들의 당구 세상">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=9.87">
-    <link rel="apple-touch-icon" href="image_0.png?v=9.87">
+    <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=9.88">
+    <link rel="apple-touch-icon" href="image_0.png?v=9.88">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 
-    <link rel="stylesheet" href="style.css?v=9.87">
+    <link rel="stylesheet" href="style.css?v=9.88">
 
     <title>경배와 친구들의 당구 세상</title>
 </head>
@@ -27,7 +27,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;9.87
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;9.88
     </div>
 </div>
 
@@ -357,7 +357,7 @@
     <button id="lastPlace-share-btn" class="share-btn-common" style="margin-top: 10px;" onclick="shareLastPlaceRecord()">📸 마지막 최하위 기록 스크린샷 공유</button>
 </div>
 
-<!-- 👇 [여기에 신규 추가] V9.87 연승 & 연속 꼴찌 기네스북 카드 -->
+<!-- 👇 [여기에 신규 추가] V9.88 연승 & 연속 꼴찌 기네스북 카드 -->
 <div class="card" id="streakCard">
     <div id="streak-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
         <h2 style="font-size:16px; margin:5px 0 15px 5px; color:#444; font-weight:800; text-align:left; letter-spacing:-0.5px;">🔥 연승 & 연속 꼴찌 기네스북 <span id="streakFilterLabel" style="font-size:12px; color:var(--rank1);"></span></h2>
@@ -417,7 +417,35 @@
         <div id="orderStatsResultArea" style="margin-top:15px; display:none;"></div>
     </div>
 </div>
+<!-- [기존 코드 끝부분 참고] -->
+        <button id="orderStats-share-btn" class="share-btn-common" style="margin-top: 15px; display: none;" onclick="shareOrderStatsResult()">📸 순번별 성적 분석 스크린샷 공유</button>
+        <div id="orderStatsResultArea" style="margin-top:15px; display:none;"></div>
+    </div>
+</div>
 
+<!-- 👇 [여기에 신규 추가] V9.88 라운드별 체력/집중력 분석 카드 -->
+<div class="card" id="staminaCard">
+    <div id="stamina-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
+        <h2 style="font-size:16px; margin:5px 0 15px 10px; color:#444; font-weight:800;">⏱️ 라운드별 체력/집중력 분석 <span class="strategy-subtitle" style="font-size:12px; color:var(--rank1);">(첫판·중반·막판)</span></h2>
+        <div class="input-row">
+            <label>분석 선수</label>
+            <select id="staminaPlayer" style="color: #4a148c; font-weight: 800;" onchange="analyzeStaminaStats()">
+                <option value="">선택</option>
+                <option value="경배">경배</option>
+                <option value="원석">원석</option>
+                <option value="정석">정석</option>
+                <option value="진웅">진웅</option>
+                <option value="창한">창한</option>
+                <option value="경석">경석</option>
+            </select>
+        </div>
+        <button id="stamina-share-btn" class="share-btn-common" style="margin-top: 15px; display: none;" onclick="shareStaminaResult()">📸 체력/집중력 분석 스크린샷 공유</button>
+        <div id="staminaResultArea" style="margin-top:15px; display:none;"></div>
+    </div>
+</div>
+<!-- 👆 [신규 추가 끝] -->
+
+<div class="card" id="searchCard">
 <div class="card" id="searchCard">
     <h2 style="font-size:16px; margin:5px 0 15px 10px; color:#444; font-weight:800;">🔍 월별 선수 전적 검색</h2>
     
@@ -471,8 +499,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-<script src="main.js?v=9.87"></script>
-<script src="share.js?v=9.87"></script>
+<script src="main.js?v=9.88"></script>
+<script src="share.js?v=9.88"></script>
 
 </body>
 </html>
