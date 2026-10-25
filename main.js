@@ -630,17 +630,20 @@ function pickRandomOrder() {
     const firstPlayer = bestOrder[0];
     const remaining = bestOrder.slice(1);
     
+    /* [수정 코드] */
     const resultArea = document.getElementById('order-result'); 
     const confirmBtn = document.querySelector('#order-modal button');
     const p1Color = getPlayerColor(firstPlayer);
+    const alertBadgesHtml = generateOrderAlertBadgesHTML(bestOrder);
     
-    const finalHtml = `<div style="background: rgba(128, 128, 128, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 20px; border: 2.5px dashed ${p1Color}; display:block;">
+    const finalHtml = `<div style="background: rgba(128, 128, 128, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 2.5px dashed ${p1Color}; display:block;">
                            <div style="font-size: 14px; color: ${p1Color}; margin-bottom:5px;">🎯 이 게임의 초구는 바로 너!</div>
                            <div style="font-size: 26px; color: ${p1Color}; font-weight: 900;">1번 : ${firstPlayer}</div>
                        </div>
-                       <div style="font-size: 17px; opacity: 0.9; line-height: 2.2; font-weight: 800; display:block;">
+                       <div style="font-size: 17px; opacity: 0.9; line-height: 2.0; font-weight: 800; display:block;">
                            ${remaining.map((p, idx) => `<div style="color: ${getPlayerColor(p)}; display:block;">${idx + 2}번 : ${p}</div>`).join('')}
-                       </div>`;
+                       </div>
+                       ${alertBadgesHtml}`;
                        
     if (confirmBtn) confirmBtn.style.display = 'none';
     document.getElementById('order-modal').style.display = 'flex';
@@ -2760,4 +2763,110 @@ function renderStreakRecords() {
 // [V9.87] 신규 로직 추가: 기네스북 스크린샷 공유 버튼 연동
 function shareStreakRecord() {
     captureAndShare('streak-capture-area', 'streak-share-btn', 'streak_guinness_record.png', '연승 & 연속 꼴찌 기네스북', '멤버별 연승 및 연속 꼴찌 기네스북 기록입니다!');
+}
+// [V9.87] 신규 로직 추가: 초구 추첨 결과 팝업용 실시간 현장 주의보 배지 생성 독립 함수
+function generateOrderAlertBadgesHTML(drawnOrder) {
+    if (!drawnOrder || drawnOrder.length === 0 || !gameLogs || gameLogs.length === 0) return "";
+
+    const sortedGames = [...gameLogs].sort((a, b) => {
+        const dateA = new Date(a.dateStr);
+        const dateB = new Date(b.dateStr);
+        if (dateA - dateB !== 0) return dateA - dateB;
+        return (parseInt(a.round) || 0) - (parseInt(b.round) || 0);
+    });
+
+    // 오늘 경기 중 뒷주자 평균 순위가 가장 낮은(방어력 1위) 선수 탐색
+    const todayGames = sortedGames.filter(g => g.dateStr === selectedDateStr && g.startOrder && g.startOrder.length > 0);
+    let todayDefLeader = null;
+    let maxDefAvg = -1;
+    if (todayGames.length > 0) {
+        let defStats = {};
+        drawnOrder.forEach(p => defStats[p] = { sum: 0, cnt: 0 });
+        todayGames.forEach(g => {
+            const actual = g.ranks.filter(n => n && n.trim() !== "");
+            for (let i = 0; i < g.startOrder.length; i++) {
+                const curP = g.startOrder[i];
+                const nextP = g.startOrder[(i + 1) % g.startOrder.length];
+                const rIdx = actual.indexOf(nextP);
+                if (rIdx !== -1 && defStats[curP]) {
+                    defStats[curP].sum += (rIdx + 1);
+                    defStats[curP].cnt++;
+                }
+            }
+        });
+        drawnOrder.forEach(p => {
+            if (defStats[p].cnt > 0) {
+                const avg = defStats[p].sum / defStats[p].cnt;
+                if (avg > maxDefAvg && avg >= 2.5) {
+                    maxDefAvg = avg;
+                    todayDefLeader = p;
+                }
+            }
+        });
+    }
+
+    let badges = [];
+
+    drawnOrder.forEach((p, orderIdx) => {
+        const pGames = sortedGames.filter(g => g.ranks.filter(n => n && n.trim() !== "").includes(p));
+        if (pGames.length === 0) return;
+
+        let curWin = 0;
+        let curLoss = 0;
+        let firstBreakGames = 0;
+        let firstBreakWins = 0;
+
+        pGames.forEach(g => {
+            const actual = g.ranks.filter(n => n && n.trim() !== "");
+            const rIdx = actual.indexOf(p);
+            if (rIdx === 0) { curWin++; curLoss = 0; }
+            else if (rIdx === actual.length - 1 && actual.length > 1) { curLoss++; curWin = 0; }
+            else { curWin = 0; curLoss = 0; }
+
+            if (g.startOrder && g.startOrder[0] === p) {
+                firstBreakGames++;
+                if (rIdx === 0) firstBreakWins++;
+            }
+        });
+
+        let tagText = "";
+        let tagColor = "var(--text-color)";
+
+        // 우선순위: 1. 2연승 이상 -> 2. 2연꼴 이상 -> 3. 초구자 초구승률 강자 -> 4. 직전 1위 -> 5. 직전 꼴찌 -> 6. 오늘 철벽 방어 1위
+        if (curWin >= 2) {
+            tagText = `🔥 ${curWin}연승 질주! 집중 견제 요망`;
+            tagColor = "var(--rank1)";
+        } else if (curLoss >= 2) {
+            tagText = `🚨 ${curLoss}연속 꼴찌 중 (멘탈 주의)`;
+            tagColor = "var(--rankL)";
+        } else if (orderIdx === 0 && firstBreakGames >= 3 && (firstBreakWins / firstBreakGames) >= 0.45) {
+            const fbRate = Math.round((firstBreakWins / firstBreakGames) * 100);
+            tagText = `🎱 초구 승률 ${fbRate}%! 선공 주의보`;
+            tagColor = "#e67e22";
+        } else if (curWin === 1) {
+            tagText = `✨ 직전 게임 1위 (연승 도전)`;
+            tagColor = "var(--rank2)";
+        } else if (curLoss === 1) {
+            tagText = `💀 직전 게임 꼴찌 (독기 품음)`;
+            tagColor = "#8e44ad";
+        } else if (todayDefLeader === p) {
+            const nextP = drawnOrder[(orderIdx + 1) % drawnOrder.length];
+            tagText = `🛡️ 오늘의 철벽 (${nextP} 겐세이 주의!)`;
+            tagColor = "var(--edit)";
+        }
+
+        if (tagText) {
+            badges.push(`<div class="order-alert-badge">
+                            <span style="color:${getPlayerColor(p)}; font-weight:900; margin-right:8px; white-space:nowrap;">${playerThemes[p] ? playerThemes[p].emoji : '🎱'} ${p}</span>
+                            <span style="color:${tagColor}; font-weight:800; text-align:right; letter-spacing:-0.5px;">${tagText}</span>
+                         </div>`);
+        }
+    });
+
+    if (badges.length === 0) return "";
+
+    return `<div class="order-alert-wrap">
+                <div class="order-alert-title">🚨 실시간 현장 주의보 브리핑</div>
+                <div class="order-alert-list">${badges.join('')}</div>
+            </div>`;
 }
