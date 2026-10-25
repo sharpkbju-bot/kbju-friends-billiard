@@ -1,4 +1,4 @@
-// main.js - V9.85 Live Pulse Edition
+// main.js - V9.86 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -792,7 +792,7 @@ async function fetchData() {
 
 // [V9.80] renderLastPlaceRecord 함수를 최하단에서 호출하도록 로직 영향도 완벽 유지
 function renderAll() { 
-    renderDashboard(); renderCalendar(); renderStats(); renderScoreRank(); renderDefenseStats(); renderGameList(); analyzeStrategy(); analyzeOrderStats(); renderLastPlaceRecord();
+    renderDashboard(); renderCalendar(); renderStats(); renderScoreRank(); renderDefenseStats(); renderGameList(); analyzeStrategy(); analyzeOrderStats(); renderLastPlaceRecord(); renderStreakRecords();
 }
 
 function isHoliday(year, month, day) {
@@ -1109,7 +1109,7 @@ function renderDashboard() {
     document.getElementById('dashLastTurn').innerText = bestLast !== "-" ? `${bestLast} (${maxLast}회)` : "-";
 }
 
-function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); analyzeOrderStats(); }
+function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); analyzeOrderStats(); renderStreakRecords(); }
 function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
 
 function renderScoreRank() {
@@ -2637,4 +2637,127 @@ function renderLastPlaceRecord() {
 // [V9.80] 신규 로직 추가: 공유 버튼 연동
 function shareLastPlaceRecord() {
     captureAndShare('lastPlace-capture-area', 'lastPlace-share-btn', 'last_place_record.png', '선수별 마지막 최하위 기록', '멤버별 마지막 최하위 기록 결과입니다!');
+}
+// [V9.86] 신규 로직 추가: 연승 & 연속 꼴찌 기네스북 탐색 및 산출 독립 함수 (기존 로직/변수 공유 없음)
+function renderStreakRecords() {
+    const tbody = document.getElementById('streakBody');
+    if (!tbody) return;
+
+    const filterVal = document.getElementById('statsFilterCount')?.value || "all";
+    const monthVal = document.getElementById('statsFilterMonth')?.value || "";
+    const labelEl = document.getElementById('streakFilterLabel');
+    if (labelEl) {
+        let countText = filterVal === "all" ? "전체" : filterVal + "인";
+        let monthText = monthVal ? monthVal : "전체";
+        labelEl.innerText = `(${monthText}, ${countText})`;
+    }
+
+    let stats = {};
+    players.forEach(p => {
+        stats[p] = {
+            played: 0,
+            curWin: 0,
+            maxWin: 0,
+            maxWinDate: "",
+            curLoss: 0,
+            maxLoss: 0,
+            maxLossDate: ""
+        };
+    });
+
+    // 시간 순으로 전체 게임 정렬 (오래된 게임 -> 최근 게임 순방향)
+    const sortedGames = [...gameLogs].sort((a, b) => {
+        const dateA = new Date(a.dateStr);
+        const dateB = new Date(b.dateStr);
+        if (dateA - dateB !== 0) return dateA - dateB;
+        return (parseInt(a.round) || 0) - (parseInt(b.round) || 0);
+    });
+
+    sortedGames.forEach(g => {
+        if (monthVal && !g.dateStr.startsWith(monthVal)) return;
+        const actual = g.ranks.filter(n => n && n.trim() !== "");
+        if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+        if (actual.length <= 1) return;
+
+        actual.forEach((p, idx) => {
+            if (!stats[p]) return;
+            stats[p].played++;
+
+            // 1. 연승(1위) 카운트 계산
+            if (idx === 0) {
+                stats[p].curWin++;
+                if (stats[p].curWin >= stats[p].maxWin) {
+                    stats[p].maxWin = stats[p].curWin;
+                    stats[p].maxWinDate = g.dateStr.slice(5);
+                }
+            } else {
+                stats[p].curWin = 0;
+            }
+
+            // 2. 연속 꼴찌 카운트 계산
+            if (idx === actual.length - 1) {
+                stats[p].curLoss++;
+                if (stats[p].curLoss >= stats[p].maxLoss) {
+                    stats[p].maxLoss = stats[p].curLoss;
+                    stats[p].maxLossDate = g.dateStr.slice(5);
+                }
+            } else {
+                stats[p].curLoss = 0;
+            }
+        });
+    });
+
+    const activePlayers = players.filter(p => stats[p].played > 0);
+    if (activePlayers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">해당 조건의 데이터가 없습니다.</td></tr>`;
+        return;
+    }
+
+    // 정렬 기준: 최다 연승 높은 순 -> 현재 연승 높은 순 -> 최다 연꼴 낮은 순
+    activePlayers.sort((a, b) => {
+        if (stats[b].maxWin !== stats[a].maxWin) return stats[b].maxWin - stats[a].maxWin;
+        if (stats[b].curWin !== stats[a].curWin) return stats[b].curWin - stats[a].curWin;
+        return stats[a].maxLoss - stats[b].maxLoss;
+    });
+
+    const topMaxWin = Math.max(...activePlayers.map(p => stats[p].maxWin));
+    const topMaxLoss = Math.max(...activePlayers.map(p => stats[p].maxLoss));
+
+    let html = '';
+    activePlayers.forEach(p => {
+        const s = stats[p];
+
+        let maxWinHtml = s.maxWin > 0 
+            ? `<span style="color:${s.maxWin === topMaxWin && topMaxWin >= 2 ? 'var(--rank1)' : 'var(--text-color)'}; font-weight:900; font-size:14px;">${s.maxWin}연승${s.maxWin === topMaxWin && topMaxWin >= 2 ? '👑' : ''}</span><span style="display:block; font-size:10px; color:var(--sub-text); font-weight:800; margin-top:2px;">(${s.maxWinDate})</span>` 
+            : `<span style="color:var(--sub-text); font-size:12px;">-</span>`;
+
+        let maxLossHtml = s.maxLoss > 0 
+            ? `<span style="color:${s.maxLoss === topMaxLoss && topMaxLoss >= 2 ? 'var(--rankL)' : 'var(--text-color)'}; font-weight:900; font-size:14px;">${s.maxLoss}연꼴${s.maxLoss === topMaxLoss && topMaxLoss >= 2 ? '💸' : ''}</span><span style="display:block; font-size:10px; color:var(--sub-text); font-weight:800; margin-top:2px;">(${s.maxLossDate})</span>` 
+            : `<span style="color:var(--sub-text); font-size:12px;">-</span>`;
+
+        let currentStatusHtml = `<span style="color:var(--sub-text); font-size:12px; font-weight:800;">평온 ⛅</span>`;
+        if (s.curWin >= 2) {
+            currentStatusHtml = `<span style="color:var(--rank1); font-weight:900; font-size:13px;">🔥 ${s.curWin}연승 중!</span>`;
+        } else if (s.curWin === 1) {
+            currentStatusHtml = `<span style="color:var(--rank2); font-weight:800; font-size:12px;">✨ 직전 1위</span>`;
+        } else if (s.curLoss >= 2) {
+            currentStatusHtml = `<span style="color:var(--rankL); font-weight:900; font-size:13px;">🚨 ${s.curLoss}연꼴 중!</span>`;
+        } else if (s.curLoss === 1) {
+            currentStatusHtml = `<span style="color:#e67e22; font-weight:800; font-size:12px;">💀 직전 꼴찌</span>`;
+        }
+
+        html += `<tr style="background:rgba(255,255,255,0.4);">
+            <td style="color:${getPlayerColor(p)}; font-weight:900;">${p}</td>
+            <td style="line-height:1.2;">${maxWinHtml}</td>
+            <td style="line-height:1.2;">${maxLossHtml}</td>
+            <td>${currentStatusHtml}</td>
+        </tr>`;
+    });
+
+    tbody.innerHTML = html;
+}
+
+// [V9.86] 신규 로직 추가: 기네스북 스크린샷 공유 버튼 연동
+function shareStreakRecord() {
+    captureAndShare('streak-capture-area', 'streak-share-btn', 'streak_guinness_record.png', '연승 & 연속 꼴찌 기네스북', '멤버별 연승 및 연속 꼴찌 기네스북 기록입니다!');
 }
