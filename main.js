@@ -1,4 +1,4 @@
-// main.js - V9.88 Live Pulse Edition
+// main.js - V9.89 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -1623,14 +1623,16 @@ function renderTodayMVP() {
     area.innerHTML = html; area.style.display = 'flex';
 }
 
+/* [수정 코드] */
 function renderGameList() {
     const games = gameLogs.filter(g => g.dateStr === selectedDateStr); 
     const area = document.getElementById('dayGameList');
     renderTodayMVP();
     
     if(games.length > 0) { 
-        let html = `<div id="record-header-wrap" style="text-align:center; margin:25px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>
-                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+        const liveCastHtml = generateDayLiveCastBannerHTML();
+        let html = `${liveCastHtml}
+                    <div id="record-header-wrap" style="text-align:center; margin:20px 0 10px 0;"><span style="font-size:12px; color:#999; font-weight:800;">DAY'S RECORD</span></div>                    <div style="display:flex; gap:10px; margin-bottom:15px;">
                         <button id="today-share-btn" class="share-btn-common" style="flex:1; margin:0;" onclick="shareTodayResult()">📸 전적 공유</button>
                         <button class="share-btn-common" style="flex:1; margin:0; background: linear-gradient(145deg, #f1c40f, #f39c12); border: 1.5px solid #d35400; color: #fff;" onclick="showTodayReplay()">▶️ 오늘의 복기</button>
                     </div>`; 
@@ -3046,4 +3048,157 @@ function analyzeStaminaStats() {
 function shareStaminaResult() {
     const player = document.getElementById('staminaPlayer').value;
     captureAndShare('stamina-capture-area', 'stamina-share-btn', `stamina_stats_${player}.png`, '라운드별 체력/집중력 분석', `${player} 선수의 라운드별 체력 및 집중력 분석 결과입니다!`);
+}
+// [V9.89] 신규 로직 추가: 단일 경기 맥락 분석 및 LIVE 한줄 중계 멘트 생성 독립 함수
+function buildSingleGameLiveComment(targetGame, gameNumber, dayGamesSorted) {
+    const actual = targetGame.ranks.filter(n => n && n.trim() !== "");
+    if (actual.length <= 1) return "";
+
+    const winner = actual[0];
+    const loser = actual[actual.length - 1];
+    const pCount = actual.length;
+    const startOrder = (targetGame.startOrder && targetGame.startOrder.length > 0) ? targetGame.startOrder : null;
+
+    // 당일 이 경기 직전까지의 누적 흐름(연승/연꼴/직전 순위) 계산
+    let winStreak = 1;
+    let lossStreak = 1;
+    let prevWinnerWasLoser = false;
+
+    const targetIdxInDay = dayGamesSorted.findIndex(x => x.round === targetGame.round);
+    if (targetIdxInDay > 0) {
+        const prevGames = dayGamesSorted.slice(0, targetIdxInDay);
+
+        // winner의 당일 직전 경기들 추적
+        const winnerPrevGames = prevGames.filter(g => g.ranks.filter(n => n && n.trim() !== "").includes(winner));
+        for (let i = winnerPrevGames.length - 1; i >= 0; i--) {
+            const act = winnerPrevGames[i].ranks.filter(n => n && n.trim() !== "");
+            if (act.indexOf(winner) === 0) winStreak++;
+            else break;
+        }
+        if (winnerPrevGames.length > 0) {
+            const lastAct = winnerPrevGames[winnerPrevGames.length - 1].ranks.filter(n => n && n.trim() !== "");
+            if (lastAct.indexOf(winner) === lastAct.length - 1 && lastAct.length > 1) {
+                prevWinnerWasLoser = true;
+            }
+        }
+
+        // loser의 당일 직전 경기들 추적
+        const loserPrevGames = prevGames.filter(g => g.ranks.filter(n => n && n.trim() !== "").includes(loser));
+        for (let i = loserPrevGames.length - 1; i >= 0; i--) {
+            const act = loserPrevGames[i].ranks.filter(n => n && n.trim() !== "");
+            if (act.indexOf(loser) === act.length - 1 && act.length > 1) lossStreak++;
+            else break;
+        }
+    }
+
+    const wSpan = `<b style="color:${getPlayerColor(winner)};">${winner}</b>`;
+    const lSpan = `<b style="color:${getPlayerColor(loser)};">${loser}</b>`;
+
+    // 상황별 우선순위 브리핑 생성
+    if (startOrder && pCount >= 3) {
+        const firstBreaker = startOrder[0];
+        const lastBreaker = startOrder[startOrder.length - 1];
+        const winnerOrderIdx = startOrder.indexOf(winner);
+        const nextOfWinner = winnerOrderIdx !== -1 ? startOrder[(winnerOrderIdx + 1) % startOrder.length] : null;
+
+        // 1. 말구 출발 1위 + 초구 출발 꼴찌 (최고의 드라마)
+        if (winner === lastBreaker && loser === firstBreaker) {
+            return `⚡ <b>[${gameNumber}G 대역전극]</b> 말구였던 ${wSpan} 선수가 판을 뒤집고 짜릿한 1위🥇! 반면 초구를 잡았던 ${lSpan} 선수는 꼴찌💀로 추락하는 대이변이 일어납니다!`;
+        }
+        // 2. 말구 출발 1위 (역전승)
+        if (winner === lastBreaker) {
+            return `⚡ <b>[${gameNumber}G 역전승]</b> 가장 불리한 말구에서 출발한 ${wSpan} 선수, 엄청난 뒷심으로 역전 1위🥇를 차지합니다! (${lSpan} 아쉬운 꼴찌💀)`;
+        }
+        // 3. 초구 출발 1위 + 당일 2연승 이상
+        if (winner === firstBreaker && winStreak >= 2) {
+            return `🔥 <b>[${gameNumber}G 파죽지세]</b> 초구자 ${wSpan} 선수, 시작부터 끝까지 리드를 지키며 오늘 <b>${winStreak}연승</b>🥇을 질주합니다! (${lSpan} 꼴찌💀)`;
+        }
+        // 4. 초구 출발 1위 (선공 완승)
+        if (winner === firstBreaker) {
+            return `🎱 <b>[${gameNumber}G 선공 완승]</b> 초구를 잡은 ${wSpan} 선수, 단 한 번도 주도권을 내주지 않고 깔끔하게 1위🥇로 골인합니다! (${lSpan} 꼴찌💀)`;
+        }
+        // 5. 1위 선수가 바로 뒷순서 선수를 꼴찌로 보냄 (겐세이 발동)
+        if (nextOfWinner === loser) {
+            return `😈 <b>[${gameNumber}G 철벽 겐세이]</b> ${wSpan} 선수가 1위🥇로 치고 나가면서 바로 뒷주자였던 ${lSpan} 선수를 꽁꽁 묶어 꼴찌💀로 떨어뜨립니다!`;
+        }
+    }
+
+    // 6. 당일 2연승 이상 질주
+    if (winStreak >= 2) {
+        return `🔥 <b>[${gameNumber}G 연승 행진]</b> 누구도 막을 수 없다! ${wSpan} 선수가 거침없는 기세로 오늘 <b>${winStreak}연속 1위🥇</b>를 달성합니다! (${lSpan} 꼴찌💀)`;
+    }
+    // 7. 직전 경기 꼴찌가 바로 다음 경기 1위 (설욕전)
+    if (prevWinnerWasLoser) {
+        return `🔄 <b>[${gameNumber}G 완벽한 설욕]</b> 직전 게임 꼴찌로 자존심을 구겼던 ${wSpan} 선수, 곧바로 1위🥇로 부활하며 복수에 성공합니다! (${lSpan} 꼴찌💀)`;
+    }
+    // 8. 당일 2연속 이상 꼴찌 발생
+    if (lossStreak >= 2) {
+        return `🚨 <b>[${gameNumber}G 지갑 비상]</b> ${wSpan} 선수가 1위🥇를 챙긴 가운데, ${lSpan} 선수는 오늘 <b>${lossStreak}연속 꼴찌💀</b>의 늪에 빠집니다!`;
+    }
+
+    // 9. 기본 접전 브리핑
+    return `⚔️ <b>[${gameNumber}G 치열한 접전]</b> 물고 물리는 승부 끝에 ${wSpan} 선수가 최종 1위🥇의 영광을 차지합니다! (${lSpan} 꼴찌💀)`;
+}
+
+// [V9.89] 신규 로직 추가: 당일 대표 LIVE 경기 한줄 중계 배너 HTML 생성
+function generateDayLiveCastBannerHTML() {
+    const dayGames = gameLogs.filter(g => g.dateStr === selectedDateStr);
+    if (dayGames.length === 0) return "";
+
+    const sortedDayGames = [...dayGames].sort((a, b) => (parseInt(a.round) || 0) - (parseInt(b.round) || 0));
+    const latestGame = sortedDayGames[sortedDayGames.length - 1];
+    const latestGameNum = sortedDayGames.length;
+
+    const comment = buildSingleGameLiveComment(latestGame, latestGameNum, sortedDayGames);
+    if (!comment) return "";
+
+    return `<div class="live-cast-banner" onclick="showDayLiveCastModal()">
+                <div class="live-cast-header">
+                    <span class="live-cast-badge"><span class="live-cast-dot"></span>🎙️ LIVE 경기 한줄 중계 (자동 브리핑)</span>
+                    <span class="live-cast-more">전체 ${sortedDayGames.length}G 중계 보기 ▸</span>
+                </div>
+                <div class="live-cast-text">${comment}</div>
+            </div>`;
+}
+
+// [V9.89] 신규 로직 추가: 배너 터치 시 당일 전체 경기 한줄 중계록 모달 표시
+function showDayLiveCastModal() {
+    triggerHaptic(10);
+    const dayGames = gameLogs.filter(g => g.dateStr === selectedDateStr);
+    if (dayGames.length === 0) return;
+
+    const sortedDayGames = [...dayGames].sort((a, b) => (parseInt(a.round) || 0) - (parseInt(b.round) || 0));
+
+    let listHtml = `<div style="display:flex; flex-direction:column; gap:10px; max-height:320px; overflow-y:auto; padding-right:4px;">`;
+    sortedDayGames.forEach((g, idx) => {
+        const cmt = buildSingleGameLiveComment(g, idx + 1, sortedDayGames);
+        if (cmt) {
+            listHtml += `<div style="background:rgba(0,0,0,0.04); padding:12px; border-radius:10px; border-left:3.5px solid var(--rank1); font-size:13px; font-weight:800; color:#333; line-height:1.5; word-break:keep-all; text-align:left;">
+                            ${cmt}
+                         </div>`;
+        }
+    });
+    listHtml += `</div>`;
+
+    const titleEl = document.getElementById('info-modal-title');
+    const descEl = document.getElementById('info-modal-desc');
+    document.getElementById('info-modal-icon').innerHTML = "🎙️";
+
+    titleEl.innerHTML = `LIVE 경기 한줄 중계록<br><span style="font-size:12px; color:var(--sub-text); margin-top:4px; display:block;">[ ${selectedDateStr} 전체 브리핑 ]</span>`;
+    descEl.innerHTML = listHtml;
+
+    const currentAppTheme = document.documentElement.getAttribute('data-theme');
+    if (currentAppTheme === 'dark' || currentAppTheme === 'navy') {
+        titleEl.style.setProperty('color', '#2980b9', 'important');
+    } else {
+        titleEl.style.removeProperty('color');
+        titleEl.style.color = 'var(--rank1)';
+    }
+
+    if (infoModalCountdownInterval) { clearInterval(infoModalCountdownInterval); infoModalCountdownInterval = null; }
+    if (dashInfoCountdownInterval) { clearInterval(dashInfoCountdownInterval); dashInfoCountdownInterval = null; }
+    const timerEl = document.getElementById('dash-info-timer');
+    if (timerEl) timerEl.remove();
+
+    document.getElementById('info-modal').style.display = 'flex';
 }
