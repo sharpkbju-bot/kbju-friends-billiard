@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v9.85 - Live Pulse Edition */
+/* Billiard World Style v9.86 - Live Pulse Edition */
 /* [절대 원칙 준수]: 최적화 전면 금지, 모든 클래스와 테마를 개별적으로 분리 전개함 */
 
 :root { 
@@ -115,7 +115,9 @@
 [data-theme='navy'] #searchCard h2 { color: #ffffff !important; }
 [data-theme='navy'] #strategyCard h2 { color: #ffffff !important; }
 [data-theme='navy'] #defenseCard h2 { color: #ffffff !important; }
-
+[data-theme='navy'] #defenseCard h2 { color: #ffffff !important; }
+[data-theme='navy'] #lastPlaceCard h2 { color: #ffffff !important; }
+[data-theme='navy'] #streakCard h2 { color: #ffffff !important; }
 [data-theme='navy'] .win-rate-pill { color: #ffd60a !important; }
 [data-theme='navy'] .stats-table td[style*="color:darkblue;"] { color: #448aff !important; } 
 [data-theme='navy'] .stats-table td[style*="color:darkred;"] { color: #ff5252 !important; } 
@@ -205,7 +207,9 @@
 [data-theme='dark'] #searchCard h2 { color: #ffffff !important; }
 [data-theme='dark'] #strategyCard h2 { color: #ffffff !important; }
 [data-theme='dark'] #defenseCard h2 { color: #ffffff !important; }
-
+[data-theme='dark'] #defenseCard h2 { color: #ffffff !important; }
+[data-theme='dark'] #lastPlaceCard h2 { color: #ffffff !important; }
+[data-theme='dark'] #streakCard h2 { color: #ffffff !important; }
 [data-theme='dark'] .win-rate-pill { color: #ffd60a !important; }
 [data-theme='dark'] .stats-table td[style*="color:darkblue;"] { color: #448aff !important; } 
 [data-theme='dark'] .stats-table td[style*="color:darkred;"] { color: #ff5252 !important; } 
@@ -1015,4 +1019,8 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
     border-radius: 9px;
     background: var(--card-bg);
     z-index: -1;
+}
+/* [V9.86 신규] 연승 & 연속 꼴찌 기네스북 카드 확대 모드 역보정 (기본 크기 유지) */
+.zoom-active #streakCard {
+    zoom: 0.833333;
 }
