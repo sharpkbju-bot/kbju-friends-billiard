@@ -1024,3 +1024,5 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
 .zoom-active #streakCard {
     zoom: 0.833333;
 }
+.streak-table th { font-size: 13.5px !important; }
+.zoom-active .streak-table th { font-size: 13.5px !important; }
