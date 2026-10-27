@@ -3016,10 +3016,10 @@ function analyzeStaminaStats() {
         const otherCount = s.games - s.wins - s.lasts;
         const otherP = Math.max(0, 100 - winP - lastP);
 
-        html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <div style="font-size:15px; font-weight:900; color:${s.color};">${s.label} <span style="font-size:13px; font-weight:900; color:var(--text-color); margin-left:4px;">(${s.games}G)</span></div>
-                        <div style="font-size:13px; font-weight:800; color:var(--text-color);">평균 ${avgRank}위 <span style="color:var(--sub-text);">/ ${avgScore}점</span></div>
+        html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px 11px; border-radius:12px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:4px; white-space:nowrap;">
+                        <div style="font-size:13.5px; font-weight:900; color:${s.color}; letter-spacing:-0.8px; white-space:nowrap; flex-shrink:0;">${s.label} <span style="font-size:12px; font-weight:900; color:var(--text-color); margin-left:2px; letter-spacing:-0.5px;">(${s.games}G)</span></div>
+                        <div style="font-size:12.5px; font-weight:800; color:var(--text-color); letter-spacing:-0.6px; white-space:nowrap; flex-shrink:0;">평균 ${avgRank}위 <span style="color:var(--sub-text);">/ ${avgScore}점</span></div>
                     </div>
                     <div style="display:flex; gap:6px;">
                         <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;">
