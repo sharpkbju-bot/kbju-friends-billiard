@@ -1165,3 +1165,7 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
 .zoom-active .live-cast-banner {
     zoom: 0.88;
 }
+/* [신규 추가] 라운드별 체력/집중력 분석 카드 확대 모드 역보정 (기본 크기 유지) */
+.zoom-active #staminaCard {
+    zoom: 0.833333;
+}
