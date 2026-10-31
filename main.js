@@ -1,4 +1,4 @@
-// main.js - V9.90 Live Pulse Edition
+// main.js - V9.91 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
