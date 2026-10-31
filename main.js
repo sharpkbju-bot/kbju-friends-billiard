@@ -479,6 +479,9 @@ function showInfoModal(type) {
     } else if (type === 'stamina') {
         icon = "⏱️"; title = "라운드별 구간 및 체력 기준";
         desc = wrapStart + "<b>[구간 분류 기준]</b><br>• 🌅 <b>첫판 (초반)</b>: 당일 1번째 경기 (1G)<br>• ☀️ <b>중반 (예열)</b>: 2G ~ 마지막 경기 전 (3G 이하인 날 기준)<br>• 🌙 <b>막판 & 장기전</b>: 당일 마지막 경기(클러치) 또는 4G 이상 장기전<br><br><b>[체력 유형 진단]</b><br>• 🤖 <b>무결점 강철체력</b>: 첫판·막판 모두 고득점 & 고승률 유지<br>• 🔥 <b>슬로우 스타터</b>: 첫판보다 막판/장기전 성적이 급상승<br>• 🔋 <b>후반 체력 방전형</b>: 첫판 대비 막판 성적 급락 & 꼴찌율 35%↑<br>• ⚡ <b>첫판 제왕</b>: 1G 초반 기선제압 집중력 최강<br>• ☀️ <b>중반 지배자</b>: 몸이 풀린 중간 라운드에서 최고 효율<br>• ⚖️ <b>기복 없는 밸런스형</b>: 첫판부터 막판까지 편차 없이 일정한 경기력 유지" + wrapEnd;
+    } else if (type === 'aiPredict') {
+        icon = "🔮"; title = "AI 승부 예측 산출 기준";
+        desc = wrapStart + "추첨된 순번과 누적 빅데이터를 기반으로 아래 <b>4가지 실전 지표</b>를 가중 합산하여 예상 1위 확률(합계 100%)과 꼴찌 위험도를 산출합니다.<br><br>• 🎲 <b>배정 순번 실전 승률 (30%)</b>: 이번 판에 뽑힌 순번(초구~말구)에서의 역대 승률<br>• 🎯 <b>앞주자 상성 성적 (25%)</b>: 내 바로 앞 순서 선수 뒤에서 쳤을 때의 실제 성적<br>• 📈 <b>최근 7G 컨디션 (25%)</b>: 최근 7경기 평균 승점 및 연승/연꼴 흐름<br>• ⏱️ <b>당일 라운드 체력 (20%)</b>: 현재 라운드(첫판·중반·장기전) 구간별 강점" + wrapEnd;
     }
     
     const descEl = document.getElementById('info-modal-desc');
@@ -570,6 +573,7 @@ function resetPlayerSelection() {
     if(!editMode) updateInputFields(); 
     const saveBtn = document.getElementById('mainBtn');
     if (saveBtn) saveBtn.classList.remove('flash-save-active');
+    clearAiPredictionBanner();
 }
 function pickRandomOrder() {
     triggerHaptic([20, 30, 20]); 
@@ -660,6 +664,7 @@ function pickRandomOrder() {
             if (selectEl) selectEl.value = name; 
         });
         checkDuplicates();
+        renderAiPredictionBanner(lastDrawnPlayers);
     }
     
     if (animationStep === 0) {
@@ -851,6 +856,7 @@ function renderCalendar() {
 
 function selectDate(dateStr) {
     triggerHaptic(10); if(editMode) cancelEdit();
+    clearAiPredictionBanner();
     selectedDateStr = dateStr; document.getElementById('selectedDateTitle').innerText = `📅 ${dateStr}`;
     renderCalendar(); renderGameList();
     const hasRecord = gameLogs.some(g => g.dateStr === dateStr);
@@ -3201,4 +3207,241 @@ function showDayLiveCastModal() {
     if (timerEl) timerEl.remove();
 
     document.getElementById('info-modal').style.display = 'flex';
+}
+// [V9.91] 신규 로직 추가: AI 승부 예측 배너 초기화 및 숨김 독립 함수
+function clearAiPredictionBanner() {
+    const area = document.getElementById('aiPredictionArea');
+    if (!area) return;
+    area.innerHTML = "";
+    area.style.display = "none";
+}
+
+// [V9.91] 신규 로직 추가: 초구 추첨 직후 본 화면에 표시되는 라인업 AI 승부 예측 브리핑 독립 함수
+function renderAiPredictionBanner(drawnOrder) {
+    const area = document.getElementById('aiPredictionArea');
+    if (!area) return;
+    if (!drawnOrder || drawnOrder.length < 2 || !gameLogs || gameLogs.length === 0) {
+        area.style.display = "none";
+        return;
+    }
+
+    const pCount = drawnOrder.length;
+    const baseProb = 1 / pCount;
+
+    // 시간 순 정렬 (오래된 경기 -> 최근 경기)
+    const sortedGames = [...gameLogs].sort((a, b) => {
+        const dateA = new Date(a.dateStr);
+        const dateB = new Date(b.dateStr);
+        if (dateA - dateB !== 0) return dateA - dateB;
+        return (parseInt(a.round) || 0) - (parseInt(b.round) || 0);
+    });
+
+    // 날짜별 경기 목록 구성 (당일 몇 번째 경기인지 및 구간 판별용)
+    const gamesByDate = {};
+    sortedGames.forEach(g => {
+        if (!gamesByDate[g.dateStr]) gamesByDate[g.dateStr] = [];
+        gamesByDate[g.dateStr].push(g);
+    });
+
+    const todayPlayedCount = gamesByDate[selectedDateStr] ? gamesByDate[selectedDateStr].length : 0;
+    const nextGameNum = todayPlayedCount + 1;
+    let currentPhase = "mid";
+    if (nextGameNum === 1) currentPhase = "early";
+    else if (nextGameNum >= 4) currentPhase = "late";
+
+    let rawPredictions = [];
+
+    drawnOrder.forEach((player, orderIdx) => {
+        const prevPlayer = drawnOrder[(orderIdx - 1 + pCount) % pCount];
+        let orderType = "";
+        if (orderIdx === 0) orderType = "first";
+        else if (orderIdx === pCount - 1 && pCount > 1) orderType = "last";
+        else orderType = "mid_" + orderIdx;
+
+        let totalGames = 0, totalWins = 0, totalLasts = 0;
+        let orderGames = 0, orderWins = 0, orderLasts = 0;
+        let prevGames = 0, prevWins = 0, prevLasts = 0;
+        let phaseGames = 0, phaseWins = 0, phaseLasts = 0;
+
+        const personalGames = [];
+
+        Object.keys(gamesByDate).forEach(dStr => {
+            const dGames = gamesByDate[dStr];
+            const dTotal = dGames.length;
+            dGames.forEach((g, idxInDay) => {
+                const actual = g.ranks.filter(n => n && n.trim() !== "");
+                if (actual.length <= 1 || !actual.includes(player)) return;
+
+                const myRankIdx = actual.indexOf(player);
+                const isWin = (myRankIdx === 0);
+                const isLast = (myRankIdx === actual.length - 1);
+
+                totalGames++;
+                if (isWin) totalWins++;
+                if (isLast) totalLasts++;
+                personalGames.push({ g: g, actual: actual, myRankIdx: myRankIdx });
+
+                // 1. 배정 순번 성적 집계
+                if (g.startOrder && g.startOrder.includes(player)) {
+                    const sIdx = g.startOrder.indexOf(player);
+                    const sLen = g.startOrder.length;
+                    let gOrderType = "";
+                    if (sIdx === 0) gOrderType = "first";
+                    else if (sIdx === sLen - 1 && sLen > 1) gOrderType = "last";
+                    else gOrderType = "mid_" + sIdx;
+
+                    if (gOrderType === orderType) {
+                        orderGames++;
+                        if (isWin) orderWins++;
+                        if (isLast) orderLasts++;
+                    }
+
+                    // 2. 앞주자 상성 성적 집계
+                    const gPrevP = g.startOrder[(sIdx - 1 + sLen) % sLen];
+                    if (gPrevP === prevPlayer) {
+                        prevGames++;
+                        if (isWin) prevWins++;
+                        if (isLast) prevLasts++;
+                    }
+                }
+
+                // 3. 라운드 체력 구간 성적 집계
+                const gNum = idxInDay + 1;
+                let gPhase = "mid";
+                if (gNum === 1) gPhase = "early";
+                else if (gNum === dTotal || gNum >= 4) gPhase = "late";
+
+                if (gPhase === currentPhase) {
+                    phaseGames++;
+                    if (isWin) phaseWins++;
+                    if (isLast) phaseLasts++;
+                }
+            });
+        });
+
+        // 표본 부족 방어용 베이지안 스무딩 함수 (3경기 가중치)
+        const overallWinRate = totalGames > 0 ? (totalWins + 2 * baseProb) / (totalGames + 2) : baseProb;
+        const overallLastRate = totalGames > 0 ? (totalLasts + 2 * baseProb) / (totalGames + 2) : baseProb;
+
+        const orderWinRate = (orderWins + 3 * overallWinRate) / (orderGames + 3);
+        const orderLastRate = (orderLasts + 3 * overallLastRate) / (orderGames + 3);
+
+        const prevWinRate = (prevWins + 3 * overallWinRate) / (prevGames + 3);
+        const prevLastRate = (prevLasts + 3 * overallLastRate) / (prevGames + 3);
+
+        const phaseWinRate = (phaseWins + 3 * overallWinRate) / (phaseGames + 3);
+        const phaseLastRate = (phaseLasts + 3 * overallLastRate) / (phaseGames + 3);
+
+        // 4. 최근 7G 컨디션 집계
+        const recent7 = personalGames.slice(-7);
+        let rWins = 0, rLasts = 0, rScoreRatioSum = 0;
+        recent7.forEach(item => {
+            if (item.myRankIdx === 0) rWins++;
+            if (item.myRankIdx === item.actual.length - 1) rLasts++;
+            const maxPossible = getEarnedScore(0, item.actual.length) || 1;
+            const earned = getEarnedScore(item.myRankIdx, item.actual.length);
+            rScoreRatioSum += (earned / maxPossible);
+        });
+        const recentWinRate = recent7.length > 0 ? ((rWins / recent7.length) * 0.6 + (rScoreRatioSum / recent7.length) * 0.4) : overallWinRate;
+        const recentLastRate = recent7.length > 0 ? ((rLasts + 2 * overallLastRate) / (recent7.length + 2)) : overallLastRate;
+
+        // 4대 지표 가중 합산 (순번 30% + 앞주자 상성 25% + 최근 7G 25% + 라운드 체력 20%)
+        const winPower = Math.max(0.05, (orderWinRate * 0.30) + (prevWinRate * 0.25) + (recentWinRate * 0.25) + (phaseWinRate * 0.20));
+        const lastRisk = Math.max(0.05, (orderLastRate * 0.30) + (prevLastRate * 0.25) + (recentLastRate * 0.25) + (phaseLastRate * 0.20));
+
+        // 선수별 핵심 강점 태그 생성
+        let reasonTag = `${orderIdx === 0 ? '초구(1번)' : (orderIdx === pCount - 1 ? '말구' : (orderIdx + 1) + '번')} 배정`;
+        if (orderGames >= 3 && (orderWins / orderGames) >= 0.4) {
+            reasonTag = `${orderIdx === 0 ? '초구' : (orderIdx === pCount - 1 ? '말구' : (orderIdx + 1) + '번')} 승률 ${Math.round((orderWins / orderGames) * 100)}%`;
+        } else if (prevGames >= 3 && (prevWins / prevGames) >= 0.4) {
+            reasonTag = `${prevPlayer} 뒤 승률 ${Math.round((prevWins / prevGames) * 100)}%`;
+        } else if (recent7.length >= 3 && rWins >= 3) {
+            reasonTag = `최근 7G ${rWins}승 상승세`;
+        } else if (phaseGames >= 3 && (phaseWins / phaseGames) >= 0.4) {
+            reasonTag = `${currentPhase === 'early' ? '첫판' : (currentPhase === 'late' ? '장기전' : '중반')} 강자`;
+        }
+
+        rawPredictions.push({
+            name: player,
+            orderIdx: orderIdx,
+            prevPlayer: prevPlayer,
+            winPower: winPower,
+            lastRisk: lastRisk,
+            reasonTag: reasonTag
+        });
+    });
+
+    // 확률 합계가 정확히 100%가 되도록 정규화
+    const totalWinPower = rawPredictions.reduce((sum, p) => sum + p.winPower, 0) || 1;
+    const totalLastRisk = rawPredictions.reduce((sum, p) => sum + p.lastRisk, 0) || 1;
+
+    rawPredictions.forEach(p => {
+        p.winPct = Math.round((p.winPower / totalWinPower) * 100);
+        p.lastPct = Math.round((p.lastRisk / totalLastRisk) * 100);
+    });
+
+    // 반올림 오차 보정 (1위 확률 총합 100% 맞춤)
+    const sumWinPct = rawPredictions.reduce((sum, p) => sum + p.winPct, 0);
+    if (sumWinPct !== 100 && rawPredictions.length > 0) {
+        let maxIdx = 0;
+        for (let i = 1; i < rawPredictions.length; i++) {
+            if (rawPredictions[i].winPower > rawPredictions[maxIdx].winPower) maxIdx = i;
+        }
+        rawPredictions[maxIdx].winPct += (100 - sumWinPct);
+    }
+
+    // 우승 유력 1위 및 꼴찌 위험 1위 도출
+    const sortedByWin = [...rawPredictions].sort((a, b) => b.winPower - a.winPower);
+    const topWinner = sortedByWin[0];
+
+    const sortedByLast = [...rawPredictions].sort((a, b) => b.lastRisk - a.lastRisk);
+    const topLoser = sortedByLast[0];
+
+    const phaseLabel = currentPhase === "early" ? "🌅 첫판(1G)" : (currentPhase === "late" ? `🌙 장기전(${nextGameNum}G)` : `☀️ 중반(${nextGameNum}G)`);
+
+    let rowsHtml = "";
+    rawPredictions.forEach(p => {
+        const isTopWin = (p.name === topWinner.name);
+        const isTopLose = (p.name === topLoser.name && p.name !== topWinner.name);
+        const orderLabel = p.orderIdx === 0 ? "1번(초구)" : (p.orderIdx === pCount - 1 ? `${p.orderIdx + 1}번(말구)` : `${p.orderIdx + 1}번`);
+        const pColor = getPlayerColor(p.name);
+
+        let badgeHtml = "";
+        if (isTopWin) {
+            badgeHtml = `<span class="ai-predict-tag win-tag">👑 1위 유력</span>`;
+        } else if (isTopLose) {
+            badgeHtml = `<span class="ai-predict-tag risk-tag">💀 꼴찌 주의(${p.lastPct}%)</span>`;
+        } else {
+            badgeHtml = `<span class="ai-predict-tag sub-tag">${p.reasonTag}</span>`;
+        }
+
+        rowsHtml += `<div class="ai-predict-row">
+                        <div class="ai-predict-row-top">
+                            <div class="ai-predict-player">
+                                <span class="ai-predict-order">${orderLabel}</span>
+                                <span style="color:${pColor}; font-weight:900; font-size:14px;">${playerThemes[p.name] ? playerThemes[p.name].emoji : '🎱'} ${p.name}</span>
+                                ${badgeHtml}
+                            </div>
+                            <div class="ai-predict-pct" style="color:${isTopWin ? 'var(--rank1)' : 'var(--text-color)'};">1위 확률 <b>${p.winPct}%</b></div>
+                        </div>
+                        <div class="ai-predict-bar-bg">
+                            <div class="ai-predict-bar-fill" style="width:${Math.min(100, Math.max(8, p.winPct))}%; background:${isTopWin ? 'linear-gradient(90deg, #2196f3, #00e5ff)' : (isTopLose ? 'linear-gradient(90deg, #ff7675, #ff4757)' : 'linear-gradient(90deg, #95a5a6, #7f8c8d)')};"></div>
+                        </div>
+                     </div>`;
+    });
+
+    area.innerHTML = `<div class="ai-predict-box">
+                        <div class="ai-predict-header">
+                            <div class="ai-predict-title" onclick="showInfoModal('aiPredict')">
+                                <span>🔮 이번 판 AI 승부 예측 브리핑</span>
+                                <span class="ai-predict-phase">${phaseLabel} · 기준 안내 ⓘ</span>
+                            </div>
+                            <div class="ai-predict-close" onclick="clearAiPredictionBanner()">닫기 ✕</div>
+                        </div>
+                        <div class="ai-predict-summary">
+                            🏆 우승 유력: <b style="color:${getPlayerColor(topWinner.name)};">${topWinner.name}(${topWinner.winPct}%)</b> <span style="opacity:0.4; margin:0 4px;">|</span> 🚨 지갑 주의: <b style="color:var(--rankL);">${topLoser.name}(${topLoser.lastPct}%)</b>
+                        </div>
+                        <div class="ai-predict-list">${rowsHtml}</div>
+                      </div>`;
+    area.style.display = "block";
 }
