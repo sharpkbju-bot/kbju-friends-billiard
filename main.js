@@ -481,7 +481,7 @@ function showInfoModal(type) {
         desc = wrapStart + "<b>[구간 분류 기준]</b><br>• 🌅 <b>첫판 (초반)</b>: 당일 1번째 경기 (1G)<br>• ☀️ <b>중반 (예열)</b>: 2G ~ 마지막 경기 전 (3G 이하인 날 기준)<br>• 🌙 <b>막판 & 장기전</b>: 당일 마지막 경기(클러치) 또는 4G 이상 장기전<br><br><b>[체력 유형 진단]</b><br>• 🤖 <b>무결점 강철체력</b>: 첫판·막판 모두 고득점 & 고승률 유지<br>• 🔥 <b>슬로우 스타터</b>: 첫판보다 막판/장기전 성적이 급상승<br>• 🔋 <b>후반 체력 방전형</b>: 첫판 대비 막판 성적 급락 & 꼴찌율 35%↑<br>• ⚡ <b>첫판 제왕</b>: 1G 초반 기선제압 집중력 최강<br>• ☀️ <b>중반 지배자</b>: 몸이 풀린 중간 라운드에서 최고 효율<br>• ⚖️ <b>기복 없는 밸런스형</b>: 첫판부터 막판까지 편차 없이 일정한 경기력 유지" + wrapEnd;
     } else if (type === 'aiPredict') {
         icon = "🔮"; title = "AI 승부 예측 산출 기준";
-        desc = wrapStart + "추첨된 순번과 누적 빅데이터를 기반으로 아래 <b>4가지 실전 지표</b>를 가중 합산하여 예상 1위 확률(합계 100%)과 꼴찌 위험도를 산출합니다.<br><br>• 🎲 <b>배정 순번 실전 승률 (30%)</b>: 이번 판에 뽑힌 순번(초구~말구)에서의 역대 승률<br>• 🎯 <b>앞주자 상성 성적 (25%)</b>: 내 바로 앞 순서 선수 뒤에서 쳤을 때의 실제 성적<br>• 📈 <b>최근 7G 컨디션 (25%)</b>: 최근 7경기 평균 승점 및 연승/연꼴 흐름<br>• ⏱️ <b>당일 라운드 체력 (20%)</b>: 현재 라운드(첫판·중반·장기전) 구간별 강점" + wrapEnd;
+        desc = wrapStart + "추첨된 순번과 누적 빅데이터를 기반으로 아래 <b>4가지 실전 지표</b>를 가중 합산하여 예상 1위 확률(합계 100%)과 꼴찌 위험도를 산출합니다.<br><br>• 🎯 <b>앞주자 상성 성적 (30%)</b>: 내 바로 앞 순서 선수 뒤에서 쳤을 때의 실제 성적<br>• 🎲 <b>배정 순번 실전 승률 (25%)</b>: 이번 판에 뽑힌 순번(초구~말구)에서의 역대 승률<br>• 📈 <b>최근 7G 컨디션 (25%)</b>: 최근 7경기 평균 승점 및 연승/연꼴 흐름<br>• ⏱️ <b>당일 라운드 체력 (20%)</b>: 현재 라운드(첫판·중반·장기전) 구간별 강점" + wrapEnd;
     }
     
     const descEl = document.getElementById('info-modal-desc');
@@ -568,8 +568,8 @@ function togglePlayerSelection(el, name) {
 }
 
 function resetPlayerSelection() { 
-    selectedPlayersForLottery = []; currentStartOrder = []; 
-    document.querySelectorAll('.player-chip').forEach(el => el.classList.remove('active')); 
+    currentStartOrder = []; 
+    lastDrawnPlayers = []; 
     if(!editMode) updateInputFields(); 
     const saveBtn = document.getElementById('mainBtn');
     if (saveBtn) saveBtn.classList.remove('flash-save-active');
@@ -893,11 +893,10 @@ function updateInputFields(preFill = null) {
 
 function resetInputs() { 
     if(editMode) cancelEdit(); 
-    else { document.getElementById('playerCount').value = "3"; resetPlayerSelection(); updateInputFields(); } 
+    else { resetPlayerSelection(); updateInputFields(); } 
     const saveBtn = document.getElementById('mainBtn');
     if (saveBtn) saveBtn.classList.remove('flash-save-active');
 }
-
 async function saveGame() {
     triggerHaptic(20); const saveBtn = document.getElementById('mainBtn');
     if (saveBtn) saveBtn.classList.remove('flash-save-active');
@@ -915,9 +914,9 @@ async function saveGame() {
     showLoading(true, "저장 중");
     const payload = { action: "SAVE", date: selectedDateStr, ranks: [ranks[0]||"", ranks[1]||"", ranks[2]||"", ranks[3]||"", ranks[4]||""], round: editRound, startOrder: currentStartOrder.length > 0 ? currentStartOrder : null };
     if(editMode) payload.action = "UPDATE";
-    try { 
+   try { 
         await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); 
-        cancelEdit(); currentStartOrder = []; document.getElementById('playerCount').value = "3"; resetPlayerSelection(); updateInputFields(); await fetchData(); 
+        cancelEdit(); currentStartOrder = []; resetPlayerSelection(); updateInputFields(); await fetchData(); 
     } catch (e) { alert("오류 발생!"); showLoading(false); }
 }
 function calculateLuckyGuy(filteredGames) {
@@ -1684,7 +1683,7 @@ function cancelEdit() {
     editMode = false; editRound = null; currentStartOrder = []; 
     document.getElementById('editBadge').style.display = 'none'; document.getElementById('inputCard').classList.remove('edit-active'); 
     const btn = document.getElementById('mainBtn'); btn.innerText = "순위 저장"; btn.classList.remove('edit-btn'); 
-    document.getElementById('playerCount').value = "3"; resetPlayerSelection(); updateInputFields(); 
+    resetPlayerSelection(); updateInputFields(); 
     if (btn) btn.classList.remove('flash-save-active');
 }
 
@@ -3345,10 +3344,10 @@ function renderAiPredictionBanner(drawnOrder) {
         const recentWinRate = recent7.length > 0 ? ((rWins / recent7.length) * 0.6 + (rScoreRatioSum / recent7.length) * 0.4) : overallWinRate;
         const recentLastRate = recent7.length > 0 ? ((rLasts + 2 * overallLastRate) / (recent7.length + 2)) : overallLastRate;
 
-        // 4대 지표 가중 합산 (순번 30% + 앞주자 상성 25% + 최근 7G 25% + 라운드 체력 20%)
-        const winPower = Math.max(0.05, (orderWinRate * 0.30) + (prevWinRate * 0.25) + (recentWinRate * 0.25) + (phaseWinRate * 0.20));
-        const lastRisk = Math.max(0.05, (orderLastRate * 0.30) + (prevLastRate * 0.25) + (recentLastRate * 0.25) + (phaseLastRate * 0.20));
-
+        // 4대 지표 가중 합산 (앞주자 상성 30% + 순번 25% + 최근 7G 25% + 라운드 체력 20%)
+        const winPower = Math.max(0.05, (prevWinRate * 0.30) + (orderWinRate * 0.25) + (recentWinRate * 0.25) + (phaseWinRate * 0.20));
+        const lastRisk = Math.max(0.05, (prevLastRate * 0.30) + (orderLastRate * 0.25) + (recentLastRate * 0.25) + (phaseLastRate * 0.20));
+        
         // 선수별 핵심 강점 태그 생성
         let reasonTag = `${orderIdx === 0 ? '초구(1번)' : (orderIdx === pCount - 1 ? '말구' : (orderIdx + 1) + '번')} 배정`;
         if (orderGames >= 3 && (orderWins / orderGames) >= 0.4) {
@@ -3433,7 +3432,7 @@ function renderAiPredictionBanner(drawnOrder) {
     area.innerHTML = `<div class="ai-predict-box">
                         <div class="ai-predict-header">
                             <div class="ai-predict-title" onclick="showInfoModal('aiPredict')">
-                                <span>🔮 이번 판 AI 승부 예측 브리핑</span>
+                                <span>🔮 이번 GAME AI 승부 예측 브리핑</span>
                                 <span class="ai-predict-phase">${phaseLabel} · 기준 안내 ⓘ</span>
                             </div>
                             <div class="ai-predict-close" onclick="clearAiPredictionBanner()">닫기 ✕</div>
