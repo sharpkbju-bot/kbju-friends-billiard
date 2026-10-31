@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v9.90 - Live Pulse Edition */
+/* Billiard World Style v9.91 - Live Pulse Edition */
 /* [절대 원칙 준수]: 최적화 전면 금지, 모든 클래스와 테마를 개별적으로 분리 전개함 */
 
 :root { 
@@ -1475,3 +1475,176 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
 [data-theme='dark'] #streakCard h2 { border-bottom-color: rgba(255, 255, 255, 0.12); }
 [data-theme='dark'] #streakCard .stats-table thead tr { background: rgba(255, 255, 255, 0.9) !important; }
 [data-theme='dark'] #streakCard .stats-table tbody tr { background: rgba(52, 52, 58, 0.82) !important; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08); }
+/* ============================================================
+   [V9.91 신규] 라인업 AI 승부 예측 브리핑 배너 스타일 (개별 분리 전개)
+   ============================================================ */
+.ai-predict-box {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(240, 246, 255, 0.78));
+    border: 2px solid rgba(33, 150, 243, 0.45);
+    border-radius: 16px;
+    padding: 14px 12px;
+    box-shadow: 0 8px 20px rgba(33, 150, 243, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+    animation: fadeInScale 0.35s ease-out;
+}
+
+.ai-predict-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.ai-predict-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--rank1);
+    cursor: pointer;
+    letter-spacing: -0.4px;
+}
+
+.ai-predict-phase {
+    font-size: 10.5px;
+    font-weight: 800;
+    color: var(--sub-text);
+}
+
+.ai-predict-close {
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--sub-text);
+    background: rgba(0, 0, 0, 0.05);
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.ai-predict-summary {
+    background: rgba(33, 150, 243, 0.08);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: var(--text-color);
+    text-align: center;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    letter-spacing: -0.5px;
+}
+
+.ai-predict-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ai-predict-row {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    padding: 8px 10px;
+}
+
+.ai-predict-row-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    white-space: nowrap;
+}
+
+.ai-predict-player {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+}
+
+.ai-predict-order {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--sub-text);
+    letter-spacing: -0.5px;
+}
+
+.ai-predict-tag {
+    font-size: 10px;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 6px;
+    letter-spacing: -0.4px;
+    white-space: nowrap;
+}
+
+.ai-predict-tag.win-tag {
+    background: rgba(33, 150, 243, 0.15);
+    color: var(--rank1);
+}
+
+.ai-predict-tag.risk-tag {
+    background: rgba(255, 71, 87, 0.14);
+    color: var(--rankL);
+}
+
+.ai-predict-tag.sub-tag {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--sub-text);
+}
+
+.ai-predict-pct {
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.ai-predict-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.ai-predict-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* 네이비(navy) 테마 개별 대응 */
+[data-theme='navy'] .ai-predict-box {
+    background: linear-gradient(145deg, rgba(20, 38, 72, 0.95), rgba(10, 22, 46, 0.96));
+    border-color: rgba(100, 181, 246, 0.45);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+}
+[data-theme='navy'] .ai-predict-header { border-bottom-color: rgba(255, 255, 255, 0.12); }
+[data-theme='navy'] .ai-predict-close { background: rgba(255, 255, 255, 0.1); color: #e0e0e0; }
+[data-theme='navy'] .ai-predict-summary { background: rgba(100, 181, 246, 0.12); }
+[data-theme='navy'] .ai-predict-row { background: rgba(30, 50, 88, 0.75); border-color: rgba(255, 255, 255, 0.08); }
+[data-theme='navy'] .ai-predict-tag.sub-tag { background: rgba(255, 255, 255, 0.1); color: #b0bec5; }
+[data-theme='navy'] .ai-predict-bar-bg { background: rgba(255, 255, 255, 0.12); }
+
+/* 다크(dark) 테마 개별 대응 */
+[data-theme='dark'] .ai-predict-box {
+    background: linear-gradient(145deg, rgba(42, 42, 48, 0.95), rgba(24, 24, 28, 0.96));
+    border-color: rgba(100, 181, 246, 0.4);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
+}
+[data-theme='dark'] .ai-predict-header { border-bottom-color: rgba(255, 255, 255, 0.12); }
+[data-theme='dark'] .ai-predict-close { background: rgba(255, 255, 255, 0.1); color: #eeeeee; }
+[data-theme='dark'] .ai-predict-summary { background: rgba(100, 181, 246, 0.12); }
+[data-theme='dark'] .ai-predict-row { background: rgba(55, 55, 62, 0.8); border-color: rgba(255, 255, 255, 0.08); }
+[data-theme='dark'] .ai-predict-tag.sub-tag { background: rgba(255, 255, 255, 0.1); color: #cccccc; }
+[data-theme='dark'] .ai-predict-bar-bg { background: rgba(255, 255, 255, 0.12); }
+
+/* 확대 모드(1.2배) 역보정 (기본 크기 유지 및 돌출 방지) */
+.zoom-active #aiPredictionArea {
+    zoom: 0.833333;
+}
