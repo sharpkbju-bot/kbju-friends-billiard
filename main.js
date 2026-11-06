@@ -2637,9 +2637,9 @@ function renderLastPlaceRecord() {
         }
 
         const isLongSafe = (!s.lastDate || s.gamesSinceLast >= 15);
-        const dateColor = isLongSafe ? "#e67e22" : "var(--text-color)";
-        const gameColor = isLongSafe ? "#e67e22" : "var(--sub-text)";
-        const durationColor = isLongSafe ? "#e67e22" : "var(--accent)";
+        const dateColor = isLongSafe ? "#5D4037" : "var(--text-color)";
+        const gameColor = isLongSafe ? "#5D4037" : "var(--sub-text)";
+        const durationColor = isLongSafe ? "#5D4037" : "var(--accent)";
 
         html += `<tr style="background:rgba(255,255,255,0.4);">
             <td style="color:${getPlayerColor(p)}; font-weight:900;">${p}</td>
