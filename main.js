@@ -2636,11 +2636,16 @@ function renderLastPlaceRecord() {
             durationText = `무패행진 중!`;
         }
 
+        const isLongSafe = (!s.lastDate || s.gamesSinceLast >= 15);
+        const dateColor = isLongSafe ? "#e67e22" : "var(--text-color)";
+        const gameColor = isLongSafe ? "#e67e22" : "var(--sub-text)";
+        const durationColor = isLongSafe ? "#e67e22" : "var(--accent)";
+
         html += `<tr style="background:rgba(255,255,255,0.4);">
             <td style="color:${getPlayerColor(p)}; font-weight:900;">${p}</td>
-            <td style="color:var(--text-color); font-weight:800; font-size:13px;">${dateText}</td>
-            <td style="color:var(--sub-text); font-weight:800; font-size:13px;">${gameText}</td>
-            <td style="color:var(--accent); font-weight:900; font-size:13px;">${durationText}</td>
+            <td style="color:${dateColor}; font-weight:800; font-size:13px;">${dateText}</td>
+            <td style="color:${gameColor}; font-weight:800; font-size:13px;">${gameText}</td>
+            <td style="color:${durationColor}; font-weight:900; font-size:13px;">${durationText}</td>
         </tr>`;
     });
 
