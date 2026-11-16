@@ -84,7 +84,7 @@ const playerThemes = {
 function getEarnedScore(idx, pCount) {
     if (idx === pCount - 1 && pCount > 1) return 0;
     if (pCount === 2 && idx === 0) return 2;
-    if (pCount === 3) return idx === 0 ? 3 : (idx === 1 ? 1 : 0);
+    if (pCount === 3) return idx === 0 ? 3 : (idx === 1 ? 2 : 0);
     if (pCount === 4) return idx === 0 ? 4 : (idx === 1 ? 3 : (idx === 2 ? 2 : 0));
     if (pCount === 5) return idx === 0 ? 5 : (idx === 1 ? 4 : (idx === 2 ? 3 : (idx === 3 ? 1 : 0)));
     return 0;
@@ -465,7 +465,7 @@ function showInfoModal(type) {
 
     if (type === 'score') {
         icon = "📊"; title = "인원별 차등 승점 기준";
-        desc = "<div style='white-space: nowrap; line-height: 1.5; text-align: left;'>• <b>2인</b>: 1위(+2), 꼴찌(0)<br>• <b>3인</b>: 1위(+3), 2위(+1), 꼴찌(0)<br>• <b>4인</b>: 1위(+4), 2위(+3), 3위(+2), 꼴찌(0)<br>• <b>5인</b>: 1위(+5), 2위(+4), 3위(+3), 4위(+1), 꼴찌(0)</div>";
+        desc = "<div style='white-space: nowrap; line-height: 1.5; text-align: left;'>• <b>2인</b>: 1위(+2), 꼴찌(0)<br>• <b>3인</b>: 1위(+3), 2위(+2), 꼴찌(0)<br>• <b>4인</b>: 1위(+4), 2위(+3), 3위(+2), 꼴찌(0)<br>• <b>5인</b>: 1위(+5), 2위(+4), 3위(+3), 4위(+1), 꼴찌(0)</div>";
     } else if (type === 'tier') {
         icon = "🏅"; title = "랭킹 티어(계급) 기준";
         desc = wrapStart + "👑<b>챌린저</b>: 60+ &nbsp;💎<b>플래티넘</b>: 50+<br>🥇<b>골드</b>: 40+ &nbsp;&nbsp;🥈<b>실버</b>: 30+ &nbsp;🥉<b>브론즈</b>: 30미만" + wrapEnd;
