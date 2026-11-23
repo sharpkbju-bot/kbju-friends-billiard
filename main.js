@@ -1931,14 +1931,24 @@ function analyzeStrategy() {
         area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'none'; return;
     }
 
+    const strategyAvgValues = targets.map(t => parseFloat((stats[t].totalRank / stats[t].games).toFixed(1)));
+    const bestStrategyAvg = Math.min(...strategyAvgValues);
+    const worstStrategyAvg = Math.max(...strategyAvgValues);
+
     let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 다음 선수들의 <b>뒤에서</b> 기록한 성적</div>`;
     targets.forEach(t => {
         const s = stats[t]; const avg = (s.totalRank / s.games).toFixed(1);
+        const avgNum = parseFloat(avg);
+        let avgColor = "var(--text-color)";
+        if (bestStrategyAvg !== worstStrategyAvg) {
+            if (avgNum === bestStrategyAvg) avgColor = "var(--rank1)";
+            else if (avgNum === worstStrategyAvg) avgColor = "var(--rankL)";
+        }
         const winP = Math.round((s.wins / s.games) * 100); const lastP = Math.round((s.lasts / s.games) * 100); const otherP = 100 - winP - lastP; 
         html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                         <div style="font-size:15px; font-weight:800; color:var(--sub-text);">앞 순서: <span style="font-size:19px; font-weight:900; color:${getPlayerColor(t)};">${t}</span> <span style="font-size:14px; font-weight:900; color:var(--accent); margin-left:4px;">${s.games}G</span></div>
-                        <div style="font-size:15px; font-weight:800; color:var(--text-color);">${player}의 성적: 평균 ${avg}위</div>
+                        <div style="font-size:15px; font-weight:800; color:var(--text-color);">${player}의 성적: <span style="color:${avgColor}; font-weight:900;">평균 ${avg}위</span></div>
                     </div>
                     <div style="display:flex; gap:6px;">
                         <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">1위 확률</div><div style="font-size:15px; font-weight:900; color:var(--rank1);">${winP}%, <span style="font-size:12px; color:var(--sub-text);">${s.wins}회</span></div></div>
@@ -2006,6 +2016,12 @@ function analyzeOrderStats() {
     }
 
     const orderKeys = ['초구(1번)', '2번', '3번', '4번', '말구'];
+    const validOrderAvgValues = orderKeys
+        .filter(k => stats[k].games > 0)
+        .map(k => parseFloat((stats[k].totalRank / stats[k].games).toFixed(1)));
+    const bestOrderAvg = Math.min(...validOrderAvgValues);
+    const worstOrderAvg = Math.max(...validOrderAvgValues);
+
     let html = `<div style="text-align:center; font-size:13px; color:var(--sub-text); font-weight:800; margin-bottom:15px;">[ ${player} ] 선수가 특정 <b>순번</b>일 때 기록한 성적</div>`;
     
     orderKeys.forEach(t => {
@@ -2013,6 +2029,12 @@ function analyzeOrderStats() {
         if (s.games === 0) return; 
         
         const avg = (s.totalRank / s.games).toFixed(1);
+        const avgNum = parseFloat(avg);
+        let avgColor = "var(--text-color)";
+        if (bestOrderAvg !== worstOrderAvg) {
+            if (avgNum === bestOrderAvg) avgColor = "var(--rank1)";
+            else if (avgNum === worstOrderAvg) avgColor = "var(--rankL)";
+        }
         const winP = Math.round((s.wins / s.games) * 100); 
         const lastP = Math.round((s.lasts / s.games) * 100); 
         const otherP = 100 - winP - lastP; 
@@ -2024,7 +2046,7 @@ function analyzeOrderStats() {
         html += `<div style="background:var(--bg); border:1px solid rgba(0,0,0,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                         <div style="font-size:15px; font-weight:800; color:var(--sub-text);">순서: <span style="font-size:19px; font-weight:900; color:${orderColor};">${t}</span> <span style="font-size:14px; font-weight:900; color:var(--accent); margin-left:4px;">${s.games}G</span></div>
-                        <div style="font-size:15px; font-weight:800; color:var(--text-color);">평균 ${avg}위</div>
+                        <div style="font-size:15px; font-weight:900; color:${avgColor};">평균 ${avg}위</div>
                     </div>
                     <div style="display:flex; gap:6px;">
                         <div style="flex:1; background:rgba(255,255,255,0.5); padding:10px 2px; border-radius:8px; text-align:center;"><div style="font-size:12px; color:var(--sub-text); margin-bottom:6px; font-weight:800;">1위 확률</div><div style="font-size:15px; font-weight:900; color:var(--rank1);">${winP}%, <span style="font-size:12px; color:var(--sub-text);">${s.wins}회</span></div></div>
