@@ -1,4 +1,4 @@
-// main.js - V9.91 Live Pulse Edition
+// main.js - V9.95 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -71,6 +71,8 @@ let awardsFlatpickr; // [V9.74 신규] 월간 시상식 전용 달력 인스턴�
 let animationStep = 0;
 let lastDrawnPlayers = []; 
 let currentStartOrder = []; 
+let currentDrawMode = 'random'; // [V9.95 신규] 초구 추첨 모드 ('random' | 'loserFirst' | 'aiBalance')
+let lastAppliedDrawModeLabel = ''; // [V9.95 신규] 마지막 추첨에 실제 적용된 모드 안내 라벨
 
 const playerThemes = {
     "경배": { emoji: "👑", color: "#1A237E" },
@@ -596,40 +598,154 @@ function pickRandomOrder() {
     let minPenalty = Infinity;
     const MAX_ATTEMPTS = 100;
 
-    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-        let candidate = [...selectedPlayersForLottery];
-        for (let i = candidate.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [candidate[i], candidate[j]] = [candidate[j], candidate[i]];
-        }
-
-        let penalty = 0;
-        
-        // [V9.77 신규 추가 로직] 직전 게임 초구자가 또 1번(초구)로 배치되면 극단적 페널티 부여하여 강제 배제
-        if (lastFirstPlayer && candidate[0] === lastFirstPlayer) {
-            penalty += 1000;
-        }
-
-        for (let g of todayGames) {
-            const prevOrder = g.startOrder;
-            for (let i = 0; i < candidate.length; i++) {
-                const currentP = candidate[i];
-                const nextP = candidate[(i + 1) % candidate.length]; 
-
-                for (let j = 0; j < prevOrder.length; j++) {
-                    if (prevOrder[j] === currentP && prevOrder[(j + 1) % prevOrder.length] === nextP) {
-                        penalty++; 
-                    }
-                }
+    if (currentDrawMode === 'loserFirst') {
+        // [V9.95 신규] 모드 2: 직전 꼴찌 우선 배정 (패자 우대 모드)
+        const todayAllGames = gameLogs.filter(g => g.dateStr === selectedDateStr);
+        let lastLoserPlayer = null;
+        if (todayAllGames.length > 0) {
+            const sortedAllToday = [...todayAllGames].sort((a, b) => parseInt(a.round) - parseInt(b.round));
+            const latestGame = sortedAllToday[sortedAllToday.length - 1];
+            const actualRanks = latestGame.ranks.filter(n => n && n.trim() !== "");
+            if (actualRanks.length > 1) {
+                lastLoserPlayer = actualRanks[actualRanks.length - 1];
             }
         }
 
-        if (penalty < minPenalty) {
-            minPenalty = penalty;
-            bestOrder = [...candidate];
+        if (lastLoserPlayer && selectedPlayersForLottery.includes(lastLoserPlayer)) {
+            const otherPlayers = selectedPlayersForLottery.filter(p => p !== lastLoserPlayer);
+            for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+                let shuffledOthers = [...otherPlayers];
+                for (let i = shuffledOthers.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledOthers[i], shuffledOthers[j]] = [shuffledOthers[j], shuffledOthers[i]];
+                }
+                const candidate = [lastLoserPlayer, ...shuffledOthers];
+                let penalty = 0;
+                for (let g of todayGames) {
+                    const prevOrder = g.startOrder;
+                    for (let i = 0; i < candidate.length; i++) {
+                        const currentP = candidate[i];
+                        const nextP = candidate[(i + 1) % candidate.length];
+                        for (let j = 0; j < prevOrder.length; j++) {
+                            if (prevOrder[j] === currentP && prevOrder[(j + 1) % prevOrder.length] === nextP) {
+                                penalty++;
+                            }
+                        }
+                    }
+                }
+                if (penalty < minPenalty) {
+                    minPenalty = penalty;
+                    bestOrder = [...candidate];
+                }
+                if (penalty === 0) break;
+            }
+            lastAppliedDrawModeLabel = `💀 직전 꼴찌 우선 (${lastLoserPlayer} 초구 배정)`;
+        } else {
+            // 직전 경기 기록이 없거나 직전 꼴찌가 불참한 경우 기본 랜덤 추첨으로 자동 전환
+            for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+                let candidate = [...selectedPlayersForLottery];
+                for (let i = candidate.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [candidate[i], candidate[j]] = [candidate[j], candidate[i]];
+                }
+                let penalty = 0;
+                if (lastFirstPlayer && candidate[0] === lastFirstPlayer) {
+                    penalty += 1000;
+                }
+                for (let g of todayGames) {
+                    const prevOrder = g.startOrder;
+                    for (let i = 0; i < candidate.length; i++) {
+                        const currentP = candidate[i];
+                        const nextP = candidate[(i + 1) % candidate.length];
+                        for (let j = 0; j < prevOrder.length; j++) {
+                            if (prevOrder[j] === currentP && prevOrder[(j + 1) % prevOrder.length] === nextP) {
+                                penalty++;
+                            }
+                        }
+                    }
+                }
+                if (penalty < minPenalty) {
+                    minPenalty = penalty;
+                    bestOrder = [...candidate];
+                }
+                if (penalty === 0) break;
+            }
+            lastAppliedDrawModeLabel = '🎲 기본 랜덤 (직전 꼴찌 미참여/첫판 전환)';
         }
+    } else if (currentDrawMode === 'aiBalance') {
+        // [V9.95 신규] 모드 3: AI 밸런스 매칭 (황금 밸런스 모드)
+        let bestBalanceScore = Infinity;
+        const AI_ATTEMPTS = 150;
+        for (let attempt = 0; attempt < AI_ATTEMPTS; attempt++) {
+            let candidate = [...selectedPlayersForLottery];
+            for (let i = candidate.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [candidate[i], candidate[j]] = [candidate[j], candidate[i]];
+            }
 
-        if (penalty === 0) break;
+            let repeatPenalty = 0;
+            if (lastFirstPlayer && candidate[0] === lastFirstPlayer) {
+                repeatPenalty += 1000;
+            }
+            for (let g of todayGames) {
+                const prevOrder = g.startOrder;
+                for (let i = 0; i < candidate.length; i++) {
+                    const currentP = candidate[i];
+                    const nextP = candidate[(i + 1) % candidate.length];
+                    for (let j = 0; j < prevOrder.length; j++) {
+                        if (prevOrder[j] === currentP && prevOrder[(j + 1) % prevOrder.length] === nextP) {
+                            repeatPenalty += 2;
+                        }
+                    }
+                }
+            }
+
+            const evalResult = evaluateLineupBalance(candidate);
+            const totalScore = evalResult.spread + repeatPenalty;
+            if (totalScore < bestBalanceScore) {
+                bestBalanceScore = totalScore;
+                bestOrder = [...candidate];
+            }
+        }
+        lastAppliedDrawModeLabel = '⚖️ AI 밸런스 매칭 (황금 라인업)';
+    } else {
+        // 기존 v9.91 기본 랜덤 추첨 로직 100% 보존
+        for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+            let candidate = [...selectedPlayersForLottery];
+            for (let i = candidate.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [candidate[i], candidate[j]] = [candidate[j], candidate[i]];
+            }
+
+            let penalty = 0;
+            
+            // [V9.77 신규 추가 로직] 직전 게임 초구자가 또 1번(초구)로 배치되면 극단적 페널티 부여하여 강제 배제
+            if (lastFirstPlayer && candidate[0] === lastFirstPlayer) {
+                penalty += 1000;
+            }
+
+            for (let g of todayGames) {
+                const prevOrder = g.startOrder;
+                for (let i = 0; i < candidate.length; i++) {
+                    const currentP = candidate[i];
+                    const nextP = candidate[(i + 1) % candidate.length]; 
+
+                    for (let j = 0; j < prevOrder.length; j++) {
+                        if (prevOrder[j] === currentP && prevOrder[(j + 1) % prevOrder.length] === nextP) {
+                            penalty++; 
+                        }
+                    }
+                }
+            }
+
+            if (penalty < minPenalty) {
+                minPenalty = penalty;
+                bestOrder = [...candidate];
+            }
+
+            if (penalty === 0) break;
+        }
+        lastAppliedDrawModeLabel = '🎲 기본 랜덤 추첨';
     }
     
     lastDrawnPlayers = [...bestOrder]; 
@@ -644,7 +760,8 @@ function pickRandomOrder() {
     const p1Color = getPlayerColor(firstPlayer);
     const alertBadgesHtml = generateOrderAlertBadgesHTML(bestOrder);
     
-    const finalHtml = `<div style="background: rgba(128, 128, 128, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 2.5px dashed ${p1Color}; display:block;">
+    const finalHtml = `<div style="font-size: 11.5px; font-weight: 900; color: var(--sub-text); margin-bottom: 10px; background: rgba(128, 128, 128, 0.12); padding: 5px 10px; border-radius: 8px; display: inline-block;">${lastAppliedDrawModeLabel}</div>
+                       <div style="background: rgba(128, 128, 128, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 2.5px dashed ${p1Color}; display:block;">
                            <div style="font-size: 14px; color: ${p1Color}; margin-bottom:5px;">🎯 이 게임의 초구는 바로 너!</div>
                            <div style="font-size: 26px; color: ${p1Color}; font-weight: 900;">1번 : ${firstPlayer}</div>
                        </div>
@@ -3470,4 +3587,146 @@ function renderAiPredictionBanner(drawnOrder) {
                         <div class="ai-predict-list">${rowsHtml}</div>
                       </div>`;
     area.style.display = "block";
+}
+
+
+// [V9.95 신규] 초구 추첨 모드 선택 및 안내 문구 갱신 독립 함수
+function selectDrawMode(mode) {
+    triggerHaptic(10);
+    currentDrawMode = mode;
+    const btns = document.querySelectorAll('.draw-mode-btn');
+    btns.forEach(btn => {
+        if (btn.getAttribute('data-mode') === mode) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    const descEl = document.getElementById('drawModeDesc');
+    if (descEl) {
+        if (mode === 'random') {
+            descEl.innerText = '직전 초구 연속 방지 및 순번 중복을 최소화하여 공정하게 무작위 추첨합니다.';
+        } else if (mode === 'loserFirst') {
+            descEl.innerText = '오늘 직전 게임 꼴찌에게 1번(초구) 우선권을 부여하고 나머지 순번만 추첨합니다.';
+        } else if (mode === 'aiBalance') {
+            descEl.innerText = '상성·순번·최근 7G·체력 데이터를 분석해 승률 격차가 가장 적은 황금 라인업을 매칭합니다.';
+        }
+    }
+}
+
+// [V9.95 신규] AI 밸런스 매칭용 후보 순번 조합의 승률 균형도 평가 독립 함수
+function evaluateLineupBalance(candidateOrder) {
+    if (!candidateOrder || candidateOrder.length < 2 || !gameLogs || gameLogs.length === 0) {
+        return { spread: 0 };
+    }
+
+    const pCount = candidateOrder.length;
+    const baseProb = 1 / pCount;
+
+    const sortedGames = [...gameLogs].sort((a, b) => {
+        const dateA = new Date(a.dateStr);
+        const dateB = new Date(b.dateStr);
+        if (dateA - dateB !== 0) return dateA - dateB;
+        return (parseInt(a.round) || 0) - (parseInt(b.round) || 0);
+    });
+
+    const gamesByDate = {};
+    sortedGames.forEach(g => {
+        if (!gamesByDate[g.dateStr]) gamesByDate[g.dateStr] = [];
+        gamesByDate[g.dateStr].push(g);
+    });
+
+    const todayPlayedCount = gamesByDate[selectedDateStr] ? gamesByDate[selectedDateStr].length : 0;
+    const nextGameNum = todayPlayedCount + 1;
+    let currentPhase = "mid";
+    if (nextGameNum === 1) currentPhase = "early";
+    else if (nextGameNum >= 4) currentPhase = "late";
+
+    let winPowers = [];
+
+    candidateOrder.forEach((player, orderIdx) => {
+        const prevPlayer = candidateOrder[(orderIdx - 1 + pCount) % pCount];
+        let orderType = "";
+        if (orderIdx === 0) orderType = "first";
+        else if (orderIdx === pCount - 1 && pCount > 1) orderType = "last";
+        else orderType = "mid_" + orderIdx;
+
+        let totalGames = 0, totalWins = 0;
+        let orderGames = 0, orderWins = 0;
+        let prevGames = 0, prevWins = 0;
+        let phaseGames = 0, phaseWins = 0;
+        const personalGames = [];
+
+        Object.keys(gamesByDate).forEach(dStr => {
+            const dGames = gamesByDate[dStr];
+            const dTotal = dGames.length;
+            dGames.forEach((g, idxInDay) => {
+                const actual = g.ranks.filter(n => n && n.trim() !== "");
+                if (actual.length <= 1 || !actual.includes(player)) return;
+
+                const myRankIdx = actual.indexOf(player);
+                const isWin = (myRankIdx === 0);
+
+                totalGames++;
+                if (isWin) totalWins++;
+                personalGames.push({ actual: actual, myRankIdx: myRankIdx });
+
+                if (g.startOrder && g.startOrder.includes(player)) {
+                    const sIdx = g.startOrder.indexOf(player);
+                    const sLen = g.startOrder.length;
+                    let gOrderType = "";
+                    if (sIdx === 0) gOrderType = "first";
+                    else if (sIdx === sLen - 1 && sLen > 1) gOrderType = "last";
+                    else gOrderType = "mid_" + sIdx;
+
+                    if (gOrderType === orderType) {
+                        orderGames++;
+                        if (isWin) orderWins++;
+                    }
+
+                    const gPrevP = g.startOrder[(sIdx - 1 + sLen) % sLen];
+                    if (gPrevP === prevPlayer) {
+                        prevGames++;
+                        if (isWin) prevWins++;
+                    }
+                }
+
+                const gNum = idxInDay + 1;
+                let gPhase = "mid";
+                if (gNum === 1) gPhase = "early";
+                else if (gNum === dTotal || gNum >= 4) gPhase = "late";
+
+                if (gPhase === currentPhase) {
+                    phaseGames++;
+                    if (isWin) phaseWins++;
+                }
+            });
+        });
+
+        const overallWinRate = totalGames > 0 ? (totalWins + 2 * baseProb) / (totalGames + 2) : baseProb;
+        const orderWinRate = (orderWins + 3 * overallWinRate) / (orderGames + 3);
+        const prevWinRate = (prevWins + 3 * overallWinRate) / (prevGames + 3);
+        const phaseWinRate = (phaseWins + 3 * overallWinRate) / (phaseGames + 3);
+
+        const recent7 = personalGames.slice(-7);
+        let rWins = 0, rScoreRatioSum = 0;
+        recent7.forEach(item => {
+            if (item.myRankIdx === 0) rWins++;
+            const maxPossible = getEarnedScore(0, item.actual.length) || 1;
+            const earned = getEarnedScore(item.myRankIdx, item.actual.length);
+            rScoreRatioSum += (earned / maxPossible);
+        });
+        const recentWinRate = recent7.length > 0 ? ((rWins / recent7.length) * 0.6 + (rScoreRatioSum / recent7.length) * 0.4) : overallWinRate;
+
+        const winPower = Math.max(0.05, (prevWinRate * 0.30) + (orderWinRate * 0.25) + (recentWinRate * 0.25) + (phaseWinRate * 0.20));
+        winPowers.push(winPower);
+    });
+
+    const totalWinPower = winPowers.reduce((sum, v) => sum + v, 0) || 1;
+    const winPcts = winPowers.map(v => (v / totalWinPower) * 100);
+    const maxPct = Math.max(...winPcts);
+    const minPct = Math.min(...winPcts);
+
+    return { spread: maxPct - minPct };
 }
