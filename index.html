@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=9.91">
+    <link rel="manifest" href="manifest.json?v=9.95">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들의 당구 세상">
 
     <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=9.91">
-    <link rel="apple-touch-icon" href="image_0.png?v=9.91">
+    <link rel="apple-touch-icon" href="image_0.png?v=9.95">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 
-    <link rel="stylesheet" href="style.css?v=9.91">
+    <link rel="stylesheet" href="style.css?v=9.95">
     <title>경배와 친구들의 당구 세상</title>
 </head>
 <body id="app-body">
@@ -26,7 +26,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;9.91
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;9.95
     </div>
 </div>
 
@@ -235,10 +235,20 @@
             <div class="player-chip" onclick="togglePlayerSelection(this, '진웅')">진웅</div>
             <div class="player-chip" onclick="togglePlayerSelection(this, '창한')">창한</div>
             <div class="player-chip" onclick="togglePlayerSelection(this, '경석')">경석</div>
-        </div>
-    </div>
-    
-    <div id="drawCardArea" style="display: flex; gap: 10px; margin-bottom: 20px;">
+ </div>
+ </div>
+
+ <div id="drawModeWrap" class="draw-mode-wrap">
+ <div class="draw-mode-title">🎯 초구 추첨 모드 선택</div>
+ <div class="draw-mode-grid">
+ <button type="button" class="draw-mode-btn active" data-mode="random" onclick="selectDrawMode('random')">🎲 기본 랜덤</button>
+ <button type="button" class="draw-mode-btn" data-mode="loserFirst" onclick="selectDrawMode('loserFirst')">💀 직전 꼴찌 우선</button>
+ <button type="button" class="draw-mode-btn" data-mode="aiBalance" onclick="selectDrawMode('aiBalance')">⚖️ AI 밸런스 매칭</button>
+ </div>
+ <div id="drawModeDesc" class="draw-mode-desc">직전 초구 연속 방지 및 순번 중복을 최소화하여 공정하게 무작위 추첨합니다.</div>
+ </div>
+ 
+<div id="drawCardArea" style="display: flex; gap: 10px; margin-bottom: 20px;">
         <button class="share-btn-common" style="background: linear-gradient(145deg, #1abc9c, #16a085); flex: 2; margin: 0; font-size: 13px;" onclick="pickRandomOrder()">
             🎲 초구 추첨하기
         </button>
