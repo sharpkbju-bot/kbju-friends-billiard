@@ -3606,11 +3606,11 @@ function selectDrawMode(mode) {
     const descEl = document.getElementById('drawModeDesc');
     if (descEl) {
         if (mode === 'random') {
-            descEl.innerText = '직전 초구 연속 방지 및 순번 중복을 최소화하여 공정하게 무작위 추첨합니다.';
+            descEl.innerText = '직전 초구 연속 방지 및 순번 중복을 최소화하여 공정하게 무작위 추첨.';
         } else if (mode === 'loserFirst') {
-            descEl.innerText = '오늘 직전 게임 꼴찌에게 1번(초구) 우선권을 부여하고 나머지 순번만 추첨합니다.';
+            descEl.innerText = '오늘 직전 게임 꼴찌에게 1번(초구) 우선권을 부여하고 나머지 순번만 추첨.';
         } else if (mode === 'aiBalance') {
-            descEl.innerText = '상성·순번·최근 7G·체력 데이터를 분석해 승률 격차가 가장 적은 황금 라인업을 매칭합니다.';
+            descEl.innerText = '상성·순번·최근 7G·체력 데이터를 분석해 승률 격차가 가장 적은 황금 라인업을 매칭.';
         }
     }
 }
