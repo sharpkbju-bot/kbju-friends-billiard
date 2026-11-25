@@ -1655,16 +1655,16 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
 .draw-mode-wrap {
  margin-bottom: 14px;
  padding: 12px 10px;
- background: rgba(255, 255, 255, 0.55);
+ background: linear-gradient(145deg, rgba(255, 243, 224, 0.92), rgba(255, 224, 178, 0.82));
  border-radius: 14px;
- border: 1.5px solid rgba(255, 255, 255, 0.85);
- box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+ border: 1.5px solid rgba(255, 152, 0, 0.65);
+ box-shadow: 0 4px 12px rgba(255, 152, 0, 0.16), inset 0 1px 1px rgba(255, 255, 255, 0.85);
 }
 
 .draw-mode-title {
  font-size: 12.5px;
  font-weight: 900;
- color: var(--sub-text);
+ color: #e65100;
  margin-bottom: 8px;
  text-align: left;
  letter-spacing: -0.4px;
@@ -1681,9 +1681,9 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
  min-width: 0;
  padding: 9px 2px;
  border-radius: 9px;
- border: 1.5px solid rgba(0, 0, 0, 0.08);
- background: linear-gradient(145deg, #ffffff, #f1f3f6);
- color: var(--sub-text);
+ border: 1.5px solid rgba(255, 152, 0, 0.35);
+ background: linear-gradient(145deg, #ffffff, #fff8f0);
+ color: #8d4004;
  font-family: inherit;
  font-size: 11.5px;
  font-weight: 800;
@@ -1691,22 +1691,22 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
  white-space: nowrap;
  cursor: pointer;
  transition: all 0.2s ease;
- box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+ box-shadow: 0 2px 5px rgba(255, 152, 0, 0.08);
 }
 
 .draw-mode-btn.active {
- background: linear-gradient(145deg, #2196f3, #1976d2);
- border-color: #0d47a1;
+ background: linear-gradient(145deg, #ff9800, #f57c00);
+ border-color: #e65100;
  color: #ffffff;
  font-weight: 900;
- box-shadow: 0 4px 10px rgba(33, 150, 243, 0.35);
+ box-shadow: 0 4px 10px rgba(255, 152, 0, 0.4);
 }
 
 .draw-mode-desc {
  margin-top: 8px;
  font-size: 11px;
  font-weight: 800;
- color: var(--sub-text);
+ color: #6d3b00;
  text-align: center;
  line-height: 1.4;
  word-break: keep-all;
@@ -1715,34 +1715,46 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
 
 /* 네이비(navy) 테마 개별 대응 */
 [data-theme='navy'] .draw-mode-wrap {
- background: rgba(0, 0, 0, 0.3);
- border-color: rgba(255, 255, 255, 0.1);
+ background: linear-gradient(145deg, rgba(255, 152, 0, 0.24), rgba(230, 81, 0, 0.16));
+ border-color: rgba(255, 167, 38, 0.6);
+}
+[data-theme='navy'] .draw-mode-title {
+ color: #ffb74d;
 }
 [data-theme='navy'] .draw-mode-btn {
- background: rgba(45, 55, 75, 0.85);
- border-color: rgba(255, 255, 255, 0.1);
- color: #b0bec5;
+ background: rgba(45, 55, 75, 0.88);
+ border-color: rgba(255, 167, 38, 0.35);
+ color: #ffe0b2;
 }
 [data-theme='navy'] .draw-mode-btn.active {
- background: linear-gradient(145deg, #448aff, #2962ff);
- border-color: #82b1ff;
+ background: linear-gradient(145deg, #ff9800, #f57c00);
+ border-color: #ffcc80;
  color: #ffffff;
+}
+[data-theme='navy'] .draw-mode-desc {
+ color: #ffe0b2;
 }
 
 /* 다크(dark) 테마 개별 대응 */
 [data-theme='dark'] .draw-mode-wrap {
- background: rgba(0, 0, 0, 0.35);
- border-color: rgba(255, 255, 255, 0.1);
+ background: linear-gradient(145deg, rgba(255, 152, 0, 0.22), rgba(230, 81, 0, 0.14));
+ border-color: rgba(255, 167, 38, 0.55);
+}
+[data-theme='dark'] .draw-mode-title {
+ color: #ffb74d;
 }
 [data-theme='dark'] .draw-mode-btn {
- background: rgba(60, 60, 66, 0.88);
- border-color: rgba(255, 255, 255, 0.1);
- color: #cccccc;
+ background: rgba(60, 60, 66, 0.9);
+ border-color: rgba(255, 167, 38, 0.35);
+ color: #ffe0b2;
 }
 [data-theme='dark'] .draw-mode-btn.active {
- background: linear-gradient(145deg, #448aff, #2962ff);
- border-color: #82b1ff;
+ background: linear-gradient(145deg, #ff9800, #f57c00);
+ border-color: #ffcc80;
  color: #ffffff;
+}
+[data-theme='dark'] .draw-mode-desc {
+ color: #ffe0b2;
 }
 
 /* 확대 모드(1.2배) 역보정 */
