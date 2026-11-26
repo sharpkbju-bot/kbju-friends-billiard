@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=9.95">
+    <link rel="manifest" href="manifest.json?v=9.96">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="경배와 친구들의 당구 세상">
 
     <link rel="icon" type="image/png" sizes="512x512" href="image_0.png?v=9.91">
-    <link rel="apple-touch-icon" href="image_0.png?v=9.95">
+    <link rel="apple-touch-icon" href="image_0.png?v=9.96">
         
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 
-    <link rel="stylesheet" href="style.css?v=9.95">
+    <link rel="stylesheet" href="style.css?v=9.96">
     <title>경배와 친구들의 당구 세상</title>
 </head>
 <body id="app-body">
@@ -26,7 +26,7 @@
 <div id="welcome-screen">
     <div class="welcome-content">
         <img src="image_0.png" alt="앱 아이콘" class="welcome-logo">
-        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;9.95
+        <div class="welcome-text">경배와 친구들의<br>당구 세상에 오신걸 환영합니다.<br><br><br><br><br>Created by&nbsp;&nbsp;&nbsp;<span style="font-size: 20px; font-weight: bold;">Ju Kyung Bae</span></div><br>Version&nbsp;&nbsp;9.96
     </div>
 </div>
 
@@ -455,7 +455,42 @@
     </div>
 </div>
 <!-- 👆 [신규 추가 끝] -->
-
+<!-- 👇 [V9.96 신규 추가] 1:1 라이벌 정밀 비교 (헤드투헤드 매치업 분석) 카드 -->
+<div class="card" id="rivalCard">
+ <div id="rival-capture-area" style="padding: 5px; border-radius: 20px; background: transparent; box-sizing: border-box; overflow: hidden;">
+ <h2 style="font-size:16px; margin:5px 0 15px 10px; color:#444; font-weight:800;">⚔️ 1:1 라이벌 정밀 비교 <span id="rivalFilterLabel" class="strategy-subtitle" style="font-size:12px; color:var(--rank1);">(헤드투헤드 매치업)</span></h2>
+ <div class="rival-select-grid">
+ <div class="rival-select-box">
+ <label for="rivalPlayerA">선수 A (도전자)</label>
+ <select id="rivalPlayerA" style="color: #1A237E; font-weight: 800;" onchange="analyzeRivalMatchup()">
+ <option value="">선택</option>
+ <option value="경배">경배</option>
+ <option value="원석">원석</option>
+ <option value="정석">정석</option>
+ <option value="진웅">진웅</option>
+ <option value="창한">창한</option>
+ <option value="경석">경석</option>
+ </select>
+ </div>
+ <div class="rival-vs-badge">VS</div>
+ <div class="rival-select-box">
+ <label for="rivalPlayerB">선수 B (상대)</label>
+ <select id="rivalPlayerB" style="color: #E74C3C; font-weight: 800;" onchange="analyzeRivalMatchup()">
+ <option value="">선택</option>
+ <option value="경배">경배</option>
+ <option value="원석">원석</option>
+ <option value="정석">정석</option>
+ <option value="진웅">진웅</option>
+ <option value="창한">창한</option>
+ <option value="경석">경석</option>
+ </select>
+ </div>
+ </div>
+ <button id="rival-share-btn" class="share-btn-common" style="margin-top: 15px; display: none;" onclick="shareRivalResult()">📸 1:1 라이벌 비교 결과 스크린샷 공유</button>
+ <div id="rivalResultArea" style="margin-top:15px; display:none;"></div>
+ </div>
+</div>
+<!-- 👆 [V9.96 신규 추가 끝] -->
 <div class="card" id="searchCard">
 <div class="card" id="searchCard">
     <h2 style="font-size:16px; margin:5px 0 15px 10px; color:#444; font-weight:800;">🔍 월별 선수 전적 검색</h2>
