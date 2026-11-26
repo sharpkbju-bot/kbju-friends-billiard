@@ -1,4 +1,4 @@
-// main.js - V9.95 Live Pulse Edition
+// main.js - V9.96 Live Pulse Edition
 let scoreModalTimeout = null;
 let hideScoreModalTimeout = null;
 let graphCountdownInterval = null;
@@ -1237,7 +1237,7 @@ function renderDashboard() {
     document.getElementById('dashLastTurn').innerText = bestLast !== "-" ? `${bestLast} (${maxLast}회)` : "-";
 }
 
-function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); analyzeOrderStats(); renderStreakRecords(); analyzeStaminaStats(); }
+function onFilterChange() { renderDashboard(); renderStats(); renderScoreRank(); renderDefenseStats(); closeMemberHistory(); analyzeOrderStats(); renderStreakRecords(); analyzeStaminaStats(); analyzeRivalMatchup(); }
 function toggleAllMode() { isPercentMode = !isPercentMode; renderStats(); }
 
 function renderScoreRank() {
@@ -3729,4 +3729,211 @@ function evaluateLineupBalance(candidateOrder) {
     const minPct = Math.min(...winPcts);
 
     return { spread: maxPct - minPct };
+}
+// [V9.96 신규] 1:1 라이벌 정밀 비교 (헤드투헤드 매치업 분석) 독립 함수
+function analyzeRivalMatchup() {
+ const selA = document.getElementById('rivalPlayerA');
+ const selB = document.getElementById('rivalPlayerB');
+ const area = document.getElementById('rivalResultArea');
+ const shareBtn = document.getElementById('rival-share-btn');
+ if (!selA || !selB || !area) return;
+
+ const playerA = selA.value;
+ const playerB = selB.value;
+
+ const filterVal = document.getElementById('statsFilterCount')?.value || "all";
+ const monthVal = document.getElementById('statsFilterMonth')?.value || "";
+ const labelEl = document.getElementById('rivalFilterLabel');
+ if (labelEl) {
+ let countText = filterVal === "all" ? "전체" : filterVal + "인";
+ let monthText = monthVal ? monthVal : "전체";
+ labelEl.innerText = `(${monthText}, ${countText})`;
+ }
+
+ if (!playerA || !playerB) {
+ area.style.display = 'none';
+ if (shareBtn) shareBtn.style.display = 'none';
+ return;
+ }
+
+ if (playerA === playerB) {
+ area.innerHTML = `<div style="text-align:center; padding:18px; color:var(--accent); font-weight:900; font-size:13.5px;">⚠️ 서로 다른 두 선수를 선택해 주세요!</div>`;
+ area.style.display = 'block';
+ if (shareBtn) shareBtn.style.display = 'none';
+ return;
+ }
+
+ const sortedGames = [...gameLogs].sort((a, b) => {
+ const dateA = new Date(a.dateStr);
+ const dateB = new Date(b.dateStr);
+ if (dateA - dateB !== 0) return dateA - dateB;
+ return (parseInt(a.round) || 0) - (parseInt(b.round) || 0);
+ });
+
+ let matchCount = 0;
+ let winA = 0, winB = 0;
+ let rankSumA = 0, rankSumB = 0;
+ let scoreSumA = 0, scoreSumB = 0;
+ let topWinA = 0, topWinB = 0;
+ let lastPlaceA = 0, lastPlaceB = 0;
+ let curStreakA = 0, maxStreakA = 0;
+ let curStreakB = 0, maxStreakB = 0;
+ let matchHistory = [];
+
+ sortedGames.forEach(g => {
+ if (monthVal && !g.dateStr.startsWith(monthVal)) return;
+ const actual = g.ranks.filter(n => n && n.trim() !== "");
+ if (filterVal !== "all" && actual.length !== parseInt(filterVal)) return;
+ if (!actual.includes(playerA) || !actual.includes(playerB)) return;
+
+ const idxA = actual.indexOf(playerA);
+ const idxB = actual.indexOf(playerB);
+ const pCount = actual.length;
+
+ matchCount++;
+ rankSumA += (idxA + 1);
+ rankSumB += (idxB + 1);
+ scoreSumA += getEarnedScore(idxA, pCount);
+ scoreSumB += getEarnedScore(idxB, pCount);
+
+ if (idxA === 0) topWinA++;
+ if (idxB === 0) topWinB++;
+ if (idxA === pCount - 1 && pCount > 1) lastPlaceA++;
+ if (idxB === pCount - 1 && pCount > 1) lastPlaceB++;
+
+ let winnerSide = "";
+ if (idxA < idxB) {
+ winA++;
+ curStreakA++;
+ curStreakB = 0;
+ if (curStreakA > maxStreakA) maxStreakA = curStreakA;
+ winnerSide = "A";
+ } else if (idxB < idxA) {
+ winB++;
+ curStreakB++;
+ curStreakA = 0;
+ if (curStreakB > maxStreakB) maxStreakB = curStreakB;
+ winnerSide = "B";
+ }
+
+ const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr);
+ const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
+ matchHistory.push({
+ dateStr: g.dateStr,
+ gameNumber: gameNumber,
+ rankA: idxA + 1,
+ rankB: idxB + 1,
+ pCount: pCount,
+ winnerSide: winnerSide
+ });
+ });
+
+ if (matchCount === 0) {
+ area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">해당 조건에서 두 선수의 맞대결 기록이 없습니다.</div>`;
+ area.style.display = 'block';
+ if (shareBtn) shareBtn.style.display = 'none';
+ return;
+ }
+
+ const pctA = Math.round((winA / matchCount) * 100);
+ const pctB = 100 - pctA;
+ const avgRankA = (rankSumA / matchCount).toFixed(2);
+ const avgRankB = (rankSumB / matchCount).toFixed(2);
+ const avgScoreA = (scoreSumA / matchCount).toFixed(2);
+ const avgScoreB = (scoreSumB / matchCount).toFixed(2);
+
+ const colorA = getPlayerColor(playerA);
+ const colorB = getPlayerColor(playerB);
+ const emojiA = playerThemes[playerA] ? playerThemes[playerA].emoji : "🎱";
+ const emojiB = playerThemes[playerB] ? playerThemes[playerB].emoji : "🎱";
+
+ let verdictText = "⚖️ 팽팽한 호각세! 한 치 양보 없는 라이벌전";
+ if (winA > winB) {
+ const diff = winA - winB;
+ verdictText = diff >= 3
+ ? `🔥 ${playerA} 선수가 상대 전적에서 압도적 우위 (+${diff}승)`
+ : `👑 ${playerA} 선수가 근소하게 우세 (+${diff}승 리드)`;
+ } else if (winB > winA) {
+ const diff = winB - winA;
+ verdictText = diff >= 3
+ ? `🔥 ${playerB} 선수가 상대 전적에서 압도적 우위 (+${diff}승)`
+ : `👑 ${playerB} 선수가 근소하게 우세 (+${diff}승 리드)`;
+ }
+
+ const recent5 = matchHistory.slice(-5).reverse();
+ let recentHtml = recent5.map(m => {
+ const labelA = m.rankA === 1 ? "1위🥇" : (m.rankA === m.pCount ? "꼴찌💀" : `${m.rankA}위`);
+ const labelB = m.rankB === 1 ? "1위🥇" : (m.rankB === m.pCount ? "꼴찌💀" : `${m.rankB}위`);
+ const badgeWinner = m.winnerSide === "A"
+ ? `<span style="color:var(--rank1); font-weight:900;">${playerA} 승</span>`
+ : `<span style="color:var(--rankL); font-weight:900;">${playerB} 승</span>`;
+ return `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.55); padding:8px 10px; border-radius:8px; margin-bottom:6px; font-size:12px; font-weight:800;">
+ <span style="color:var(--sub-text);">${m.dateStr.slice(5)} (${m.gameNumber}G)</span>
+ <span style="color:var(--text-color);">${playerA}(${labelA}) vs ${playerB}(${labelB})</span>
+ ${badgeWinner}
+ </div>`;
+ }).join('');
+
+ area.innerHTML = `
+ <div style="background:var(--bg); border:1.5px solid rgba(0,0,0,0.06); border-radius:14px; padding:15px 12px;">
+ <div style="text-align:center; font-size:12.5px; font-weight:900; color:var(--text-color); margin-bottom:12px;">
+ 총 <span style="color:var(--accent);">${matchCount}전</span> 맞대결 · ${verdictText}
+ </div>
+
+ <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+ <div style="text-align:left;">
+ <div style="font-size:16px; font-weight:900; color:${colorA};">${emojiA} ${playerA}</div>
+ <div style="font-size:18px; font-weight:900; color:var(--rank1);">${winA}승 <span style="font-size:12px;">(${pctA}%)</span></div>
+ </div>
+ <div style="text-align:right;">
+ <div style="font-size:16px; font-weight:900; color:${colorB};">${emojiB} ${playerB}</div>
+ <div style="font-size:18px; font-weight:900; color:var(--rankL);">${winB}승 <span style="font-size:12px;">(${pctB}%)</span></div>
+ </div>
+ </div>
+
+ <div class="rival-gauge-wrap">
+ <div class="rival-gauge-a" style="width:${pctA}%;"></div>
+ <div class="rival-gauge-b" style="width:${pctB}%;"></div>
+ </div>
+
+ <div style="display:flex; flex-direction:column; gap:6px; margin-top:12px; font-size:12.5px; font-weight:800;">
+ <div style="display:flex; justify-content:space-between; background:rgba(255,255,255,0.55); padding:8px 12px; border-radius:8px;">
+ <span style="color:${colorA}; font-weight:900;">${avgRankA}위</span>
+ <span style="color:var(--sub-text);">맞대결 평균 순위</span>
+ <span style="color:${colorB}; font-weight:900;">${avgRankB}위</span>
+ </div>
+ <div style="display:flex; justify-content:space-between; background:rgba(255,255,255,0.55); padding:8px 12px; border-radius:8px;">
+ <span style="color:${colorA}; font-weight:900;">${avgScoreA}점</span>
+ <span style="color:var(--sub-text);">맞대결 평균 승점</span>
+ <span style="color:${colorB}; font-weight:900;">${avgScoreB}점</span>
+ </div>
+ <div style="display:flex; justify-content:space-between; background:rgba(255,255,255,0.55); padding:8px 12px; border-radius:8px;">
+ <span style="color:var(--rank1); font-weight:900;">${topWinA}회 / ${lastPlaceA}회</span>
+ <span style="color:var(--sub-text);">동반 게임 1위 / 꼴찌</span>
+ <span style="color:var(--rankL); font-weight:900;">${topWinB}회 / ${lastPlaceB}회</span>
+ </div>
+ <div style="display:flex; justify-content:space-between; background:rgba(255,255,255,0.55); padding:8px 12px; border-radius:8px;">
+ <span style="color:${colorA}; font-weight:900;">${maxStreakA}연승</span>
+ <span style="color:var(--sub-text);">맞대결 최다 연승</span>
+ <span style="color:${colorB}; font-weight:900;">${maxStreakB}연승</span>
+ </div>
+ </div>
+
+ <div style="margin-top:14px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:10px;">
+ <div style="font-size:11.5px; font-weight:900; color:var(--sub-text); margin-bottom:8px; text-align:center;">최근 맞대결 기록 (최대 5G)</div>
+ ${recentHtml}
+ </div>
+ </div>
+ `;
+
+ area.style.display = 'block';
+ if (shareBtn) shareBtn.style.display = 'block';
+ setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+}
+
+// [V9.96 신규] 1:1 라이벌 정밀 비교 스크린샷 공유 버튼 연동
+function shareRivalResult() {
+ const pA = document.getElementById('rivalPlayerA')?.value || "선수A";
+ const pB = document.getElementById('rivalPlayerB')?.value || "선수B";
+ captureAndShare('rival-capture-area', 'rival-share-btn', `rival_${pA}_vs_${pB}.png`, '1:1 라이벌 정밀 비교', `${pA} vs ${pB} 헤드투헤드 매치업 분석 결과입니다!`);
 }
