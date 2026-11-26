@@ -2172,7 +2172,9 @@ function analyzeOrderStats() {
                     </div>
                  </div>`;
     });
-    area.innerHTML = html; area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'block';
+    area.innerHTML = html; area.style.display = 'block';
+ if (resetBtn) resetBtn.style.display = 'block';
+ if (shareBtn) shareBtn.style.display = 'block';
     setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 }
 
@@ -3735,6 +3737,7 @@ function analyzeRivalMatchup() {
  const selA = document.getElementById('rivalPlayerA');
  const selB = document.getElementById('rivalPlayerB');
  const area = document.getElementById('rivalResultArea');
+ const resetBtn = document.getElementById('rival-reset-btn');
  const shareBtn = document.getElementById('rival-share-btn');
  if (!selA || !selB || !area) return;
 
@@ -3752,6 +3755,7 @@ function analyzeRivalMatchup() {
 
  if (!playerA || !playerB) {
  area.style.display = 'none';
+ if (resetBtn) resetBtn.style.display = 'none';
  if (shareBtn) shareBtn.style.display = 'none';
  return;
  }
@@ -3759,6 +3763,7 @@ function analyzeRivalMatchup() {
  if (playerA === playerB) {
  area.innerHTML = `<div style="text-align:center; padding:18px; color:var(--accent); font-weight:900; font-size:13.5px;">⚠️ 서로 다른 두 선수를 선택해 주세요!</div>`;
  area.style.display = 'block';
+ if (resetBtn) resetBtn.style.display = 'none';
  if (shareBtn) shareBtn.style.display = 'none';
  return;
  }
@@ -3816,7 +3821,7 @@ function analyzeRivalMatchup() {
  winnerSide = "B";
  }
 
- const sameDateGames = gameLogs.filter(x => x.dateStr === g.dateStr);
+ const sameDateGames = sortedGames.filter(x => x.dateStr === g.dateStr);
  const gameNumber = sameDateGames.findIndex(x => x.round === g.round) + 1;
  matchHistory.push({
  dateStr: g.dateStr,
@@ -3831,6 +3836,7 @@ function analyzeRivalMatchup() {
  if (matchCount === 0) {
  area.innerHTML = `<div style="text-align:center; padding:20px; color:var(--sub-text); font-weight:800;">해당 조건에서 두 선수의 맞대결 기록이 없습니다.</div>`;
  area.style.display = 'block';
+ if (resetBtn) resetBtn.style.display = 'none';
  if (shareBtn) shareBtn.style.display = 'none';
  return;
  }
@@ -3936,4 +3942,21 @@ function shareRivalResult() {
  const pA = document.getElementById('rivalPlayerA')?.value || "선수A";
  const pB = document.getElementById('rivalPlayerB')?.value || "선수B";
  captureAndShare('rival-capture-area', 'rival-share-btn', `rival_${pA}_vs_${pB}.png`, '1:1 라이벌 정밀 비교', `${pA} vs ${pB} 헤드투헤드 매치업 분석 결과입니다!`);
+}
+// [V9.96] 1:1 라이벌 정밀 비교 선택 및 결과 초기화 독립 함수
+function resetRivalMatchup() {
+ triggerHaptic(10);
+ const selA = document.getElementById('rivalPlayerA');
+ const selB = document.getElementById('rivalPlayerB');
+ const area = document.getElementById('rivalResultArea');
+ const resetBtn = document.getElementById('rival-reset-btn');
+ const shareBtn = document.getElementById('rival-share-btn');
+ if (selA) selA.value = '';
+ if (selB) selB.value = '';
+ if (area) {
+ area.innerHTML = '';
+ area.style.display = 'none';
+ }
+ if (resetBtn) resetBtn.style.display = 'none';
+ if (shareBtn) shareBtn.style.display = 'none';
 }
