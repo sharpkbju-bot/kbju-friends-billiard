@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Billiard World Style v9.95 - Live Pulse Edition */
+/* Billiard World Style v9.96 - Live Pulse Edition */
 /* [절대 원칙 준수]: 최적화 전면 금지, 모든 클래스와 테마를 개별적으로 분리 전개함 */
 
 :root { 
@@ -1760,4 +1760,114 @@ span.flatpickr-weekday { font-weight: 900 !important; color: #95a5a6 !important;
 /* 확대 모드(1.2배) 역보정 */
 .zoom-active .draw-mode-wrap {
  zoom: 0.85;
+}
+/* ============================================================
+ [V9.96 신규] 1:1 라이벌 정밀 비교 카드 (#rivalCard) 스타일 (개별 분리 전개)
+ ============================================================ */
+#rivalCard {
+ border-radius: 20px;
+ background: linear-gradient(155deg, rgba(255, 255, 255, 0.72), var(--card-bg));
+ backdrop-filter: blur(14px);
+ box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12), inset 0 1.5px 2px rgba(255, 255, 255, 0.85);
+}
+
+#rivalCard h2 {
+ padding-bottom: 10px;
+ border-bottom: 2px dashed rgba(0, 0, 0, 0.08);
+}
+
+.rival-select-grid {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 8px;
+ width: 100%;
+}
+
+.rival-select-box {
+ flex: 1 1 0;
+ min-width: 0;
+ display: flex;
+ flex-direction: column;
+ gap: 6px;
+ background: rgba(255, 255, 255, 0.55);
+ padding: 10px 8px;
+ border-radius: 12px;
+ border: 1px solid rgba(255, 255, 255, 0.8);
+ box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+}
+
+.rival-select-box label {
+ font-size: 11.5px;
+ font-weight: 900;
+ color: var(--sub-text);
+ text-align: center;
+ white-space: nowrap;
+}
+
+.rival-select-box select {
+ width: 100% !important;
+ flex: none !important;
+ padding: 10px 6px !important;
+ font-size: 14px !important;
+ font-weight: 900 !important;
+}
+
+.rival-vs-badge {
+ flex-shrink: 0;
+ width: 34px;
+ height: 34px;
+ border-radius: 50%;
+ background: linear-gradient(145deg, #ff4757, #ff6b81);
+ color: #ffffff;
+ font-size: 12px;
+ font-weight: 900;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ box-shadow: 0 4px 10px rgba(255, 71, 87, 0.35);
+}
+
+.rival-gauge-wrap {
+ width: 100%;
+ height: 14px;
+ border-radius: 8px;
+ background: rgba(0, 0, 0, 0.08);
+ overflow: hidden;
+ display: flex;
+ margin: 10px 0;
+ box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.rival-gauge-a {
+ height: 100%;
+ background: linear-gradient(90deg, #2196f3, #00bcd4);
+ transition: width 0.5s ease;
+}
+
+.rival-gauge-b {
+ height: 100%;
+ background: linear-gradient(90deg, #ff7675, #ff4757);
+ transition: width 0.5s ease;
+}
+
+/* 네이비(navy) 테마 개별 대응 */
+[data-theme='navy'] #rivalCard {
+ background: linear-gradient(155deg, rgba(24, 44, 82, 0.95), rgba(12, 24, 48, 0.96));
+ box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55), inset 0 1px 1.5px rgba(255, 255, 255, 0.12);
+}
+[data-theme='navy'] #rivalCard h2 { color: #ffffff !important; border-bottom-color: rgba(255, 255, 255, 0.12); }
+[data-theme='navy'] .rival-select-box { background: rgba(0, 0, 0, 0.28); border-color: rgba(255, 255, 255, 0.08); }
+
+/* 다크(dark) 테마 개별 대응 */
+[data-theme='dark'] #rivalCard {
+ background: linear-gradient(155deg, rgba(45, 45, 50, 0.95), rgba(25, 25, 28, 0.96));
+ box-shadow: 0 14px 30px rgba(0, 0, 0, 0.65), inset 0 1px 1.5px rgba(255, 255, 255, 0.1);
+}
+[data-theme='dark'] #rivalCard h2 { color: #ffffff !important; border-bottom-color: rgba(255, 255, 255, 0.12); }
+[data-theme='dark'] .rival-select-box { background: rgba(0, 0, 0, 0.32); border-color: rgba(255, 255, 255, 0.08); }
+
+/* 확대 모드(1.2배) 역보정 (기본 크기 유지) */
+.zoom-active #rivalCard {
+ zoom: 0.833333;
 }
