@@ -2074,7 +2074,7 @@ function analyzeStrategy() {
                     </div>
                  </div>`;
     });
-    area.innerHTML = html; area.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'block';
+    area.innerHTML = html; area.style.display = 'block'; if (resetBtn) resetBtn.style.display = 'block'; if (shareBtn) shareBtn.style.display = 'block';
     setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 }
 
