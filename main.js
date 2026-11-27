@@ -3854,12 +3854,12 @@ function analyzeRivalMatchup() {
  let verdictText = "⚖️ 팽팽한 호각세! 한 치 양보 없는 라이벌전";
  if (winA > winB) {
  const diff = winA - winB;
- verdictText = diff >= 3
+ verdictText = diff >= 10
  ? `🔥 ${playerA} 선수가 상대 전적에서 압도적 우위 (+${diff}승)`
  : `👑 ${playerA} 선수가 근소하게 우세 (+${diff}승 리드)`;
  } else if (winB > winA) {
  const diff = winB - winA;
- verdictText = diff >= 3
+ verdictText = diff >= 10
  ? `🔥 ${playerB} 선수가 상대 전적에서 압도적 우위 (+${diff}승)`
  : `👑 ${playerB} 선수가 근소하게 우세 (+${diff}승 리드)`;
  }
